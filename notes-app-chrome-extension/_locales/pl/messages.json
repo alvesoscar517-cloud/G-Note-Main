@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "G-Note: Prosta i Nowoczesna Aplikacja do Notatek",
+    "description": "Nazwa rozszerzenia do optymalizacji wyszukiwania w Chrome Web Store"
+  },
+  "extDescription": {
+    "message": "Prosta i nowoczesna aplikacja do notatek. Synchronizacja z Google Drive.",
+    "description": "Opis rozszerzenia"
+  }
+}

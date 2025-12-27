@@ -1,0 +1,144 @@
+import { useState, memo } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Globe, Check, Search } from 'lucide-react'
+import { CircleFlag } from '@/components/ui/CircleFlag'
+import { languages } from '@/locales'
+import { cn } from '@/lib/utils'
+
+// Map language codes to country codes for flags
+const langToCountry: Record<string, string> = {
+  'en': 'us',
+  'vi': 'vn',
+  'ja': 'jp',
+  'ko': 'kr',
+  'zh-CN': 'cn',
+  'zh-TW': 'tw',
+  'de': 'de',
+  'fr': 'fr',
+  'es': 'es',
+  'pt-BR': 'br',
+  'it': 'it',
+  'nl': 'nl',
+  'ar': 'sa',
+  'hi': 'in',
+  'tr': 'tr',
+  'pl': 'pl',
+  'th': 'th',
+  'id': 'id',
+}
+
+// Memoized flag component to prevent re-renders
+const MemoizedFlag = memo(function MemoizedFlag({ 
+  countryCode, 
+  size = 24 
+}: { 
+  countryCode: string
+  size?: number 
+}) {
+  return (
+    <CircleFlag 
+      countryCode={countryCode} 
+      size={size}
+    />
+  )
+})
+
+interface LanguageSelectorProps {
+  onClose?: () => void
+}
+
+export function LanguageSelector({ onClose }: LanguageSelectorProps) {
+  const { i18n, t } = useTranslation()
+  const [search, setSearch] = useState('')
+  
+  const filteredLanguages = languages.filter(lang =>
+    lang.name.toLowerCase().includes(search.toLowerCase()) ||
+    lang.nativeName.toLowerCase().includes(search.toLowerCase()) ||
+    lang.code.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const handleSelect = (code: string) => {
+    i18n.changeLanguage(code)
+    // Update document direction for RTL languages
+    const lang = languages.find(l => l.code === code)
+    document.documentElement.dir = lang?.rtl ? 'rtl' : 'ltr'
+    onClose?.()
+  }
+
+  return (
+    <div className="w-full">
+      {/* Search */}
+      <div className="p-2">
+        <div className="flex items-center gap-2 px-3 py-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
+          <Search className="w-4 h-4 text-neutral-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t('common.searchLanguage')}
+            className="flex-1 bg-transparent border-0 outline-none text-sm text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-400"
+            autoFocus
+          />
+        </div>
+      </div>
+      
+      {/* Language list */}
+      <div className="max-h-[400px] overflow-y-auto p-1">
+        {filteredLanguages.map((lang) => (
+          <button
+            key={lang.code}
+            onClick={() => handleSelect(lang.code)}
+            className={cn(
+              "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-left transition-colors",
+              "hover:bg-neutral-100 dark:hover:bg-neutral-800",
+              i18n.language === lang.code && "bg-neutral-100 dark:bg-neutral-800"
+            )}
+          >
+            <div className="flex items-center gap-3">
+              <MemoizedFlag countryCode={langToCountry[lang.code] || 'us'} />
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-neutral-900 dark:text-white">
+                  {lang.nativeName}
+                </span>
+                <span className="text-xs text-neutral-500">
+                  {lang.name}
+                </span>
+              </div>
+            </div>
+            {i18n.language === lang.code && (
+              <Check className="w-4 h-4 text-neutral-900 dark:text-white" />
+            )}
+          </button>
+        ))}
+        {filteredLanguages.length === 0 && (
+          <div className="px-3 py-4 text-sm text-neutral-400 text-center">
+            {t('common.noLanguageFound')}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export function LanguageButton({ onClick }: { onClick: () => void }) {
+  const { i18n } = useTranslation()
+  const currentLang = languages.find(l => l.code === i18n.language) || languages[0]
+  
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2.5 sm:py-3 rounded-xl text-left text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+    >
+      <div className="p-1.5 sm:p-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+        <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm sm:text-base font-medium">{currentLang.nativeName}</p>
+        <p className="text-[11px] sm:text-xs mt-0.5 text-neutral-500 dark:text-neutral-500 hidden sm:block">
+          {currentLang.name}
+        </p>
+      </div>
+      <MemoizedFlag countryCode={langToCountry[currentLang.code] || 'us'} />
+    </button>
+  )
+}

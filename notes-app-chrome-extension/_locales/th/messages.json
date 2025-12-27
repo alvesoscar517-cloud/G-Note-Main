@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "G-Note: แอปจดบันทึกที่เรียบง่ายและทันสมัย",
+    "description": "ชื่อส่วนขยายสำหรับการเพิ่มประสิทธิภาพการค้นหาใน Chrome Web Store"
+  },
+  "extDescription": {
+    "message": "แอปจดบันทึกที่เรียบง่ายและทันสมัย ซิงค์กับ Google Drive",
+    "description": "คำอธิบายส่วนขยาย"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "G-Note: 簡潔現代的筆記應用",
+    "description": "擴充功能名稱用於Chrome線上應用程式商店搜尋優化"
+  },
+  "extDescription": {
+    "message": "簡潔現代的筆記應用。與Google Drive同步。",
+    "description": "擴充功能描述"
+  }
+}

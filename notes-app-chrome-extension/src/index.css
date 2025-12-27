@@ -1,0 +1,850 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  color-scheme: light;
+  
+  /* Safe area insets for notch/dynamic island devices */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Text Selection Colors - Monochrome/Gray Theme */
+/* Light mode: Subtle gray with good contrast */
+::selection {
+  background-color: #E2E2E2;
+  color: #171717;
+}
+
+::-moz-selection {
+  background-color: #E2E2E2;
+  color: #171717;
+}
+
+/* Dark mode: Darker gray, maintains readability */
+.dark ::selection {
+  background-color: #3F3F3F;
+  color: #F5F5F5;
+}
+
+.dark ::-moz-selection {
+  background-color: #3F3F3F;
+  color: #F5F5F5;
+}
+
+/* Safe area padding utilities */
+.safe-top {
+  padding-top: max(0.75rem, var(--safe-area-top));
+}
+
+.safe-bottom {
+  padding-bottom: max(0.75rem, var(--safe-area-bottom));
+}
+
+.safe-left {
+  padding-left: max(0.75rem, var(--safe-area-left));
+}
+
+.safe-right {
+  padding-right: max(0.75rem, var(--safe-area-right));
+}
+
+.safe-x {
+  padding-left: max(0.75rem, var(--safe-area-left));
+  padding-right: max(0.75rem, var(--safe-area-right));
+}
+
+.safe-y {
+  padding-top: max(0.75rem, var(--safe-area-top));
+  padding-bottom: max(0.75rem, var(--safe-area-bottom));
+}
+
+.safe-all {
+  padding-top: max(0.75rem, var(--safe-area-top));
+  padding-bottom: max(0.75rem, var(--safe-area-bottom));
+  padding-left: max(0.75rem, var(--safe-area-left));
+  padding-right: max(0.75rem, var(--safe-area-right));
+}
+
+/* Disable text selection globally except for specific elements */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Allow text selection in editors, inputs, and AI content */
+.tiptap,
+.tiptap *,
+input,
+textarea,
+[contenteditable="true"],
+[contenteditable="true"] *,
+.selectable,
+.selectable *,
+pre,
+pre *,
+code,
+code * {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Remove focus outline/ring globally */
+*:focus {
+  outline: none !important;
+}
+
+*:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  ring: none !important;
+}
+
+input:focus,
+textarea:focus,
+button:focus,
+select:focus,
+[contenteditable]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tiptap Editor Styles */
+.tiptap {
+  outline: none;
+  min-height: 200px;
+  font-size: 1rem;
+  line-height: 1.625;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: #9ca3af;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.tiptap p {
+  margin: 0.5em 0;
+}
+
+.tiptap h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0.5em 0;
+}
+
+.tiptap h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.5em 0;
+}
+
+.tiptap ul, .tiptap ol {
+  padding-left: 1.5rem;
+  margin: 0.5em 0;
+}
+
+.tiptap ul {
+  list-style-type: disc;
+}
+
+.tiptap ol {
+  list-style-type: decimal;
+}
+
+.tiptap strong {
+  font-weight: 600;
+}
+
+.tiptap em {
+  font-style: italic;
+}
+
+.tiptap s {
+  text-decoration: line-through;
+}
+
+.tiptap a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* Task List */
+.tiptap ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.5em 0;
+}
+
+.tiptap ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.tiptap ul[data-type="taskList"] li > label {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.15rem;
+  user-select: none;
+}
+
+.tiptap ul[data-type="taskList"] li > label input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  cursor: pointer;
+  accent-color: #171717;
+}
+
+.tiptap ul[data-type="taskList"] li > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.tiptap ul[data-type="taskList"] li > div p {
+  margin: 0;
+}
+
+.tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
+  text-decoration: line-through;
+  color: #9ca3af;
+}
+
+/* Code block */
+.tiptap pre {
+  background: #1a1a1a;
+  color: #e0e0e0;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin: 0.75em 0;
+}
+
+.dark .tiptap pre {
+  background: #1a1a1a;
+}
+
+/* Syntax highlighting - Gemini style */
+.tiptap pre code.hljs,
+.tiptap pre code {
+  background: transparent !important;
+  padding: 0;
+  display: block;
+}
+
+.tiptap pre .hljs {
+  background: transparent !important;
+}
+
+/* Comments - gray */
+.tiptap .hljs-comment,
+.tiptap .hljs-quote {
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Keywords - purple/magenta */
+.tiptap .hljs-keyword,
+.tiptap .hljs-selector-tag,
+.tiptap .hljs-built_in,
+.tiptap .hljs-name,
+.tiptap .hljs-tag {
+  color: #c792ea;
+}
+
+/* Strings - orange */
+.tiptap .hljs-string,
+.tiptap .hljs-attr,
+.tiptap .hljs-selector-id,
+.tiptap .hljs-selector-class,
+.tiptap .hljs-regexp,
+.tiptap .hljs-template-variable,
+.tiptap .hljs-addition {
+  color: #f9a875;
+}
+
+/* Functions - yellow */
+.tiptap .hljs-title,
+.tiptap .hljs-section,
+.tiptap .hljs-title.function_ {
+  color: #ffcb6b;
+}
+
+/* Numbers - green */
+.tiptap .hljs-number,
+.tiptap .hljs-literal,
+.tiptap .hljs-variable,
+.tiptap .hljs-template-tag,
+.tiptap .hljs-deletion {
+  color: #c3e88d;
+}
+
+/* Types - cyan */
+.tiptap .hljs-type,
+.tiptap .hljs-class .hljs-title,
+.tiptap .hljs-attribute {
+  color: #89ddff;
+}
+
+/* Operators, punctuation */
+.tiptap .hljs-symbol,
+.tiptap .hljs-bullet,
+.tiptap .hljs-subst,
+.tiptap .hljs-meta,
+.tiptap .hljs-link {
+  color: #89ddff;
+}
+
+/* Inline code - Gemini style: neutral, subtle */
+.tiptap code {
+  background: #e5e7eb;
+  color: #374151;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.dark .tiptap code {
+  background: #374151;
+  color: #e5e7eb;
+}
+
+.tiptap pre code {
+  background: transparent !important;
+  color: inherit;
+  padding: 0;
+  font-weight: normal;
+  border-radius: 0;
+}
+
+/* Blockquote */
+.tiptap blockquote {
+  border-left: 3px solid #d1d5db;
+  padding-left: 1rem;
+  margin: 0.5em 0;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.dark .tiptap blockquote {
+  border-left-color: #4b5563;
+  color: #9ca3af;
+}
+
+/* Horizontal rule */
+.tiptap hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 1rem 0;
+}
+
+.dark .tiptap hr {
+  border-top-color: #374151;
+}
+
+/* Images */
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0.5em 0;
+  cursor: pointer;
+}
+
+.tiptap img:hover {
+  opacity: 0.95;
+}
+
+.tiptap img.ProseMirror-selectednode {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Collaboration Cursor Styles */
+.collaboration-cursor__caret {
+  border-left: 1px solid;
+  border-right: 1px solid;
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+  position: relative;
+  word-break: normal;
+}
+
+.collaboration-cursor__label {
+  border-radius: 3px 3px 3px 0;
+  color: #fff;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  left: -1px;
+  line-height: normal;
+  padding: 0.1rem 0.3rem;
+  position: absolute;
+  top: -1.4em;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Y.js remote selection highlight */
+.yRemoteSelection {
+  background-color: var(--user-color, rgba(59, 130, 246, 0.3));
+}
+
+.yRemoteSelectionHead {
+  position: absolute;
+  border-left: 2px solid var(--user-color, #3b82f6);
+  border-top: 2px solid var(--user-color, #3b82f6);
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.yRemoteSelectionHead::after {
+  position: absolute;
+  content: attr(data-user);
+  background-color: var(--user-color, #3b82f6);
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 1px 4px;
+  border-radius: 3px;
+  top: -18px;
+  left: -2px;
+  white-space: nowrap;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn95 {
+  from { 
+    opacity: 0;
+    transform: scale(0.95) translateZ(0);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(8px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-4px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateZ(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(4px) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateZ(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateZ(0); }
+  100% { transform: translateX(100%) translateZ(0); }
+}
+
+/* Facebook-style shimmer for skeleton loading */
+@keyframes shimmerLine {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-line {
+  background: linear-gradient(
+    90deg,
+    #e5e7eb 0%,
+    #f3f4f6 50%,
+    #e5e7eb 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerLine 1.5s ease-in-out infinite;
+}
+
+.dark .shimmer-line {
+  background: linear-gradient(
+    90deg,
+    #374151 0%,
+    #4b5563 50%,
+    #374151 100%
+  );
+  background-size: 200% 100%;
+}
+
+.animate-in {
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+.zoom-in-95 {
+  animation-name: zoomIn95;
+}
+
+.slide-in-from-bottom-2,
+[data-side="bottom"].slide-in-from-top-2 {
+  animation-name: slideInFromTop;
+}
+
+[data-side="top"].slide-in-from-bottom-2 {
+  animation-name: slideInFromBottom;
+}
+
+[data-side="left"].slide-in-from-right-2 {
+  animation-name: slideInFromRight;
+}
+
+[data-side="right"].slide-in-from-left-2 {
+  animation-name: slideInFromLeft;
+}
+
+.duration-200 {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Tooltip animations */
+.fade-in-0 {
+  animation: fadeIn 150ms cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: opacity;
+}
+
+.zoom-in-95 {
+  animation: zoomIn95 150ms cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform, opacity;
+}
+
+[data-state="closed"].fade-out-0 {
+  animation: fadeIn 100ms cubic-bezier(0.32, 0.72, 0, 1) reverse;
+}
+
+[data-state="closed"].zoom-out-95 {
+  animation: zoomIn95 100ms cubic-bezier(0.32, 0.72, 0, 1) reverse;
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite;
+}
+
+/* Collaboration Cursors */
+.collaboration-cursor__caret {
+  border-left: 1px solid;
+  border-right: 1px solid;
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+  position: relative;
+  word-break: normal;
+}
+
+.collaboration-cursor__label {
+  border-radius: 6px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  left: -1px;
+  line-height: 1;
+  padding: 2px 6px;
+  position: absolute;
+  top: -1.4em;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Scrollbar - Only show on desktop (large screens with hover devices) */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: #4b5563;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
+}
+
+/* Hide scrollbar on mobile/tablet (small screens or touch devices) */
+@media (max-width: 1023px), (hover: none), (pointer: coarse) {
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Hide scrollbar */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Touch optimization - ONLY for true mobile/tablet devices (not touch laptops) */
+/* pointer: coarse = finger/stylus, hover: none = no mouse hover capability */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable hover effects on true touch devices */
+  .hover\:bg-neutral-100:hover,
+  .hover\:bg-neutral-200:hover {
+    background-color: inherit;
+  }
+  
+  .dark .dark\:hover\:bg-neutral-700:hover,
+  .dark .dark\:hover\:bg-neutral-800:hover {
+    background-color: inherit;
+  }
+}
+
+/* Prevent text selection on interactive elements */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth momentum scrolling on iOS */
+.overflow-y-auto,
+.overflow-x-auto,
+.overflow-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Landscape mode utilities for mobile */
+@media (orientation: landscape) and (max-height: 500px) {
+  .landscape\:flex {
+    display: flex !important;
+  }
+  .landscape\:items-center {
+    align-items: center !important;
+  }
+  .landscape\:gap-3 {
+    gap: 0.75rem !important;
+  }
+  .landscape\:text-left {
+    text-align: left !important;
+  }
+  .landscape\:pt-3 {
+    padding-top: 0.75rem !important;
+  }
+  .landscape\:pb-2 {
+    padding-bottom: 0.5rem !important;
+  }
+  .landscape\:mx-0 {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  .landscape\:mt-0 {
+    margin-top: 0 !important;
+  }
+  .landscape\:w-10 {
+    width: 2.5rem !important;
+  }
+  .landscape\:h-10 {
+    height: 2.5rem !important;
+  }
+  .landscape\:flex-1 {
+    flex: 1 1 0% !important;
+  }
+  .landscape\:min-w-0 {
+    min-width: 0 !important;
+  }
+  .landscape\:py-1 {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+  }
+  .landscape\:max-h-screen {
+    max-height: 100vh !important;
+  }
+}
+
+
+/* Prevent browser back/forward gesture on modal content */
+.overscroll-none {
+  overscroll-behavior: none;
+}
+
+/* Swipe indicator animation */
+@keyframes pulseSwipe {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.swipe-indicator {
+  animation: pulseSwipe 2s ease-in-out infinite;
+}
+
+/* Disable pull-to-refresh on mobile when modal is open */
+body.modal-open {
+  overscroll-behavior-y: contain;
+}
+
+/* GPU acceleration for modals and animated elements */
+.modal-content,
+.animate-in,
+[class*="zoom-in"],
+[class*="fade-in"],
+[class*="slide-in"] {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+/* Optimized transitions for interactive elements */
+.transition-colors {
+  transition-property: background-color, border-color, color;
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  transition-duration: 150ms;
+}
+
+.transition-transform {
+  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+}
+
+/* Safe area support for curved edge devices (iPhone, modern Android) */
+@supports (padding: max(0px)) {
+  .modal-safe-area {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    border-radius: max(16px, calc(env(safe-area-inset-left) + 8px));
+  }
+  
+  /* Ensure content doesn't get cut off on curved corners */
+  .rounded-2xl {
+    border-radius: max(16px, calc(env(safe-area-inset-left) / 2 + 12px));
+  }
+  
+  /* Modal container adjustments for curved screens */
+  .fixed.inset-0 {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Curved screen corner protection */
+@media screen and (display-mode: standalone) {
+  .modal-content,
+  .rounded-2xl {
+    /* Extra padding for PWA mode on curved devices */
+    margin: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-in,
+  .fade-in,
+  .zoom-in-95,
+  [class*="slide-in"] {
+    animation: none !important;
+    transition: none !important;
+  }
+}

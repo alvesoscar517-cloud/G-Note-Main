@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "G-Note: Basit ve Modern Not Uygulaması",
+    "description": "Chrome Web Mağazası arama optimizasyonu için uzantı adı"
+  },
+  "extDescription": {
+    "message": "Basit ve modern not uygulaması. Google Drive ile senkronize edin.",
+    "description": "Uzantı açıklaması"
+  }
+}

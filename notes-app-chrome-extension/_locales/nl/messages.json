@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "G-Note: Eenvoudige & Moderne Notitie-App",
+    "description": "Extensienaam voor Chrome Web Store zoekoptimalisatie"
+  },
+  "extDescription": {
+    "message": "Eenvoudige en moderne notitie-app. Synchroniseer met Google Drive.",
+    "description": "Extensiebeschrijving"
+  }
+}

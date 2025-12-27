@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "version": "1.0.0",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    },
+    "default_title": "__MSG_extName__"
+  },
+  "permissions": [
+    "storage",
+    "identity",
+    "tabs",
+    "contextMenus",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.googleapis.com/*",
+    "https://notes-285680531861.us-central1.run.app/*",
+    "<all_urls>"
+  ],
+  "oauth2": {
+    "client_id": "472729326429-tuv9pq6mql0q6kl1o2ed16o05t3b1dks.apps.googleusercontent.com",
+    "scopes": [
+      "email",
+      "profile",
+      "https://www.googleapis.com/auth/drive.file"
+    ]
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/contentScript.ts"],
+      "run_at": "document_idle"
+    }
+  ]
+}
