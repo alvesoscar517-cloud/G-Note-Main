@@ -2,7 +2,6 @@ import { useGoogleLogin } from '@react-oauth/google'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
-import { useThemeStore } from '@/stores/themeStore'
 import { VantaWaves } from '@/components/ui/VantaWaves'
 import { hasAuthBackend, getGoogleAuthUrl } from '@/lib/tokenRefresh'
 import { useNetworkStore } from '@/stores/networkStore'
@@ -12,10 +11,7 @@ import { DownloadAppPill } from '@/components/layout/DownloadAppPill'
 export function LoginScreen() {
   const { t } = useTranslation()
   const { setUser, setLoading, setLoginTransition } = useAuthStore()
-  const { theme } = useThemeStore()
   const { isOnline } = useNetworkStore()
-  
-  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
   // Implicit flow (fallback when no backend)
   const implicitLogin = useGoogleLogin({
@@ -66,24 +62,24 @@ export function LoginScreen() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen min-h-dvh flex flex-col items-center justify-center px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] relative overflow-hidden">
       {/* Vanta Clouds Background */}
       <VantaWaves />
       {/* Card Container - Apple-style glassmorphism */}
       <div className="relative z-10 w-full max-w-sm bg-white/40 dark:bg-black/40 backdrop-blur-xl rounded-[24px] p-8 shadow-2xl border border-white/50 dark:border-white/10">
         <div className="space-y-5 text-center">
-          {/* Logo - App icon */}
+          {/* Logo - App icon: white background with black logo, iOS standard corners */}
           <div className="flex flex-col items-center gap-3">
-            <div className="w-20 h-20 rounded-[20px] bg-neutral-900/90 dark:bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center p-3">
+            <div className="w-20 h-20 rounded-[18px] bg-white shadow-lg flex items-center justify-center p-[13px]">
               <img 
-                src={isDark ? "/g-note.svg" : "/g-note-dark.svg"}
+                src="/g-note.svg"
                 alt="G-Note" 
                 className="w-full h-full"
               />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">G-Note</h1>
-              <p className="text-neutral-500 dark:text-white/70 mt-1">
+              <p className="text-neutral-600 dark:text-white/70 mt-1">
                 {t('app.tagline')}
               </p>
             </div>
@@ -113,13 +109,13 @@ export function LoginScreen() {
             {t('auth.loginWithGoogle')}
           </button>
 
-          <p className="text-xs text-neutral-400 dark:text-white/50 !mt-3">
+          <p className="text-xs text-neutral-600 dark:text-white/60 !mt-3">
             {t('auth.agreeToTerms.prefix')}{' '}
-            <Link to="/terms" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline">
+            <Link to="/terms" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline">
               {t('auth.agreeToTerms.terms')}
             </Link>{' '}
             {t('auth.agreeToTerms.and')}{' '}
-            <Link to="/privacy" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline">
+            <Link to="/privacy" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline">
               {t('auth.agreeToTerms.privacy')}
             </Link>
           </p>

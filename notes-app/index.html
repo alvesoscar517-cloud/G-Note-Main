@@ -127,9 +127,6 @@
         #splash-screen {
           background-color: #0a0a0a;
         }
-        .splash-icon {
-          background-color: rgba(255, 255, 255, 0.9) !important;
-        }
         .splash-title {
           color: #ffffff !important;
         }
@@ -141,9 +138,6 @@
       /* Override for user-selected theme */
       .dark #splash-screen {
         background-color: #0a0a0a;
-      }
-      .dark .splash-icon {
-        background-color: rgba(255, 255, 255, 0.9) !important;
       }
       .dark .splash-title {
         color: #ffffff !important;
@@ -157,39 +151,9 @@
         pointer-events: none;
       }
       
-      .splash-icon {
-        width: 80px;
-        height: 80px;
-        border-radius: 20px;
-        background-color: rgba(23, 23, 23, 0.9);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 14px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
-      
-      .splash-icon img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      }
-      
-      .splash-title {
-        margin-top: 16px;
-        font-size: 18px;
-        font-weight: 600;
-        color: #171717;
-        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        animation: fadeInUp 0.4s ease-out 0.1s both;
-        letter-spacing: -0.02em;
-      }
-      
       .splash-dots {
         display: flex;
         gap: 6px;
-        margin-top: 16px;
       }
       
       .splash-dot {
@@ -204,35 +168,9 @@
       .splash-dot:nth-child(2) { animation-delay: 0.16s; }
       .splash-dot:nth-child(3) { animation-delay: 0.32s; }
       
-      @keyframes scaleIn {
-        from { opacity: 0; transform: scale(0.8); }
-        to { opacity: 1; transform: scale(1); }
-      }
-      
-      @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      
       @keyframes loadingPulse {
         0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
         40% { transform: scale(1); opacity: 1; }
-      }
-      
-      /* Responsive sizing for different devices */
-      @media (max-width: 380px) {
-        .splash-icon { width: 72px; height: 72px; border-radius: 18px; padding: 12px; }
-        .splash-title { font-size: 16px; }
-      }
-      
-      @media (min-width: 768px) {
-        .splash-icon { width: 72px; height: 72px; border-radius: 18px; padding: 12px; }
-        .splash-title { font-size: 16px; }
-      }
-      
-      @media (min-width: 1024px) {
-        .splash-icon { width: 72px; height: 72px; border-radius: 18px; padding: 12px; }
-        .splash-title { font-size: 16px; }
       }
     </style>
     
@@ -267,34 +205,16 @@
   </head>
   <body>
     <!-- Universal splash screen - works on ALL platforms -->
-    <!-- iOS PWA: Uses apple-touch-startup-image (defined in head) -->
+    <!-- iOS PWA: Uses apple-touch-startup-image (defined in head) with icon -->
     <!-- Android PWA: Uses manifest.json icons + background_color -->
-    <!-- Web browsers: Uses this HTML splash screen -->
+    <!-- Web browsers: Uses this HTML splash screen with dots only -->
     <div id="splash-screen" role="progressbar" aria-label="Loading G-Note">
-      <div class="splash-icon">
-        <img id="splash-icon-img" src="/g-note-dark.svg" alt="G-Note Logo" />
-      </div>
-      <div class="splash-title">G-Note</div>
       <div class="splash-dots" aria-hidden="true">
         <div class="splash-dot"></div>
         <div class="splash-dot"></div>
         <div class="splash-dot"></div>
       </div>
     </div>
-    
-    <script>
-      // Update splash icon based on theme - runs immediately
-      (function() {
-        var isDark = document.documentElement.classList.contains('dark') || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-        var iconImg = document.getElementById('splash-icon-img');
-        if (iconImg) {
-          // Dark mode: white background needs dark icon
-          // Light mode: dark background needs light icon
-          iconImg.src = isDark ? '/g-note.svg' : '/g-note-dark.svg';
-        }
-      })();
-    </script>
     
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

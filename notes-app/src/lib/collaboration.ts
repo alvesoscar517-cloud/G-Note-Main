@@ -1,7 +1,5 @@
 import * as Y from 'yjs'
 import { WebrtcProvider } from 'y-webrtc'
-import { Extension } from '@tiptap/core'
-import { ySyncPlugin, yUndoPlugin, yCursorPlugin } from 'y-prosemirror'
 
 export interface CollaboratorInfo {
   name: string
@@ -18,6 +16,16 @@ export interface CollaborationRoom {
 
 // Store active collaborations
 const activeRooms = new Map<string, CollaborationRoom>()
+
+// Custom signaling server URL - can be configured via environment variable
+// For production, you should host your own signaling server
+// See: https://github.com/yjs/y-webrtc#signaling-server
+const SIGNALING_SERVERS = import.meta.env.VITE_SIGNALING_SERVERS
+  ? import.meta.env.VITE_SIGNALING_SERVERS.split(',').map((s: string) => s.trim())
+  : [
+      // Default public servers - may be unreliable
+      // Consider self-hosting for production use
+    ]
 
 // Generate a shareable room ID
 export function generateRoomId(): string {
@@ -42,13 +50,13 @@ export function joinRoom(roomId: string, userName: string, userColor: string): C
   // Get the XML fragment for ProseMirror content
   const type = doc.getXmlFragment('prosemirror')
   
-  // Connect via WebRTC with public signaling servers
+  // Connect via WebRTC
+  // Configure signaling servers via VITE_SIGNALING_SERVERS env variable
+  // For production, host your own signaling server for reliability
   const provider = new WebrtcProvider(`notes-app-${roomId}`, doc, {
-    signaling: [
-      'wss://signaling.yjs.dev',
-      'wss://y-webrtc-signaling-eu.herokuapp.com',
-      'wss://y-webrtc-signaling-us.herokuapp.com'
-    ]
+    signaling: SIGNALING_SERVERS,
+    // BroadcastChannel enables same-browser tab collaboration
+    // This works even without signaling servers for local testing
   })
 
   // Set user awareness (cursor, name, etc.)
@@ -122,57 +130,3 @@ export function generateUserColor(): string {
   ]
   return colors[Math.floor(Math.random() * colors.length)]
 }
-
-// TipTap Collaboration Extension using y-prosemirror
-export interface CollaborationOptions {
-  document: Y.Doc
-  field: string
-}
-
-export const Collaboration = Extension.create<CollaborationOptions>({
-  name: 'collaboration',
-
-  addOptions() {
-    return {
-      document: new Y.Doc(),
-      field: 'prosemirror',
-    }
-  },
-
-  addProseMirrorPlugins() {
-    const fragment = this.options.document.getXmlFragment(this.options.field)
-    return [
-      ySyncPlugin(fragment),
-      yUndoPlugin(),
-    ]
-  },
-})
-
-// TipTap Collaboration Cursor Extension
-export interface CollaborationCursorOptions {
-  provider: WebrtcProvider
-  user: {
-    name: string
-    color: string
-  }
-}
-
-export const CollaborationCursor = Extension.create<CollaborationCursorOptions>({
-  name: 'collaborationCursor',
-
-  addOptions() {
-    return {
-      provider: null as unknown as WebrtcProvider,
-      user: {
-        name: 'Anonymous',
-        color: '#888888',
-      },
-    }
-  },
-
-  addProseMirrorPlugins() {
-    return [
-      yCursorPlugin(this.options.provider.awareness),
-    ]
-  },
-})

@@ -64,8 +64,18 @@ export function DriveSearchResults({ query, onClose }: DriveSearchResultsProps) 
 
     try {
       const searchResults = await searchDocuments(user.accessToken, query, 20)
-      // Filter out system files
-      const filteredResults = searchResults.filter(r => !isSystemFile(r.name))
+      // Filter out system files and deduplicate by note ID
+      const seenNoteIds = new Set<string>()
+      const filteredResults = searchResults.filter(r => {
+        if (isSystemFile(r.name)) return false
+        // Deduplicate by note ID
+        const match = r.name.match(/^note-(.+)\.json$/)
+        if (match) {
+          if (seenNoteIds.has(match[1])) return false
+          seenNoteIds.add(match[1])
+        }
+        return true
+      })
       setResults(filteredResults)
     } catch (err) {
       console.error('Drive search error:', err)

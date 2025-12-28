@@ -24,12 +24,14 @@ import {
 } from '@/components/ui/ContextMenu'
 import { ConfirmDialog } from '@/components/ui/Dialog'
 import { useNotesStore } from '@/stores/notesStore'
+import { useIsTouchDevice } from '@/hooks/useIsTouchDevice'
 import type { Note, Collection } from '@/types'
 import { cn } from '@/lib/utils'
 import { getPlainText, formatDate } from '@/lib/utils'
 
 export function NotesList() {
   const { t } = useTranslation()
+  const isTouchDevice = useIsTouchDevice()
   const { 
     notes,
     getSearchResults, 
@@ -138,6 +140,65 @@ export function NotesList() {
     )
   }
 
+  // On touch devices, disable drag & drop - show simple grid without DndContext
+  if (isTouchDevice) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <AnimatePresence mode="popLayout">
+          {/* Collections */}
+          {collections.map((collection) => {
+            const collectionNotes = getNotesInCollection(collection.id)
+            if (collectionNotes.length === 0) return null
+
+            if (collection.isExpanded) {
+              return (
+                <ExpandedCollection
+                  key={collection.id}
+                  collection={collection}
+                  notes={collectionNotes}
+                  isEditing={editingCollectionId === collection.id}
+                  editingName={editingName}
+                  isDraggingFromThis={false}
+                  onToggleExpand={() => toggleCollectionExpanded(collection.id)}
+                  onStartEdit={() => handleStartEditCollection(collection)}
+                  onSaveName={handleSaveCollectionName}
+                  onChangeName={setEditingName}
+                  onDelete={() => deleteCollection(collection.id)}
+                  onAddNote={() => addNote(collection.id)}
+                  t={t}
+                  disableDrag={true}
+                />
+              )
+            }
+
+            return (
+              <CollapsedCollection
+                key={collection.id}
+                collection={collection}
+                notes={collectionNotes}
+                isEditing={editingCollectionId === collection.id}
+                editingName={editingName}
+                isDraggingFromThis={false}
+                onToggleExpand={() => toggleCollectionExpanded(collection.id)}
+                onStartEdit={() => handleStartEditCollection(collection)}
+                onSaveName={handleSaveCollectionName}
+                onChangeName={setEditingName}
+                onDelete={() => deleteCollection(collection.id)}
+                onAddNote={() => addNote(collection.id)}
+                t={t}
+              />
+            )
+          })}
+        </AnimatePresence>
+
+        {/* Uncollected notes - no drag on touch */}
+        {uncollectedNotes.map((note) => (
+          <NoteCard key={note.id} note={note} />
+        ))}
+      </div>
+    )
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -210,9 +271,7 @@ export function NotesList() {
 
       <DragOverlay>
         {activeNote ? (
-          <div className="opacity-90 rotate-2 scale-105 shadow-2xl">
-            <NoteCard note={activeNote} />
-          </div>
+          <NoteCard note={activeNote} />
         ) : null}
       </DragOverlay>
     </DndContext>
@@ -246,6 +305,8 @@ interface CollectionProps {
   onDelete: () => void
   onAddNote: () => void
   t: (key: string) => string
+  /** Disable drag & drop on touch devices */
+  disableDrag?: boolean
 }
 
 // Collapsed collection - stacked cards style, fits in grid
@@ -375,7 +436,8 @@ function ExpandedCollection({
   onChangeName,
   onDelete,
   onAddNote,
-  t
+  t,
+  disableDrag = false
 }: CollectionProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
@@ -510,7 +572,11 @@ function ExpandedCollection({
           {/* Collection Notes */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pl-6">
             {notes.map((note) => (
-              <DraggableNoteCard key={note.id} note={note} />
+              disableDrag ? (
+                <NoteCard key={note.id} note={note} />
+              ) : (
+                <DraggableNoteCard key={note.id} note={note} />
+              )
             ))}
           </div>
         </div>

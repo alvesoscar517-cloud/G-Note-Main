@@ -181,7 +181,7 @@
     "alreadyInstalled": "Zaten Yüklü!",
     "alreadyInstalledDescription": "G-Note'un uygulama sürümünü kullanıyorsunuz.",
     "androidChromeInstructions": "Üstteki menü simgesine (⋮) dokunun, ardından \"Uygulamayı yükle\" veya \"Ana ekrana ekle\"yi seçin",
-    "desktopChromeInstructions": "Adres çubuğundaki yükleme simgesine (⊕) tıklayın veya Menü → Uygulamayı yükle'ye gidin",
+    "desktopChromeInstructions": "Adres çubuğundaki yükleme simgesine (⬇) tıklayın veya Menü → Uygulamayı yükle'ye gidin",
     "iosSafariInstructions": "Aşağıdaki Paylaş düğmesine dokunun, ardından \"Ana Ekrana Ekle\"yi seçin",
     "iosChromeInstructions": "En iyi deneyim için Safari'de açın ve Paylaş → Ana Ekrana Ekle'ye dokunun",
     "androidFirefoxInstructions": "Menüye (⋮) dokunun, ardından \"Yükle\"yi seçin",
@@ -212,7 +212,8 @@
     "cancel": "İptal",
     "rotate": "Döndür",
     "flipH": "Yatay çevir",
-    "flipV": "Dikey çevir"
+    "flipV": "Dikey çevir",
+    "auto": "Otomatik"
   },
   "common": {
     "confirm": "Onayla",

@@ -15,6 +15,17 @@
   --safe-area-right: env(safe-area-inset-right, 0px);
 }
 
+/* Dynamic viewport height for mobile - fills entire screen */
+html, body {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Utility class for dynamic viewport height */
+.min-h-dvh {
+  min-height: 100dvh;
+}
+
 .dark {
   color-scheme: dark;
 }
@@ -829,7 +840,35 @@ body.modal-open {
   }
 }
 
-/* Curved screen corner protection */
+/* Fullscreen PWA mode - app fills entire screen including notch area */
+@media screen and (display-mode: fullscreen) {
+  /* Root element extends to full screen */
+  html, body, #root {
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
+  }
+  
+  /* Main app container fills screen with safe area padding */
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+    /* Background extends behind notch, content stays safe */
+    padding-top: env(safe-area-inset-top, 0);
+  }
+  
+  /* Header gets extra top padding in fullscreen mode */
+  .safe-top {
+    padding-top: max(1rem, calc(env(safe-area-inset-top, 0px) + 0.5rem));
+  }
+  
+  /* Modals need safe area awareness in fullscreen */
+  .modal-content,
+  .rounded-2xl {
+    margin: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+  }
+}
+
+/* Standalone mode - status bar visible but app is immersive */
 @media screen and (display-mode: standalone) {
   .modal-content,
   .rounded-2xl {
@@ -838,12 +877,34 @@ body.modal-open {
   }
 }
 
+/* Loading dots animation - unified for all loading screens */
+@keyframes loadingDot {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-loading-dot {
+  animation: loadingDot 1.4s infinite ease-in-out both;
+}
+
+/* Fade in animation */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
   .animate-in,
   .fade-in,
   .zoom-in-95,
-  [class*="slide-in"] {
+  [class*="slide-in"],
+  .animate-loading-dot {
     animation: none !important;
     transition: none !important;
   }

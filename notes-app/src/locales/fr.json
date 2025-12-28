@@ -181,7 +181,7 @@
     "alreadyInstalled": "Déjà installé !",
     "alreadyInstalledDescription": "Vous utilisez la version app de G-Note.",
     "androidChromeInstructions": "Appuyez sur l'icône menu (⋮) en haut, puis sélectionnez \"Installer l'application\" ou \"Ajouter à l'écran d'accueil\"",
-    "desktopChromeInstructions": "Cliquez sur l'icône d'installation (⊕) dans la barre d'adresse, ou allez dans Menu → Installer l'application",
+    "desktopChromeInstructions": "Cliquez sur l'icône d'installation (⬇) dans la barre d'adresse, ou allez dans Menu → Installer l'application",
     "iosSafariInstructions": "Appuyez sur le bouton Partager ci-dessous, puis \"Sur l'écran d'accueil\"",
     "iosChromeInstructions": "Pour la meilleure expérience, ouvrez dans Safari et appuyez Partager → Sur l'écran d'accueil",
     "androidFirefoxInstructions": "Appuyez sur le menu (⋮) puis \"Installer\"",
@@ -212,7 +212,8 @@
     "cancel": "Annuler",
     "rotate": "Pivoter",
     "flipH": "Retourner H",
-    "flipV": "Retourner V"
+    "flipV": "Retourner V",
+    "auto": "Auto"
   },
   "common": {
     "confirm": "Confirmer",

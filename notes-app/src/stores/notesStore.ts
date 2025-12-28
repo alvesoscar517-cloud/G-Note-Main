@@ -41,8 +41,9 @@ interface NotesState {
   syncWithDrive: (accessToken: string) => Promise<void>
   loadSharedNotes: (accessToken: string) => Promise<void>
   markAllSynced: () => void
-  initOfflineStorage: () => Promise<void>
+  initOfflineStorage: (userId?: string) => Promise<void>
   saveToOfflineStorage: () => Promise<void>
+  resetForNewUser: () => void
 
   // Trash actions
   moveToTrash: (id: string) => void
@@ -99,13 +100,51 @@ export const useNotesStore = create<NotesState>()(
       syncError: null,
       isOfflineReady: false,
 
+      // Reset store state for new user (called when user changes)
+      resetForNewUser: () => {
+        // Clear persisted state in localStorage
+        try {
+          localStorage.removeItem('notes-storage')
+        } catch (e) {
+          console.error('[NotesStore] Failed to clear localStorage:', e)
+        }
+        
+        set({
+          notes: [],
+          sharedNotes: [],
+          collections: [],
+          deletedNoteIds: [],
+          deletedCollectionIds: [],
+          searchQuery: '',
+          selectedNoteId: null,
+          isModalOpen: false,
+          isSyncing: false,
+          lastSyncTime: null,
+          syncError: null,
+          isOfflineReady: false
+        })
+        console.log('[NotesStore] Store reset for new user')
+      },
+
       // Initialize offline storage - IndexedDB is source of truth
-      initOfflineStorage: async () => {
+      initOfflineStorage: async (userId?: string) => {
         try {
           if (!offlineDb.isIndexedDBAvailable()) {
             console.log('[NotesStore] IndexedDB not available')
             set({ isOfflineReady: true })
             return
+          }
+
+          // Check if user has changed and clear data if needed
+          if (userId) {
+            const userChanged = await offlineDb.handleUserChange(userId)
+            if (userChanged) {
+              // User changed - reset store state and start fresh
+              get().resetForNewUser()
+              set({ isOfflineReady: true })
+              console.log('[NotesStore] User changed, starting with fresh state')
+              return
+            }
           }
 
           const [offlineNotes, offlineCollections] = await Promise.all([

@@ -53,14 +53,14 @@ function AppContent() {
     const cleanupNetwork = initNetwork()
     const cleanupOfflineSync = initOfflineSync()
     
-    // Initialize offline storage (IndexedDB)
-    initOfflineStorage()
+    // Initialize offline storage (IndexedDB) with user ID for data isolation
+    initOfflineStorage(user?.id)
     
     return () => {
       cleanupNetwork()
       cleanupOfflineSync()
     }
-  }, [initNetwork, initOfflineStorage])
+  }, [initNetwork, initOfflineStorage, user?.id])
 
   // Debounced sync - wait 2s after last change before syncing
   const debouncedSync = useDebouncedCallback(async () => {
@@ -241,7 +241,7 @@ function AppContent() {
 
   return (
     <LayoutGroup>
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+      <div className="min-h-screen min-h-dvh bg-neutral-50 dark:bg-neutral-950">
         <OfflineBanner />
         <Header />
         <main className="max-w-6xl mx-auto px-4 py-6 safe-x safe-bottom">

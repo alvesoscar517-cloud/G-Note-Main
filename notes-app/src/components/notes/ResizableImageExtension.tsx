@@ -1,10 +1,9 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { ReactNodeViewRenderer, NodeViewWrapper, NodeViewProps } from '@tiptap/react'
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Pencil, Trash2, Download, Copy } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -22,15 +21,48 @@ declare module '@tiptap/core' {
   }
 }
 
+/**
+ * Detect if device is a mobile phone (not tablet or laptop with touch)
+ * Uses screen size + touch capability + user agent hints
+ */
+function isMobilePhone(): boolean {
+  if (typeof window === 'undefined') return false
+  
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+  if (!hasTouch) return false
+  
+  // Check screen size - mobile phones typically < 768px width
+  const isSmallScreen = window.innerWidth < 768
+  
+  // Additional check using user agent for mobile-specific keywords
+  const userAgent = navigator.userAgent.toLowerCase()
+  const isMobileUA = /android|webos|iphone|ipod|blackberry|iemobile|opera mini|mobile/i.test(userAgent)
+  
+  // Exclude tablets (iPad, Android tablets)
+  const isTablet = /ipad|tablet/i.test(userAgent) || (window.innerWidth >= 768 && window.innerWidth <= 1024)
+  
+  return hasTouch && (isSmallScreen || (isMobileUA && !isTablet))
+}
+
 // NodeView component for resizable image
 function ResizableImageComponent({ node, updateAttributes, deleteNode, selected }: NodeViewProps) {
   const { t } = useTranslation()
-  const [isResizing, setIsResizing] = useState(false)
   const [showEditor, setShowEditor] = useState(false)
   const [isActive, setIsActive] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const imageRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const startPos = useRef({ x: 0, y: 0, width: 0, height: 0 })
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const touchStartPosRef = useRef<{ x: number; y: number } | null>(null)
+
+  // Detect mobile on mount
+  useEffect(() => {
+    setIsMobile(isMobilePhone())
+    
+    const handleResize = () => setIsMobile(isMobilePhone())
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const { src, alt, width, height } = node.attrs as { 
     src: string
@@ -39,59 +71,6 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
     width?: number
     height?: number 
   }
-
-  // Handle resize start
-  const handleResizeStart = useCallback((e: React.MouseEvent, corner: string) => {
-    e.preventDefault()
-    e.stopPropagation()
-    
-    if (!imageRef.current) return
-    
-    const rect = imageRef.current.getBoundingClientRect()
-    startPos.current = {
-      x: e.clientX,
-      y: e.clientY,
-      width: rect.width,
-      height: rect.height,
-    }
-    
-    setIsResizing(true)
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const deltaX = e.clientX - startPos.current.x
-      const deltaY = e.clientY - startPos.current.y
-      
-      let newWidth = startPos.current.width
-      let newHeight = startPos.current.height
-      const aspectRatio = startPos.current.width / startPos.current.height
-
-      // Calculate new dimensions based on corner
-      if (corner.includes('e')) newWidth = Math.max(100, startPos.current.width + deltaX)
-      if (corner.includes('w')) newWidth = Math.max(100, startPos.current.width - deltaX)
-      if (corner.includes('s')) newHeight = Math.max(100, startPos.current.height + deltaY)
-      if (corner.includes('n')) newHeight = Math.max(100, startPos.current.height - deltaY)
-
-      // Maintain aspect ratio if shift is held or for corner handles
-      if (e.shiftKey || corner.length === 2) {
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-          newHeight = newWidth / aspectRatio
-        } else {
-          newWidth = newHeight * aspectRatio
-        }
-      }
-
-      updateAttributes({ width: Math.round(newWidth), height: Math.round(newHeight) })
-    }
-
-    const handleMouseUp = () => {
-      setIsResizing(false)
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-    }
-
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-  }, [updateAttributes])
 
   // Handle image edit save
   const handleEditSave = useCallback((newSrc: string) => {
@@ -124,9 +103,59 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
   }, [src, alt])
 
   // Activate on click/touch, deactivate on click outside
-  const handleImageClick = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+  // On mobile: only activate on long press
+  const handleImageClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
-    setIsActive(true)
+    // On desktop/laptop: activate immediately on click
+    if (!isMobile) {
+      setIsActive(true)
+    }
+  }, [isMobile])
+
+  // Touch handlers for mobile long press
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!isMobile) {
+      // On non-mobile touch devices (laptop), activate immediately
+      setIsActive(true)
+      return
+    }
+    
+    // On mobile: start long press timer
+    const touch = e.touches[0]
+    touchStartPosRef.current = { x: touch.clientX, y: touch.clientY }
+    
+    longPressTimerRef.current = setTimeout(() => {
+      setIsActive(true)
+      // Haptic feedback if available
+      if (navigator.vibrate) {
+        navigator.vibrate(50)
+      }
+    }, 500) // 500ms long press
+  }, [isMobile])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isMobile || !touchStartPosRef.current) return
+    
+    // Cancel long press if finger moved too much
+    const touch = e.touches[0]
+    const deltaX = Math.abs(touch.clientX - touchStartPosRef.current.x)
+    const deltaY = Math.abs(touch.clientY - touchStartPosRef.current.y)
+    
+    if (deltaX > 10 || deltaY > 10) {
+      if (longPressTimerRef.current) {
+        clearTimeout(longPressTimerRef.current)
+        longPressTimerRef.current = null
+      }
+    }
+  }, [isMobile])
+
+  const handleTouchEnd = useCallback(() => {
+    // Clear long press timer
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+    }
+    touchStartPosRef.current = null
   }, [])
 
   // Click outside to deactivate
@@ -134,14 +163,24 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
     if (!isActive) return
 
     const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      // Don't deactivate if clicking on toolbar buttons or tooltip content
+      const target = e.target as HTMLElement
+      if (target.closest('[data-image-toolbar]') || target.closest('[data-radix-popper-content-wrapper]')) {
+        return
+      }
       if (containerRef.current && !containerRef.current.contains(e.target as globalThis.Node)) {
         setIsActive(false)
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('touchstart', handleClickOutside)
+    // Use setTimeout to avoid immediate deactivation on the same click
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('touchstart', handleClickOutside)
+    }, 0)
+    
     return () => {
+      clearTimeout(timeoutId)
       document.removeEventListener('mousedown', handleClickOutside)
       document.removeEventListener('touchstart', handleClickOutside)
     }
@@ -152,30 +191,25 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
     if (selected) setIsActive(true)
   }, [selected])
 
-  const showControls = isActive || isResizing
-
   return (
     <NodeViewWrapper className="relative inline-block my-2">
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div
             ref={containerRef}
-            className={cn(
-              "relative inline-block",
-              isResizing && "select-none"
-            )}
+            className="relative inline-block"
             onClick={handleImageClick}
-            onTouchStart={handleImageClick}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
           >
             <img
               ref={imageRef}
               src={src}
               alt={alt || ''}
               draggable={false}
-              className={cn(
-                "max-w-full rounded-lg transition-shadow cursor-pointer",
-                showControls && "ring-2 ring-neutral-400 dark:ring-neutral-500 ring-offset-2"
-              )}
+              className="max-w-full rounded-lg cursor-pointer"
               style={{
                 width: width ? `${width}px` : 'auto',
                 height: height ? `${height}px` : 'auto',
@@ -183,67 +217,54 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
             />
 
             {/* Controls overlay - only show when active */}
-            {showControls && (
-              <>
-                {/* Top toolbar */}
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-neutral-800 dark:bg-neutral-700 rounded-lg p-1 shadow-lg">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setShowEditor(true) }}
-                        className="p-1.5 rounded hover:bg-neutral-700 dark:hover:bg-neutral-600 text-neutral-200 transition-colors"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">{t('imageEditor.edit')}</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); deleteNode() }}
-                        className="p-1.5 rounded hover:bg-neutral-700 dark:hover:bg-neutral-600 text-neutral-200 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">{t('imageEditor.delete')}</TooltipContent>
-                  </Tooltip>
-                  <div className="w-px h-4 bg-neutral-600 mx-1" />
-                  <div className="px-2 text-xs text-neutral-400">
-                    {width && height ? `${width}×${height}` : 'Auto'}
-                  </div>
-                </div>
-
-                {/* Resize handles */}
-                {['nw', 'ne', 'sw', 'se', 'n', 's', 'e', 'w'].map((corner) => (
-                  <div
-                    key={corner}
-                    onMouseDown={(e) => handleResizeStart(e, corner)}
-                    onTouchStart={(e) => {
-                      const touch = e.touches[0]
-                      handleResizeStart({ 
-                        clientX: touch.clientX, 
-                        clientY: touch.clientY, 
-                        preventDefault: () => e.preventDefault(),
-                        stopPropagation: () => e.stopPropagation()
-                      } as React.MouseEvent, corner)
-                    }}
-                    className={cn(
-                      "absolute w-3 h-3 bg-neutral-700 dark:bg-neutral-300 border-2 border-white dark:border-neutral-800 rounded-sm cursor-pointer shadow-md z-10",
-                      "hover:bg-neutral-600 dark:hover:bg-neutral-400 transition-colors",
-                      corner === 'nw' && "top-0 left-0 -translate-x-1/2 -translate-y-1/2 cursor-nw-resize",
-                      corner === 'ne' && "top-0 right-0 translate-x-1/2 -translate-y-1/2 cursor-ne-resize",
-                      corner === 'sw' && "bottom-0 left-0 -translate-x-1/2 translate-y-1/2 cursor-sw-resize",
-                      corner === 'se' && "bottom-0 right-0 translate-x-1/2 translate-y-1/2 cursor-se-resize",
-                      corner === 'n' && "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-n-resize",
-                      corner === 's' && "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 cursor-s-resize",
-                      corner === 'e' && "top-1/2 right-0 translate-x-1/2 -translate-y-1/2 cursor-e-resize",
-                      corner === 'w' && "top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 cursor-w-resize"
-                    )}
-                  />
-                ))}
-              </>
+            {isActive && (
+              <div 
+                data-image-toolbar
+                contentEditable={false}
+                className="absolute -top-10 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-neutral-800 rounded-lg p-1 shadow-lg z-20"
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  title={t('imageEditor.edit')}
+                  onClick={(e) => { 
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setShowEditor(true) 
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                  }}
+                  onPointerDown={(e) => {
+                    e.stopPropagation()
+                  }}
+                  className="p-1.5 rounded hover:bg-neutral-700 text-white transition-colors"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  title={t('imageEditor.delete')}
+                  onClick={(e) => { 
+                    e.preventDefault()
+                    e.stopPropagation()
+                    deleteNode() 
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                  }}
+                  onPointerDown={(e) => {
+                    e.stopPropagation()
+                  }}
+                  className="p-1.5 rounded hover:bg-neutral-700 text-white transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             )}
           </div>
         </ContextMenuTrigger>
@@ -267,13 +288,14 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
         </ContextMenuContent>
       </ContextMenu>
 
-      {/* Image Editor Modal */}
-      {showEditor && (
+      {/* Image Editor Modal - rendered via Portal to avoid TipTap interference */}
+      {showEditor && createPortal(
         <ImageEditor
           src={src}
           onSave={handleEditSave}
           onCancel={() => setShowEditor(false)}
-        />
+        />,
+        document.body
       )}
     </NodeViewWrapper>
   )

@@ -1,14 +1,19 @@
 import express from 'express'
 import cors from 'cors'
+import { createServer } from 'http'
 import authRoutes from './routes/auth.js'
 import userRoutes from './routes/users.js'
 import aiRoutes from './routes/ai.js'
 import webhookRoutes from './routes/webhooks.js'
 import driveRoutes from './routes/drive.js'
 import { getConfiguredPlatforms } from './config/google.js'
+import { setupSignaling } from './signaling.js'
 
 const app = express()
 const PORT = process.env.PORT || 8080
+
+// Create HTTP server for both Express and WebSocket
+const server = createServer(app)
 
 // Parse ALLOWED_ORIGINS - supports multiple origins separated by comma
 // Example: ALLOWED_ORIGINS=http://localhost:5173,https://gnote.app,chrome-extension://xxx
@@ -85,7 +90,11 @@ app.get('/health', (req, res) => {
   })
 })
 
-app.listen(PORT, () => {
+// Setup WebRTC signaling server for real-time collaboration
+setupSignaling(server, '/signaling')
+
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
   console.log(`Configured OAuth platforms: ${getConfiguredPlatforms().join(', ')}`)
+  console.log(`WebRTC signaling available at ws://localhost:${PORT}/signaling`)
 })
