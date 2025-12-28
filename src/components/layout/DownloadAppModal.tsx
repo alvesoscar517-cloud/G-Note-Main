@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Share, Plus, MoreVertical, Download, ChevronRight, Smartphone, Monitor, Tablet, Info } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { useThemeStore } from '@/stores/themeStore'
 
 interface DownloadAppModalProps {
   isOpen: boolean
@@ -86,11 +85,9 @@ function BrowserCard({ browser, name, isRecommended, children }: BrowserCardProp
 
 export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
   const { t } = useTranslation()
-  const { theme } = useThemeStore()
   const [selectedPlatform, setSelectedPlatform] = useState<Platform>('ios')
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   
-  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
   const deviceInfo = getDeviceInfo()
 
   // Auto-select platform based on device
@@ -269,9 +266,10 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
         <div className="sticky top-0 bg-white dark:bg-neutral-900 px-5 pt-5 pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-neutral-900 dark:bg-white flex items-center justify-center p-1.5">
+              {/* App Icon - always white background with black logo */}
+              <div className="w-10 h-10 rounded-xl bg-white shadow-md flex items-center justify-center p-1.5">
                 <img 
-                  src={isDark ? "/g-note.svg" : "/g-note-dark.svg"}
+                  src="/g-note.svg"
                   alt="G-Note" 
                   className="w-full h-full"
                 />

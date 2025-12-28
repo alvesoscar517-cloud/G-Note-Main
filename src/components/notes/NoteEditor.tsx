@@ -20,7 +20,9 @@ import Link from '@tiptap/extension-link'
 import { marked } from 'marked'
 import * as Y from 'yjs'
 import { WebrtcProvider } from 'y-webrtc'
-import { Collaboration, CollaborationCursor } from '@/lib/collaboration'
+import Collaboration from '@tiptap/extension-collaboration'
+import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
+import { generateUserColor } from '@/lib/collaboration'
 import {
   Undo2, 
   Redo2,
@@ -80,12 +82,13 @@ import { ShareDialog } from './ShareDialog'
 import { VersionHistoryPanel } from './VersionHistoryPanel'
 import { NoteStylePicker } from './NoteStylePicker'
 import { NoteActionsMenu } from './NoteActionsMenu'
-import { generateUserColor } from '@/lib/collaboration'
 import { AIMenu, SummaryModal, InsufficientCreditsModal } from './AIMenu'
 import { AIChatView } from './AIChatView'
 import { SpeechButton } from './SpeechButton'
 import { EditorSkeleton } from '@/components/ui/Skeleton'
 import { useNetworkRequiredOverlay } from '@/components/ui/OfflineIndicator'
+import { useResponsiveToolbar } from '@/hooks/useResponsiveToolbar'
+import { useKeyboardHeight } from '@/hooks/useKeyboardHeight'
 import * as AI from '@/lib/ai'
 import { InsufficientCreditsError } from '@/lib/ai'
 import type { Note, NoteStyle, AIChatMessage } from '@/types'
@@ -171,6 +174,7 @@ interface NoteEditorProps {
 interface CollaboratorInfo {
   name: string
   color: string
+  picture?: string
 }
 
 export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen, canToggleFullscreen = true, onToggleFullscreen }: NoteEditorProps) {
@@ -208,6 +212,14 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   const [showDrawingModal, setShowDrawingModal] = useState(false)
   const [showLinkDialog, setShowLinkDialog] = useState(false)
   const editorContainerRef = useRef<HTMLDivElement>(null)
+  const toolbarRef = useRef<HTMLDivElement>(null)
+  
+  // Responsive toolbar visibility
+  const toolbarVisibility = useResponsiveToolbar(toolbarRef)
+  
+  // Keyboard height for mobile toolbar positioning
+  const keyboardHeight = useKeyboardHeight()
+  const isKeyboardVisible = keyboardHeight > 0
 
   // Clear AI error after 5 seconds
   useEffect(() => {
@@ -241,39 +253,62 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   // WebRTC provider and Y.Doc for collaboration
   const [provider, setProvider] = useState<WebrtcProvider | null>(null)
   const [ydoc, setYdoc] = useState<Y.Doc | null>(null)
+  const [isProviderReady, setIsProviderReady] = useState(false)
+  
+  // Use refs to track current provider/ydoc for cleanup
+  const providerRef = useRef<WebrtcProvider | null>(null)
+  const ydocRef = useRef<Y.Doc | null>(null)
 
   // Setup collaboration when roomId changes
   useEffect(() => {
+    // Cleanup previous provider/ydoc if exists
+    if (providerRef.current) {
+      providerRef.current.disconnect()
+      providerRef.current.destroy()
+      providerRef.current = null
+    }
+    if (ydocRef.current) {
+      ydocRef.current.destroy()
+      ydocRef.current = null
+    }
+    
     if (!roomId) {
-      if (provider) {
-        provider.disconnect()
-        provider.destroy()
-        setProvider(null)
-      }
-      if (ydoc) {
-        ydoc.destroy()
-        setYdoc(null)
-      }
+      setProvider(null)
+      setYdoc(null)
+      setIsProviderReady(false)
       return
     }
 
     const newYdoc = new Y.Doc()
+    
+    // Get signaling servers from environment variable
+    const signalingServers = import.meta.env.VITE_SIGNALING_SERVERS
+      ? import.meta.env.VITE_SIGNALING_SERVERS.split(',').map((s: string) => s.trim())
+      : []
+    
     const newProvider = new WebrtcProvider(`notes-app-${roomId}`, newYdoc, {
-      signaling: [
-        'wss://signaling.yjs.dev',
-        'wss://y-webrtc-signaling-eu.herokuapp.com',
-        'wss://y-webrtc-signaling-us.herokuapp.com'
-      ]
+      signaling: signalingServers
     })
+
+    // Store in refs for cleanup
+    providerRef.current = newProvider
+    ydocRef.current = newYdoc
 
     newProvider.awareness.setLocalStateField('user', {
       name: user?.name || 'Anonymous',
       color: userColor,
-      colorLight: userColor + '40'
+      colorLight: userColor + '40',
+      picture: user?.avatar || null
     })
 
     setYdoc(newYdoc)
     setProvider(newProvider)
+    
+    // Wait for awareness to be fully initialized before marking ready
+    // This ensures the editor won't try to use awareness before it's ready
+    const readyTimeout = setTimeout(() => {
+      setIsProviderReady(true)
+    }, 200)
 
     // Update collaborators list
     const updateCollaborators = () => {
@@ -282,7 +317,8 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         if (state.user) {
           collabs.push({
             name: state.user.name || 'Anonymous',
-            color: state.user.color || '#888'
+            color: state.user.color || '#888',
+            picture: state.user.picture || undefined
           })
         }
       })
@@ -290,16 +326,31 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     }
 
     newProvider.awareness.on('change', updateCollaborators)
+    // Initial update
+    updateCollaborators()
     const interval = setInterval(updateCollaborators, 2000)
 
     return () => {
+      clearTimeout(readyTimeout)
       clearInterval(interval)
       newProvider.awareness.off('change', updateCollaborators)
-      newProvider.disconnect()
-      newProvider.destroy()
-      newYdoc.destroy()
+      setIsProviderReady(false)
+      // Cleanup will be done at the start of next effect run
     }
   }, [roomId, user?.name, userColor])
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (providerRef.current) {
+        providerRef.current.disconnect()
+        providerRef.current.destroy()
+      }
+      if (ydocRef.current) {
+        ydocRef.current.destroy()
+      }
+    }
+  }, [])
 
   // Debounced update note content - reduced for snappier feel
   const debouncedUpdate = useDebouncedCallback((id: string, content: string) => {
@@ -340,14 +391,23 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         HTMLAttributes: { class: 'task-item' }
       }),
       ResizableImage,
+      // Add Link BEFORE Markdown - Markdown will detect it exists and not add duplicate
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-500 underline cursor-pointer'
+        }
+      }),
+      // Add Underline BEFORE Markdown - Markdown will detect it exists and not add duplicate
+      Underline,
+      // Markdown extension - will use existing Link and Underline instead of adding new ones
       Markdown.configure({
         html: true,
         transformPastedText: true,
         transformCopiedText: true,
-        linkify: true,
-        breaks: false
+        linkify: false,
+        breaks: false,
       }),
-      Underline,
       Highlight.configure({
         multicolor: false
       }),
@@ -355,34 +415,28 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       Superscript,
       TextAlign.configure({
         types: ['heading', 'paragraph']
-      }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-blue-500 underline cursor-pointer'
-        }
       })
     ]
 
     // Add collaboration extensions when in a room
-    if (roomId && ydoc && provider) {
+    // Only add if provider and ydoc are ready
+    if (roomId && ydoc && provider && isProviderReady) {
       baseExtensions.push(
         Collaboration.configure({
           document: ydoc,
-          field: 'prosemirror'
         }),
         CollaborationCursor.configure({
           provider: provider,
           user: {
             name: user?.name || 'Anonymous',
-            color: userColor
-          }
+            color: userColor,
+          },
         })
       )
     }
 
     return baseExtensions
-  }, [t, roomId, ydoc, provider, user?.name, userColor])
+  }, [t, roomId, ydoc, provider, isProviderReady, user?.name, userColor])
 
   // Editor - only recreate when roomId changes, NOT when note changes
   const editor = useEditor({
@@ -426,7 +480,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
 
   // When starting collaboration, initialize Y.js document with current content
   useEffect(() => {
-    if (roomId && provider && editor && ydoc) {
+    if (roomId && provider && editor && ydoc && isProviderReady) {
       const fragment = ydoc.getXmlFragment('prosemirror')
       
       // If this is a new collaboration session and Y.js doc is empty, 
@@ -456,7 +510,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         clearInterval(autoSaveInterval)
       }
     }
-  }, [roomId, provider, editor, ydoc, note.content, updateNote])
+  }, [roomId, provider, editor, ydoc, isProviderReady, note.content, updateNote])
 
   // Save on page unload or visibility change (prevent data loss)
   useEffect(() => {
@@ -950,13 +1004,24 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         <div className="md:hidden flex items-center gap-1 px-4 pt-2">
           <div className="flex -space-x-1">
             {collaborators.slice(0, 2).map((collab, i) => (
-              <div
-                key={i}
-                className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-medium text-white border border-white dark:border-neutral-900"
-                style={{ backgroundColor: collab.color }}
-              >
-                {collab.name.charAt(0).toUpperCase()}
-              </div>
+              collab.picture ? (
+                <img
+                  key={i}
+                  src={collab.picture}
+                  alt={collab.name}
+                  className="w-5 h-5 rounded-full border border-white dark:border-neutral-900 object-cover"
+                  title={collab.name}
+                />
+              ) : (
+                <div
+                  key={i}
+                  className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-medium text-white border border-white dark:border-neutral-900"
+                  style={{ backgroundColor: collab.color }}
+                  title={collab.name}
+                >
+                  {collab.name.charAt(0).toUpperCase()}
+                </div>
+              )
             ))}
           </div>
           <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
@@ -964,7 +1029,11 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       )}
 
       {/* Scrollable Content Area - includes title */}
-      <div ref={editorContainerRef} className="flex-1 overflow-y-auto px-4 relative">
+      <div 
+        ref={editorContainerRef} 
+        className="flex-1 overflow-y-auto px-4 relative"
+        style={isKeyboardVisible ? { paddingBottom: 60 } : undefined}
+      >
         {/* Title + Pin - Desktop (now scrolls with content), hidden when fullscreen */}
         {!isFullscreen && (
           <div className="hidden md:flex items-center gap-2 pt-4 pb-2 min-w-0">
@@ -982,14 +1051,24 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <div className="flex items-center gap-1">
                 <div className="flex -space-x-1">
                   {collaborators.slice(0, 3).map((collab, i) => (
-                    <div
-                      key={i}
-                      className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium text-white border-2 border-white dark:border-neutral-900"
-                      style={{ backgroundColor: collab.color }}
-                      title={collab.name}
-                    >
-                      {collab.name.charAt(0).toUpperCase()}
-                    </div>
+                    collab.picture ? (
+                      <img
+                        key={i}
+                        src={collab.picture}
+                        alt={collab.name}
+                        className="w-6 h-6 rounded-full border-2 border-white dark:border-neutral-900 object-cover"
+                        title={collab.name}
+                      />
+                    ) : (
+                      <div
+                        key={i}
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium text-white border-2 border-white dark:border-neutral-900"
+                        style={{ backgroundColor: collab.color }}
+                        title={collab.name}
+                      >
+                        {collab.name.charAt(0).toUpperCase()}
+                      </div>
+                    )
                   ))}
                   {collaborators.length > 3 && (
                     <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium bg-neutral-300 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-200 border-2 border-white dark:border-neutral-900">
@@ -1055,7 +1134,19 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       </div>
 
       {/* Footer Toolbar */}
-      <div className="relative flex items-center justify-between px-2 py-1.5 bg-neutral-100/80 dark:bg-neutral-800/60 backdrop-blur-sm rounded-b-[12px] safe-bottom safe-x">
+      <div 
+        ref={toolbarRef} 
+        className={cn(
+          "flex items-center justify-between px-2 py-1.5 bg-neutral-100/80 dark:bg-neutral-800/60 backdrop-blur-sm safe-x",
+          isKeyboardVisible 
+            ? "fixed left-0 right-0 z-50 rounded-none shadow-lg border-t border-neutral-200 dark:border-neutral-700" 
+            : "relative rounded-b-[12px] safe-bottom"
+        )}
+        style={isKeyboardVisible ? { 
+          bottom: keyboardHeight,
+          transition: 'bottom 0.15s ease-out'
+        } : undefined}
+      >
         {/* AI Modals - positioned above toolbar */}
         <SummaryModal
           open={showSummary}
@@ -1085,288 +1176,363 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         )}
 
         <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-none">
-          {/* AI Menu - First position */}
-          <AIMenu 
-            onAction={handleAIAction} 
-            disabled={isAILoading || isStreaming}
-          />
+          {/* AI Menu - Priority 1 (always visible) */}
+          {toolbarVisibility.ai && (
+            <AIMenu 
+              onAction={handleAIAction} 
+              disabled={isAILoading || isStreaming}
+            />
+          )}
           
-          {/* Speech to Text */}
-          <SpeechButton
-            onTranscript={(text, isFinal) => {
-              if (isFinal && editor) {
-                editor.commands.insertContent(text + ' ')
-              }
-            }}
-            disabled={isAILoading || isStreaming}
-          />
+          {/* Speech to Text - Priority 1 */}
+          {toolbarVisibility.voice && (
+            <SpeechButton
+              onTranscript={(text, isFinal) => {
+                if (isFinal && editor) {
+                  editor.commands.insertContent(text + ' ')
+                }
+              }}
+              disabled={isAILoading || isStreaming}
+            />
+          )}
           
-          <Divider />
+          {toolbarVisibility.dividerAfterVoice && <Divider />}
           
-          {/* Primary formatting tools - always visible */}
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleBold().run()}
-            active={editor?.isActive('bold')}
-            tooltip={t('editor.bold')}
-          >
-            <Bold className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleItalic().run()}
-            active={editor?.isActive('italic')}
-            tooltip={t('editor.italic')}
-          >
-            <Italic className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleUnderline().run()}
-            active={editor?.isActive('underline')}
-            tooltip={t('editor.underline')}
-          >
-            <UnderlineIcon className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleStrike().run()}
-            active={editor?.isActive('strike')}
-            tooltip={t('editor.strikethrough')}
-          >
-            <Strikethrough className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleHighlight().run()}
-            active={editor?.isActive('highlight')}
-            tooltip={t('editor.highlight')}
-          >
-            <Highlighter className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {/* Primary formatting tools - Priority 1 */}
+          {toolbarVisibility.bold && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleBold().run()}
+              active={editor?.isActive('bold')}
+              tooltip={t('editor.bold')}
+            >
+              <Bold className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.italic && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleItalic().run()}
+              active={editor?.isActive('italic')}
+              tooltip={t('editor.italic')}
+            >
+              <Italic className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.underline && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleUnderline().run()}
+              active={editor?.isActive('underline')}
+              tooltip={t('editor.underline')}
+            >
+              <UnderlineIcon className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
           
-          <Divider />
+          {/* Priority 2 - sm+ */}
+          {toolbarVisibility.strikethrough && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleStrike().run()}
+              active={editor?.isActive('strike')}
+              tooltip={t('editor.strikethrough')}
+            >
+              <Strikethrough className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.highlight && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleHighlight().run()}
+              active={editor?.isActive('highlight')}
+              tooltip={t('editor.highlight')}
+            >
+              <Highlighter className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
           
-          {/* Headings */}
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
-            active={editor?.isActive('heading', { level: 1 })}
-            tooltip={t('editor.heading1')}
-          >
-            <Heading1 className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-            active={editor?.isActive('heading', { level: 2 })}
-            tooltip={t('editor.heading2')}
-          >
-            <Heading2 className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
-            active={editor?.isActive('heading', { level: 3 })}
-            tooltip={t('editor.heading3')}
-          >
-            <Heading3 className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {toolbarVisibility.dividerAfterHighlight && <Divider />}
           
-          <Divider />
+          {/* Headings - Priority 2 & 3 */}
+          {toolbarVisibility.heading1 && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+              active={editor?.isActive('heading', { level: 1 })}
+              tooltip={t('editor.heading1')}
+            >
+              <Heading1 className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.heading2 && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+              active={editor?.isActive('heading', { level: 2 })}
+              tooltip={t('editor.heading2')}
+            >
+              <Heading2 className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.heading3 && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
+              active={editor?.isActive('heading', { level: 3 })}
+              tooltip={t('editor.heading3')}
+            >
+              <Heading3 className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
           
-          {/* Lists */}
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleBulletList().run()}
-            active={editor?.isActive('bulletList')}
-            tooltip={t('editor.bulletList')}
-          >
-            <List className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-            active={editor?.isActive('orderedList')}
-            tooltip={t('editor.numberedList')}
-          >
-            <ListOrdered className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleTaskList().run()}
-            active={editor?.isActive('taskList')}
-            tooltip={t('editor.taskList')}
-          >
-            <CheckSquare className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {toolbarVisibility.dividerAfterHeadings && <Divider />}
           
-          <Divider />
+          {/* Lists - Priority 2 & 3 */}
+          {toolbarVisibility.bulletList && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleBulletList().run()}
+              active={editor?.isActive('bulletList')}
+              tooltip={t('editor.bulletList')}
+            >
+              <List className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.orderedList && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+              active={editor?.isActive('orderedList')}
+              tooltip={t('editor.numberedList')}
+            >
+              <ListOrdered className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.taskList && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleTaskList().run()}
+              active={editor?.isActive('taskList')}
+              tooltip={t('editor.taskList')}
+            >
+              <CheckSquare className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
           
-          {/* Text alignment */}
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().setTextAlign('left').run()}
-            active={editor?.isActive({ textAlign: 'left' })}
-            tooltip={t('editor.alignLeft')}
-          >
-            <AlignLeft className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().setTextAlign('center').run()}
-            active={editor?.isActive({ textAlign: 'center' })}
-            tooltip={t('editor.alignCenter')}
-          >
-            <AlignCenter className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().setTextAlign('right').run()}
-            active={editor?.isActive({ textAlign: 'right' })}
-            tooltip={t('editor.alignRight')}
-          >
-            <AlignRight className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
-            active={editor?.isActive({ textAlign: 'justify' })}
-            tooltip={t('editor.alignJustify')}
-          >
-            <AlignJustify className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {toolbarVisibility.dividerAfterLists && <Divider />}
           
-          <Divider />
+          {/* Text alignment - Priority 3 & 4 */}
+          {toolbarVisibility.alignLeft && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().setTextAlign('left').run()}
+              active={editor?.isActive({ textAlign: 'left' })}
+              tooltip={t('editor.alignLeft')}
+            >
+              <AlignLeft className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.alignCenter && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().setTextAlign('center').run()}
+              active={editor?.isActive({ textAlign: 'center' })}
+              tooltip={t('editor.alignCenter')}
+            >
+              <AlignCenter className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.alignRight && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().setTextAlign('right').run()}
+              active={editor?.isActive({ textAlign: 'right' })}
+              tooltip={t('editor.alignRight')}
+            >
+              <AlignRight className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.alignJustify && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
+              active={editor?.isActive({ textAlign: 'justify' })}
+              tooltip={t('editor.alignJustify')}
+            >
+              <AlignJustify className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
           
-          {/* Code & Quote */}
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleCode().run()}
-            active={editor?.isActive('code')}
-            tooltip={t('editor.inlineCode')}
-          >
-            <Code className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
-            active={editor?.isActive('codeBlock')}
-            tooltip={t('editor.codeBlock')}
-          >
-            <Code2 className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleBlockquote().run()}
-            active={editor?.isActive('blockquote')}
-            tooltip={t('editor.blockquote')}
-          >
-            <Quote className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {toolbarVisibility.dividerAfterAlignment && <Divider />}
           
-          <Divider />
+          {/* Code & Quote - Priority 4 */}
+          {toolbarVisibility.inlineCode && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleCode().run()}
+              active={editor?.isActive('code')}
+              tooltip={t('editor.inlineCode')}
+            >
+              <Code className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.codeBlock && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+              active={editor?.isActive('codeBlock')}
+              tooltip={t('editor.codeBlock')}
+            >
+              <Code2 className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.blockquote && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleBlockquote().run()}
+              active={editor?.isActive('blockquote')}
+              tooltip={t('editor.blockquote')}
+            >
+              <Quote className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
           
-          {/* Subscript & Superscript */}
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleSubscript().run()}
-            active={editor?.isActive('subscript')}
-            tooltip={t('editor.subscript')}
-          >
-            <SubscriptIcon className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().toggleSuperscript().run()}
-            active={editor?.isActive('superscript')}
-            tooltip={t('editor.superscript')}
-          >
-            <SuperscriptIcon className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {toolbarVisibility.dividerAfterCode && <Divider />}
           
-          <Divider />
+          {/* Subscript & Superscript - Priority 5 */}
+          {toolbarVisibility.subscript && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleSubscript().run()}
+              active={editor?.isActive('subscript')}
+              tooltip={t('editor.subscript')}
+            >
+              <SubscriptIcon className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.superscript && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().toggleSuperscript().run()}
+              active={editor?.isActive('superscript')}
+              tooltip={t('editor.superscript')}
+            >
+              <SuperscriptIcon className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
           
-          {/* Link */}
-          <ToolbarButton
-            onClick={() => {
-              if (editor?.isActive('link')) {
-                editor.chain().focus().unsetLink().run()
-              } else {
-                setShowLinkDialog(true)
-              }
-            }}
-            active={editor?.isActive('link')}
-            tooltip={editor?.isActive('link') ? t('editor.removeLink') : t('editor.insertLink')}
-          >
-            {editor?.isActive('link') ? <Unlink className="w-[18px] h-[18px]" /> : <LinkIcon className="w-[18px] h-[18px]" />}
-          </ToolbarButton>
+          {toolbarVisibility.dividerAfterSubscript && <Divider />}
           
-          {/* Horizontal rule */}
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().setHorizontalRule().run()}
-            tooltip={t('editor.horizontalRule')}
-          >
-            <Minus className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {/* Link - Priority 4 */}
+          {toolbarVisibility.link && (
+            <ToolbarButton
+              onClick={() => {
+                if (editor?.isActive('link')) {
+                  editor.chain().focus().unsetLink().run()
+                } else {
+                  setShowLinkDialog(true)
+                }
+              }}
+              active={editor?.isActive('link')}
+              tooltip={editor?.isActive('link') ? t('editor.removeLink') : t('editor.insertLink')}
+            >
+              {editor?.isActive('link') ? <Unlink className="w-[18px] h-[18px]" /> : <LinkIcon className="w-[18px] h-[18px]" />}
+            </ToolbarButton>
+          )}
           
-          {/* Clear formatting */}
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().clearNodes().unsetAllMarks().run()}
-            tooltip={t('editor.clearFormatting')}
-          >
-            <RemoveFormatting className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {/* Horizontal rule - Priority 5 */}
+          {toolbarVisibility.horizontalRule && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+              tooltip={t('editor.horizontalRule')}
+            >
+              <Minus className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          
+          {/* Clear formatting - Priority 5 */}
+          {toolbarVisibility.clearFormatting && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().clearNodes().unsetAllMarks().run()}
+              tooltip={t('editor.clearFormatting')}
+            >
+              <RemoveFormatting className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
 
-          <Divider />
+          {toolbarVisibility.dividerAfterLink && <Divider />}
 
-          <ToolbarButton onClick={addImage} tooltip={t('editor.insertImage')}>
-            <ImagePlus className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {/* Image & Drawing - Priority 5 */}
+          {toolbarVisibility.image && (
+            <ToolbarButton onClick={addImage} tooltip={t('editor.insertImage')}>
+              <ImagePlus className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
           
-          <ToolbarButton 
-            onClick={() => setShowDrawingModal(true)} 
-            tooltip={t('drawing.insert')}
-          >
-            <Pencil className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {toolbarVisibility.drawing && (
+            <ToolbarButton 
+              onClick={() => setShowDrawingModal(true)} 
+              tooltip={t('drawing.insert')}
+            >
+              <Pencil className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
           
-          <NoteStylePicker 
-            style={note.style} 
-            onChange={handleStyleChange}
-          />
+          {toolbarVisibility.style && (
+            <NoteStylePicker 
+              style={note.style} 
+              onChange={handleStyleChange}
+            />
+          )}
 
-          <Divider />
+          {toolbarVisibility.dividerAfterStyle && <Divider />}
 
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().undo().run()}
-            disabled={!editor?.can().undo()}
-            tooltip={t('editor.undo')}
-          >
-            <Undo2 className="w-[18px] h-[18px]" />
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={() => editor?.chain().focus().redo().run()}
-            disabled={!editor?.can().redo()}
-            tooltip={t('editor.redo')}
-          >
-            <Redo2 className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {/* Undo/Redo - Priority 1 */}
+          {toolbarVisibility.undo && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().undo().run()}
+              disabled={!editor?.can().undo()}
+              tooltip={t('editor.undo')}
+            >
+              <Undo2 className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+          {toolbarVisibility.redo && (
+            <ToolbarButton
+              onClick={() => editor?.chain().focus().redo().run()}
+              disabled={!editor?.can().redo()}
+              tooltip={t('editor.redo')}
+            >
+              <Redo2 className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
 
-          <Divider />
+          {toolbarVisibility.dividerAfterUndoRedo && <Divider />}
 
-          {/* Export/Import menu */}
-          <NoteActionsMenu
-            noteTitle={note.title}
-            noteContent={editor?.getHTML() || note.content}
-            onImport={handleImportDocument}
-            disabled={isAILoading || isStreaming}
-          />
+          {/* Export/Import menu - Priority 5 */}
+          {toolbarVisibility.exportImport && (
+            <NoteActionsMenu
+              noteTitle={note.title}
+              noteContent={editor?.getHTML() || note.content}
+              onImport={handleImportDocument}
+              disabled={isAILoading || isStreaming}
+            />
+          )}
 
-          {/* More menu for less-used actions */}
-          <ToolbarButton
-            onClick={() => roomId ? handleStopSharing() : setShowShareDialog(true)}
-            active={!!roomId}
-            tooltip={roomId ? t('editor.stopSharing') : t('editor.collaborate')}
-          >
-            {roomId ? <Users className="w-[18px] h-[18px]" /> : <Share2 className="w-[18px] h-[18px]" />}
-          </ToolbarButton>
+          {/* Share - Priority 5 */}
+          {toolbarVisibility.share && (
+            <ToolbarButton
+              onClick={() => roomId ? handleStopSharing() : setShowShareDialog(true)}
+              active={!!roomId}
+              tooltip={roomId ? t('editor.stopSharing') : t('editor.collaborate')}
+            >
+              {roomId ? <Users className="w-[18px] h-[18px]" /> : <Share2 className="w-[18px] h-[18px]" />}
+            </ToolbarButton>
+          )}
 
-          <ToolbarButton
-            onClick={() => setShowVersionHistory(true)}
-            tooltip={t('editor.versionHistory')}
-          >
-            <History className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {/* History - Priority 5 */}
+          {toolbarVisibility.history && (
+            <ToolbarButton
+              onClick={() => setShowVersionHistory(true)}
+              tooltip={t('editor.versionHistory')}
+            >
+              <History className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
 
-          <ToolbarButton
-            onClick={() => setShowDeleteDialog(true)}
-            tooltip={t('notes.delete')}
-          >
-            <Trash2 className="w-[18px] h-[18px]" />
-          </ToolbarButton>
+          {/* Delete - Priority 1 */}
+          {toolbarVisibility.delete && (
+            <ToolbarButton
+              onClick={() => setShowDeleteDialog(true)}
+              tooltip={t('notes.delete')}
+            >
+              <Trash2 className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
 
-          {onToggleFullscreen && canToggleFullscreen && (
+          {/* Fullscreen - Priority 5 */}
+          {toolbarVisibility.fullscreen && onToggleFullscreen && canToggleFullscreen && (
             <ToolbarButton
               onClick={onToggleFullscreen}
               tooltip={isFullscreen ? t('editor.exitFullscreen') : t('editor.fullscreen')}

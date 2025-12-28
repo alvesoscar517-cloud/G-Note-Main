@@ -20,6 +20,18 @@ import trFlag from 'circle-flags/flags/tr.svg'
 import plFlag from 'circle-flags/flags/pl.svg'
 import thFlag from 'circle-flags/flags/th.svg'
 import idFlag from 'circle-flags/flags/id.svg'
+import ruFlag from 'circle-flags/flags/ru.svg'
+import myFlag from 'circle-flags/flags/my.svg'
+import uaFlag from 'circle-flags/flags/ua.svg'
+import czFlag from 'circle-flags/flags/cz.svg'
+import seFlag from 'circle-flags/flags/se.svg'
+import dkFlag from 'circle-flags/flags/dk.svg'
+import fiFlag from 'circle-flags/flags/fi.svg'
+import noFlag from 'circle-flags/flags/no.svg'
+import grFlag from 'circle-flags/flags/gr.svg'
+import ilFlag from 'circle-flags/flags/il.svg'
+import roFlag from 'circle-flags/flags/ro.svg'
+import huFlag from 'circle-flags/flags/hu.svg'
 
 // Map country codes to imported SVGs
 const flagMap: Record<string, string> = {
@@ -41,6 +53,18 @@ const flagMap: Record<string, string> = {
   pl: plFlag,
   th: thFlag,
   id: idFlag,
+  ru: ruFlag,
+  my: myFlag,
+  ua: uaFlag,
+  cz: czFlag,
+  se: seFlag,
+  dk: dkFlag,
+  fi: fiFlag,
+  no: noFlag,
+  gr: grFlag,
+  il: ilFlag,
+  ro: roFlag,
+  hu: huFlag,
 }
 
 interface CircleFlagProps {
@@ -63,7 +87,7 @@ export const CircleFlag = memo(function CircleFlag({
       width={size}
       height={size}
       className={cn(
-        "rounded-full ring-2 ring-neutral-200 dark:ring-neutral-600",
+        "rounded-full ring-1 ring-neutral-200 dark:ring-neutral-600",
         className
       )}
       loading="eager"

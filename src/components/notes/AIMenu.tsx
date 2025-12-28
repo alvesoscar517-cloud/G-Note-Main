@@ -19,12 +19,12 @@ import {
   X,
   Copy,
   Scissors,
-  Search,
   Coins,
   Mic
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
+import { CircleFlag } from '@/components/ui/CircleFlag'
 import * as AI from '@/lib/ai'
 
 // Type declarations for Web Speech API
@@ -78,12 +78,10 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [showLanguages, setShowLanguages] = useState(false)
-  const [langSearch, setLangSearch] = useState('')
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       setShowLanguages(false)
-      setLangSearch('')
     }
     setOpen(newOpen)
   }
@@ -99,15 +97,9 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
 
   const handleTranslate = (langName: string) => {
     setShowLanguages(false)
-    setLangSearch('')
     setOpen(false)
     onAction('translate', langName)
   }
-
-  const filteredLanguages = AI.LANGUAGES.filter(lang => 
-    lang.name.toLowerCase().includes(langSearch.toLowerCase()) ||
-    lang.code.toLowerCase().includes(langSearch.toLowerCase())
-  )
 
   return (
     <Popover.Root open={open} onOpenChange={handleOpenChange}>
@@ -160,87 +152,48 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
           {showLanguages && (
             <>
               {/* Mobile: inline replacement */}
-              <div className="sm:hidden w-[200px] flex flex-col overflow-hidden">
+              <div className="sm:hidden w-[160px] flex flex-col overflow-hidden">
                 {/* Back button */}
                 <button
                   onClick={() => setShowLanguages(false)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg mb-1"
+                  className="flex items-center gap-2 px-2.5 py-1.5 text-[13px] text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg mb-0.5"
                 >
                   <span>‹</span>
                   {t('ai.translate')}
                 </button>
                 
-                {/* Search input */}
-                <div className="p-2 flex-shrink-0">
-                  <div className="flex items-center gap-2 px-2 py-1.5 bg-neutral-100 dark:bg-neutral-700 rounded-lg">
-                    <Search className="w-3.5 h-3.5 text-neutral-400" />
-                    <input
-                      type="text"
-                      value={langSearch}
-                      onChange={(e) => setLangSearch(e.target.value)}
-                      placeholder={t('ai.searchLanguage')}
-                      className="flex-1 bg-transparent border-0 outline-none text-sm text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-400"
-                      autoFocus
-                    />
-                  </div>
-                </div>
-                
                 {/* Language list */}
-                <div className="max-h-[200px] overflow-y-auto p-1 pt-0">
-                  {filteredLanguages.length > 0 ? (
-                    filteredLanguages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => handleTranslate(lang.name)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
-                      >
-                        {lang.name}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-3 py-2 text-sm text-neutral-400">
-                      {t('ai.notFound')}
-                    </div>
-                  )}
+                <div className="max-h-[220px] overflow-y-auto p-1 pt-0">
+                  {AI.LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleTranslate(lang.name)}
+                      className="w-full flex items-center gap-2 px-2 py-1.5 text-[13px] text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+                    >
+                      <CircleFlag countryCode={lang.countryCode} size={16} className="flex-shrink-0" />
+                      <span className="truncate">{lang.name}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
               {/* Desktop: side popup */}
               <div 
-                className="hidden sm:flex absolute left-full top-0 ml-2 w-[200px] h-full bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 animate-in fade-in zoom-in-95 duration-200 flex-col overflow-hidden"
+                className="hidden sm:flex absolute left-full top-0 ml-1 w-[160px] bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 animate-in fade-in zoom-in-95 duration-200 flex-col overflow-hidden"
+                style={{ maxHeight: '240px' }}
               >
-                {/* Search input */}
-                <div className="p-2 flex-shrink-0">
-                  <div className="flex items-center gap-2 px-2 py-1.5 bg-neutral-100 dark:bg-neutral-700 rounded-lg">
-                    <Search className="w-3.5 h-3.5 text-neutral-400" />
-                    <input
-                      type="text"
-                      value={langSearch}
-                      onChange={(e) => setLangSearch(e.target.value)}
-                      placeholder={t('ai.searchLanguage')}
-                      className="flex-1 bg-transparent border-0 outline-none text-sm text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-400"
-                      autoFocus
-                    />
-                  </div>
-                </div>
-                
                 {/* Language list */}
-                <div className="flex-1 overflow-y-auto p-1 pt-0">
-                  {filteredLanguages.length > 0 ? (
-                    filteredLanguages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => handleTranslate(lang.name)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
-                      >
-                        {lang.name}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-3 py-2 text-sm text-neutral-400">
-                      {t('ai.notFound')}
-                    </div>
-                  )}
+                <div className="flex-1 overflow-y-auto p-1">
+                  {AI.LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleTranslate(lang.name)}
+                      className="w-full flex items-center gap-2 px-2 py-1.5 text-[13px] text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+                    >
+                      <CircleFlag countryCode={lang.countryCode} size={16} className="flex-shrink-0" />
+                      <span className="truncate">{lang.name}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             </>

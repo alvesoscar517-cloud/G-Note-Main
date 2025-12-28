@@ -181,7 +181,7 @@
     "alreadyInstalled": "Đã cài đặt!",
     "alreadyInstalledDescription": "Bạn đang sử dụng phiên bản ứng dụng của G-Note.",
     "androidChromeInstructions": "Nhấn vào biểu tượng menu (⋮) ở góc trên, sau đó chọn \"Cài đặt ứng dụng\" hoặc \"Thêm vào màn hình chính\"",
-    "desktopChromeInstructions": "Nhấn vào biểu tượng cài đặt (⊕) ở thanh địa chỉ, hoặc vào Menu → Cài đặt ứng dụng",
+    "desktopChromeInstructions": "Nhấn vào biểu tượng cài đặt (⬇) ở thanh địa chỉ, hoặc vào Menu → Cài đặt ứng dụng",
     "iosSafariInstructions": "Nhấn nút Chia sẻ bên dưới, sau đó chọn \"Thêm vào MH chính\"",
     "iosChromeInstructions": "Để có trải nghiệm tốt nhất, hãy mở trong Safari và nhấn Chia sẻ → Thêm vào MH chính",
     "androidFirefoxInstructions": "Nhấn menu (⋮) rồi chọn \"Cài đặt\"",
@@ -212,7 +212,8 @@
     "cancel": "Hủy",
     "rotate": "Xoay",
     "flipH": "Lật ngang",
-    "flipV": "Lật dọc"
+    "flipV": "Lật dọc",
+    "auto": "Tự động"
   },
   "common": {
     "confirm": "Xác nhận",

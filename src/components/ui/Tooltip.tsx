@@ -1,10 +1,48 @@
 import * as React from 'react'
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import { cn } from '@/lib/utils'
+import { isTouchDevice } from '@/hooks/useIsTouchDevice'
 
 const TooltipProvider = TooltipPrimitive.Provider
 
-const Tooltip = TooltipPrimitive.Root
+// Context to track if tooltip should be disabled
+const TooltipDisabledContext = React.createContext(false)
+
+// Smart Tooltip that disables on touch devices
+const Tooltip = ({ children, ...props }: React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root>) => {
+  // On touch devices, don't show tooltip at all
+  const [isTouch, setIsTouch] = React.useState(() => isTouchDevice())
+  
+  React.useEffect(() => {
+    // Listen for input type changes
+    const handleTouch = () => setIsTouch(true)
+    const handleMouse = (e: MouseEvent) => {
+      if (e.movementX !== 0 || e.movementY !== 0) {
+        setIsTouch(false)
+      }
+    }
+    
+    window.addEventListener('touchstart', handleTouch, { passive: true })
+    window.addEventListener('mousemove', handleMouse, { passive: true })
+    
+    return () => {
+      window.removeEventListener('touchstart', handleTouch)
+      window.removeEventListener('mousemove', handleMouse)
+    }
+  }, [])
+  
+  return (
+    <TooltipDisabledContext.Provider value={isTouch}>
+      <TooltipPrimitive.Root 
+        {...props}
+        // Close immediately on click
+        disableHoverableContent
+      >
+        {children}
+      </TooltipPrimitive.Root>
+    </TooltipDisabledContext.Provider>
+  )
+}
 
 const TooltipTrigger = TooltipPrimitive.Trigger
 
@@ -35,6 +73,12 @@ const TooltipContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
 >(({ className, sideOffset = 6, ...props }, ref) => {
   const isDark = useIsDark()
+  const isDisabled = React.useContext(TooltipDisabledContext)
+  
+  // Don't render tooltip content on touch devices
+  if (isDisabled) {
+    return null
+  }
   
   return (
     <TooltipPrimitive.Portal>

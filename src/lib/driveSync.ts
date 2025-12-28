@@ -78,7 +78,7 @@ class DriveSync {
   private async getOrCreateFolder(): Promise<string> {
     if (this.folderId) return this.folderId
 
-    // First, try to find the new folder name
+    // Find the G-Note folder
     const searchUrl = `${DRIVE_API}/files?q=name='${FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`
     const searchRes = await this.request(searchUrl)
     const searchData = await searchRes.json()
@@ -89,23 +89,7 @@ class DriveSync {
       return id
     }
 
-    // Check for old folder name 'NotesApp' and rename it to 'G-Note'
-    const oldFolderUrl = `${DRIVE_API}/files?q=name='NotesApp' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`
-    const oldFolderRes = await this.request(oldFolderUrl)
-    const oldFolderData = await oldFolderRes.json()
-
-    if (oldFolderData.files?.length > 0) {
-      const oldFolderId: string = oldFolderData.files[0].id
-      // Rename old folder to new name
-      await this.request(`${DRIVE_API}/files/${oldFolderId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: FOLDER_NAME })
-      })
-      this.folderId = oldFolderId
-      return oldFolderId
-    }
-
+    // Create new folder if not exists
     const createRes = await this.request(`${DRIVE_API}/files`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

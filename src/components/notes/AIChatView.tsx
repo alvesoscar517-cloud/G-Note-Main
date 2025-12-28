@@ -7,15 +7,17 @@ import { common, createLowlight } from 'lowlight'
 import { Markdown } from 'tiptap-markdown'
 import Link from '@tiptap/extension-link'
 import { 
-  X, 
   Send, 
   Mic,
   MessageCircle,
-  FileText
+  FileText,
+  ChevronLeft,
+  X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { useAuthStore } from '@/stores/authStore'
+import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
 import * as AI from '@/lib/ai'
 import { InsufficientCreditsError } from '@/lib/ai'
 import type { AIChatMessage } from '@/types'
@@ -116,6 +118,19 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
+
+  // Edge swipe back gesture
+  const { 
+    handlers: edgeSwipeHandlers, 
+    swipeStyle: edgeSwipeStyle,
+    swipeState: edgeSwipeState,
+    progress: edgeSwipeProgress 
+  } = useEdgeSwipeBack({
+    onSwipeBack: onClose,
+    edgeWidth: 25,
+    threshold: 100,
+    enabled: open
+  })
 
   // Check if speech recognition is supported
   const isSpeechSupported = typeof window !== 'undefined' && 
@@ -307,13 +322,24 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
   const userName = user?.name?.split(' ')[0] || 'there'
 
   return (
-    <div className="fixed inset-0 z-50 bg-white dark:bg-neutral-950 flex flex-col">
-      {/* Close button - floating */}
+    <div 
+      className="fixed inset-0 z-50 bg-white dark:bg-neutral-950 flex flex-col"
+      style={edgeSwipeState.isDragging ? edgeSwipeStyle : undefined}
+      {...edgeSwipeHandlers}
+    >
+      {/* Edge swipe indicator */}
+      <EdgeSwipeIndicator 
+        progress={edgeSwipeProgress} 
+        isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
+      />
+      
+      {/* Back button - badge style on left side */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-10 p-2 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+        className="absolute top-[max(0.75rem,env(safe-area-inset-top))] left-[max(0.75rem,env(safe-area-inset-left))] z-10 inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors text-sm font-medium"
       >
-        <X className="w-5 h-5" />
+        <ChevronLeft className="w-4 h-4" />
+        {t('notes.close')}
       </button>
 
       {/* Messages Area */}
@@ -352,10 +378,10 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
         )}
       </div>
 
-      {/* Input Area - Prompt style */}
-      <div className="p-4">
+      {/* Input Area - Prompt style with border and safe area */}
+      <div className="px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-          <div className="bg-neutral-100 dark:bg-neutral-900 rounded-2xl overflow-hidden">
+          <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl overflow-hidden shadow-sm">
             {/* Context text attachment - shown above textarea */}
             {contextText && (
               <div className="px-4 pt-3">

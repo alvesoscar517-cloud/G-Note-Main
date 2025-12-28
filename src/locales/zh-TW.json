@@ -181,7 +181,7 @@
     "alreadyInstalled": "已安裝！",
     "alreadyInstalledDescription": "您正在使用 G-Note 的應用程式版本。",
     "androidChromeInstructions": "點擊頂部的選單圖示 (⋮)，然後選擇「安裝應用程式」或「加入主畫面」",
-    "desktopChromeInstructions": "點擊網址列中的安裝圖示 (⊕)，或前往 選單 → 安裝應用程式",
+    "desktopChromeInstructions": "點擊網址列中的安裝圖示 (⬇)，或前往 選單 → 安裝應用程式",
     "iosSafariInstructions": "點擊下方的分享按鈕，然後選擇「加入主畫面」",
     "iosChromeInstructions": "為獲得最佳體驗，請在 Safari 中開啟並點擊 分享 → 加入主畫面",
     "androidFirefoxInstructions": "點擊選單 (⋮) 然後選擇「安裝」",
@@ -212,7 +212,8 @@
     "cancel": "取消",
     "rotate": "旋轉",
     "flipH": "水平翻轉",
-    "flipV": "垂直翻轉"
+    "flipV": "垂直翻轉",
+    "auto": "自動"
   },
   "common": {
     "confirm": "確認",

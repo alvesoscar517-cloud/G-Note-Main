@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Download, X, Share, Plus, MoreVertical, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { useThemeStore } from '@/stores/themeStore'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -64,13 +63,10 @@ function getInstallMethod(): InstallMethod {
 
 export function InstallPrompt() {
   const { t } = useTranslation()
-  const { theme } = useThemeStore()
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
   const [dismissed, setDismissed] = useState(false)
   const [installMethod, setInstallMethod] = useState<InstallMethod>('none')
-  
-  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
   useEffect(() => {
     // Check if already dismissed (with expiry - show again after 7 days)
@@ -219,10 +215,10 @@ export function InstallPrompt() {
     <div className="fixed bottom-4 left-2 right-2 sm:left-4 sm:right-4 md:left-auto md:right-4 md:w-96 z-50 animate-in slide-in-from-bottom-4 duration-300">
       <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 p-3 sm:p-4 backdrop-blur-xl">
         <div className="flex items-start gap-2.5 sm:gap-3">
-          {/* App Icon */}
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-[12px] bg-neutral-900 dark:bg-white flex items-center justify-center shrink-0 shadow-lg p-1.5 sm:p-2">
+          {/* App Icon - always white background with black logo */}
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-[12px] bg-white flex items-center justify-center shrink-0 shadow-lg p-1.5 sm:p-2">
             <img 
-              src={isDark ? "/g-note.svg" : "/g-note-dark.svg"}
+              src="/g-note.svg"
               alt="G-Note" 
               className="w-full h-full"
             />

@@ -181,7 +181,7 @@
     "alreadyInstalled": "インストール済み！",
     "alreadyInstalledDescription": "G-Noteのアプリ版をご利用中です。",
     "androidChromeInstructions": "上部のメニューアイコン（⋮）をタップし、「アプリをインストール」または「ホーム画面に追加」を選択",
-    "desktopChromeInstructions": "アドレスバーのインストールアイコン（⊕）をクリック、またはメニュー→アプリをインストール",
+    "desktopChromeInstructions": "アドレスバーのインストールアイコン（⬇）をクリック、またはメニュー→アプリをインストール",
     "iosSafariInstructions": "下の共有ボタンをタップし、「ホーム画面に追加」を選択",
     "iosChromeInstructions": "最高の体験のために、Safariで開いて共有→ホーム画面に追加をタップ",
     "androidFirefoxInstructions": "メニュー（⋮）をタップして「インストール」を選択",
@@ -212,7 +212,8 @@
     "cancel": "キャンセル",
     "rotate": "回転",
     "flipH": "左右反転",
-    "flipV": "上下反転"
+    "flipV": "上下反転",
+    "auto": "自動"
   },
   "common": {
     "confirm": "確認",

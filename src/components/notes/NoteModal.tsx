@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { getPlainText } from '@/lib/utils'
 import { NoteBackground, getNoteBackgroundStyle } from './NoteStylePicker'
 import { useSwipeGesture } from '@/hooks/useSwipeGesture'
+import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
 import type { Note } from '@/types'
 
 // Modal max-width in pixels for each size
@@ -245,6 +246,19 @@ export function NoteModal() {
     enabled: isModalOpen
   })
 
+  // Edge swipe back gesture (swipe from left edge to close)
+  const { 
+    handlers: edgeSwipeHandlers, 
+    swipeStyle: edgeSwipeStyle,
+    swipeState: edgeSwipeState,
+    progress: edgeSwipeProgress 
+  } = useEdgeSwipeBack({
+    onSwipeBack: handleClose,
+    edgeWidth: 25,
+    threshold: 100,
+    enabled: isModalOpen
+  })
+
   // If viewing a public note, show the view page
   if (!displayNote) return null
 
@@ -269,7 +283,9 @@ export function NoteModal() {
             style={{ 
               willChange: 'transform',
               contain: 'layout style paint',
-              ...backgroundStyle 
+              ...backgroundStyle,
+              // Apply edge swipe transform on mobile
+              ...(edgeSwipeState.isDragging ? edgeSwipeStyle : {})
             }}
             className={cn(
               'fixed z-50 flex flex-col overflow-hidden',
@@ -284,23 +300,25 @@ export function NoteModal() {
                 ? 'md:w-full md:h-full md:max-w-none md:max-h-none md:rounded-none md:border-0' 
                 : MODAL_SIZES[modalSize]
             )}
+            {...edgeSwipeHandlers}
           >
-            <NoteBackground style={displayNote.style} className="rounded-[12px]" />
+            {/* Edge swipe indicator */}
+            <EdgeSwipeIndicator 
+              progress={edgeSwipeProgress} 
+              isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
+            />
+            <NoteBackground style={displayNote.style} className="md:rounded-[12px]" />
             
-            {/* Swipe indicator for mobile - drag down to close */}
-            <div 
-              className="md:hidden flex justify-center pt-2 pb-1 cursor-grab active:cursor-grabbing touch-manipulation safe-top"
-              {...swipeHandlers}
-            >
-              <div className="w-10 h-1 bg-neutral-300 dark:bg-neutral-600 rounded-full swipe-indicator" />
-            </div>
-            
-            {/* Mobile Header OR Fullscreen Header */}
+            {/* Mobile Header - full width with safe areas */}
             <div 
               className={cn(
-                'flex items-center gap-1 px-2 py-1.5 relative z-10 safe-x',
-                isFullscreen ? 'flex safe-top' : 'md:hidden'
+                'flex items-center gap-1 px-2 py-1.5 relative z-10',
+                'pt-[max(0.375rem,env(safe-area-inset-top))]',
+                'pl-[max(0.5rem,env(safe-area-inset-left))]',
+                'pr-[max(0.5rem,env(safe-area-inset-right))]',
+                isFullscreen ? 'flex' : 'md:hidden'
               )}
+              {...swipeHandlers}
               style={swipeStyle}
             >
               <Button variant="ghost" size="icon" onClick={handleClose} className="shrink-0">

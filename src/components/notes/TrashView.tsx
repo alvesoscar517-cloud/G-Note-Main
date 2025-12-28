@@ -1,7 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Trash2, RotateCcw, X, CheckSquare, Square, AlertTriangle, Search, Loader2 } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Dialog, DialogHeader, DialogContent, DialogFooter } from '@/components/ui/Dialog'
@@ -13,6 +12,7 @@ import { cn, getPlainText, formatDate } from '@/lib/utils'
 import { NoteBackground, getNoteBackgroundStyle } from './NoteStylePicker'
 import { Highlight } from '@/components/ui/Highlight'
 import { searchDocuments, type DriveSearchResult } from '@/lib/driveSearch'
+import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
 import type { Note } from '@/types'
 
 interface TrashViewProps {
@@ -41,6 +41,19 @@ export function TrashView({ open, onClose }: TrashViewProps) {
   
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
   
+  // Edge swipe back gesture
+  const { 
+    handlers: edgeSwipeHandlers, 
+    swipeStyle: edgeSwipeStyle,
+    swipeState: edgeSwipeState,
+    progress: edgeSwipeProgress 
+  } = useEdgeSwipeBack({
+    onSwipeBack: onClose,
+    edgeWidth: 25,
+    threshold: 100,
+    enabled: open
+  })
+  
   const trashNotes = useMemo(() => {
     return notes
       .filter(n => n.isDeleted)
@@ -67,11 +80,20 @@ export function TrashView({ open, onClose }: TrashViewProps) {
     setIsDriveSearching(true)
     try {
       const results = await searchDocuments(user.accessToken, searchQuery, 20)
-      // Filter to only show notes that are in trash
+      // Filter to only show notes that are in trash and deduplicate by note ID
       const trashNoteIds = new Set(trashNotes.map(n => n.id))
+      const seenNoteIds = new Set<string>()
       const filteredResults = results.filter(r => {
         const match = r.name.match(/^note-(.+)\.json$/)
-        return match && trashNoteIds.has(match[1])
+        if (match && trashNoteIds.has(match[1])) {
+          // Deduplicate - only keep first occurrence of each note ID
+          if (seenNoteIds.has(match[1])) {
+            return false
+          }
+          seenNoteIds.add(match[1])
+          return true
+        }
+        return false
       })
       setDriveResults(filteredResults)
     } catch (err) {
@@ -144,7 +166,17 @@ export function TrashView({ open, onClose }: TrashViewProps) {
 
   return (
     <>
-      <div className="fixed inset-0 z-[90] flex flex-col bg-neutral-50 dark:bg-neutral-950">
+      <div 
+        className="fixed inset-0 z-[90] flex flex-col bg-neutral-50 dark:bg-neutral-950"
+        style={edgeSwipeState.isDragging ? edgeSwipeStyle : undefined}
+        {...edgeSwipeHandlers}
+      >
+        {/* Edge swipe indicator */}
+        <EdgeSwipeIndicator 
+          progress={edgeSwipeProgress} 
+          isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
+        />
+        
         {/* Header */}
         <div className="sticky top-0 z-30 px-3 sm:px-4 pt-3 sm:pt-4 safe-top safe-x">
           <div className="max-w-6xl mx-auto bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg border border-neutral-200 dark:border-neutral-800 rounded-[16px] px-3 sm:px-4 py-2.5 sm:py-3">
@@ -177,16 +209,10 @@ export function TrashView({ open, onClose }: TrashViewProps) {
         </div>
 
         {/* Selection toolbar / Search bar */}
-        <AnimatePresence mode="wait">
-          {trashNotes.length > 0 && (
-            <motion.div 
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="px-3 sm:px-4 pt-2 sm:pt-3"
-            >
-              <div className="max-w-6xl mx-auto flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg">
-                {hasSelection ? (
+        {trashNotes.length > 0 && (
+          <div className="px-3 sm:px-4 pt-2 sm:pt-3">
+            <div className="max-w-6xl mx-auto flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg">
+              {hasSelection ? (
                   <>
                     <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} className="gap-1.5 flex-shrink-0 px-2 sm:px-3">
                       <X className="w-4 h-4" />
@@ -240,9 +266,8 @@ export function TrashView({ open, onClose }: TrashViewProps) {
                   </>
                 )}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </div>
+        )}
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 sm:py-4 safe-x safe-bottom">
@@ -373,14 +398,10 @@ function TrashNoteCard({ note, isSelected, hasSelection, onToggleSelect, onResto
 
   return (
     <>
-      <motion.div
-        layout
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
+      <div
         style={backgroundStyle}
         className={cn(
-          'relative group rounded-[16px] border p-4 cursor-pointer transition-all overflow-hidden',
+          'relative group rounded-[16px] border p-4 cursor-pointer transition-shadow overflow-hidden',
           note.style?.backgroundImage ? 'bg-white dark:bg-neutral-900' : (!hasCustomBg && 'bg-white dark:bg-neutral-900'),
           isSelected 
             ? 'border-neutral-900 dark:border-white ring-2 ring-neutral-900/20 dark:ring-white/20' 
@@ -458,7 +479,7 @@ function TrashNoteCard({ note, isSelected, hasSelection, onToggleSelect, onResto
             </Tooltip>
           </div>
         )}
-      </motion.div>
+      </div>
 
       <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
         <DialogHeader>{t('trash.deleteConfirmTitle')}</DialogHeader>

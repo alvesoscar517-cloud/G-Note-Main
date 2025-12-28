@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useDebounce } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
-import { Search, Plus, Moon, Sun, LogOut, RefreshCw, Settings, X, Coins, ChevronRight, ArrowLeft, Maximize2, Trash2, Loader2 } from 'lucide-react'
+import { Search, Plus, Moon, Sun, LogOut, RefreshCw, Settings, X, Coins, ChevronRight, ArrowLeft, Maximize2, Trash2 } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
@@ -12,6 +12,7 @@ import { LanguageSelector, LanguageButton } from '@/components/ui/LanguageSelect
 import { OfflineIndicator } from '@/components/ui/OfflineIndicator'
 import { TrashView } from '@/components/notes/TrashView'
 import { DriveSearchResults } from '@/components/search/DriveSearchResults'
+import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 import { cn } from '@/lib/utils'
 
 // Modal size options
@@ -175,16 +176,9 @@ export function Header() {
   return (
     <>
       {/* Logout Loading Overlay */}
-      {isLoggingOut && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm">
-          <div className="flex flex-col items-center gap-3">
-            <Loader2 className="w-8 h-8 animate-spin text-neutral-600 dark:text-neutral-400" />
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">{t('settings.loggingOut')}</p>
-          </div>
-        </div>
-      )}
+      <LoadingOverlay isVisible={isLoggingOut} text={t('settings.loggingOut')} />
 
-      <header className="sticky top-0 z-30 px-4 pt-4 safe-top safe-x">
+      <header className="px-4 pt-4 safe-top safe-x relative z-40">
         <div className="max-w-6xl mx-auto bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg border border-neutral-200 dark:border-neutral-800 rounded-[16px] px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             {/* Logo & Search */}
@@ -229,7 +223,7 @@ export function Header() {
                 
                 {/* Drive Search Results Dropdown */}
                 {showDriveResults && debouncedSearch.trim() && (
-                  <div className="absolute top-full left-0 right-0 mt-2 z-50 mx-0 sm:mx-0">
+                  <div className="absolute top-full left-0 right-0 mt-2 z-[100] mx-0 sm:mx-0">
                     <DriveSearchResults 
                       query={debouncedSearch}
                       onClose={() => setShowDriveResults(false)}
@@ -386,69 +380,69 @@ export function Header() {
 
       {/* Credits Packages Modal */}
       {packagesOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 safe-x">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 safe-x">
           <div 
             className="absolute inset-0 bg-black/50"
             onClick={() => setPackagesOpen(false)}
           />
           
-          <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl animate-in fade-in-0 zoom-in-95 border border-neutral-200 dark:border-neutral-700 modal-safe-area">
+          <div className="relative w-full max-w-[320px] sm:max-w-sm max-h-[85vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl animate-in fade-in-0 zoom-in-95 border border-neutral-200 dark:border-neutral-700 modal-safe-area">
             <button
               onClick={() => setPackagesOpen(false)}
-              className="absolute top-2 right-2 sm:top-3 sm:right-3 p-1.5 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors z-10"
+              className="absolute top-2 right-2 p-1.5 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors z-10"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             
-            {/* Header - compact in landscape */}
-            <div className="pt-4 sm:pt-6 pb-2 sm:pb-4 px-4 sm:px-6 text-center">
-              <div className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-neutral-100 dark:bg-neutral-800 mb-2 sm:mb-3">
-                <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-600 dark:text-neutral-400" />
+            {/* Header - compact */}
+            <div className="pt-4 pb-2 px-4 text-center">
+              <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 mb-2">
+                <Coins className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
               </div>
-              <h2 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">
+              <h2 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
                 {t('credits.title')}
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
                 {t('credits.balance')}: <span className="font-semibold">{credits.toLocaleString()}</span> {t('credits.aiCredits')}
               </p>
             </div>
             
             {/* Packages - compact spacing */}
-            <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-2 sm:space-y-3">
+            <div className="px-3 pb-3 space-y-2">
               {CREDIT_PACKAGES.map((pkg) => (
                 <div
                   key={pkg.id}
                   onClick={() => handleBuyPackage(pkg.id)}
                   className={cn(
-                    "relative p-4 rounded-xl border transition-all cursor-pointer hover:shadow-md",
+                    "relative p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer hover:shadow-md active:scale-[0.98]",
                     pkg.badge 
                       ? "border-neutral-400 dark:border-neutral-500 bg-neutral-50 dark:bg-neutral-800" 
                       : "border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500"
                   )}
                 >
                   {pkg.badge && (
-                    <span className="absolute -top-2.5 left-4 px-2 py-0.5 text-xs font-semibold bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-full">
+                    <span className="absolute -top-2 left-3 px-1.5 py-0.5 text-[10px] font-semibold bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-full">
                       {t('credits.bestValue')}
                     </span>
                   )}
                   
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center">
-                        <img src={pkg.icon} alt="" className={pkg.iconSize} />
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0">
+                        <img src={pkg.icon} alt="" className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-sm sm:text-base text-neutral-900 dark:text-white">
+                      <div className="min-w-0">
+                        <h3 className="font-semibold text-xs sm:text-sm text-neutral-900 dark:text-white">
                           {pkg.name}
                         </h3>
-                        <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
-                          <Coins className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                        <p className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 flex items-center gap-0.5">
+                          <Coins className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
                           {pkg.credits.toLocaleString()} {t('credits.aiCredits')}
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
+                    <div className="text-right flex-shrink-0 ml-2">
+                      <p className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white">
                         {pkg.priceDisplay}
                       </p>
                     </div>
@@ -458,16 +452,16 @@ export function Header() {
             </div>
             
             {/* Footer with Lemon Squeezy logo */}
-            <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-1 sm:pt-2 flex items-center justify-center">
+            <div className="px-4 pb-3 pt-1 flex items-center justify-center">
               <img 
                 src="/lemonsqueezy-black.svg" 
                 alt="Lemon Squeezy" 
-                className="h-3 sm:h-4 dark:hidden"
+                className="h-3 dark:hidden"
               />
               <img 
                 src="/lemonsqueezy-white.svg" 
                 alt="Lemon Squeezy" 
-                className="h-3 sm:h-4 hidden dark:block"
+                className="h-3 hidden dark:block"
               />
             </div>
           </div>

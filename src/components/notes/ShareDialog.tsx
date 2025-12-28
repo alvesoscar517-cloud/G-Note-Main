@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Copy, Check, Users, Link2, Mail, Loader2, Globe, WifiOff } from 'lucide-react'
 import { Dialog, DialogHeader, DialogContent, DialogFooter } from '@/components/ui/Dialog'
@@ -42,8 +42,20 @@ export function ShareDialog({
   const [shareSuccess, setShareSuccess] = useState(false)
   const [shareError, setShareError] = useState<string | null>(null)
   const [publicLink, setPublicLink] = useState<string | null>(null)
+  const [generatedRoomId, setGeneratedRoomId] = useState<string | null>(null)
 
-  const roomId = existingRoomId || generateRoomId()
+  // Generate roomId only once when dialog opens and no existing roomId
+  const roomId = useMemo(() => {
+    if (existingRoomId) return existingRoomId
+    return generatedRoomId
+  }, [existingRoomId, generatedRoomId])
+
+  // Generate new roomId when dialog opens without existing one
+  useEffect(() => {
+    if (open && !existingRoomId && !generatedRoomId) {
+      setGeneratedRoomId(generateRoomId())
+    }
+  }, [open, existingRoomId, generatedRoomId])
 
   // Check if note already has a public link when dialog opens
   useEffect(() => {
@@ -60,8 +72,10 @@ export function ShareDialog({
   }
 
   const handleStartRealtime = () => {
-    onCreateRoom(roomId)
-    onClose()
+    if (roomId) {
+      onCreateRoom(roomId)
+      onClose()
+    }
   }
 
   const handleJoinRoom = () => {
@@ -139,6 +153,7 @@ export function ShareDialog({
     setShareError(null)
     setShareEmail('')
     setJoinRoomId('')
+    setGeneratedRoomId(null) // Reset generated roomId for next open
     if (!note?.publicFileId) {
       setPublicLink(null)
     }
@@ -217,11 +232,11 @@ export function ShareDialog({
               </p>
               <div className="flex gap-2">
                 <Input 
-                  value={roomId} 
+                  value={roomId || ''} 
                   readOnly 
                   className="font-mono text-center tracking-wider"
                 />
-                <Button variant="outline" size="icon" onClick={() => handleCopy(roomId)}>
+                <Button variant="outline" size="icon" onClick={() => roomId && handleCopy(roomId)} disabled={!roomId}>
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
               </div>
@@ -283,7 +298,7 @@ export function ShareDialog({
         )}
         
         {mode === 'realtime' && (
-          <Button onClick={handleStartRealtime} disabled={!isOnline}>{t('share.start')}</Button>
+          <Button onClick={handleStartRealtime} disabled={!isOnline || !roomId}>{t('share.start')}</Button>
         )}
         
         {mode === 'email' && (

@@ -181,7 +181,7 @@
     "alreadyInstalled": "Al geïnstalleerd!",
     "alreadyInstalledDescription": "Je gebruikt de app-versie van G-Note.",
     "androidChromeInstructions": "Tik op het menu-icoon (⋮) bovenaan, selecteer dan \"App installeren\" of \"Toevoegen aan startscherm\"",
-    "desktopChromeInstructions": "Klik op het installatie-icoon (⊕) in de adresbalk, of ga naar Menu → App installeren",
+    "desktopChromeInstructions": "Klik op het installatie-icoon (⬇) in de adresbalk, of ga naar Menu → App installeren",
     "iosSafariInstructions": "Tik op de Deel-knop hieronder, dan \"Zet op beginscherm\"",
     "iosChromeInstructions": "Voor de beste ervaring, open in Safari en tik Deel → Zet op beginscherm",
     "androidFirefoxInstructions": "Tik op het menu (⋮) dan \"Installeren\"",
@@ -212,7 +212,8 @@
     "cancel": "Annuleren",
     "rotate": "Draaien",
     "flipH": "Horizontaal spiegelen",
-    "flipV": "Verticaal spiegelen"
+    "flipV": "Verticaal spiegelen",
+    "auto": "Auto"
   },
   "common": {
     "confirm": "Bevestigen",

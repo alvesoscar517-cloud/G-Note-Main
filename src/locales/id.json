@@ -181,7 +181,7 @@
     "alreadyInstalled": "Sudah Terinstal!",
     "alreadyInstalledDescription": "Anda menggunakan versi aplikasi G-Note.",
     "androidChromeInstructions": "Ketuk ikon menu (⋮) di atas, lalu pilih \"Instal aplikasi\" atau \"Tambahkan ke Layar Utama\"",
-    "desktopChromeInstructions": "Klik ikon instal (⊕) di bilah alamat, atau buka Menu → Instal aplikasi",
+    "desktopChromeInstructions": "Klik ikon instal (⬇) di bilah alamat, atau buka Menu → Instal aplikasi",
     "iosSafariInstructions": "Ketuk tombol Bagikan di bawah, lalu \"Tambahkan ke Layar Utama\"",
     "iosChromeInstructions": "Untuk pengalaman terbaik, buka di Safari dan ketuk Bagikan → Tambahkan ke Layar Utama",
     "androidFirefoxInstructions": "Ketuk menu (⋮) lalu \"Instal\"",
@@ -212,7 +212,8 @@
     "cancel": "Batal",
     "rotate": "Putar",
     "flipH": "Balik H",
-    "flipV": "Balik V"
+    "flipV": "Balik V",
+    "auto": "Otomatis"
   },
   "common": {
     "confirm": "Konfirmasi",
