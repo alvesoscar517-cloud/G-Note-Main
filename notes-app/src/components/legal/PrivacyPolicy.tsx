@@ -197,7 +197,7 @@ export function PrivacyPolicy() {
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">10. Contact Us</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px]">
                     If you have any questions about this Privacy Policy, please contact us at:{' '}
-                    <a href="mailto:Support@graphoasai.com" className="text-neutral-900 dark:text-neutral-100 underline underline-offset-2">
+                    <a href="mailto:Support@graphosai.com" className="text-neutral-900 dark:text-neutral-100 underline underline-offset-2">
                       Support@graphoasai.com
                     </a>
                   </p>

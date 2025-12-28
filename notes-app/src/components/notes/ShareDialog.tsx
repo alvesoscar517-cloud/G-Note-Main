@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Users, Link2, Mail, Loader2, Globe, WifiOff } from 'lucide-react'
+import { Copy, Check, Users, Link2, Mail, Loader2, Globe, WifiOff, AlertCircle } from 'lucide-react'
 import { Dialog, DialogHeader, DialogContent, DialogFooter } from '@/components/ui/Dialog'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -14,9 +14,11 @@ interface ShareDialogProps {
   open: boolean
   onClose: () => void
   noteId: string
-  existingRoomId?: string
+  existingRoomId?: string | null
+  collaboratorsCount?: number
   onCreateRoom: (roomId: string) => void
   onJoinRoom: (roomId: string) => void
+  onStopSharing?: () => void
 }
 
 type TabType = 'public' | 'realtime' | 'email' | 'join'
@@ -25,8 +27,10 @@ export function ShareDialog({
   open, 
   onClose, 
   existingRoomId,
+  collaboratorsCount = 0,
   onCreateRoom,
-  onJoinRoom
+  onJoinRoom,
+  onStopSharing
 }: ShareDialogProps) {
   const { t } = useTranslation()
   const { user } = useAuthStore()
@@ -42,20 +46,9 @@ export function ShareDialog({
   const [shareSuccess, setShareSuccess] = useState(false)
   const [shareError, setShareError] = useState<string | null>(null)
   const [publicLink, setPublicLink] = useState<string | null>(null)
-  const [generatedRoomId, setGeneratedRoomId] = useState<string | null>(null)
-
-  // Generate roomId only once when dialog opens and no existing roomId
-  const roomId = useMemo(() => {
-    if (existingRoomId) return existingRoomId
-    return generatedRoomId
-  }, [existingRoomId, generatedRoomId])
-
-  // Generate new roomId when dialog opens without existing one
-  useEffect(() => {
-    if (open && !existingRoomId && !generatedRoomId) {
-      setGeneratedRoomId(generateRoomId())
-    }
-  }, [open, existingRoomId, generatedRoomId])
+  
+  // Check if currently in a realtime session
+  const isInRealtimeSession = !!existingRoomId
 
   // Check if note already has a public link when dialog opens
   useEffect(() => {
@@ -72,10 +65,10 @@ export function ShareDialog({
   }
 
   const handleStartRealtime = () => {
-    if (roomId) {
-      onCreateRoom(roomId)
-      onClose()
-    }
+    // Generate new roomId when starting
+    const newRoomId = generateRoomId()
+    onCreateRoom(newRoomId)
+    onClose()
   }
 
   const handleJoinRoom = () => {
@@ -153,7 +146,6 @@ export function ShareDialog({
     setShareError(null)
     setShareEmail('')
     setJoinRoomId('')
-    setGeneratedRoomId(null) // Reset generated roomId for next open
     if (!note?.publicFileId) {
       setPublicLink(null)
     }
@@ -227,19 +219,47 @@ export function ShareDialog({
 
           {mode === 'realtime' && (
             <div className="space-y-3">
-              <p className="text-sm">
-                {t('share.realtimeDescription')}
-              </p>
-              <div className="flex gap-2">
-                <Input 
-                  value={roomId || ''} 
-                  readOnly 
-                  className="font-mono text-center tracking-wider"
-                />
-                <Button variant="outline" size="icon" onClick={() => roomId && handleCopy(roomId)} disabled={!roomId}>
-                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                </Button>
-              </div>
+              {isInRealtimeSession ? (
+                <>
+                  {/* Currently in a session */}
+                  <div className="p-3 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                    <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                      <Users className="w-4 h-4" />
+                      <span className="text-sm font-medium">
+                        {t('share.realtimeActive', { count: collaboratorsCount })}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                    {t('share.shareCodeToInvite')}
+                  </p>
+                  <div className="flex gap-2">
+                    <Input 
+                      value={existingRoomId || ''} 
+                      readOnly 
+                      className="font-mono text-center tracking-wider"
+                    />
+                    <Button variant="outline" size="icon" onClick={() => existingRoomId && handleCopy(existingRoomId)}>
+                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Not in a session - show create option */}
+                  <p className="text-sm">
+                    {t('share.realtimeDescription')}
+                  </p>
+                  <div className="p-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+                    <div className="flex items-start gap-2 text-neutral-600 dark:text-neutral-400">
+                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <span className="text-xs">
+                        {t('share.realtimeNote')}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -297,8 +317,16 @@ export function ShareDialog({
           </Button>
         )}
         
-        {mode === 'realtime' && (
-          <Button onClick={handleStartRealtime} disabled={!isOnline || !roomId}>{t('share.start')}</Button>
+        {mode === 'realtime' && !isInRealtimeSession && (
+          <Button onClick={handleStartRealtime} disabled={!isOnline}>
+            {t('share.start')}
+          </Button>
+        )}
+        
+        {mode === 'realtime' && isInRealtimeSession && onStopSharing && (
+          <Button onClick={() => { onStopSharing(); onClose(); }} variant="destructive">
+            {t('share.stopSharing')}
+          </Button>
         )}
         
         {mode === 'email' && (

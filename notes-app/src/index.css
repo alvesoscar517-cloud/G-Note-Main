@@ -16,9 +16,34 @@
 }
 
 /* Dynamic viewport height for mobile - fills entire screen */
-html, body {
+html {
   min-height: 100vh;
   min-height: 100dvh;
+  /* Ensure background extends to full screen including notch area */
+  background-color: #fafafa;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  /* Inherit background from html to ensure consistency */
+  background-color: inherit;
+  /* Prevent any margin/padding that could cause gaps */
+  margin: 0;
+  padding: 0;
+}
+
+/* Dark mode background - must use :where for proper specificity with Tailwind */
+html.dark, html.dark body,
+:root:has(.dark), :root:has(.dark) body {
+  background-color: #0a0a0a;
+}
+
+/* Root element fills entire screen */
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: inherit;
 }
 
 /* Utility class for dynamic viewport height */
@@ -57,38 +82,39 @@ html, body {
   color: #F5F5F5;
 }
 
-/* Safe area padding utilities */
+/* Safe area padding utilities - CONSISTENT across all modes */
+/* Use env() directly with fallback, not CSS variables that may not update */
 .safe-top {
-  padding-top: max(0.75rem, var(--safe-area-top));
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
 }
 
 .safe-bottom {
-  padding-bottom: max(0.75rem, var(--safe-area-bottom));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
 }
 
 .safe-left {
-  padding-left: max(0.75rem, var(--safe-area-left));
+  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
 }
 
 .safe-right {
-  padding-right: max(0.75rem, var(--safe-area-right));
+  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
 }
 
 .safe-x {
-  padding-left: max(0.75rem, var(--safe-area-left));
-  padding-right: max(0.75rem, var(--safe-area-right));
+  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
 }
 
 .safe-y {
-  padding-top: max(0.75rem, var(--safe-area-top));
-  padding-bottom: max(0.75rem, var(--safe-area-bottom));
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
 }
 
 .safe-all {
-  padding-top: max(0.75rem, var(--safe-area-top));
-  padding-bottom: max(0.75rem, var(--safe-area-bottom));
-  padding-left: max(0.75rem, var(--safe-area-left));
-  padding-right: max(0.75rem, var(--safe-area-right));
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
 }
 
 /* Disable text selection globally except for specific elements */
@@ -848,17 +874,10 @@ body.modal-open {
     min-height: 100dvh; /* Dynamic viewport height for mobile */
   }
   
-  /* Main app container fills screen with safe area padding */
+  /* Main app container fills screen - background extends behind notch */
   .min-h-screen {
     min-height: 100vh;
     min-height: 100dvh;
-    /* Background extends behind notch, content stays safe */
-    padding-top: env(safe-area-inset-top, 0);
-  }
-  
-  /* Header gets extra top padding in fullscreen mode */
-  .safe-top {
-    padding-top: max(1rem, calc(env(safe-area-inset-top, 0px) + 0.5rem));
   }
   
   /* Modals need safe area awareness in fullscreen */
@@ -870,6 +889,12 @@ body.modal-open {
 
 /* Standalone mode - status bar visible but app is immersive */
 @media screen and (display-mode: standalone) {
+  /* Root element extends to full screen */
+  html, body, #root {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  
   .modal-content,
   .rounded-2xl {
     /* Extra padding for PWA mode on curved devices */

@@ -27,36 +27,41 @@ export default defineConfig({
                 'apple-splash-*.png'
             ],
             manifest: {
-                name: 'G-Note',
+                name: 'G-Note - Free Note Taking App',
                 short_name: 'G-Note',
-                description: 'G-Note - Simple & Modern Notes App. Sync with Google Drive.',
-                theme_color: '#ffffff',
-                background_color: '#ffffff',
-                display: 'fullscreen',
-                display_override: ['fullscreen', 'standalone'],
+                description: 'G-Note is a free, beautiful note-taking app that syncs with Google Drive. Create notes, collaborate in real-time, use AI assistance, and access your notes anywhere. Works offline!',
+                theme_color: '#fafafa',
+                background_color: '#fafafa',
+                display: 'standalone',
+                display_override: ['standalone', 'fullscreen'],
                 orientation: 'any',
                 start_url: '/',
                 scope: '/',
                 id: '/',
-                lang: 'vi',
+                lang: 'en',
                 dir: 'ltr',
-                categories: ['productivity', 'utilities'],
+                categories: ['productivity', 'utilities', 'business', 'education'],
                 prefer_related_applications: false,
+                iarc_rating_id: '',
+                related_applications: [
+                    {
+                        platform: 'webapp',
+                        url: 'https://g-note.app'
+                    }
+                ],
                 icons: [
+                    // Icons với nền trắng - dùng cho install dialog và favicon
                     {
                         src: 'pwa-64x64.png',
                         sizes: '64x64',
-                        type: 'image/png'
+                        type: 'image/png',
+                        purpose: 'any'
                     },
                     {
                         src: 'pwa-192x192.png',
                         sizes: '192x192',
-                        type: 'image/png'
-                    },
-                    {
-                        src: 'pwa-512x512.png',
-                        sizes: '512x512',
-                        type: 'image/png'
+                        type: 'image/png',
+                        purpose: 'any'
                     },
                     {
                         src: 'pwa-512x512.png',
@@ -64,6 +69,8 @@ export default defineConfig({
                         type: 'image/png',
                         purpose: 'any'
                     },
+                    // Maskable icons - icon nhỏ hơn trong safe zone 80%, nền trắng
+                    // Dùng cho Android adaptive icon và home screen
                     {
                         src: 'pwa-maskable-192x192.png',
                         sizes: '192x192',
@@ -81,11 +88,31 @@ export default defineConfig({
                     {
                         name: 'New Note',
                         short_name: 'New',
-                        description: 'Create a new note',
+                        description: 'Create a new note quickly',
                         url: '/?action=new',
                         icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }]
+                    },
+                    {
+                        name: 'Search Notes',
+                        short_name: 'Search',
+                        description: 'Search through your notes',
+                        url: '/?action=search',
+                        icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }]
                     }
-                ]
+                ],
+                screenshots: [
+                    {
+                        src: '/og-image.png',
+                        sizes: '1200x630',
+                        type: 'image/png',
+                        form_factor: 'wide',
+                        label: 'G-Note - Note Taking App'
+                    }
+                ],
+                handle_links: 'preferred',
+                launch_handler: {
+                    client_mode: ['navigate-existing', 'auto']
+                }
             },
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,json}'],

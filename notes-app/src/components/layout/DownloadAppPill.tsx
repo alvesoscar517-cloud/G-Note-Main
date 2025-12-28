@@ -24,6 +24,15 @@ const WindowsIcon = ({ className }: { className?: string }) => (
   </svg>
 )
 
+// Chrome Icon (official Google Chrome logo)
+const ChromeIcon = ({ className }: { className?: string }) => (
+  <img 
+    src="/chrome-color-svgrepo-com.svg" 
+    alt="Chrome" 
+    className={className}
+  />
+)
+
 export function DownloadAppPill() {
   const { t } = useTranslation()
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -55,6 +64,10 @@ export function DownloadAppPill() {
           {/* Windows */}
           <div className="w-7 h-7 rounded-full bg-white dark:bg-neutral-800 flex items-center justify-center border border-neutral-200 dark:border-neutral-700">
             <WindowsIcon className="w-3.5 h-3.5 text-[#0078D4]" />
+          </div>
+          {/* Chrome Extension */}
+          <div className="w-7 h-7 rounded-full bg-white dark:bg-neutral-800 flex items-center justify-center border border-neutral-200 dark:border-neutral-700">
+            <ChromeIcon className="w-3.5 h-3.5" />
           </div>
         </div>
 

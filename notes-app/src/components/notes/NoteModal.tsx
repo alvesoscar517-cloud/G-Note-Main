@@ -112,10 +112,14 @@ export function NoteModal() {
   const checkAutoFullscreen = useCallback(() => {
     const modalWidth = MODAL_MAX_WIDTHS[modalSize]
     const screenWidth = window.innerWidth
+    const screenHeight = window.innerHeight
     const sideMargin = (screenWidth - modalWidth) / 2
     
-    // Auto-fullscreen if side margins are too small
-    const shouldAutoFullscreen = sideMargin <= MIN_SIDE_MARGIN
+    // Auto-fullscreen if:
+    // 1. Side margins are too small (small screen)
+    // 2. Landscape mode on mobile (height < 500px indicates mobile landscape)
+    const isLandscapeMobile = screenHeight < 500 && screenWidth > screenHeight
+    const shouldAutoFullscreen = sideMargin <= MIN_SIDE_MARGIN || isLandscapeMobile
     
     // Update whether user can exit fullscreen
     setCanExitFullscreen(!shouldAutoFullscreen)
@@ -312,14 +316,20 @@ export function NoteModal() {
             {/* Mobile Header - full width with safe areas */}
             <div 
               className={cn(
-                'flex items-center gap-1 px-2 py-1.5 relative z-10',
-                'pt-[max(0.375rem,env(safe-area-inset-top))]',
-                'pl-[max(0.5rem,env(safe-area-inset-left))]',
-                'pr-[max(0.5rem,env(safe-area-inset-right))]',
+                'flex items-center gap-1 relative z-10',
+                // Base padding - consistent across all orientations
+                'px-2 py-1.5',
+                // Safe area padding - applied to the container, not individual items
+                // This ensures all items align properly regardless of orientation
                 isFullscreen ? 'flex' : 'md:hidden'
               )}
+              style={{
+                paddingTop: 'max(0.375rem, env(safe-area-inset-top, 0px))',
+                paddingLeft: 'max(0.5rem, env(safe-area-inset-left, 0px))',
+                paddingRight: 'max(0.5rem, env(safe-area-inset-right, 0px))',
+                ...swipeStyle
+              }}
               {...swipeHandlers}
-              style={swipeStyle}
             >
               <Button variant="ghost" size="icon" onClick={handleClose} className="shrink-0">
                 <ArrowLeft className="w-5 h-5" />

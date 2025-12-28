@@ -15,10 +15,10 @@ import { NoteModal } from '@/components/notes/NoteModal'
 import { PublicNoteView } from '@/components/notes/PublicNoteView'
 import { PrivacyPolicy, TermsOfService } from '@/components/legal'
 import { TooltipProvider } from '@/components/ui/Tooltip'
-import { OfflineBanner } from '@/components/ui/OfflineIndicator'
 import { useBlockContextMenu } from '@/components/ui/ContextMenuBlocker'
+import { SEOHead } from '@/components/SEOHead'
 import { initOfflineSync } from '@/lib/offlineSync'
-import { hideSplashScreen } from '@/main'
+import { hideSplashScreen } from '@/lib/splashScreen'
 import { 
   isTokenExpired, 
   hasAuthBackend, 
@@ -241,8 +241,8 @@ function AppContent() {
 
   return (
     <LayoutGroup>
-      <div className="min-h-screen min-h-dvh bg-neutral-50 dark:bg-neutral-950">
-        <OfflineBanner />
+      <SEOHead />
+      <div className="min-h-screen min-h-dvh bg-neutral-50 dark:bg-neutral-950 fixed inset-0 overflow-auto">
         <Header />
         <main className="max-w-6xl mx-auto px-4 py-6 safe-x safe-bottom">
           <NotesList />

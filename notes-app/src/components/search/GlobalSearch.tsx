@@ -101,7 +101,7 @@ export function GlobalSearch({ open, onClose, onSelectNote }: GlobalSearchProps)
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] p-4">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 safe-x safe-top">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/50"

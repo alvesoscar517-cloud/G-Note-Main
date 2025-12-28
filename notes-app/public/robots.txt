@@ -1,0 +1,41 @@
+# G-Note Robots.txt
+# https://g-note.app
+
+User-agent: *
+Allow: /
+
+# Disallow API and internal paths
+Disallow: /api/
+Disallow: /_/
+Disallow: /auth/
+Disallow: /callback
+
+# Allow important pages
+Allow: /privacy
+Allow: /terms
+
+# Sitemap location
+Sitemap: https://g-note.app/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Bing specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Social media crawlers
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /

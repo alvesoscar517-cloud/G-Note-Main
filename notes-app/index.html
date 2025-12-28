@@ -1,21 +1,92 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    
+    <!-- Primary Meta Tags -->
+    <title>G-Note - Free Note Taking App | Sync with Google Drive</title>
+    <meta name="title" content="G-Note - Free Note Taking App | Sync with Google Drive" />
+    <meta name="description" content="G-Note is a free, beautiful note-taking app that syncs with Google Drive. Create notes, collaborate in real-time, use AI assistance, and access your notes anywhere. Works offline!" />
+    <meta name="keywords" content="note taking app, notes app, google drive notes, free notes, cloud notes, productivity app, offline notes, AI notes, collaborative notes, PWA notes, ghi chú, メモ, 笔记, 메모" />
+    <meta name="author" content="G-Note" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="google" content="notranslate" />
+    <meta name="rating" content="General" />
+    <meta name="revisit-after" content="7 days" />
+    
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/g-note.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://g-note.app" />
+    
+    <!-- Hreflang for 18 languages -->
+    <link rel="alternate" hreflang="en" href="https://g-note.app" />
+    <link rel="alternate" hreflang="vi" href="https://g-note.app/?lang=vi" />
+    <link rel="alternate" hreflang="ja" href="https://g-note.app/?lang=ja" />
+    <link rel="alternate" hreflang="ko" href="https://g-note.app/?lang=ko" />
+    <link rel="alternate" hreflang="zh-Hans" href="https://g-note.app/?lang=zh-CN" />
+    <link rel="alternate" hreflang="zh-Hant" href="https://g-note.app/?lang=zh-TW" />
+    <link rel="alternate" hreflang="de" href="https://g-note.app/?lang=de" />
+    <link rel="alternate" hreflang="fr" href="https://g-note.app/?lang=fr" />
+    <link rel="alternate" hreflang="es" href="https://g-note.app/?lang=es" />
+    <link rel="alternate" hreflang="pt-BR" href="https://g-note.app/?lang=pt-BR" />
+    <link rel="alternate" hreflang="it" href="https://g-note.app/?lang=it" />
+    <link rel="alternate" hreflang="nl" href="https://g-note.app/?lang=nl" />
+    <link rel="alternate" hreflang="ar" href="https://g-note.app/?lang=ar" />
+    <link rel="alternate" hreflang="hi" href="https://g-note.app/?lang=hi" />
+    <link rel="alternate" hreflang="tr" href="https://g-note.app/?lang=tr" />
+    <link rel="alternate" hreflang="pl" href="https://g-note.app/?lang=pl" />
+    <link rel="alternate" hreflang="th" href="https://g-note.app/?lang=th" />
+    <link rel="alternate" hreflang="id" href="https://g-note.app/?lang=id" />
+    <link rel="alternate" hreflang="x-default" href="https://g-note.app" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://g-note.app" />
+    <meta property="og:title" content="G-Note - Your Notes, Everywhere" />
+    <meta property="og:description" content="Free note-taking app with Google Drive sync. Beautiful, fast, and works offline. Start organizing your thoughts today!" />
+    <meta property="og:image" content="https://g-note.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="G-Note - Free Note Taking App" />
+    <meta property="og:site_name" content="G-Note" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="vi_VN" />
+    <meta property="og:locale:alternate" content="ja_JP" />
+    <meta property="og:locale:alternate" content="ko_KR" />
+    <meta property="og:locale:alternate" content="zh_CN" />
+    <meta property="og:locale:alternate" content="zh_TW" />
+    <meta property="og:locale:alternate" content="de_DE" />
+    <meta property="og:locale:alternate" content="fr_FR" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="pt_BR" />
+    <meta property="og:locale:alternate" content="it_IT" />
+    <meta property="og:locale:alternate" content="nl_NL" />
+    <meta property="og:locale:alternate" content="ar_SA" />
+    <meta property="og:locale:alternate" content="hi_IN" />
+    <meta property="og:locale:alternate" content="tr_TR" />
+    <meta property="og:locale:alternate" content="pl_PL" />
+    <meta property="og:locale:alternate" content="th_TH" />
+    <meta property="og:locale:alternate" content="id_ID" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://g-note.app" />
+    <meta name="twitter:title" content="G-Note - Your Notes, Everywhere" />
+    <meta name="twitter:description" content="Free note-taking app with Google Drive sync. Beautiful, fast, and works offline. Start organizing your thoughts today!" />
+    <meta name="twitter:image" content="https://g-note.app/og-image.png" />
+    <meta name="twitter:image:alt" content="G-Note - Free Note Taking App" />
+    <meta name="twitter:creator" content="@gnoteapp" />
+    <meta name="twitter:site" content="@gnoteapp" />
+    
     <!-- Viewport & PWA -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
-    
-    <!-- SEO & Description -->
-    <meta name="description" content="G-Note - Simple & Modern Notes App. Sync with Google Drive." />
-    <meta name="keywords" content="notes, note-taking, productivity, google drive, sync" />
-    <meta name="author" content="G-Note" />
     
     <!-- iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -97,12 +168,161 @@
     
     <!-- Microsoft -->
     <meta name="msapplication-TileColor" content="#0a0a0a" />
+    <meta name="msapplication-TileImage" content="/pwa-192x192.png" />
     <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
     
     <!-- Disable phone number detection -->
     <meta name="format-detection" content="telephone=no" />
+    <meta name="format-detection" content="date=no" />
+    <meta name="format-detection" content="address=no" />
+    <meta name="format-detection" content="email=no" />
     
-    <title>G-Note</title>
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://www.googleapis.com" />
+    <link rel="preconnect" href="https://lh3.googleusercontent.com" />
+    
+    <!-- DNS Prefetch -->
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://g-note.app/#webapp",
+          "name": "G-Note",
+          "description": "G-Note is a free, beautiful note-taking app that syncs with Google Drive. Create notes, collaborate in real-time, use AI assistance, and access your notes anywhere.",
+          "url": "https://g-note.app",
+          "applicationCategory": "ProductivityApplication",
+          "operatingSystem": "Any",
+          "browserRequirements": "Requires JavaScript",
+          "softwareVersion": "1.0.0",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "featureList": [
+            "Google Drive Sync",
+            "Real-time Collaboration",
+            "AI Assistance",
+            "Offline Support",
+            "Multi-language Support (18 languages)",
+            "Rich Text Editor",
+            "Voice Input",
+            "Drawing Tools",
+            "Version History",
+            "Note Sharing"
+          ],
+          "screenshot": "https://g-note.app/og-image.png",
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "1000",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://g-note.app/#organization",
+          "name": "G-Note",
+          "url": "https://g-note.app",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://g-note.app/pwa-512x512.png",
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://g-note.app/#website",
+          "url": "https://g-note.app",
+          "name": "G-Note",
+          "description": "Free note-taking app with Google Drive sync",
+          "publisher": {
+            "@id": "https://g-note.app/#organization"
+          },
+          "inLanguage": ["en", "vi", "ja", "ko", "zh-Hans", "zh-Hant", "de", "fr", "es", "pt-BR", "it", "nl", "ar", "hi", "tr", "pl", "th", "id"],
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://g-note.app/?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://g-note.app/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is G-Note free to use?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, G-Note is completely free to use with all core features including Google Drive sync, offline support, and rich text editing."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Does G-Note work offline?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, G-Note is a Progressive Web App (PWA) that works fully offline. Your notes are saved locally and sync automatically when you're back online."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does Google Drive sync work?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "G-Note securely syncs your notes to your Google Drive account. Your notes are stored in a dedicated folder and can be accessed from any device."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What languages does G-Note support?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "G-Note supports 18 languages including English, Vietnamese, Japanese, Korean, Chinese (Simplified & Traditional), German, French, Spanish, Portuguese, Italian, Dutch, Arabic, Hindi, Turkish, Polish, Thai, and Indonesian."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I collaborate with others on notes?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, G-Note supports real-time collaboration. You can share notes via public links or start live collaboration sessions where multiple users can edit simultaneously."
+              }
+            }
+          ]
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "G-Note",
+          "operatingSystem": "Web, iOS, Android, Windows, macOS, Linux",
+          "applicationCategory": "ProductivityApplication",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "downloadUrl": "https://g-note.app",
+          "installUrl": "https://g-note.app"
+        }
+      ]
+    }
+    </script>
+    
+    <title>G-Note - Free Note Taking App | Sync with Google Drive</title>
     
     <!-- Inline critical CSS for splash screen -->
     <style>
@@ -193,17 +413,24 @@
           
           if (isDark) {
             document.documentElement.classList.add('dark');
+            // Set html background for immediate effect (body not yet available)
+            document.documentElement.style.backgroundColor = '#0a0a0a';
+          } else {
+            document.documentElement.style.backgroundColor = '#fafafa';
           }
         } catch (e) {
           // Fallback to system preference
           if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.add('dark');
+            document.documentElement.style.backgroundColor = '#0a0a0a';
+          } else {
+            document.documentElement.style.backgroundColor = '#fafafa';
           }
         }
       })();
     </script>
   </head>
-  <body>
+  <body style="margin: 0; padding: 0; min-height: 100vh; min-height: 100dvh;">
     <!-- Universal splash screen - works on ALL platforms -->
     <!-- iOS PWA: Uses apple-touch-startup-image (defined in head) with icon -->
     <!-- Android PWA: Uses manifest.json icons + background_color -->

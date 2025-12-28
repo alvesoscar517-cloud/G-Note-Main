@@ -107,7 +107,14 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
   return (
     <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
       {/* Header - with safe area support */}
-      <div className="flex items-center justify-between px-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 sm:p-4 shrink-0">
+      <div 
+        className="flex items-center justify-between pb-2 sm:p-4 shrink-0"
+        style={{
+          paddingLeft: 'max(0.5rem, env(safe-area-inset-left, 0px))',
+          paddingRight: 'max(0.5rem, env(safe-area-inset-right, 0px))',
+          paddingTop: 'max(0.5rem, env(safe-area-inset-top, 0px))',
+        }}
+      >
         <Tooltip>
           <TooltipTrigger asChild>
             <button
@@ -152,7 +159,14 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
       </div>
 
       {/* Controls - with safe area support */}
-      <div className="px-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:p-4 shrink-0">
+      <div 
+        className="pt-2 sm:p-4 shrink-0"
+        style={{
+          paddingLeft: 'max(0.5rem, env(safe-area-inset-left, 0px))',
+          paddingRight: 'max(0.5rem, env(safe-area-inset-right, 0px))',
+          paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
+        }}
+      >
         <div className="flex items-center justify-center gap-2 sm:gap-4">
           <button
             onClick={handleRotate}
