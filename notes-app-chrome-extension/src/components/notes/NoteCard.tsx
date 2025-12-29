@@ -127,11 +127,14 @@ export function NoteCard({ note, searchQuery }: NoteCardProps) {
               </p>
             )}
             
-            {preview && (
-              <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 relative z-10">
+            {/* Content preview - always show with min-height for consistent card size */}
+            <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 min-h-[2.5rem] relative z-10">
+              {preview ? (
                 <Highlight text={preview} query={searchQuery} />
-              </p>
-            )}
+              ) : (
+                <span className="text-neutral-300 dark:text-neutral-600">&nbsp;</span>
+              )}
+            </p>
             
             <p className="mt-3 text-xs text-neutral-400 dark:text-neutral-500 relative z-10">
               {formatDate(note.updatedAt)}
@@ -288,11 +291,14 @@ export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
                 </p>
               )}
               
-              {preview && (
-                <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 relative z-10">
+              {/* Content preview - always show with min-height for consistent card size */}
+              <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 min-h-[2.5rem] relative z-10">
+                {preview ? (
                   <Highlight text={preview} query={searchQuery} />
-                </p>
-              )}
+                ) : (
+                  <span className="text-neutral-300 dark:text-neutral-600">&nbsp;</span>
+                )}
+              </p>
               
               <p className="mt-3 text-xs text-neutral-400 dark:text-neutral-500 relative z-10">
                 {formatDate(note.updatedAt)}

@@ -29,6 +29,15 @@ export function generateRoomId(): string {
   return result
 }
 
+// Custom signaling server URL - can be configured via environment variable
+// For production, you should host your own signaling server
+const SIGNALING_SERVERS = import.meta.env.VITE_SIGNALING_SERVERS
+  ? import.meta.env.VITE_SIGNALING_SERVERS.split(',').map((s: string) => s.trim())
+  : [
+      // Default public servers - may be unreliable
+      // Consider self-hosting for production use
+    ]
+
 // Create or join a collaboration room
 export function joinRoom(roomId: string, userName: string, userColor: string): CollaborationRoom {
   // Check if already connected to this room
@@ -42,13 +51,11 @@ export function joinRoom(roomId: string, userName: string, userColor: string): C
   // Get the XML fragment for ProseMirror content
   const type = doc.getXmlFragment('prosemirror')
   
-  // Connect via WebRTC with public signaling servers
+  // Connect via WebRTC
+  // Configure signaling servers via VITE_SIGNALING_SERVERS env variable
+  // For production, host your own signaling server for reliability
   const provider = new WebrtcProvider(`notes-app-${roomId}`, doc, {
-    signaling: [
-      'wss://signaling.yjs.dev',
-      'wss://y-webrtc-signaling-eu.herokuapp.com',
-      'wss://y-webrtc-signaling-us.herokuapp.com'
-    ]
+    signaling: SIGNALING_SERVERS
   })
 
   // Set user awareness (cursor, name, etc.)

@@ -7,53 +7,37 @@
   --radius-sm: 8px;
   --radius-lg: 16px;
   color-scheme: light;
-  
-  /* Safe area insets for notch/dynamic island devices */
-  /* NOTE: --safe-area-top is set to 0 because app has its own status bar area */
-  --safe-area-top: 0px;
-  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-area-left: env(safe-area-inset-left, 0px);
-  --safe-area-right: env(safe-area-inset-right, 0px);
 }
 
-/* Dynamic viewport height for mobile - fills entire screen */
 html {
   min-height: 100vh;
   min-height: 100dvh;
-  /* Ensure background extends to full screen including notch area */
   background-color: #fafafa;
-  /* Critical for edge-to-edge on iOS with black-translucent status bar */
-  /* Background must extend behind status bar */
 }
 
 body {
   min-height: 100vh;
   min-height: 100dvh;
-  /* Inherit background from html to ensure consistency */
   background-color: inherit;
-  /* Prevent any margin/padding that could cause gaps */
   margin: 0;
   padding: 0;
-  /* Ensure body starts from absolute top (behind status bar) */
-  padding-top: 0 !important;
-  /* Allow system back gesture on horizontal swipe */
-  overscroll-behavior-x: contain;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Dark mode background - must use :where for proper specificity with Tailwind */
 html.dark, html.dark body,
 :root:has(.dark), :root:has(.dark) body {
   background-color: #0a0a0a;
 }
 
-/* Root element fills entire screen */
 #root {
   min-height: 100vh;
   min-height: 100dvh;
   background-color: inherit;
 }
 
-/* Utility class for dynamic viewport height */
 .min-h-dvh {
   min-height: 100dvh;
 }
@@ -66,8 +50,7 @@ html.dark, html.dark body,
   box-sizing: border-box;
 }
 
-/* Text Selection Colors - Monochrome/Gray Theme */
-/* Light mode: Subtle gray with good contrast */
+/* Text Selection Colors */
 ::selection {
   background-color: #E2E2E2;
   color: #171717;
@@ -78,7 +61,6 @@ html.dark, html.dark body,
   color: #171717;
 }
 
-/* Dark mode: Darker gray, maintains readability */
 .dark ::selection {
   background-color: #3F3F3F;
   color: #F5F5F5;
@@ -89,72 +71,35 @@ html.dark, html.dark body,
   color: #F5F5F5;
 }
 
-/* Safe area padding utilities - CONSISTENT across all modes */
-/* Portrait mode: use safe area values with minimum padding for visual spacing */
-/* NOTE: safe-top is disabled because app has its own status bar area */
+/* Simple padding utilities */
 .safe-top {
   padding-top: 0.75rem;
 }
 
 .safe-bottom {
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: 0.75rem;
 }
 
 .safe-left {
-  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+  padding-left: 0.75rem;
 }
 
 .safe-right {
-  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+  padding-right: 0.75rem;
 }
 
 .safe-x {
-  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
-  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
 }
 
 .safe-y {
   padding-top: 0.75rem;
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: 0.75rem;
 }
 
 .safe-all {
-  padding-top: 0.75rem;
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
-  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
-  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
-}
-
-/* Landscape mode: use fixed padding for all sides */
-/* In standalone mode, status bar stays at top, so no side safe area needed for status bar */
-/* NOTE: safe-top is already disabled globally */
-@media (orientation: landscape) {
-  .safe-top {
-    padding-top: 0.75rem !important;
-  }
-  
-  .safe-left {
-    padding-left: 0.75rem !important;
-  }
-  
-  .safe-right {
-    padding-right: 0.75rem !important;
-  }
-  
-  .safe-x {
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
-  }
-  
-  .safe-y {
-    padding-top: 0.75rem !important;
-  }
-  
-  .safe-all {
-    padding-top: 0.75rem !important;
-    padding-left: 0.75rem !important;
-    padding-right: 0.75rem !important;
-  }
+  padding: 0.75rem;
 }
 
 /* Disable text selection globally except for specific elements */
@@ -192,7 +137,6 @@ code * {
 *:focus-visible {
   outline: none !important;
   box-shadow: none !important;
-  ring: none !important;
 }
 
 input:focus,
@@ -204,12 +148,6 @@ select:focus,
   box-shadow: none !important;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
 
 /* Tiptap Editor Styles */
 .tiptap {
@@ -336,7 +274,7 @@ body {
   background: #1a1a1a;
 }
 
-/* Syntax highlighting - Gemini style */
+/* Syntax highlighting */
 .tiptap pre code.hljs,
 .tiptap pre code {
   background: transparent !important;
@@ -348,14 +286,12 @@ body {
   background: transparent !important;
 }
 
-/* Comments - gray */
 .tiptap .hljs-comment,
 .tiptap .hljs-quote {
   color: #6b7280;
   font-style: italic;
 }
 
-/* Keywords - purple/magenta */
 .tiptap .hljs-keyword,
 .tiptap .hljs-selector-tag,
 .tiptap .hljs-built_in,
@@ -364,7 +300,6 @@ body {
   color: #c792ea;
 }
 
-/* Strings - orange */
 .tiptap .hljs-string,
 .tiptap .hljs-attr,
 .tiptap .hljs-selector-id,
@@ -375,14 +310,12 @@ body {
   color: #f9a875;
 }
 
-/* Functions - yellow */
 .tiptap .hljs-title,
 .tiptap .hljs-section,
 .tiptap .hljs-title.function_ {
   color: #ffcb6b;
 }
 
-/* Numbers - green */
 .tiptap .hljs-number,
 .tiptap .hljs-literal,
 .tiptap .hljs-variable,
@@ -391,14 +324,12 @@ body {
   color: #c3e88d;
 }
 
-/* Types - cyan */
 .tiptap .hljs-type,
 .tiptap .hljs-class .hljs-title,
 .tiptap .hljs-attribute {
   color: #89ddff;
 }
 
-/* Operators, punctuation */
 .tiptap .hljs-symbol,
 .tiptap .hljs-bullet,
 .tiptap .hljs-subst,
@@ -407,7 +338,7 @@ body {
   color: #89ddff;
 }
 
-/* Inline code - Gemini style: neutral, subtle */
+/* Inline code */
 .tiptap code {
   background: #e5e7eb;
   color: #374151;
@@ -486,14 +417,13 @@ body {
 }
 
 .collaboration-cursor__label {
-  border-radius: 3px 3px 3px 0;
+  border-radius: 6px;
   color: #fff;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 500;
   left: -1px;
-  line-height: normal;
-  padding: 0.1rem 0.3rem;
+  line-height: 1;
+  padding: 2px 6px;
   position: absolute;
   top: -1.4em;
   user-select: none;
@@ -527,6 +457,7 @@ body {
   white-space: nowrap;
 }
 
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -536,101 +467,81 @@ body {
 @keyframes zoomIn95 {
   from { 
     opacity: 0;
-    transform: scale(0.95) translateZ(0);
+    transform: scale(0.95);
   }
   to { 
     opacity: 1;
-    transform: scale(1) translateZ(0);
+    transform: scale(1);
   }
 }
 
 @keyframes slideInFromBottom {
   from {
     opacity: 0;
-    transform: translateY(8px) translateZ(0);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) translateZ(0);
+    transform: translateY(0);
   }
 }
 
 @keyframes slideInFromTop {
   from {
     opacity: 0;
-    transform: translateY(-4px) translateZ(0);
+    transform: translateY(-4px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) translateZ(0);
+    transform: translateY(0);
   }
 }
 
 @keyframes slideInFromLeft {
   from {
     opacity: 0;
-    transform: translateX(-4px) translateZ(0);
+    transform: translateX(-4px);
   }
   to {
     opacity: 1;
-    transform: translateX(0) translateZ(0);
+    transform: translateX(0);
   }
 }
 
 @keyframes slideInFromRight {
   from {
     opacity: 0;
-    transform: translateX(4px) translateZ(0);
+    transform: translateX(4px);
   }
   to {
     opacity: 1;
-    transform: translateX(0) translateZ(0);
+    transform: translateX(0);
   }
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%) translateZ(0); }
-  100% { transform: translateX(100%) translateZ(0); }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
-/* Facebook-style shimmer for skeleton loading */
 @keyframes shimmerLine {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .shimmer-line {
-  background: linear-gradient(
-    90deg,
-    #e5e7eb 0%,
-    #f3f4f6 50%,
-    #e5e7eb 100%
-  );
+  background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
   background-size: 200% 100%;
   animation: shimmerLine 1.5s ease-in-out infinite;
 }
 
 .dark .shimmer-line {
-  background: linear-gradient(
-    90deg,
-    #374151 0%,
-    #4b5563 50%,
-    #374151 100%
-  );
+  background: linear-gradient(90deg, #374151 0%, #4b5563 50%, #374151 100%);
   background-size: 200% 100%;
 }
 
 .animate-in {
   animation-fill-mode: both;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
 }
 
 .fade-in {
@@ -663,15 +574,8 @@ body {
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* Tooltip animations */
 .fade-in-0 {
   animation: fadeIn 150ms cubic-bezier(0.32, 0.72, 0, 1);
-  will-change: opacity;
-}
-
-.zoom-in-95 {
-  animation: zoomIn95 150ms cubic-bezier(0.32, 0.72, 0, 1);
-  will-change: transform, opacity;
 }
 
 [data-state="closed"].fade-out-0 {
@@ -686,32 +590,7 @@ body {
   animation: shimmer 1.5s infinite;
 }
 
-/* Collaboration Cursors */
-.collaboration-cursor__caret {
-  border-left: 1px solid;
-  border-right: 1px solid;
-  margin-left: -1px;
-  margin-right: -1px;
-  pointer-events: none;
-  position: relative;
-  word-break: normal;
-}
-
-.collaboration-cursor__label {
-  border-radius: 6px;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 500;
-  left: -1px;
-  line-height: 1;
-  padding: 2px 6px;
-  position: absolute;
-  top: -1.4em;
-  user-select: none;
-  white-space: nowrap;
-}
-
-/* Scrollbar - Only show on desktop (large screens with hover devices) */
+/* Scrollbar - Only show on desktop */
 @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
   ::-webkit-scrollbar {
     width: 6px;
@@ -740,7 +619,7 @@ body {
   }
 }
 
-/* Hide scrollbar on mobile/tablet (small screens or touch devices) */
+/* Hide scrollbar on mobile/tablet */
 @media (max-width: 1023px), (hover: none), (pointer: coarse) {
   * {
     -ms-overflow-style: none;
@@ -752,7 +631,6 @@ body {
   }
 }
 
-/* Hide scrollbar */
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -762,22 +640,7 @@ body {
   display: none;
 }
 
-/* Touch optimization - ONLY for true mobile/tablet devices (not touch laptops) */
-/* pointer: coarse = finger/stylus, hover: none = no mouse hover capability */
-@media (hover: none) and (pointer: coarse) {
-  /* Disable hover effects on true touch devices */
-  .hover\:bg-neutral-100:hover,
-  .hover\:bg-neutral-200:hover {
-    background-color: inherit;
-  }
-  
-  .dark .dark\:hover\:bg-neutral-700:hover,
-  .dark .dark\:hover\:bg-neutral-800:hover {
-    background-color: inherit;
-  }
-}
-
-/* Prevent text selection on interactive elements */
+/* Touch optimization */
 .touch-manipulation {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -790,60 +653,6 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Landscape mode utilities for mobile */
-@media (orientation: landscape) and (max-height: 500px) {
-  .landscape\:flex {
-    display: flex !important;
-  }
-  .landscape\:items-center {
-    align-items: center !important;
-  }
-  .landscape\:gap-3 {
-    gap: 0.75rem !important;
-  }
-  .landscape\:text-left {
-    text-align: left !important;
-  }
-  .landscape\:pt-3 {
-    padding-top: 0.75rem !important;
-  }
-  .landscape\:pb-2 {
-    padding-bottom: 0.5rem !important;
-  }
-  .landscape\:mx-0 {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-  .landscape\:mt-0 {
-    margin-top: 0 !important;
-  }
-  .landscape\:w-10 {
-    width: 2.5rem !important;
-  }
-  .landscape\:h-10 {
-    height: 2.5rem !important;
-  }
-  .landscape\:flex-1 {
-    flex: 1 1 0% !important;
-  }
-  .landscape\:min-w-0 {
-    min-width: 0 !important;
-  }
-  .landscape\:py-1 {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-  }
-  .landscape\:max-h-screen {
-    max-height: 100vh !important;
-  }
-}
-
-
-/* Prevent browser back/forward gesture on modal content */
-.overscroll-none {
-  overscroll-behavior: none;
-}
-
 /* Swipe indicator animation */
 @keyframes pulseSwipe {
   0%, 100% { opacity: 0.6; }
@@ -854,152 +663,7 @@ body {
   animation: pulseSwipe 2s ease-in-out infinite;
 }
 
-/* Disable pull-to-refresh on mobile when modal is open */
-body.modal-open {
-  overscroll-behavior-y: contain;
-}
-
-/* Block pull-to-refresh globally on touch devices (mobile/tablet) */
-/* This prevents the browser's native pull-to-refresh gesture */
-@media (hover: none) and (pointer: coarse) {
-  html, body {
-    overscroll-behavior-y: contain;
-  }
-}
-
-/* Also block for standalone PWA mode */
-@media screen and (display-mode: standalone) {
-  html, body {
-    overscroll-behavior-y: contain;
-  }
-}
-
-/* Block for fullscreen PWA mode */
-@media screen and (display-mode: fullscreen) {
-  html, body {
-    overscroll-behavior-y: contain;
-  }
-}
-
-/* GPU acceleration for modals and animated elements */
-.modal-content,
-.animate-in,
-[class*="zoom-in"],
-[class*="fade-in"],
-[class*="slide-in"] {
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  perspective: 1000px;
-  -webkit-perspective: 1000px;
-}
-
-/* Optimized transitions for interactive elements */
-.transition-colors {
-  transition-property: background-color, border-color, color;
-  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
-  transition-duration: 150ms;
-}
-
-.transition-transform {
-  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
-  will-change: transform;
-}
-
-/* Safe area support for curved edge devices (iPhone, modern Android) */
-/* NOTE: In landscape mode, these are overridden to use fixed padding */
-@supports (padding: max(0px)) {
-  .modal-safe-area {
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-    border-radius: max(16px, calc(env(safe-area-inset-left) + 8px));
-  }
-  
-  /* Ensure content doesn't get cut off on curved corners */
-  .rounded-2xl {
-    border-radius: max(16px, calc(env(safe-area-inset-left) / 2 + 12px));
-  }
-  
-  /* Modal container adjustments for curved screens */
-  .fixed.inset-0 {
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
-  
-  /* Landscape mode: remove safe area padding for left/right (app handles its own spacing) */
-  @media (orientation: landscape) {
-    .modal-safe-area {
-      padding-left: 1rem;
-      padding-right: 1rem;
-      border-radius: 16px;
-    }
-    
-    .rounded-2xl {
-      border-radius: 16px;
-    }
-    
-    .fixed.inset-0 {
-      padding-left: 0;
-      padding-right: 0;
-    }
-  }
-}
-
-/* Fullscreen PWA mode - app fills entire screen including notch area */
-@media screen and (display-mode: fullscreen) {
-  /* Root element extends to full screen */
-  html, body, #root {
-    min-height: 100vh;
-    min-height: 100dvh; /* Dynamic viewport height for mobile */
-  }
-  
-  /* Main app container fills screen - background extends behind notch */
-  .min-h-screen {
-    min-height: 100vh;
-    min-height: 100dvh;
-  }
-  
-  /* Modals need safe area awareness in fullscreen - but NOT for top */
-  .modal-content,
-  .rounded-2xl {
-    margin: 0 env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
-  }
-}
-
-/* Fullscreen + Landscape: remove all side safe areas */
-@media screen and (display-mode: fullscreen) and (orientation: landscape) {
-  .modal-content,
-  .rounded-2xl {
-    margin: 0;
-  }
-}
-
-/* Standalone mode - status bar visible but app is immersive */
-@media screen and (display-mode: standalone) {
-  /* Root element extends to full screen */
-  html, body, #root {
-    min-height: 100vh;
-    min-height: 100dvh;
-  }
-  
-  .modal-content,
-  .rounded-2xl {
-    /* Extra padding for PWA mode on curved devices - but NOT for top */
-    margin: 0 env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
-  }
-}
-
-/* Standalone + Landscape: remove all side safe areas */
-@media screen and (display-mode: standalone) and (orientation: landscape) {
-  .modal-content,
-  .rounded-2xl {
-    margin: 0;
-  }
-}
-
-/* Loading dots animation - unified for all loading screens */
+/* Loading dots animation */
 @keyframes loadingDot {
   0%, 80%, 100% {
     transform: scale(0.6);
@@ -1015,7 +679,6 @@ body.modal-open {
   animation: loadingDot 1.4s infinite ease-in-out both;
 }
 
-/* Fade in animation */
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out;
 }
@@ -1030,4 +693,10 @@ body.modal-open {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Simple modal styling */
+.modal-safe-area {
+  padding: 1rem;
+  border-radius: 16px;
 }

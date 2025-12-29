@@ -19,12 +19,12 @@ import {
   X,
   Copy,
   Scissors,
-  Search,
   Coins,
   Mic
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
+import { CircleFlag } from '@/components/ui/CircleFlag'
 import * as AI from '@/lib/ai'
 
 // Type declarations for Web Speech API
@@ -78,12 +78,10 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [showLanguages, setShowLanguages] = useState(false)
-  const [langSearch, setLangSearch] = useState('')
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       setShowLanguages(false)
-      setLangSearch('')
     }
     setOpen(newOpen)
   }
@@ -99,15 +97,9 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
 
   const handleTranslate = (langName: string) => {
     setShowLanguages(false)
-    setLangSearch('')
     setOpen(false)
     onAction('translate', langName)
   }
-
-  const filteredLanguages = AI.LANGUAGES.filter(lang => 
-    lang.name.toLowerCase().includes(langSearch.toLowerCase()) ||
-    lang.code.toLowerCase().includes(langSearch.toLowerCase())
-  )
 
   return (
     <Popover.Root open={open} onOpenChange={handleOpenChange}>
@@ -137,69 +129,48 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
           sideOffset={5}
           align="start"
         >
-          {/* Main menu - hide on mobile when showing languages */}
-          <div className={cn(
-            "min-w-[180px] p-1",
-            showLanguages && "hidden sm:block"
-          )}>
-            <MenuItem icon={FileText} label={t('ai.summarize')} onClick={() => handleAction('summarize')} />
-            <MenuItem icon={PenLine} label={t('ai.continue')} onClick={() => handleAction('continue')} />
-            <MenuItem icon={Wand2} label={t('ai.improve')} onClick={() => handleAction('improve')} />
-            <MenuItem 
-              icon={Languages} 
-              label={t('ai.translate')} 
-              onClick={() => handleAction('translate')} 
-              hasSubmenu 
-              active={showLanguages}
-            />
-            <MenuItem icon={ListTodo} label={t('ai.extractTasks')} onClick={() => handleAction('extract-tasks')} />
-            <MenuItem icon={MessageCircleQuestion} label={t('ai.ask')} onClick={() => handleAction('ask')} />
-          </div>
+          {/* Main menu - hide when showing languages */}
+          {!showLanguages && (
+            <div className="min-w-[180px] p-1">
+              <MenuItem icon={FileText} label={t('ai.summarize')} onClick={() => handleAction('summarize')} />
+              <MenuItem icon={PenLine} label={t('ai.continue')} onClick={() => handleAction('continue')} />
+              <MenuItem icon={Wand2} label={t('ai.improve')} onClick={() => handleAction('improve')} />
+              <MenuItem 
+                icon={Languages} 
+                label={t('ai.translate')} 
+                onClick={() => handleAction('translate')} 
+                hasSubmenu 
+                active={showLanguages}
+              />
+              <MenuItem icon={ListTodo} label={t('ai.extractTasks')} onClick={() => handleAction('extract-tasks')} />
+              <MenuItem icon={MessageCircleQuestion} label={t('ai.ask')} onClick={() => handleAction('ask')} />
+            </div>
+          )}
 
           {/* Language submenu - inline replacement for all screen sizes */}
           {showLanguages && (
-            <div className="w-[200px] flex flex-col overflow-hidden">
+            <div className="w-[180px] flex flex-col overflow-hidden">
               {/* Back button */}
               <button
                 onClick={() => setShowLanguages(false)}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg mb-1"
+                className="flex items-center gap-2 px-2.5 py-1.5 text-[13px] text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg mb-0.5"
               >
                 <span>‹</span>
                 {t('ai.translate')}
               </button>
               
-              {/* Search input */}
-              <div className="p-2 flex-shrink-0">
-                <div className="flex items-center gap-2 px-2 py-1.5 bg-neutral-100 dark:bg-neutral-700 rounded-lg">
-                  <Search className="w-3.5 h-3.5 text-neutral-400" />
-                  <input
-                    type="text"
-                    value={langSearch}
-                    onChange={(e) => setLangSearch(e.target.value)}
-                    placeholder={t('ai.searchLanguage')}
-                    className="flex-1 bg-transparent border-0 outline-none text-sm text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-400"
-                    autoFocus
-                  />
-                </div>
-              </div>
-              
               {/* Language list */}
-              <div className="max-h-[200px] overflow-y-auto p-1 pt-0">
-                {filteredLanguages.length > 0 ? (
-                  filteredLanguages.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => handleTranslate(lang.name)}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
-                    >
-                      {lang.name}
-                    </button>
-                  ))
-                ) : (
-                  <div className="px-3 py-2 text-sm text-neutral-400">
-                    {t('ai.notFound')}
-                  </div>
-                )}
+              <div className="max-h-[220px] overflow-y-auto p-1 pt-0">
+                {AI.LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => handleTranslate(lang.name)}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 text-[13px] text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+                  >
+                    <CircleFlag countryCode={lang.countryCode} size={16} className="flex-shrink-0" />
+                    <span className="truncate">{lang.name}</span>
+                  </button>
+                ))}
               </div>
             </div>
           )}

@@ -193,6 +193,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   const [showShareDialog, setShowShareDialog] = useState(false)
   const [showVersionHistory, setShowVersionHistory] = useState(false)
   const [roomId, setRoomId] = useState<string | null>(null)
+  const [isRoomHost, setIsRoomHost] = useState(false) // Track if user created the room (host) or joined (guest)
   const [collaborators, setCollaborators] = useState<CollaboratorInfo[]>([])
   const [userColor] = useState(() => generateUserColor())
   
@@ -276,12 +277,16 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       return
     }
 
+    console.log('[Collab] Starting collaboration for room:', roomId)
+    
     const newYdoc = new Y.Doc()
     
     // Get signaling servers from environment variable
     const signalingServers = import.meta.env.VITE_SIGNALING_SERVERS
       ? import.meta.env.VITE_SIGNALING_SERVERS.split(',').map((s: string) => s.trim())
       : []
+    
+    console.log('[Collab] Using signaling servers:', signalingServers)
     
     const newProvider = new WebrtcProvider(`notes-app-${roomId}`, newYdoc, {
       signaling: signalingServers
@@ -298,6 +303,15 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       picture: user?.avatar || null
     })
 
+    // Log connection status
+    newProvider.on('synced', (event: { synced: boolean }) => {
+      console.log('[Collab] Provider synced:', event.synced)
+    })
+    
+    newProvider.on('peers', (event: { added: string[], removed: string[], webrtcPeers: string[], bcPeers: string[] }) => {
+      console.log('[Collab] Peers changed:', event)
+    })
+
     setYdoc(newYdoc)
     setProvider(newProvider)
     
@@ -308,6 +322,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       // Also verify the doc is the same as our ydoc
       const aDoc = (newProvider.awareness as any).doc
       if (newProvider.awareness && aDoc && aDoc === newYdoc) {
+        console.log('[Collab] Provider ready, awareness doc available')
         setAwarenessDoc(aDoc)
         setIsProviderReady(true)
       } else {
@@ -331,6 +346,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           })
         }
       })
+      console.log('[Collab] Collaborators updated:', collabs.length)
       setCollaborators(collabs)
     }
 
@@ -340,6 +356,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     const interval = setInterval(updateCollaborators, 2000)
 
     return () => {
+      console.log('[Collab] Cleaning up room:', roomId)
       clearTimeout(readyTimeout)
       clearInterval(interval)
       newProvider.awareness.off('change', updateCollaborators)
@@ -444,6 +461,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       baseExtensions.push(
         Collaboration.configure({
           document: ydoc,
+          field: 'prosemirror', // Use 'prosemirror' as the Y.js fragment name
         })
       )
       
@@ -459,7 +477,9 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   // Editor - only recreate when roomId changes, NOT when note changes
   const editor = useEditor({
     extensions,
-    content: note.content || '',
+    // When in collaboration mode, don't set initial content - Y.js document is the source of truth
+    // Content will be synced from the host via Y.js
+    content: isCollaborationReady ? '' : (note.content || ''),
     onUpdate: ({ editor }) => {
       if (noteIdRef.current && !roomId) {
         debouncedUpdate(noteIdRef.current, editor.getHTML())
@@ -498,37 +518,85 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
 
   // When starting collaboration, initialize Y.js document with current content
   useEffect(() => {
-    if (roomId && provider && editor && ydoc && isProviderReady) {
-      const fragment = ydoc.getXmlFragment('prosemirror')
+    if (!roomId || !provider || !editor || !ydoc || !isProviderReady) {
+      return
+    }
+    
+    const fragment = ydoc.getXmlFragment('prosemirror')
+    let initTimeout: ReturnType<typeof setTimeout> | null = null
+    let peerWaitTimeout: ReturnType<typeof setTimeout> | null = null
+    
+    console.log('[Collab] Collaboration ready, isHost:', isRoomHost, 'fragment length:', fragment.length)
+    
+    // Only the HOST should initialize Y.js document with their content
+    // Guests should wait for sync from the host
+    // Use lastSavedContentRef to get initial content without causing re-renders
+    const initialContent = lastSavedContentRef.current || note.content
+    
+    if (isRoomHost && initialContent) {
+      console.log('[Collab] Host initializing content...')
       
-      // If this is a new collaboration session and Y.js doc is empty, 
-      // initialize with current note content
-      if (fragment.length === 0 && note.content) {
-        // Set initial content to editor (y-prosemirror will sync it)
-        editor.commands.setContent(note.content)
+      // Function to set content when ready
+      const setInitialContent = () => {
+        const currentFragment = ydoc.getXmlFragment('prosemirror')
+        if (currentFragment.length === 0) {
+          console.log('[Collab] Setting initial content to Y.js document')
+          editor.commands.setContent(initialContent)
+        } else {
+          console.log('[Collab] Fragment already has content, skipping init')
+        }
       }
       
-      // Periodic auto-save during collaboration (every 10 seconds)
-      const autoSaveInterval = setInterval(() => {
-        const content = editor.getHTML()
-        if (noteIdRef.current && content !== lastSavedContentRef.current) {
-          lastSavedContentRef.current = content
-          updateNote(noteIdRef.current, { content })
+      // Wait a bit for Y.js to be fully ready before setting content
+      initTimeout = setTimeout(setInitialContent, 500)
+      
+      // Also set content again after a longer delay to ensure sync with late joiners
+      peerWaitTimeout = setTimeout(() => {
+        const currentFragment = ydoc.getXmlFragment('prosemirror')
+        if (currentFragment.length === 0 && initialContent) {
+          console.log('[Collab] Re-setting content after peer wait')
+          editor.commands.setContent(initialContent)
         }
-      }, 10000)
-
+      }, 2000)
+    } else if (!isRoomHost) {
+      console.log('[Collab] Guest waiting for sync from host...')
+      
+      // Listen for Y.js document updates to know when content arrives
+      const onUpdate = () => {
+        const currentFragment = ydoc.getXmlFragment('prosemirror')
+        console.log('[Collab] Y.js update received, fragment length:', currentFragment.length)
+      }
+      ydoc.on('update', onUpdate)
+      
       return () => {
-        // Save content before leaving collaboration
-        const finalContent = editor.getHTML()
-        if (noteIdRef.current && finalContent !== lastSavedContentRef.current) {
-          lastSavedContentRef.current = finalContent
-          updateNote(noteIdRef.current, { content: finalContent })
-        }
-        
-        clearInterval(autoSaveInterval)
+        ydoc.off('update', onUpdate)
       }
     }
-  }, [roomId, provider, editor, ydoc, isProviderReady, note.content, updateNote])
+    
+    // Periodic auto-save during collaboration (every 10 seconds)
+    const autoSaveInterval = setInterval(() => {
+      const content = editor.getHTML()
+      if (noteIdRef.current && content !== lastSavedContentRef.current) {
+        lastSavedContentRef.current = content
+        updateNote(noteIdRef.current, { content })
+      }
+    }, 10000)
+
+    return () => {
+      if (initTimeout) clearTimeout(initTimeout)
+      if (peerWaitTimeout) clearTimeout(peerWaitTimeout)
+      
+      // Save content before leaving collaboration
+      const finalContent = editor.getHTML()
+      if (noteIdRef.current && finalContent !== lastSavedContentRef.current) {
+        lastSavedContentRef.current = finalContent
+        updateNote(noteIdRef.current, { content: finalContent })
+      }
+      
+      clearInterval(autoSaveInterval)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId, provider, editor, ydoc, isProviderReady, updateNote, isRoomHost])
 
   // Save on page unload or visibility change (prevent data loss)
   useEffect(() => {
@@ -601,10 +669,12 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   }
 
   const handleCreateRoom = (newRoomId: string) => {
+    setIsRoomHost(true) // User is the host when creating a room
     setRoomId(newRoomId)
   }
 
   const handleJoinRoom = (joinRoomId: string) => {
+    setIsRoomHost(false) // User is a guest when joining a room
     setRoomId(joinRoomId)
   }
 
@@ -618,6 +688,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       }
     }
     setRoomId(null)
+    setIsRoomHost(false)
     setCollaborators([])
   }
 
@@ -986,7 +1057,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         onClose={() => setShowShareDialog(false)}
         noteId={note.id}
         existingRoomId={roomId}
-        collaboratorsCount={collaborators.length}
         onCreateRoom={handleCreateRoom}
         onJoinRoom={handleJoinRoom}
         onStopSharing={handleStopSharing}
@@ -1597,55 +1667,6 @@ function ToolbarButton({
   tooltip?: string
   className?: string
 }) {
-  const buttonRef = useRef<HTMLButtonElement>(null)
-  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null)
-  
-  // Track touch start position to detect swipe vs tap
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    const touch = e.touches[0]
-    touchStartRef.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-      time: Date.now()
-    }
-  }, [])
-  
-  // Handle touch events - only trigger click if it's a tap, not a swipe
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    // Prevent default to stop focus from moving to button
-    e.preventDefault()
-    
-    if (!touchStartRef.current || disabled || !onClick) {
-      touchStartRef.current = null
-      return
-    }
-    
-    const touch = e.changedTouches[0]
-    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x)
-    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y)
-    const deltaTime = Date.now() - touchStartRef.current.time
-    
-    // Only trigger click if:
-    // 1. Movement is less than 5px (very small movement = tap, not swipe)
-    // 2. Touch duration is less than 300ms (quick tap)
-    const isSwipe = deltaX > 5 || deltaY > 5
-    const isTooLong = deltaTime > 300
-    
-    if (!isSwipe && !isTooLong) {
-      onClick()
-    }
-    
-    touchStartRef.current = null
-  }, [disabled, onClick])
-  
-  // Cancel touch if user moves finger (scrolling)
-  const handleTouchMove = useCallback(() => {
-    // Mark as swipe immediately when movement detected
-    if (touchStartRef.current) {
-      touchStartRef.current = null
-    }
-  }, [])
-
   // Prevent mouse events from stealing focus on desktop
   const preventMouseFocusLoss = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -1653,21 +1674,15 @@ function ToolbarButton({
 
   const button = (
     <button
-      ref={buttonRef}
       onMouseDown={preventMouseFocusLoss}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onClick={(e) => {
-        // Only handle click for non-touch (mouse) interactions
-        // Touch is handled by onTouchEnd
-        if (e.detail > 0 && onClick && !disabled) {
+      onClick={() => {
+        if (onClick && !disabled) {
           onClick()
         }
       }}
       disabled={disabled}
       className={cn(
-        'p-1.5 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors touch-manipulation',
+        'p-1.5 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors',
         active && 'bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-white',
         disabled && 'opacity-40 cursor-not-allowed',
         className

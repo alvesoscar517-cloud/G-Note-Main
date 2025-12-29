@@ -9,27 +9,18 @@ interface ThemeState {
   initTheme: () => void
 }
 
-// Theme colors for different screens
+// Theme colors
 const THEME_COLORS = {
-  // Main app colors
-  app: {
-    light: '#fafafa',
-    dark: '#0a0a0a'
-  },
-  // Login screen - matches Vanta Clouds sky color
-  login: {
-    light: '#68b8d7', // Vanta clouds default sky blue
-    dark: '#23153c'   // Vanta clouds default dark purple
-  }
+  light: '#fafafa',
+  dark: '#0a0a0a'
 }
 
-// Update theme-color meta tag for status bar
-export function updateStatusBarColor(screen: 'app' | 'login' = 'app') {
+// Update theme-color meta tag
+export function updateStatusBarColor() {
   if (typeof document === 'undefined') return
   
   const isDark = document.documentElement.classList.contains('dark')
-  const colors = THEME_COLORS[screen]
-  const themeColor = isDark ? colors.dark : colors.light
+  const themeColor = isDark ? THEME_COLORS.dark : THEME_COLORS.light
   
   const metaTheme = document.querySelector('meta[name="theme-color"]')
   if (metaTheme) {
@@ -54,25 +45,7 @@ function applyTheme(theme: Theme) {
     root.classList.remove('dark')
   }
   
-  // Update ALL meta theme-color tags for mobile browsers (Android status bar)
-  // This ensures status bar color matches app background perfectly
-  const themeColor = isDark ? THEME_COLORS.app.dark : THEME_COLORS.app.light
-  
-  // Update all theme-color meta tags
-  const metaThemes = document.querySelectorAll('meta[name="theme-color"]')
-  metaThemes.forEach(meta => {
-    meta.setAttribute('content', themeColor)
-    // Remove media attribute to ensure this color is always used
-    meta.removeAttribute('media')
-  })
-  
-  // If no theme-color meta exists, create one
-  if (metaThemes.length === 0) {
-    const meta = document.createElement('meta')
-    meta.name = 'theme-color'
-    meta.content = themeColor
-    document.head.appendChild(meta)
-  }
+  updateStatusBarColor()
 }
 
 export const useThemeStore = create<ThemeState>()(

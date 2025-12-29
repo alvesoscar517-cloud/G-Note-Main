@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useGoogleLogin } from '@react-oauth/google'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -8,20 +7,11 @@ import { hasAuthBackend, getGoogleAuthUrl } from '@/lib/tokenRefresh'
 import { useNetworkStore } from '@/stores/networkStore'
 import { WifiOff } from 'lucide-react'
 import { DownloadAppPill } from '@/components/layout/DownloadAppPill'
-import { updateStatusBarColor } from '@/stores/themeStore'
 
 export function LoginScreen() {
   const { t } = useTranslation()
   const { setUser, setLoading, setLoginTransition } = useAuthStore()
   const { isOnline } = useNetworkStore()
-
-  // Update status bar color to match Vanta Clouds background
-  useEffect(() => {
-    updateStatusBarColor('login')
-    return () => {
-      updateStatusBarColor('app')
-    }
-  }, [])
 
   // Implicit flow (fallback when no backend)
   const implicitLogin = useGoogleLogin({
