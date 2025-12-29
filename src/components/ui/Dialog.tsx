@@ -150,7 +150,8 @@ export function InputDialog({
   useEffect(() => {
     if (open) {
       setValue(defaultValue)
-      setTimeout(() => inputRef.current?.focus(), 100)
+      // Don't auto-focus on mobile to prevent keyboard from opening
+      // Users can tap the input to focus
     }
   }, [open, defaultValue])
 

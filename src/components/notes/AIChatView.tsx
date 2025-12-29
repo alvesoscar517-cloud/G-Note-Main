@@ -163,11 +163,9 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
     }
   }, [streamingContent])
 
-  // Focus input when opened
+  // Focus input when opened - DISABLED to prevent keyboard auto-open on mobile
   useEffect(() => {
-    if (open) {
-      setTimeout(() => textareaRef.current?.focus(), 100)
-    } else {
+    if (!open) {
       // Don't clear messages - keep history
       setInput('')
       if (recognitionRef.current) {
@@ -336,14 +334,24 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
       {/* Back button - badge style on left side */}
       <button
         onClick={onClose}
-        className="absolute top-[max(0.75rem,env(safe-area-inset-top))] left-[max(0.75rem,env(safe-area-inset-left))] z-10 inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors text-sm font-medium"
+        className="absolute z-10 inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors text-sm font-medium"
+        style={{
+          top: 'max(0.75rem, env(safe-area-inset-top, 0px))',
+          left: 'max(0.75rem, env(safe-area-inset-left, 0px))',
+        }}
       >
         <ChevronLeft className="w-4 h-4" />
         {t('notes.close')}
       </button>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
+      {/* Messages Area - with proper padding to prevent text cutoff */}
+      <div 
+        className="flex-1 overflow-y-auto px-4"
+        style={{
+          paddingTop: 'max(3.5rem, calc(env(safe-area-inset-top, 0px) + 3rem))',
+          paddingBottom: '1rem',
+        }}
+      >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <MessageCircle className="w-16 h-16 text-neutral-400 dark:text-neutral-600 mb-4" strokeWidth={1.5} />
@@ -355,7 +363,7 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
             </p>
           </div>
         ) : (
-          <div className="max-w-3xl mx-auto space-y-4 pt-12">
+          <div className="max-w-3xl mx-auto space-y-4">
             {messages.map((message) => (
               <MessageBubble 
                 key={message.id} 
@@ -379,7 +387,14 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
       </div>
 
       {/* Input Area - Prompt style with border and safe area */}
-      <div className="px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div 
+        className="pt-4"
+        style={{
+          paddingLeft: 'max(1rem, env(safe-area-inset-left, 0px))',
+          paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))',
+        }}
+      >
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
           <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl overflow-hidden shadow-sm">
             {/* Context text attachment - shown above textarea */}

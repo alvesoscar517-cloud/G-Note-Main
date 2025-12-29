@@ -140,9 +140,9 @@ export function PublicNoteView({ fileId }: PublicNoteViewProps) {
   const hasCustomBg = note.style?.backgroundColor || note.style?.backgroundImage
 
   return (
-    <div className="h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 overflow-hidden">
+    <div className="h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 overflow-hidden fixed inset-0">
       {/* Header */}
-      <header className="flex-shrink-0 px-3 sm:px-4 pt-3 sm:pt-4 safe-top safe-x">
+      <header className="flex-shrink-0 px-3 sm:px-4 safe-top safe-x">
         <div className="max-w-3xl mx-auto bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg border border-neutral-200 dark:border-neutral-800 rounded-[12px] sm:rounded-[16px] px-3 sm:px-4 py-2.5 sm:py-3">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">

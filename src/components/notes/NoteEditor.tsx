@@ -21,7 +21,6 @@ import { marked } from 'marked'
 import * as Y from 'yjs'
 import { WebrtcProvider } from 'y-webrtc'
 import Collaboration from '@tiptap/extension-collaboration'
-import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import { generateUserColor } from '@/lib/collaboration'
 import {
   Undo2, 
@@ -254,6 +253,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   const [provider, setProvider] = useState<WebrtcProvider | null>(null)
   const [ydoc, setYdoc] = useState<Y.Doc | null>(null)
   const [isProviderReady, setIsProviderReady] = useState(false)
+  const [awarenessDoc, setAwarenessDoc] = useState<Y.Doc | null>(null)
   
   // Use refs to track current provider/ydoc for cleanup
   const providerRef = useRef<WebrtcProvider | null>(null)
@@ -276,6 +276,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       setProvider(null)
       setYdoc(null)
       setIsProviderReady(false)
+      setAwarenessDoc(null)
       return
     }
 
@@ -304,11 +305,23 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     setYdoc(newYdoc)
     setProvider(newProvider)
     
-    // Wait for awareness to be fully initialized before marking ready
-    // This ensures the editor won't try to use awareness before it's ready
-    const readyTimeout = setTimeout(() => {
-      setIsProviderReady(true)
-    }, 200)
+    // Wait for awareness to be fully initialized with doc before marking ready
+    // CollaborationCursor needs awareness.doc to be available
+    const checkReady = () => {
+      // Check if awareness has doc property (required by CollaborationCursor)
+      // Also verify the doc is the same as our ydoc
+      const aDoc = (newProvider.awareness as any).doc
+      if (newProvider.awareness && aDoc && aDoc === newYdoc) {
+        setAwarenessDoc(aDoc)
+        setIsProviderReady(true)
+      } else {
+        // Retry after a short delay
+        setTimeout(checkReady, 100)
+      }
+    }
+    
+    // Start checking after initial setup - give more time for initialization
+    const readyTimeout = setTimeout(checkReady, 300)
 
     // Update collaborators list
     const updateCollaborators = () => {
@@ -365,6 +378,17 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   const noteIdRef = useRef(note.id)
   noteIdRef.current = note.id
 
+  // Determine if collaboration mode is fully ready
+  // This ensures we only switch to collaboration mode when everything is initialized
+  // CollaborationCursor requires provider.awareness.doc to be available
+  const isCollaborationReady = !!(
+    roomId && 
+    ydoc && 
+    provider && 
+    isProviderReady && 
+    awarenessDoc
+  )
+  
   // Memoize extensions to prevent recreation on every render
   const extensions = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -373,7 +397,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         heading: { levels: [1, 2, 3] },
         codeBlock: false,
         // Disable history when collaborating (y-prosemirror handles it)
-        ...(roomId && ydoc ? { history: false } : {})
+        ...(isCollaborationReady ? { history: false } : {})
       }),
       CodeBlockLowlight.configure({
         lowlight: createLowlight(common),
@@ -419,24 +443,22 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     ]
 
     // Add collaboration extensions when in a room
-    // Only add if provider and ydoc are ready
-    if (roomId && ydoc && provider && isProviderReady) {
+    // Only add if provider and ydoc are fully ready
+    if (isCollaborationReady && ydoc && provider && awarenessDoc) {
       baseExtensions.push(
         Collaboration.configure({
           document: ydoc,
-        }),
-        CollaborationCursor.configure({
-          provider: provider,
-          user: {
-            name: user?.name || 'Anonymous',
-            color: userColor,
-          },
         })
       )
+      
+      // Note: CollaborationCursor is disabled due to compatibility issues
+      // with y-webrtc provider. The "Cannot read properties of undefined (reading 'doc')"
+      // error occurs because yCursorPlugin expects awareness.doc to be set synchronously,
+      // but y-webrtc sets it asynchronously. Content sync still works without cursor.
     }
 
     return baseExtensions
-  }, [t, roomId, ydoc, provider, isProviderReady, user?.name, userColor])
+  }, [t, isCollaborationReady, ydoc, provider, awarenessDoc, user?.name, userColor])
 
   // Editor - only recreate when roomId changes, NOT when note changes
   const editor = useEditor({
@@ -457,7 +479,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     parseOptions: {
       preserveWhitespace: 'full'
     }
-  }, [roomId, extensions]) // Only depend on roomId and memoized extensions
+  }, [isCollaborationReady, extensions]) // Only depend on collaboration state and memoized extensions
 
   // Update editor content when note changes (without recreating editor)
   useEffect(() => {
@@ -967,9 +989,11 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         open={showShareDialog}
         onClose={() => setShowShareDialog(false)}
         noteId={note.id}
-        existingRoomId={roomId || undefined}
+        existingRoomId={roomId}
+        collaboratorsCount={collaborators.length}
         onCreateRoom={handleCreateRoom}
         onJoinRoom={handleJoinRoom}
+        onStopSharing={handleStopSharing}
       />
 
       <VersionHistoryPanel

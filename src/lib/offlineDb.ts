@@ -7,7 +7,7 @@ import { openDB, type IDBPDatabase } from 'idb'
 import type { Note, Collection } from '@/types'
 
 const DB_NAME = 'gnote-offline'
-const DB_VERSION = 4 // Bumped to fix syncQueue indexes
+const DB_VERSION = 5 // Bumped to fix syncQueue indexes
 
 // Sync queue item structure
 export interface SyncQueueItem {
@@ -74,7 +74,7 @@ export async function getDb(): Promise<IDBPDatabase<GNoteDB>> {
       }
 
       // Sync queue store - recreate if upgrading to ensure indexes exist
-      if (db.objectStoreNames.contains('syncQueue') && oldVersion < 4) {
+      if (db.objectStoreNames.contains('syncQueue') && oldVersion < 5) {
         db.deleteObjectStore('syncQueue')
       }
       if (!db.objectStoreNames.contains('syncQueue')) {

@@ -255,9 +255,7 @@ export function AskAIInput({ open, onSubmit, contextText, onClearContext, isLoad
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
 
   useEffect(() => {
-    if (open) {
-      setTimeout(() => textareaRef.current?.focus(), 50)
-    } else {
+    if (!open) {
       setQuestion('')
       // Stop listening when closed
       if (recognitionRef.current) {
@@ -265,6 +263,7 @@ export function AskAIInput({ open, onSubmit, contextText, onClearContext, isLoad
         setIsListening(false)
       }
     }
+    // Don't auto-focus on mobile to prevent keyboard from opening
   }, [open])
 
   // Auto-resize textarea

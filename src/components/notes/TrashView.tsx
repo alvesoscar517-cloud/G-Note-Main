@@ -178,7 +178,7 @@ export function TrashView({ open, onClose }: TrashViewProps) {
         />
         
         {/* Header */}
-        <div className="sticky top-0 z-30 px-3 sm:px-4 pt-3 sm:pt-4 safe-top safe-x">
+        <div className="sticky top-0 z-30 px-3 sm:px-4 safe-top safe-x">
           <div className="max-w-6xl mx-auto bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg border border-neutral-200 dark:border-neutral-800 rounded-[16px] px-3 sm:px-4 py-2.5 sm:py-3">
             <div className="flex items-center justify-between gap-2 sm:gap-4">
               <div className="flex items-center gap-2 sm:gap-3">

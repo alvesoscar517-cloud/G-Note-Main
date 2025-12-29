@@ -62,7 +62,15 @@ export function LoginScreen() {
   }
 
   return (
-    <div className="min-h-screen min-h-dvh flex flex-col items-center justify-center px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] relative overflow-hidden">
+    <div 
+      className="min-h-screen min-h-dvh flex flex-col items-center justify-center relative overflow-hidden"
+      style={{
+        paddingLeft: 'max(1rem, env(safe-area-inset-left, 0px))',
+        paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
+        paddingTop: 'max(1rem, env(safe-area-inset-top, 0px))',
+        paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))',
+      }}
+    >
       {/* Vanta Clouds Background */}
       <VantaWaves />
       {/* Card Container - Apple-style glassmorphism */}

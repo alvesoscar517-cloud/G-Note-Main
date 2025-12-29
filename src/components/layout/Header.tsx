@@ -178,7 +178,7 @@ export function Header() {
       {/* Logout Loading Overlay */}
       <LoadingOverlay isVisible={isLoggingOut} text={t('settings.loggingOut')} />
 
-      <header className="px-4 pt-4 safe-top safe-x relative z-40">
+      <header className="px-4 safe-top safe-x relative z-40">
         <div className="max-w-6xl mx-auto bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg border border-neutral-200 dark:border-neutral-800 rounded-[16px] px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             {/* Logo & Search */}

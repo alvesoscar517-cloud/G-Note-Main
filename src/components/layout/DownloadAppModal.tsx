@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Share, Plus, MoreVertical, Download, ChevronRight, Smartphone, Monitor, Tablet, Info } from 'lucide-react'
+import { X, Share, Plus, MoreVertical, Download, ChevronRight, Smartphone, Monitor, Tablet, Info, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+
+// Chrome Extension ID
+const CHROME_EXTENSION_ID = 'pncgcnggbbbgnhdniigjndekfmmblioj'
+const CHROME_EXTENSION_URL = `https://chromewebstore.google.com/detail/${CHROME_EXTENSION_ID}`
 
 interface DownloadAppModalProps {
   isOpen: boolean
@@ -52,7 +56,15 @@ function getDeviceInfo() {
   return { isIOS, isAndroid, isSafari, isChrome, isEdge, isFirefox, isSamsung, isOpera, isMac, isWindows, isTablet, isStandalone }
 }
 
-type Platform = 'ios' | 'android' | 'desktop'
+type Platform = 'ios' | 'android' | 'desktop' | 'extension'
+
+// Chrome Extension Icon
+const ChromeExtensionIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+    <circle cx="12" cy="12" r="4"/>
+  </svg>
+)
 
 // Reusable card component for consistent styling
 interface BrowserCardProps {
@@ -128,6 +140,7 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
     { id: 'ios', icon: <Smartphone className="w-4 h-4" />, label: 'iOS' },
     { id: 'android', icon: <Tablet className="w-4 h-4" />, label: 'Android' },
     { id: 'desktop', icon: <Monitor className="w-4 h-4" />, label: 'Desktop' },
+    { id: 'extension', icon: <ChromeExtensionIcon className="w-4 h-4" />, label: t('install.chromeExtension') },
   ]
 
   // Step buttons component for consistent styling
@@ -249,11 +262,51 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
             </div>
           </div>
         )
+
+      case 'extension':
+        return (
+          <div className="space-y-3">
+            {/* Chrome Extension Card */}
+            <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center">
+                  <BrowserIcon browser="chrome" className="w-5 h-5" />
+                </div>
+                <span className="font-medium text-neutral-900 dark:text-white">{t('install.chromeExtension')}</span>
+                <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full">
+                  {t('install.new')}
+                </span>
+              </div>
+              <p className="text-sm text-neutral-600 dark:text-neutral-300">
+                {t('install.chromeExtensionDescription')}
+              </p>
+              <a
+                href={CHROME_EXTENSION_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full h-10 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors"
+              >
+                <ExternalLink className="w-4 h-4" />
+                {t('install.addToChrome')}
+              </a>
+            </div>
+
+            {/* Info about extension */}
+            <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl">
+              <div className="flex items-start gap-2">
+                <Info className="w-4 h-4 text-neutral-500 dark:text-neutral-400 mt-0.5 shrink-0" />
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  {t('install.chromeExtensionInfo')}
+                </p>
+              </div>
+            </div>
+          </div>
+        )
     }
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center safe-x">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black/50"
@@ -261,7 +314,7 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
       />
       
       {/* Modal */}
-      <div className="relative w-full sm:max-w-md bg-white dark:bg-neutral-900 rounded-t-3xl sm:rounded-3xl shadow-2xl animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 max-h-[90vh] overflow-hidden">
+      <div className="relative w-full sm:max-w-md bg-white dark:bg-neutral-900 rounded-t-3xl sm:rounded-3xl shadow-2xl animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 max-h-[90vh] overflow-hidden safe-bottom">
         {/* Header */}
         <div className="sticky top-0 bg-white dark:bg-neutral-900 px-5 pt-5 pb-4">
           <div className="flex items-center justify-between">

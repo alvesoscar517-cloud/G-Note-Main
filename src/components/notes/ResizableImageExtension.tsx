@@ -232,6 +232,10 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
                   onClick={(e) => { 
                     e.preventDefault()
                     e.stopPropagation()
+                    // Blur any focused element to prevent keyboard from opening
+                    if (document.activeElement instanceof HTMLElement) {
+                      document.activeElement.blur()
+                    }
                     setShowEditor(true) 
                   }}
                   onMouseDown={(e) => {
