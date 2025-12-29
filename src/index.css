@@ -89,61 +89,59 @@ html.dark, html.dark body,
 }
 
 /* Safe area padding utilities - CONSISTENT across all modes */
-/* Use env() directly with fallback, not CSS variables that may not update */
-/* Portrait mode: use safe area values (for notch/dynamic island) */
+/* Portrait mode: use safe area values with minimum padding for visual spacing */
 .safe-top {
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
 }
 
 .safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
 }
 
 .safe-left {
-  padding-left: env(safe-area-inset-left, 0px);
+  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
 }
 
 .safe-right {
-  padding-right: env(safe-area-inset-right, 0px);
+  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
 }
 
 .safe-x {
-  padding-left: env(safe-area-inset-left, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
+  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
 }
 
 .safe-y {
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
 }
 
 .safe-all {
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  padding-left: env(safe-area-inset-left, 0px);
-  padding-right: env(safe-area-inset-right, 0px);
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
 }
 
-/* Landscape mode: remove safe area padding completely */
-/* Content displays edge-to-edge from status bar to screen edge */
-/* This applies to both standalone and fullscreen PWA modes */
+/* Landscape mode: ignore safe-area, use fixed padding for both sides */
+/* This ensures symmetric layout regardless of notch position */
 @media (orientation: landscape) {
   .safe-left {
-    padding-left: 0 !important;
+    padding-left: 0.75rem !important;
   }
   
   .safe-right {
-    padding-right: 0 !important;
+    padding-right: 0.75rem !important;
   }
   
   .safe-x {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
   }
   
   .safe-all {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
   }
 }
 
