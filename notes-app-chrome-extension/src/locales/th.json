@@ -11,7 +11,11 @@
       "terms": "ข้อกำหนดการใช้งาน",
       "and": "และ",
       "privacy": "นโยบายความเป็นส่วนตัว"
-    }
+    },
+    "drivePermissionRequired": "ต้องการสิทธิ์ Drive",
+    "drivePermissionDenied": "ไม่ได้รับสิทธิ์เข้าถึง Google Drive กรุณาเข้าสู่ระบบอีกครั้งและอนุญาตการเข้าถึง Drive เพื่อซิงค์โน้ตของคุณ",
+    "relogin": "เข้าสู่ระบบอีกครั้ง",
+    "continueWithoutSync": "ดำเนินการต่อโดยไม่ซิงค์"
   },
   "header": {
     "search": "ค้นหา...",
@@ -28,11 +32,22 @@
     "logout": "ออกจากระบบ",
     "logoutDescription": "ออกจากบัญชี",
     "loggingOut": "กำลังออกจากระบบ...",
+    "logoutConfirmTitle": "ออกจากระบบ?",
+    "logoutWarningNormal": "ข้อมูลของคุณซิงค์แล้ว คุณสามารถเข้าสู่ระบบอีกครั้งได้ทุกเมื่อเพื่อเข้าถึงโน้ตของคุณ",
+    "logoutWarningUnsynced": "คุณมีการเปลี่ยนแปลงที่ยังไม่ได้ซิงค์ การเปลี่ยนแปลงจะถูกอัปโหลดเมื่อคุณเข้าสู่ระบบอีกครั้งบนอุปกรณ์นี้",
+    "logoutWarningOffline": "คุณออฟไลน์อยู่พร้อมการเปลี่ยนแปลงที่ยังไม่ได้ซิงค์ การเปลี่ยนแปลงเหล่านี้อาจสูญหายหากคุณออกจากระบบตอนนี้",
+    "unsyncedWarning": "{{count}} การเปลี่ยนแปลงที่ยังไม่ได้ซิงค์",
+    "allSynced": "การเปลี่ยนแปลงทั้งหมดซิงค์แล้ว",
+    "lastSync": "{{time}}",
+    "noDataToSync": "ไม่มีข้อมูลที่จะซิงค์",
     "modalSize": "ขนาดหน้าต่าง",
     "modalSizeDescription": "ปรับขนาดตัวแก้ไข",
     "modalSizeDefault": "ค่าเริ่มต้น",
     "modalSizeLarge": "ใหญ่",
-    "modalSizeXLarge": "ใหญ่มาก"
+    "modalSizeXLarge": "ใหญ่มาก",
+    "offlineLogoutTitle": "ออกจากระบบขณะออฟไลน์?",
+    "offlineLogoutWarning": "คุณออฟไลน์อยู่ การเปลี่ยนแปลงที่ยังไม่ได้บันทึกอาจยังไม่ได้ซิงค์กับ Google Drive หากคุณออกจากระบบตอนนี้ คุณอาจสูญเสียการเปลี่ยนแปลงเหล่านั้น",
+    "logoutAnyway": "ออกจากระบบต่อไป"
   },
   "credits": {
     "title": "ซื้อเครดิต AI",
@@ -143,15 +158,19 @@
     "createLink": "สร้างลิงก์",
     "updateLink": "อัปเดต",
     "realtime": "สด",
-    "realtimeDescription": "แชร์รหัสห้องเพื่อทำงานร่วมกันแบบเรียลไทม์:",
-    "start": "เริ่ม",
+    "realtimeDescription": "เริ่มเซสชันการทำงานร่วมกันแบบสด ผู้อื่นสามารถเข้าร่วมด้วยรหัสห้อง",
+    "realtimeActive": "เซสชันสดกำลังทำงาน ({{count}} เชื่อมต่อ)",
+    "realtimeNote": "คุณต้องเริ่มเซสชันก่อนแชร์รหัส ผู้ที่เข้าร่วมจะซิงค์กับเนื้อหาโน้ตของคุณ",
+    "shareCodeToInvite": "แชร์รหัสนี้เพื่อเชิญผู้อื่น:",
+    "start": "เริ่มเซสชัน",
+    "stopSharing": "สิ้นสุดเซสชัน",
     "email": "อีเมล",
     "emailDescription": "แชร์ผ่านอีเมล Google Drive:",
     "emailPlaceholder": "อีเมลผู้รับ...",
     "shareSuccess": "แชร์สำเร็จ!",
     "shareButton": "แชร์",
     "join": "เข้าร่วม",
-    "joinDescription": "ป้อนรหัสห้องเพื่อเข้าร่วมการทำงานร่วมกัน:",
+    "joinDescription": "ป้อนรหัสห้องเพื่อเข้าร่วมเซสชันสด:",
     "joinPlaceholder": "ป้อนรหัสห้อง...",
     "joinButton": "เข้าร่วม",
     "close": "ปิด",
@@ -181,13 +200,18 @@
     "alreadyInstalled": "ติดตั้งแล้ว!",
     "alreadyInstalledDescription": "คุณกำลังใช้เวอร์ชันแอปของ G-Note",
     "androidChromeInstructions": "แตะไอคอนเมนู (⋮) ด้านบน จากนั้นเลือก \"ติดตั้งแอป\" หรือ \"เพิ่มไปยังหน้าจอหลัก\"",
-    "desktopChromeInstructions": "คลิกไอคอนติดตั้ง (⊕) ในแถบที่อยู่ หรือไปที่ เมนู → ติดตั้งแอป",
+    "desktopChromeInstructions": "คลิกไอคอนติดตั้ง (⬇) ในแถบที่อยู่ หรือไปที่ เมนู → ติดตั้งแอป",
     "iosSafariInstructions": "แตะปุ่มแชร์ด้านล่าง จากนั้นเลือก \"เพิ่มไปยังหน้าจอหลัก\"",
     "iosChromeInstructions": "เพื่อประสบการณ์ที่ดีที่สุด เปิดใน Safari แล้วแตะ แชร์ → เพิ่มไปยังหน้าจอหลัก",
     "androidFirefoxInstructions": "แตะเมนู (⋮) จากนั้นเลือก \"ติดตั้ง\"",
     "androidOtherInstructions": "แตะเมนู จากนั้นเลือก \"เพิ่มไปยังหน้าจอหลัก\" หรือ \"ติดตั้ง\"",
     "desktopFirefoxInstructions": "Firefox ไม่รองรับการติดตั้ง PWA ลองใช้ Chrome หรือ Edge เพื่อประสบการณ์ที่ดีที่สุด",
-    "desktopSafariInstructions": "คลิก File → เพิ่มไปยัง Dock หรือใช้ Chrome/Edge เพื่อรองรับ PWA เต็มรูปแบบ"
+    "desktopSafariInstructions": "คลิก File → เพิ่มไปยัง Dock หรือใช้ Chrome/Edge เพื่อรองรับ PWA เต็มรูปแบบ",
+    "chromeExtension": "ส่วนขยาย",
+    "chromeExtensionDescription": "ติดตั้งส่วนขยาย Chrome เพื่อเข้าถึงได้เร็วจากแถบเครื่องมือเบราว์เซอร์",
+    "addToChrome": "เพิ่มไปยัง Chrome",
+    "chromeExtensionInfo": "ส่วนขยายนี้ใช้งานได้กับ Chrome, Edge, Brave และเบราว์เซอร์อื่นๆ ที่ใช้ Chromium",
+    "new": "ใหม่"
   },
   "packages": {
     "starter": "เริ่มต้น",
@@ -212,7 +236,8 @@
     "cancel": "ยกเลิก",
     "rotate": "หมุน",
     "flipH": "พลิกแนวนอน",
-    "flipV": "พลิกแนวตั้ง"
+    "flipV": "พลิกแนวตั้ง",
+    "auto": "อัตโนมัติ"
   },
   "common": {
     "confirm": "ยืนยัน",
@@ -317,6 +342,24 @@
     "noResults": "ไม่พบผลลัพธ์",
     "noResultsDescription": "ไม่มีโน้ตที่ตรงกับการค้นหาของคุณ"
   },
+  "freeNote": {
+    "freeMode": "โหมดฟรี",
+    "placeholder": "เริ่มเขียนโน้ตของคุณที่นี่...",
+    "titlePlaceholder": "ชื่อโน้ต",
+    "untitledNote": "โน้ตไม่มีชื่อ",
+    "savePermanently": "บันทึกถาวร",
+    "save": "บันทึก",
+    "lastSaved": "บันทึกแล้ว",
+    "localStorageWarning": "โน้ตของคุณถูกบันทึกในเบราว์เซอร์นี้เท่านั้น อาจสูญหายหากคุณล้างข้อมูลเบราว์เซอร์ คลิก 'บันทึกถาวร' เพื่อเก็บไว้ตลอดไปด้วยบัญชีฟรี",
+    "featureLocked": "ฟีเจอร์ถูกล็อค",
+    "featureLockedDescription": "\"{{feature}}\" ต้องการบัญชีฟรี สมัครเพื่อปลดล็อคฟีเจอร์ทั้งหมดและบันทึกโน้ตของคุณถาวร",
+    "goToApp": "สร้างบัญชีฟรี",
+    "goToAppShort": "สมัคร",
+    "reset": "รีเซ็ต",
+    "resetTitle": "รีเซ็ตโน้ต?",
+    "resetDescription": "การดำเนินการนี้จะลบเนื้อหาทั้งหมดและไม่สามารถยกเลิกได้",
+    "resetConfirm": "รีเซ็ต"
+  },
   "offline": {
     "offline": "ออฟไลน์",
     "online": "ออนไลน์",
@@ -336,12 +379,5 @@
     "syncError": "ข้อผิดพลาดในการซิงค์",
     "tapToRetry": "แตะเพื่อลองใหม่",
     "loginRequiresNetwork": "การเข้าสู่ระบบต้องการการเชื่อมต่ออินเทอร์เน็ต"
-  },
-  "webContent": {
-    "title": "เพิ่มไปยังโน้ต",
-    "description": "สร้างโน้ตใหม่ด้วยเนื้อหาที่เลือกจากเว็บ",
-    "createNote": "สร้างโน้ต",
-    "addToExisting": "เพิ่มไปยังโน้ตที่มีอยู่",
-    "source": "แหล่งที่มา"
   }
 }

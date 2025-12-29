@@ -36,4 +36,36 @@ function EditorSkeleton() {
   )
 }
 
-export { Skeleton, EditorSkeleton }
+// Single note card skeleton
+function NoteCardSkeleton() {
+  return (
+    <div className="p-4 rounded-xl bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+      {/* Title */}
+      <Skeleton className="h-5 w-3/4 mb-3" />
+      {/* Content lines */}
+      <div className="space-y-2">
+        <Skeleton className="h-3 w-full" />
+        <Skeleton className="h-3 w-5/6" />
+        <Skeleton className="h-3 w-4/5" />
+      </div>
+      {/* Date */}
+      <Skeleton className="h-3 w-24 mt-4" />
+    </div>
+  )
+}
+
+// Full notes list skeleton - shows multiple card skeletons in grid
+function NotesListSkeleton() {
+  // Show 6 skeleton cards for a nice loading effect
+  const skeletonCount = 6
+  
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {Array.from({ length: skeletonCount }).map((_, index) => (
+        <NoteCardSkeleton key={index} />
+      ))}
+    </div>
+  )
+}
+
+export { Skeleton, EditorSkeleton, NoteCardSkeleton, NotesListSkeleton }

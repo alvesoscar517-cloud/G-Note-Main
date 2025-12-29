@@ -45,6 +45,62 @@ class DriveSync {
   }
 
   /**
+   * Quick check if Drive has any app data (folder exists with notes)
+   * This is a lightweight check that doesn't download all data
+   * Returns: { hasData: boolean, noteCount: number }
+   */
+  async checkHasData(): Promise<{ hasData: boolean; noteCount: number }> {
+    if (!this.accessToken) {
+      return { hasData: false, noteCount: 0 }
+    }
+
+    if (!this.checkOnline()) {
+      return { hasData: false, noteCount: 0 }
+    }
+
+    try {
+      // Find the G-Note folder
+      const searchUrl = `${DRIVE_API}/files?q=name='${FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`
+      const searchRes = await this.request(searchUrl)
+      const searchData = await searchRes.json()
+
+      if (!searchData.files?.length) {
+        // Also check for old folder name 'NotesApp'
+        const oldFolderUrl = `${DRIVE_API}/files?q=name='NotesApp' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`
+        const oldFolderRes = await this.request(oldFolderUrl)
+        const oldFolderData = await oldFolderRes.json()
+        
+        if (!oldFolderData.files?.length) {
+          return { hasData: false, noteCount: 0 }
+        }
+        this.folderId = oldFolderData.files[0].id
+      } else {
+        this.folderId = searchData.files[0].id
+      }
+
+      // Check if notes-index.json exists and has notes
+      const indexUrl = `${DRIVE_API}/files?q=name='${NOTES_INDEX_FILE}' and '${this.folderId}' in parents and trashed=false&fields=files(id)`
+      const indexRes = await this.request(indexUrl)
+      const indexData = await indexRes.json()
+
+      if (!indexData.files?.length) {
+        return { hasData: false, noteCount: 0 }
+      }
+
+      // Download and check the index
+      const indexFileId = indexData.files[0].id
+      const contentRes = await this.request(`${DRIVE_API}/files/${indexFileId}?alt=media`)
+      const indexContent = await contentRes.json()
+
+      const noteCount = indexContent.notes?.length || 0
+      return { hasData: noteCount > 0, noteCount }
+    } catch (error) {
+      console.error('[DriveSync] checkHasData error:', error)
+      return { hasData: false, noteCount: 0 }
+    }
+  }
+
+  /**
    * Check if we're online before making network requests
    */
   private checkOnline(): boolean {
@@ -69,7 +125,24 @@ class DriveSync {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}))
-      throw new Error(error.error?.message || `Drive API error: ${response.status}`)
+      const status = response.status
+      
+      // Handle permission errors (403) - user didn't grant Drive access
+      if (status === 403) {
+        const errorReason = error.error?.errors?.[0]?.reason || ''
+        if (errorReason === 'insufficientPermissions' || 
+            errorReason === 'forbidden' ||
+            error.error?.message?.includes('insufficient')) {
+          throw new Error('DRIVE_PERMISSION_DENIED')
+        }
+      }
+      
+      // Handle auth errors (401)
+      if (status === 401) {
+        throw new Error(`401: ${error.error?.message || 'Authentication failed'}`)
+      }
+      
+      throw new Error(`${status}: ${error.error?.message || 'Drive API error'}`)
     }
 
     return response
@@ -321,7 +394,11 @@ class DriveSync {
     } catch (error) {
       // Ignore 404 errors - file already deleted
       const errorMsg = error instanceof Error ? error.message : ''
-      if (!errorMsg.includes('404')) throw error
+      if (!errorMsg.includes('404') && !errorMsg.includes('File not found') && !errorMsg.includes('not found')) {
+        throw error
+      }
+      // File not found means it's already deleted, which is fine
+      console.log(`[DriveSync] File ${fileId} already deleted or not found, skipping`)
     }
     
     this.noteFileIds.delete(noteId)

@@ -11,6 +11,7 @@ import { getPlainText } from '@/lib/utils'
 import { NoteBackground, getNoteBackgroundStyle } from './NoteStylePicker'
 import { useSwipeGesture } from '@/hooks/useSwipeGesture'
 import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
+import { useHistoryBack } from '@/hooks/useHistoryBack'
 import type { Note } from '@/types'
 
 // Modal max-width in pixels for each size
@@ -30,19 +31,26 @@ const MODAL_SIZES: Record<ModalSize, string> = {
   xlarge: 'md:w-full md:max-w-5xl md:h-[85vh] md:max-h-[800px]'
 }
 
-// Smooth transition config - longer duration for more frames = smoother animation
+// High refresh rate optimized transition config
+// Uses spring physics for smoother interpolation at any frame rate (60Hz, 90Hz, 120Hz)
+// Spring animations are frame-rate independent - they calculate position based on physics, not fixed keyframes
 const LAYOUT_TRANSITION = { 
   layout: { 
-    duration: 0.3, 
-    ease: [0.4, 0, 0.2, 1] as const // Material Design standard easing - smoother
+    type: 'spring' as const,
+    stiffness: 400,    // Higher = snappier response
+    damping: 35,       // Higher = less bounce
+    mass: 1,           // Lower = faster acceleration
+    // Fallback for older devices
+    duration: 0.3,
   }
 }
 
-// Content reveal synced with layout
+// Content reveal - spring for smooth fade at any refresh rate
 const CONTENT_TRANSITION = {
-  duration: 0.2,
-  delay: 0.05,
-  ease: [0.4, 0, 0.2, 1] as const
+  type: 'spring' as const,
+  stiffness: 500,
+  damping: 40,
+  mass: 0.8,
 }
 
 // Editable title component with ellipsis support for mobile
@@ -107,6 +115,16 @@ export function NoteModal() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [canExitFullscreen, setCanExitFullscreen] = useState(true)
   const userToggledRef = useRef(false)
+  
+  // Handle close function (defined early for useHistoryBack)
+  const handleCloseRef = useRef<() => void>(() => {})
+  
+  // History back support for system back gesture (Android swipe, browser back button)
+  useHistoryBack({
+    isOpen: isModalOpen,
+    onBack: () => handleCloseRef.current(),
+    stateKey: 'note-modal'
+  })
   
   // Check if modal should auto-fullscreen based on screen width
   const checkAutoFullscreen = useCallback(() => {
@@ -213,7 +231,7 @@ export function NoteModal() {
     }
   }, [isModalOpen])
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsFullscreen(false)
     setCanExitFullscreen(true)
     userToggledRef.current = false
@@ -233,7 +251,12 @@ export function NoteModal() {
       }
     }
     setModalOpen(false)
-  }
+  }, [selectedNoteId, setModalOpen])
+  
+  // Keep handleCloseRef in sync for useHistoryBack
+  useEffect(() => {
+    handleCloseRef.current = handleClose
+  }, [handleClose])
 
   const handleTogglePin = () => {
     if (displayNote) togglePin(displayNote.id)
@@ -275,7 +298,11 @@ export function NoteModal() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ 
+              type: 'spring',
+              stiffness: 500,
+              damping: 40,
+            }}
             className="hidden md:block fixed inset-0 bg-black/50 z-40"
             onClick={handleClose}
           />
@@ -319,16 +346,11 @@ export function NoteModal() {
                 'flex items-center gap-1 relative z-10',
                 // Base padding - consistent across all orientations
                 'px-2 py-1.5',
-                // Safe area padding - applied to the container, not individual items
-                // This ensures all items align properly regardless of orientation
+                // Safe area classes handle landscape automatically
+                'safe-top',
                 isFullscreen ? 'flex' : 'md:hidden'
               )}
-              style={{
-                paddingTop: 'max(0.375rem, env(safe-area-inset-top, 0px))',
-                paddingLeft: 'max(0.5rem, env(safe-area-inset-left, 0px))',
-                paddingRight: 'max(0.5rem, env(safe-area-inset-right, 0px))',
-                ...swipeStyle
-              }}
+              style={swipeStyle}
               {...swipeHandlers}
             >
               <Button variant="ghost" size="icon" onClick={handleClose} className="shrink-0">

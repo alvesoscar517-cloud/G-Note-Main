@@ -2,12 +2,20 @@ import * as React from 'react'
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu'
 import { Check, ChevronRight, Circle } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { isTouchDevice } from '@/hooks/useIsTouchDevice'
+import { useIsTouchDevice } from '@/hooks/useIsTouchDevice'
 
 // On touch devices, we completely disable custom context menu
 // to allow native text selection and browser context menu to work properly
 
 const ContextMenu = ({ children, ...props }: ContextMenuPrimitive.ContextMenuProps) => {
+  const isTouchDevice = useIsTouchDevice()
+  
+  // On touch devices, just render children without any context menu wrapper
+  // This completely disables the custom context menu behavior
+  if (isTouchDevice) {
+    return <>{children}</>
+  }
+  
   return (
     <ContextMenuPrimitive.Root {...props}>
       {children}
@@ -19,6 +27,14 @@ const ContextMenuTrigger = React.forwardRef<
   React.ComponentRef<typeof ContextMenuPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Trigger>
 >(({ children, ...props }, ref) => {
+  const isTouchDevice = useIsTouchDevice()
+  
+  // On touch devices, render children directly without context menu trigger
+  // This allows native text selection and browser context menu to work
+  if (isTouchDevice) {
+    return <>{children}</>
+  }
+
   return (
     <ContextMenuPrimitive.Trigger
       ref={ref}
@@ -86,8 +102,10 @@ const ContextMenuContent = React.forwardRef<
   React.ComponentRef<typeof ContextMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Content>
 >(({ className, children, ...props }, ref) => {
+  const isTouchDevice = useIsTouchDevice()
+  
   // On touch devices, don't render context menu - let native behavior work
-  if (isTouchDevice()) {
+  if (isTouchDevice) {
     return null
   }
 

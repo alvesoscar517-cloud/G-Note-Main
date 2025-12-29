@@ -13,6 +13,7 @@ import { OfflineIndicator } from '@/components/ui/OfflineIndicator'
 import { TrashView } from '@/components/notes/TrashView'
 import { DriveSearchResults } from '@/components/search/DriveSearchResults'
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
+import { LogoutConfirmDialog } from '@/components/auth/LogoutConfirmDialog'
 import { cn } from '@/lib/utils'
 
 // Modal size options
@@ -73,6 +74,7 @@ export function Header() {
   const [driveSearchEnabled, setDriveSearchEnabled] = useState(false)
   const [showDriveResults, setShowDriveResults] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   
   // Local search input state + debounce
   const [localSearch, setLocalSearch] = useState('')
@@ -131,6 +133,12 @@ export function Header() {
   }
 
   const handleLogout = async () => {
+    // Show confirmation dialog
+    setShowLogoutConfirm(true)
+  }
+
+  const handleConfirmLogout = async () => {
+    setShowLogoutConfirm(false)
     setIsLoggingOut(true)
     setSettingsOpen(false)
     try {
@@ -177,6 +185,13 @@ export function Header() {
     <>
       {/* Logout Loading Overlay */}
       <LoadingOverlay isVisible={isLoggingOut} text={t('settings.loggingOut')} />
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutConfirmDialog
+        open={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleConfirmLogout}
+      />
 
       <header className="px-4 safe-top safe-x relative z-40">
         <div className="max-w-6xl mx-auto bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg border border-neutral-200 dark:border-neutral-800 rounded-[16px] px-4 py-3">

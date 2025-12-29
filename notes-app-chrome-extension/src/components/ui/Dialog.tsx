@@ -73,7 +73,7 @@ export function DialogContent({ children }: { children: React.ReactNode }) {
 
 export function DialogFooter({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-end gap-2 px-5 py-3">
+    <div className="flex items-center justify-end gap-2 px-5 py-3 safe-bottom">
       {children}
     </div>
   )

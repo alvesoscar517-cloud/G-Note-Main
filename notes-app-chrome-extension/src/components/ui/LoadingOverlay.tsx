@@ -2,9 +2,10 @@ import { useThemeStore } from '@/stores/themeStore'
 
 interface LoadingOverlayProps {
   isVisible: boolean
+  text?: string
 }
 
-export function LoadingOverlay({ isVisible }: LoadingOverlayProps) {
+export function LoadingOverlay({ isVisible, text }: LoadingOverlayProps) {
   const { theme } = useThemeStore()
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
@@ -24,7 +25,7 @@ export function LoadingOverlay({ isVisible }: LoadingOverlayProps) {
         
         {/* App Name */}
         <h1 className="text-lg font-semibold text-neutral-900 dark:text-white animate-fadeInUp">
-          G-Note
+          {text || 'G-Note'}
         </h1>
         
         {/* Loading indicator */}

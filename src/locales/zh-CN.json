@@ -11,7 +11,11 @@
       "terms": "服务条款",
       "and": "和",
       "privacy": "隐私政策"
-    }
+    },
+    "drivePermissionRequired": "需要 Drive 权限",
+    "drivePermissionDenied": "未授予 Google Drive 访问权限。请重新登录并允许 Drive 访问以同步您的笔记。",
+    "relogin": "重新登录",
+    "continueWithoutSync": "不同步继续"
   },
   "header": {
     "search": "搜索...",
@@ -28,6 +32,14 @@
     "logout": "退出登录",
     "logoutDescription": "退出账户",
     "loggingOut": "正在退出...",
+    "logoutConfirmTitle": "退出登录？",
+    "logoutWarningNormal": "您的数据已同步。您可以随时重新登录以访问您的笔记。",
+    "logoutWarningUnsynced": "您有未同步的更改。当您在此设备上重新登录时，它们将被上传。",
+    "logoutWarningOffline": "您处于离线状态且有未同步的更改。如果现在退出登录，这些更改可能会丢失。",
+    "unsyncedWarning": "{{count}} 个未同步的更改",
+    "allSynced": "所有更改已同步",
+    "lastSync": "{{time}}",
+    "noDataToSync": "没有数据需要同步",
     "modalSize": "窗口大小",
     "modalSizeDescription": "调整编辑器大小",
     "modalSizeDefault": "默认",
@@ -326,6 +338,24 @@
     "searchPlaceholder": "在回收站中搜索...",
     "noResults": "未找到结果",
     "noResultsDescription": "没有与您的搜索匹配的笔记"
+  },
+  "freeNote": {
+    "freeMode": "免费模式",
+    "placeholder": "在这里输入您的笔记...",
+    "titlePlaceholder": "笔记标题",
+    "untitledNote": "无标题笔记",
+    "savePermanently": "永久保存",
+    "save": "保存",
+    "lastSaved": "已保存",
+    "localStorageWarning": "您的笔记仅保存在此浏览器中。如果清除浏览器数据可能会丢失。点击'永久保存'使用免费账户永久保存。",
+    "featureLocked": "功能已锁定",
+    "featureLockedDescription": "\"{{feature}}\"需要免费账户。注册以解锁所有功能并永久保存您的笔记。",
+    "goToApp": "获取免费账户",
+    "goToAppShort": "注册",
+    "reset": "重置",
+    "resetTitle": "重置笔记？",
+    "resetDescription": "这将清除所有内容，且无法撤销。",
+    "resetConfirm": "重置"
   },
   "offline": {
     "offline": "离线",

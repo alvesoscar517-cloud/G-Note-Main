@@ -92,7 +92,7 @@ export function VersionHistoryPanel({
             {t('versionHistory.title')}
           </div>
         </DialogHeader>
-        <div className="flex flex-col items-center py-8 text-center px-5">
+        <div className="flex flex-col items-center py-8 text-center px-4">
           <History className="w-12 h-12 text-neutral-300 dark:text-neutral-600 mb-3" />
           <p className="text-neutral-500">{t('versionHistory.noHistory')}</p>
         </div>
@@ -112,10 +112,10 @@ export function VersionHistoryPanel({
         </div>
       </DialogHeader>
       
-      <div className="max-h-[400px] overflow-y-auto">
+      <div className="max-h-[400px] overflow-y-auto px-4 pt-2">
         {/* Offline Warning */}
         {!isOnline && (
-          <div className="mx-4 mt-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+          <div className="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
             <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
               <WifiOff className="w-4 h-4" />
               <span className="text-sm font-medium">{t('offline.networkRequired')}</span>
@@ -131,12 +131,12 @@ export function VersionHistoryPanel({
             <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
           </div>
         ) : versions.length === 0 ? (
-          <div className="flex flex-col items-center py-8 text-center px-5">
+          <div className="flex flex-col items-center py-8 text-center">
             <History className="w-12 h-12 text-neutral-300 dark:text-neutral-600 mb-3" />
             <p className="text-neutral-500">{t('versionHistory.noHistory')}</p>
           </div>
         ) : (
-          <div className="p-4 space-y-3">
+          <div className="space-y-3 pb-2">
             {versions.map((version, index) => (
               <ContextMenu key={version.id}>
                 <ContextMenuTrigger asChild>

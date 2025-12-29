@@ -11,7 +11,11 @@
       "terms": "利用規約",
       "and": "と",
       "privacy": "プライバシーポリシー"
-    }
+    },
+    "drivePermissionRequired": "Driveの権限が必要です",
+    "drivePermissionDenied": "Google Driveへのアクセスが許可されていません。メモを同期するには、再度ログインしてDriveへのアクセスを許可してください。",
+    "relogin": "再度ログイン",
+    "continueWithoutSync": "同期せずに続行"
   },
   "header": {
     "search": "検索...",
@@ -28,6 +32,14 @@
     "logout": "ログアウト",
     "logoutDescription": "アカウントからサインアウト",
     "loggingOut": "サインアウト中...",
+    "logoutConfirmTitle": "ログアウトしますか？",
+    "logoutWarningNormal": "データは同期されています。いつでも再度ログインしてメモにアクセスできます。",
+    "logoutWarningUnsynced": "同期されていない変更があります。このデバイスで再度ログインすると、アップロードされます。",
+    "logoutWarningOffline": "オフライン状態で同期されていない変更があります。今ログアウトすると、これらの変更が失われる可能性があります。",
+    "unsyncedWarning": "{{count}}件の未同期の変更",
+    "allSynced": "すべての変更が同期されました",
+    "lastSync": "{{time}}",
+    "noDataToSync": "同期するデータがありません",
     "modalSize": "ウィンドウサイズ",
     "modalSizeDescription": "エディターのサイズを調整",
     "modalSizeDefault": "デフォルト",
@@ -143,15 +155,19 @@
     "createLink": "リンクを作成",
     "updateLink": "更新",
     "realtime": "ライブ",
-    "realtimeDescription": "ルームコードを共有してリアルタイムで共同編集：",
-    "start": "開始",
+    "realtimeDescription": "ライブコラボレーションセッションを開始します。他の人はルームコードで参加できます。",
+    "realtimeActive": "ライブセッション中（{{count}}人接続）",
+    "realtimeNote": "コードを共有する前にセッションを開始する必要があります。参加者はあなたのメモ内容と同期されます。",
+    "shareCodeToInvite": "このコードを共有して他の人を招待：",
+    "start": "セッション開始",
+    "stopSharing": "セッション終了",
     "email": "メール",
     "emailDescription": "Google Driveでメールで共有：",
     "emailPlaceholder": "受信者のメール...",
     "shareSuccess": "共有しました！",
     "shareButton": "共有",
     "join": "参加",
-    "joinDescription": "ルームコードを入力して共同編集に参加：",
+    "joinDescription": "ルームコードを入力してライブセッションに参加：",
     "joinPlaceholder": "ルームコードを入力...",
     "joinButton": "参加",
     "close": "閉じる",
@@ -181,13 +197,18 @@
     "alreadyInstalled": "インストール済み！",
     "alreadyInstalledDescription": "G-Noteのアプリ版をご利用中です。",
     "androidChromeInstructions": "上部のメニューアイコン（⋮）をタップし、「アプリをインストール」または「ホーム画面に追加」を選択",
-    "desktopChromeInstructions": "アドレスバーのインストールアイコン（⊕）をクリック、またはメニュー→アプリをインストール",
+    "desktopChromeInstructions": "アドレスバーのインストールアイコン（⬇）をクリック、またはメニュー→アプリをインストール",
     "iosSafariInstructions": "下の共有ボタンをタップし、「ホーム画面に追加」を選択",
     "iosChromeInstructions": "最高の体験のために、Safariで開いて共有→ホーム画面に追加をタップ",
     "androidFirefoxInstructions": "メニュー（⋮）をタップして「インストール」を選択",
     "androidOtherInstructions": "メニューをタップして「ホーム画面に追加」または「インストール」を選択",
     "desktopFirefoxInstructions": "FirefoxはPWAインストールをサポートしていません。最高の体験のためにChromeまたはEdgeをお試しください。",
-    "desktopSafariInstructions": "ファイル→Dockに追加をクリック、またはChrome/Edgeで完全なPWAサポートを利用。"
+    "desktopSafariInstructions": "ファイル→Dockに追加をクリック、またはChrome/Edgeで完全なPWAサポートを利用。",
+    "chromeExtension": "拡張機能",
+    "chromeExtensionDescription": "ブラウザのツールバーから素早くアクセスするためにChrome拡張機能をインストール。",
+    "addToChrome": "Chromeに追加",
+    "chromeExtensionInfo": "この拡張機能はChrome、Edge、Brave、その他のChromiumベースのブラウザで動作します。",
+    "new": "新着"
   },
   "packages": {
     "starter": "スターター",
@@ -212,7 +233,8 @@
     "cancel": "キャンセル",
     "rotate": "回転",
     "flipH": "左右反転",
-    "flipV": "上下反転"
+    "flipV": "上下反転",
+    "auto": "自動"
   },
   "common": {
     "confirm": "確認",
@@ -317,6 +339,24 @@
     "noResults": "結果が見つかりません",
     "noResultsDescription": "検索に一致するメモはありません"
   },
+  "freeNote": {
+    "freeMode": "無料モード",
+    "placeholder": "ここにメモを入力してください...",
+    "titlePlaceholder": "メモのタイトル",
+    "untitledNote": "無題のメモ",
+    "savePermanently": "永久保存",
+    "save": "保存",
+    "lastSaved": "保存済み",
+    "localStorageWarning": "メモはこのブラウザにのみ保存されます。ブラウザデータを消去すると失われる可能性があります。「永久保存」をクリックして無料アカウントで永久に保存してください。",
+    "featureLocked": "機能がロックされています",
+    "featureLockedDescription": "「{{feature}}」には無料アカウントが必要です。サインアップしてすべての機能をアンロックし、メモを永久に保存してください。",
+    "goToApp": "無料アカウントを取得",
+    "goToAppShort": "登録",
+    "reset": "リセット",
+    "resetTitle": "メモをリセットしますか？",
+    "resetDescription": "すべての内容が消去され、元に戻すことはできません。",
+    "resetConfirm": "リセット"
+  },
   "offline": {
     "offline": "オフライン",
     "online": "オンライン",
@@ -336,12 +376,5 @@
     "syncError": "同期エラー",
     "tapToRetry": "タップして再試行",
     "loginRequiresNetwork": "ログインにはインターネット接続が必要です"
-  },
-  "webContent": {
-    "title": "メモに追加",
-    "description": "ウェブから選択したコンテンツで新しいメモを作成します。",
-    "createNote": "メモを作成",
-    "addToExisting": "既存のメモに追加",
-    "source": "ソース"
   }
 }

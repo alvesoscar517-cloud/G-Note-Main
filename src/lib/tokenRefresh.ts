@@ -4,6 +4,7 @@
 const API_URL = import.meta.env.VITE_API_URL || ''
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
 const SCOPES = 'email profile https://www.googleapis.com/auth/drive.file'
+const REQUIRED_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
 
 interface TokenResponse {
   access_token: string
@@ -19,6 +20,13 @@ interface AuthResponse {
   }
   accessToken: string
   expiresIn: number
+  grantedScopes?: string[]
+}
+
+interface AuthError {
+  error: string
+  message: string
+  grantedScopes?: string[]
 }
 
 // Check if token is expired or about to expire (within 5 minutes)
@@ -38,6 +46,30 @@ export function getApiUrl(): string {
   return API_URL
 }
 
+// Validate that the access token has Drive scope
+export async function validateDriveScope(accessToken: string): Promise<{ valid: boolean; error?: string }> {
+  try {
+    const response = await fetch(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`)
+    if (!response.ok) {
+      return { valid: false, error: 'token_invalid' }
+    }
+    const tokenInfo = await response.json()
+    const grantedScopes: string[] = tokenInfo.scope ? tokenInfo.scope.split(' ') : []
+    
+    const hasDriveScope = grantedScopes.some(scope => 
+      scope === REQUIRED_DRIVE_SCOPE || 
+      scope === 'https://www.googleapis.com/auth/drive'
+    )
+    
+    return { 
+      valid: hasDriveScope, 
+      error: hasDriveScope ? undefined : 'drive_scope_missing'
+    }
+  } catch {
+    return { valid: false, error: 'validation_failed' }
+  }
+}
+
 // Exchange authorization code for tokens via backend
 export async function exchangeCodeForTokens(code: string): Promise<AuthResponse | null> {
   if (!API_URL) return null
@@ -53,13 +85,21 @@ export async function exchangeCodeForTokens(code: string): Promise<AuthResponse 
     })
 
     if (!response.ok) {
-      const error = await response.json()
+      const error: AuthError = await response.json()
+      // Check for permission error
+      if (response.status === 403 && error.error === 'drive_scope_missing') {
+        throw new Error('DRIVE_PERMISSION_DENIED')
+      }
       throw new Error(error.error || 'Token exchange failed')
     }
 
     return response.json()
   } catch (error) {
     console.error('Token exchange error:', error)
+    // Re-throw permission errors
+    if (error instanceof Error && error.message === 'DRIVE_PERMISSION_DENIED') {
+      throw error
+    }
     return null
   }
 }

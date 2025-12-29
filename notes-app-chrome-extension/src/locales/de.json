@@ -11,7 +11,11 @@
       "terms": "Nutzungsbedingungen",
       "and": "und",
       "privacy": "Datenschutzrichtlinie"
-    }
+    },
+    "drivePermissionRequired": "Drive-Berechtigung erforderlich",
+    "drivePermissionDenied": "Google Drive-Zugriff wurde nicht gewährt. Bitte melden Sie sich erneut an und erlauben Sie den Drive-Zugriff, um Ihre Notizen zu synchronisieren.",
+    "relogin": "Erneut anmelden",
+    "continueWithoutSync": "Ohne Synchronisierung fortfahren"
   },
   "header": {
     "search": "Suchen...",
@@ -28,6 +32,14 @@
     "logout": "Abmelden",
     "logoutDescription": "Vom Konto abmelden",
     "loggingOut": "Abmelden...",
+    "logoutConfirmTitle": "Abmelden?",
+    "logoutWarningNormal": "Ihre Daten sind synchronisiert. Sie können sich jederzeit wieder anmelden, um auf Ihre Notizen zuzugreifen.",
+    "logoutWarningUnsynced": "Sie haben nicht synchronisierte Änderungen. Diese werden hochgeladen, wenn Sie sich auf diesem Gerät wieder anmelden.",
+    "logoutWarningOffline": "Sie sind offline mit nicht synchronisierten Änderungen. Diese Änderungen können verloren gehen, wenn Sie sich jetzt abmelden.",
+    "unsyncedWarning": "{{count}} nicht synchronisierte Änderung(en)",
+    "allSynced": "Alle Änderungen synchronisiert",
+    "lastSync": "{{time}}",
+    "noDataToSync": "Keine Daten zu synchronisieren",
     "modalSize": "Notizfenstergröße",
     "modalSizeDescription": "Größe des Notizeditors anpassen",
     "modalSizeDefault": "Standard",
@@ -143,15 +155,19 @@
     "createLink": "Link erstellen",
     "updateLink": "Aktualisieren",
     "realtime": "Live",
-    "realtimeDescription": "Raumcode teilen für Echtzeit-Zusammenarbeit:",
-    "start": "Starten",
+    "realtimeDescription": "Live-Zusammenarbeit starten. Andere können mit dem Raumcode beitreten.",
+    "realtimeActive": "Live-Sitzung aktiv ({{count}} verbunden)",
+    "realtimeNote": "Sie müssen die Sitzung zuerst starten, bevor Sie den Code teilen. Beitretende synchronisieren mit Ihrem Notizinhalt.",
+    "shareCodeToInvite": "Teilen Sie diesen Code, um andere einzuladen:",
+    "start": "Sitzung starten",
+    "stopSharing": "Sitzung beenden",
     "email": "E-Mail",
     "emailDescription": "Per Google Drive E-Mail teilen:",
     "emailPlaceholder": "Empfänger-E-Mail...",
     "shareSuccess": "Erfolgreich geteilt!",
     "shareButton": "Teilen",
     "join": "Beitreten",
-    "joinDescription": "Raumcode eingeben, um der Zusammenarbeit beizutreten:",
+    "joinDescription": "Raumcode eingeben, um einer Live-Sitzung beizutreten:",
     "joinPlaceholder": "Raumcode eingeben...",
     "joinButton": "Beitreten",
     "close": "Schließen",
@@ -181,13 +197,18 @@
     "alreadyInstalled": "Bereits installiert!",
     "alreadyInstalledDescription": "Sie verwenden die App-Version von G-Note.",
     "androidChromeInstructions": "Tippen Sie auf das Menü-Symbol (⋮) oben, dann wählen Sie \"App installieren\" oder \"Zum Startbildschirm hinzufügen\"",
-    "desktopChromeInstructions": "Klicken Sie auf das Installations-Symbol (⊕) in der Adressleiste, oder gehen Sie zu Menü → App installieren",
+    "desktopChromeInstructions": "Klicken Sie auf das Installations-Symbol (⬇) in der Adressleiste, oder gehen Sie zu Menü → App installieren",
     "iosSafariInstructions": "Tippen Sie auf die Teilen-Taste unten, dann \"Zum Home-Bildschirm\"",
     "iosChromeInstructions": "Für die beste Erfahrung öffnen Sie Safari und tippen Sie Teilen → Zum Home-Bildschirm",
     "androidFirefoxInstructions": "Tippen Sie auf das Menü (⋮) dann \"Installieren\"",
     "androidOtherInstructions": "Tippen Sie auf das Menü dann \"Zum Startbildschirm hinzufügen\" oder \"Installieren\"",
     "desktopFirefoxInstructions": "Firefox unterstützt keine PWA-Installation. Verwenden Sie Chrome oder Edge für die beste Erfahrung.",
-    "desktopSafariInstructions": "Klicken Sie Ablage → Zum Dock hinzufügen, oder verwenden Sie Chrome/Edge für volle PWA-Unterstützung."
+    "desktopSafariInstructions": "Klicken Sie Ablage → Zum Dock hinzufügen, oder verwenden Sie Chrome/Edge für volle PWA-Unterstützung.",
+    "chromeExtension": "Erweiterung",
+    "chromeExtensionDescription": "Installieren Sie die Chrome-Erweiterung für schnellen Zugriff über die Browser-Symbolleiste.",
+    "addToChrome": "Zu Chrome hinzufügen",
+    "chromeExtensionInfo": "Die Erweiterung funktioniert mit Chrome, Edge, Brave und anderen Chromium-basierten Browsern.",
+    "new": "Neu"
   },
   "packages": {
     "starter": "Starter",
@@ -212,7 +233,8 @@
     "cancel": "Abbrechen",
     "rotate": "Drehen",
     "flipH": "Horizontal spiegeln",
-    "flipV": "Vertikal spiegeln"
+    "flipV": "Vertikal spiegeln",
+    "auto": "Auto"
   },
   "common": {
     "confirm": "Bestätigen",
@@ -317,6 +339,24 @@
     "noResults": "Keine Ergebnisse gefunden",
     "noResultsDescription": "Keine Notizen entsprechen Ihrer Suche"
   },
+  "freeNote": {
+    "freeMode": "Kostenloser Modus",
+    "placeholder": "Beginnen Sie hier mit Ihrer Notiz...",
+    "titlePlaceholder": "Notiz-Titel",
+    "untitledNote": "Unbenannte Notiz",
+    "savePermanently": "Dauerhaft speichern",
+    "save": "Speichern",
+    "lastSaved": "Gespeichert",
+    "localStorageWarning": "Ihre Notiz wird nur in diesem Browser gespeichert. Sie kann verloren gehen, wenn Sie Browserdaten löschen. Klicken Sie auf 'Dauerhaft speichern', um sie mit einem kostenlosen Konto für immer zu behalten.",
+    "featureLocked": "Funktion gesperrt",
+    "featureLockedDescription": "\"{{feature}}\" erfordert ein kostenloses Konto. Registrieren Sie sich, um alle Funktionen freizuschalten und Ihre Notizen dauerhaft zu speichern.",
+    "goToApp": "Kostenloses Konto erstellen",
+    "goToAppShort": "Registrieren",
+    "reset": "Zurücksetzen",
+    "resetTitle": "Notiz zurücksetzen?",
+    "resetDescription": "Dies löscht alle Inhalte und kann nicht rückgängig gemacht werden.",
+    "resetConfirm": "Zurücksetzen"
+  },
   "offline": {
     "offline": "Offline",
     "online": "Online",
@@ -336,12 +376,5 @@
     "syncError": "Synchronisierungsfehler",
     "tapToRetry": "Tippen zum Wiederholen",
     "loginRequiresNetwork": "Anmeldung erfordert eine Internetverbindung"
-  },
-  "webContent": {
-    "title": "Zu Notiz hinzufügen",
-    "description": "Erstellen Sie eine neue Notiz mit dem ausgewählten Inhalt aus dem Web.",
-    "createNote": "Notiz erstellen",
-    "addToExisting": "Zu bestehender Notiz hinzufügen",
-    "source": "Quelle"
   }
 }

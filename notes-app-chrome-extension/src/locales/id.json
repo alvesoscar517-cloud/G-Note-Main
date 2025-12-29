@@ -11,7 +11,11 @@
       "terms": "Ketentuan Layanan",
       "and": "dan",
       "privacy": "Kebijakan Privasi"
-    }
+    },
+    "drivePermissionRequired": "Izin Drive diperlukan",
+    "drivePermissionDenied": "Akses Google Drive tidak diberikan. Silakan masuk lagi dan izinkan akses Drive untuk menyinkronkan catatan Anda.",
+    "relogin": "Masuk lagi",
+    "continueWithoutSync": "Lanjutkan tanpa sinkronisasi"
   },
   "header": {
     "search": "Cari...",
@@ -28,11 +32,22 @@
     "logout": "Keluar",
     "logoutDescription": "Keluar dari akun",
     "loggingOut": "Keluar...",
+    "logoutConfirmTitle": "Keluar?",
+    "logoutWarningNormal": "Data Anda sudah disinkronkan. Anda dapat masuk lagi kapan saja untuk mengakses catatan Anda.",
+    "logoutWarningUnsynced": "Anda memiliki perubahan yang belum disinkronkan. Perubahan akan diunggah saat Anda masuk lagi di perangkat ini.",
+    "logoutWarningOffline": "Anda offline dengan perubahan yang belum disinkronkan. Perubahan ini mungkin hilang jika Anda keluar sekarang.",
+    "unsyncedWarning": "{{count}} perubahan belum disinkronkan",
+    "allSynced": "Semua perubahan disinkronkan",
+    "lastSync": "{{time}}",
+    "noDataToSync": "Tidak ada data untuk disinkronkan",
     "modalSize": "Ukuran jendela",
     "modalSizeDescription": "Sesuaikan ukuran editor",
     "modalSizeDefault": "Default",
     "modalSizeLarge": "Besar",
-    "modalSizeXLarge": "Sangat besar"
+    "modalSizeXLarge": "Sangat besar",
+    "offlineLogoutTitle": "Keluar saat offline?",
+    "offlineLogoutWarning": "Anda sedang offline. Perubahan yang belum disimpan mungkin belum disinkronkan ke Google Drive. Jika Anda keluar sekarang, Anda mungkin kehilangan perubahan tersebut.",
+    "logoutAnyway": "Tetap keluar"
   },
   "credits": {
     "title": "Beli Kredit AI",
@@ -143,15 +158,19 @@
     "createLink": "Buat tautan",
     "updateLink": "Perbarui",
     "realtime": "Langsung",
-    "realtimeDescription": "Bagikan kode ruangan untuk berkolaborasi secara real-time:",
-    "start": "Mulai",
+    "realtimeDescription": "Mulai sesi kolaborasi langsung. Orang lain dapat bergabung dengan kode ruangan.",
+    "realtimeActive": "Sesi langsung aktif ({{count}} terhubung)",
+    "realtimeNote": "Anda harus memulai sesi terlebih dahulu sebelum membagikan kode. Yang bergabung akan sinkron dengan konten catatan Anda.",
+    "shareCodeToInvite": "Bagikan kode ini untuk mengundang orang lain:",
+    "start": "Mulai sesi",
+    "stopSharing": "Akhiri sesi",
     "email": "Email",
     "emailDescription": "Bagikan melalui email Google Drive:",
     "emailPlaceholder": "Email penerima...",
     "shareSuccess": "Berhasil dibagikan!",
     "shareButton": "Bagikan",
     "join": "Gabung",
-    "joinDescription": "Masukkan kode ruangan untuk bergabung dalam kolaborasi:",
+    "joinDescription": "Masukkan kode ruangan untuk bergabung dalam sesi langsung:",
     "joinPlaceholder": "Masukkan kode ruangan...",
     "joinButton": "Gabung",
     "close": "Tutup",
@@ -181,13 +200,18 @@
     "alreadyInstalled": "Sudah Terinstal!",
     "alreadyInstalledDescription": "Anda menggunakan versi aplikasi G-Note.",
     "androidChromeInstructions": "Ketuk ikon menu (⋮) di atas, lalu pilih \"Instal aplikasi\" atau \"Tambahkan ke Layar Utama\"",
-    "desktopChromeInstructions": "Klik ikon instal (⊕) di bilah alamat, atau buka Menu → Instal aplikasi",
+    "desktopChromeInstructions": "Klik ikon instal (⬇) di bilah alamat, atau buka Menu → Instal aplikasi",
     "iosSafariInstructions": "Ketuk tombol Bagikan di bawah, lalu \"Tambahkan ke Layar Utama\"",
     "iosChromeInstructions": "Untuk pengalaman terbaik, buka di Safari dan ketuk Bagikan → Tambahkan ke Layar Utama",
     "androidFirefoxInstructions": "Ketuk menu (⋮) lalu \"Instal\"",
     "androidOtherInstructions": "Ketuk menu lalu \"Tambahkan ke layar utama\" atau \"Instal\"",
     "desktopFirefoxInstructions": "Firefox tidak mendukung instalasi PWA. Coba Chrome atau Edge untuk pengalaman terbaik.",
-    "desktopSafariInstructions": "Klik File → Tambahkan ke Dock, atau gunakan Chrome/Edge untuk dukungan PWA penuh."
+    "desktopSafariInstructions": "Klik File → Tambahkan ke Dock, atau gunakan Chrome/Edge untuk dukungan PWA penuh.",
+    "chromeExtension": "Ekstensi",
+    "chromeExtensionDescription": "Instal ekstensi Chrome untuk akses cepat dari toolbar browser.",
+    "addToChrome": "Tambahkan ke Chrome",
+    "chromeExtensionInfo": "Ekstensi ini berfungsi dengan Chrome, Edge, Brave, dan browser berbasis Chromium lainnya.",
+    "new": "Baru"
   },
   "packages": {
     "starter": "Pemula",
@@ -212,7 +236,8 @@
     "cancel": "Batal",
     "rotate": "Putar",
     "flipH": "Balik H",
-    "flipV": "Balik V"
+    "flipV": "Balik V",
+    "auto": "Otomatis"
   },
   "common": {
     "confirm": "Konfirmasi",
@@ -317,6 +342,24 @@
     "noResults": "Tidak ada hasil",
     "noResultsDescription": "Tidak ada catatan yang cocok dengan pencarian Anda"
   },
+  "freeNote": {
+    "freeMode": "Mode Gratis",
+    "placeholder": "Mulai menulis catatan Anda di sini...",
+    "titlePlaceholder": "Judul catatan",
+    "untitledNote": "Catatan tanpa judul",
+    "savePermanently": "Simpan permanen",
+    "save": "Simpan",
+    "lastSaved": "Tersimpan",
+    "localStorageWarning": "Catatan Anda hanya disimpan di browser ini. Mungkin hilang jika Anda menghapus data browser. Klik 'Simpan permanen' untuk menyimpannya selamanya dengan akun gratis.",
+    "featureLocked": "Fitur terkunci",
+    "featureLockedDescription": "\"{{feature}}\" memerlukan akun gratis. Daftar untuk membuka semua fitur dan menyimpan catatan Anda secara permanen.",
+    "goToApp": "Buat akun gratis",
+    "goToAppShort": "Daftar",
+    "reset": "Reset",
+    "resetTitle": "Reset catatan?",
+    "resetDescription": "Ini akan menghapus semua konten dan tidak dapat dibatalkan.",
+    "resetConfirm": "Reset"
+  },
   "offline": {
     "offline": "Offline",
     "online": "Online",
@@ -336,12 +379,5 @@
     "syncError": "Kesalahan sinkronisasi",
     "tapToRetry": "Ketuk untuk mencoba lagi",
     "loginRequiresNetwork": "Login memerlukan koneksi internet"
-  },
-  "webContent": {
-    "title": "Tambahkan ke catatan",
-    "description": "Buat catatan baru dengan konten yang dipilih dari web.",
-    "createNote": "Buat catatan",
-    "addToExisting": "Tambahkan ke catatan yang ada",
-    "source": "Sumber"
   }
 }

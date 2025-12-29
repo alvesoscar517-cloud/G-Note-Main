@@ -11,7 +11,11 @@
       "terms": "Terms of Service",
       "and": "and",
       "privacy": "Privacy Policy"
-    }
+    },
+    "drivePermissionRequired": "Drive permission required",
+    "drivePermissionDenied": "Google Drive access was not granted. Please sign in again and allow Drive access to sync your notes.",
+    "relogin": "Sign in again",
+    "continueWithoutSync": "Continue without sync"
   },
   "header": {
     "search": "Search...",
@@ -28,6 +32,14 @@
     "logout": "Log out",
     "logoutDescription": "Sign out of account",
     "loggingOut": "Signing out...",
+    "logoutConfirmTitle": "Sign out?",
+    "logoutWarningNormal": "Your data is synced. You can sign in again anytime to access your notes.",
+    "logoutWarningUnsynced": "You have unsynced changes. They will be uploaded when you sign in again on this device.",
+    "logoutWarningOffline": "You're offline with unsynced changes. These changes may be lost if you sign out now.",
+    "unsyncedWarning": "{{count}} unsynced change(s)",
+    "allSynced": "All changes synced",
+    "lastSync": "{{time}}",
+    "noDataToSync": "No data to sync",
     "modalSize": "Note window size",
     "modalSizeDescription": "Adjust note editor size",
     "modalSizeDefault": "Default",
@@ -326,6 +338,24 @@
     "searchPlaceholder": "Search in trash...",
     "noResults": "No results found",
     "noResultsDescription": "No notes match your search"
+  },
+  "freeNote": {
+    "freeMode": "Free Mode",
+    "placeholder": "Start typing your note here...",
+    "titlePlaceholder": "Note title",
+    "untitledNote": "Untitled Note",
+    "savePermanently": "Save Permanently",
+    "save": "Save",
+    "lastSaved": "Saved",
+    "localStorageWarning": "Your note is saved in this browser only. It may be lost if you clear browser data. Click 'Save Permanently' to keep it forever with a free account.",
+    "featureLocked": "Feature Locked",
+    "featureLockedDescription": "\"{{feature}}\" requires a free account. Sign up to unlock all features and save your notes permanently.",
+    "goToApp": "Get Free Account",
+    "goToAppShort": "Sign Up",
+    "reset": "Reset",
+    "resetTitle": "Reset Note?",
+    "resetDescription": "This will clear all content and cannot be undone.",
+    "resetConfirm": "Reset"
   },
   "offline": {
     "offline": "Offline",

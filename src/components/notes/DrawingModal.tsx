@@ -356,12 +356,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
 
       {/* Header */}
       <div 
-        className="flex items-center justify-between pb-1.5 sm:py-2 border-b border-neutral-200 dark:border-neutral-700"
-        style={{
-          paddingLeft: 'max(0.5rem, env(safe-area-inset-left, 0px))',
-          paddingRight: 'max(0.5rem, env(safe-area-inset-right, 0px))',
-          paddingTop: 'max(0.375rem, env(safe-area-inset-top, 0px))',
-        }}
+        className="flex items-center justify-between pb-1.5 sm:py-2 border-b border-neutral-200 dark:border-neutral-700 px-2 safe-top"
       >
         <button
           onClick={onClose}
@@ -397,12 +392,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
       {/* Responsive Bottom Toolbar */}
       <div 
         ref={toolbarRef}
-        className="pt-1.5 sm:py-2 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800"
-        style={{
-          paddingLeft: 'max(0.5rem, env(safe-area-inset-left, 0px))',
-          paddingRight: 'max(0.5rem, env(safe-area-inset-right, 0px))',
-          paddingBottom: 'max(0.375rem, env(safe-area-inset-bottom, 0px))',
-        }}
+        className="pt-1.5 sm:py-2 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 px-2 safe-bottom"
       >
         <div className="flex items-center justify-between max-w-xl mx-auto gap-1 sm:gap-2">
           {/* Colors - only show visible colors based on screen size */}

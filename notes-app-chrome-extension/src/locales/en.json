@@ -11,7 +11,11 @@
       "terms": "Terms of Service",
       "and": "and",
       "privacy": "Privacy Policy"
-    }
+    },
+    "drivePermissionRequired": "Drive permission required",
+    "drivePermissionDenied": "Google Drive access was not granted. Please sign in again and allow Drive access to sync your notes.",
+    "relogin": "Sign in again",
+    "continueWithoutSync": "Continue without sync"
   },
   "header": {
     "search": "Search...",
@@ -28,6 +32,14 @@
     "logout": "Log out",
     "logoutDescription": "Sign out of account",
     "loggingOut": "Signing out...",
+    "logoutConfirmTitle": "Sign out?",
+    "logoutWarningNormal": "Your data is synced. You can sign in again anytime to access your notes.",
+    "logoutWarningUnsynced": "You have unsynced changes. They will be uploaded when you sign in again on this device.",
+    "logoutWarningOffline": "You're offline with unsynced changes. These changes may be lost if you sign out now.",
+    "unsyncedWarning": "{{count}} unsynced change(s)",
+    "allSynced": "All changes synced",
+    "lastSync": "{{time}}",
+    "noDataToSync": "No data to sync",
     "modalSize": "Note window size",
     "modalSizeDescription": "Adjust note editor size",
     "modalSizeDefault": "Default",
@@ -143,15 +155,19 @@
     "createLink": "Create link",
     "updateLink": "Update",
     "realtime": "Live",
-    "realtimeDescription": "Share room code to collaborate in real-time:",
-    "start": "Start",
+    "realtimeDescription": "Start a live collaboration session. Others can join using the room code.",
+    "realtimeActive": "Live session active ({{count}} connected)",
+    "realtimeNote": "You must start the session first before sharing the code. Others who join will sync with your note content.",
+    "shareCodeToInvite": "Share this code to invite others:",
+    "start": "Start session",
+    "stopSharing": "End session",
     "email": "Email",
     "emailDescription": "Share via Google Drive with email:",
     "emailPlaceholder": "Recipient email...",
     "shareSuccess": "Shared successfully!",
     "shareButton": "Share",
     "join": "Join",
-    "joinDescription": "Enter room code to join collaboration:",
+    "joinDescription": "Enter room code to join a live session:",
     "joinPlaceholder": "Enter room code...",
     "joinButton": "Join",
     "close": "Close",
@@ -181,13 +197,18 @@
     "alreadyInstalled": "Already Installed!",
     "alreadyInstalledDescription": "You're using the app version of G-Note.",
     "androidChromeInstructions": "Tap the menu icon (⋮) at the top, then select \"Install app\" or \"Add to Home screen\"",
-    "desktopChromeInstructions": "Click the install icon (⊕) in the address bar, or go to Menu → Install app",
+    "desktopChromeInstructions": "Click the install icon (⬇) in the address bar, or go to Menu → Install app",
     "iosSafariInstructions": "Tap the Share button below, then \"Add to Home Screen\"",
     "iosChromeInstructions": "For the best experience, open in Safari and tap Share → Add to Home Screen",
     "androidFirefoxInstructions": "Tap the menu (⋮) then \"Install\"",
     "androidOtherInstructions": "Tap the menu then \"Add to Home screen\" or \"Install\"",
     "desktopFirefoxInstructions": "Firefox doesn't support PWA installation. Try Chrome or Edge for the best experience.",
-    "desktopSafariInstructions": "Click File → Add to Dock, or use Chrome/Edge for full PWA support."
+    "desktopSafariInstructions": "Click File → Add to Dock, or use Chrome/Edge for full PWA support.",
+    "chromeExtension": "Extension",
+    "chromeExtensionDescription": "Install the Chrome extension for quick access from your browser toolbar.",
+    "addToChrome": "Add to Chrome",
+    "chromeExtensionInfo": "The extension works with Chrome, Edge, Brave, and other Chromium-based browsers.",
+    "new": "New"
   },
   "packages": {
     "starter": "Starter",
@@ -212,7 +233,8 @@
     "cancel": "Cancel",
     "rotate": "Rotate",
     "flipH": "Flip H",
-    "flipV": "Flip V"
+    "flipV": "Flip V",
+    "auto": "Auto"
   },
   "common": {
     "confirm": "Confirm",
@@ -317,6 +339,24 @@
     "noResults": "No results found",
     "noResultsDescription": "No notes match your search"
   },
+  "freeNote": {
+    "freeMode": "Free Mode",
+    "placeholder": "Start typing your note here...",
+    "titlePlaceholder": "Note title",
+    "untitledNote": "Untitled Note",
+    "savePermanently": "Save Permanently",
+    "save": "Save",
+    "lastSaved": "Saved",
+    "localStorageWarning": "Your note is saved in this browser only. It may be lost if you clear browser data. Click 'Save Permanently' to keep it forever with a free account.",
+    "featureLocked": "Feature Locked",
+    "featureLockedDescription": "\"{{feature}}\" requires a free account. Sign up to unlock all features and save your notes permanently.",
+    "goToApp": "Get Free Account",
+    "goToAppShort": "Sign Up",
+    "reset": "Reset",
+    "resetTitle": "Reset Note?",
+    "resetDescription": "This will clear all content and cannot be undone.",
+    "resetConfirm": "Reset"
+  },
   "offline": {
     "offline": "Offline",
     "online": "Online",
@@ -336,12 +376,5 @@
     "syncError": "Sync error",
     "tapToRetry": "Tap to retry",
     "loginRequiresNetwork": "Login requires an internet connection"
-  },
-  "webContent": {
-    "title": "Add to Note",
-    "description": "Create a new note with the selected content from the web.",
-    "createNote": "Create Note",
-    "addToExisting": "Add to existing note",
-    "source": "Source"
   }
 }

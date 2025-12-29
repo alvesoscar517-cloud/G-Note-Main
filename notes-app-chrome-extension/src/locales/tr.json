@@ -11,7 +11,11 @@
       "terms": "Hizmet Şartları",
       "and": "ve",
       "privacy": "Gizlilik Politikası"
-    }
+    },
+    "drivePermissionRequired": "Drive izni gerekli",
+    "drivePermissionDenied": "Google Drive erişimi verilmedi. Notlarınızı senkronize etmek için lütfen tekrar giriş yapın ve Drive erişimine izin verin.",
+    "relogin": "Tekrar giriş yap",
+    "continueWithoutSync": "Senkronizasyon olmadan devam et"
   },
   "header": {
     "search": "Ara...",
@@ -28,11 +32,22 @@
     "logout": "Çıkış yap",
     "logoutDescription": "Hesaptan çıkış yap",
     "loggingOut": "Çıkış yapılıyor...",
+    "logoutConfirmTitle": "Çıkış yap?",
+    "logoutWarningNormal": "Verileriniz senkronize edildi. Notlarınıza erişmek için istediğiniz zaman tekrar giriş yapabilirsiniz.",
+    "logoutWarningUnsynced": "Senkronize edilmemiş değişiklikleriniz var. Bu cihazda tekrar giriş yaptığınızda yüklenecekler.",
+    "logoutWarningOffline": "Senkronize edilmemiş değişikliklerle çevrimdışısınız. Şimdi çıkış yaparsanız bu değişiklikler kaybolabilir.",
+    "unsyncedWarning": "{{count}} senkronize edilmemiş değişiklik",
+    "allSynced": "Tüm değişiklikler senkronize edildi",
+    "lastSync": "{{time}}",
+    "noDataToSync": "Senkronize edilecek veri yok",
     "modalSize": "Pencere boyutu",
     "modalSizeDescription": "Editör boyutunu ayarla",
     "modalSizeDefault": "Varsayılan",
     "modalSizeLarge": "Büyük",
-    "modalSizeXLarge": "Çok büyük"
+    "modalSizeXLarge": "Çok büyük",
+    "offlineLogoutTitle": "Çevrimdışıyken çıkış yap?",
+    "offlineLogoutWarning": "Şu anda çevrimdışısınız. Kaydedilmemiş değişiklikler Google Drive ile senkronize edilmemiş olabilir. Şimdi çıkış yaparsanız bu değişiklikleri kaybedebilirsiniz.",
+    "logoutAnyway": "Yine de çıkış yap"
   },
   "credits": {
     "title": "AI Kredisi Satın Al",
@@ -143,15 +158,19 @@
     "createLink": "Bağlantı oluştur",
     "updateLink": "Güncelle",
     "realtime": "Canlı",
-    "realtimeDescription": "Gerçek zamanlı işbirliği için oda kodunu paylaşın:",
-    "start": "Başlat",
+    "realtimeDescription": "Canlı işbirliği oturumu başlat. Diğerleri oda koduyla katılabilir.",
+    "realtimeActive": "Canlı oturum aktif ({{count}} bağlı)",
+    "realtimeNote": "Kodu paylaşmadan önce oturumu başlatmalısınız. Katılanlar not içeriğinizle senkronize olacak.",
+    "shareCodeToInvite": "Başkalarını davet etmek için bu kodu paylaşın:",
+    "start": "Oturumu başlat",
+    "stopSharing": "Oturumu sonlandır",
     "email": "E-posta",
     "emailDescription": "Google Drive e-postası ile paylaş:",
     "emailPlaceholder": "Alıcı e-postası...",
     "shareSuccess": "Başarıyla paylaşıldı!",
     "shareButton": "Paylaş",
     "join": "Katıl",
-    "joinDescription": "İşbirliğine katılmak için oda kodunu girin:",
+    "joinDescription": "Canlı oturuma katılmak için oda kodunu girin:",
     "joinPlaceholder": "Oda kodunu girin...",
     "joinButton": "Katıl",
     "close": "Kapat",
@@ -181,13 +200,18 @@
     "alreadyInstalled": "Zaten Yüklü!",
     "alreadyInstalledDescription": "G-Note'un uygulama sürümünü kullanıyorsunuz.",
     "androidChromeInstructions": "Üstteki menü simgesine (⋮) dokunun, ardından \"Uygulamayı yükle\" veya \"Ana ekrana ekle\"yi seçin",
-    "desktopChromeInstructions": "Adres çubuğundaki yükleme simgesine (⊕) tıklayın veya Menü → Uygulamayı yükle'ye gidin",
+    "desktopChromeInstructions": "Adres çubuğundaki yükleme simgesine (⬇) tıklayın veya Menü → Uygulamayı yükle'ye gidin",
     "iosSafariInstructions": "Aşağıdaki Paylaş düğmesine dokunun, ardından \"Ana Ekrana Ekle\"yi seçin",
     "iosChromeInstructions": "En iyi deneyim için Safari'de açın ve Paylaş → Ana Ekrana Ekle'ye dokunun",
     "androidFirefoxInstructions": "Menüye (⋮) dokunun, ardından \"Yükle\"yi seçin",
     "androidOtherInstructions": "Menüye dokunun, ardından \"Ana ekrana ekle\" veya \"Yükle\"yi seçin",
     "desktopFirefoxInstructions": "Firefox PWA kurulumunu desteklemiyor. En iyi deneyim için Chrome veya Edge'i deneyin.",
-    "desktopSafariInstructions": "Dosya → Dock'a Ekle'ye tıklayın veya tam PWA desteği için Chrome/Edge kullanın."
+    "desktopSafariInstructions": "Dosya → Dock'a Ekle'ye tıklayın veya tam PWA desteği için Chrome/Edge kullanın.",
+    "chromeExtension": "Uzantı",
+    "chromeExtensionDescription": "Tarayıcı araç çubuğundan hızlı erişim için Chrome uzantısını yükleyin.",
+    "addToChrome": "Chrome'a Ekle",
+    "chromeExtensionInfo": "Uzantı Chrome, Edge, Brave ve diğer Chromium tabanlı tarayıcılarla çalışır.",
+    "new": "Yeni"
   },
   "packages": {
     "starter": "Başlangıç",
@@ -212,7 +236,8 @@
     "cancel": "İptal",
     "rotate": "Döndür",
     "flipH": "Yatay çevir",
-    "flipV": "Dikey çevir"
+    "flipV": "Dikey çevir",
+    "auto": "Otomatik"
   },
   "common": {
     "confirm": "Onayla",
@@ -317,6 +342,24 @@
     "noResults": "Sonuç bulunamadı",
     "noResultsDescription": "Aramanızla eşleşen not yok"
   },
+  "freeNote": {
+    "freeMode": "Ücretsiz Mod",
+    "placeholder": "Notunuzu buraya yazmaya başlayın...",
+    "titlePlaceholder": "Not başlığı",
+    "untitledNote": "Başlıksız not",
+    "savePermanently": "Kalıcı olarak kaydet",
+    "save": "Kaydet",
+    "lastSaved": "Kaydedildi",
+    "localStorageWarning": "Notunuz yalnızca bu tarayıcıda kaydedilir. Tarayıcı verilerini temizlerseniz kaybolabilir. Ücretsiz bir hesapla sonsuza kadar saklamak için 'Kalıcı olarak kaydet'e tıklayın.",
+    "featureLocked": "Özellik kilitli",
+    "featureLockedDescription": "\"{{feature}}\" ücretsiz bir hesap gerektirir. Tüm özelliklerin kilidini açmak ve notlarınızı kalıcı olarak kaydetmek için kaydolun.",
+    "goToApp": "Ücretsiz hesap oluştur",
+    "goToAppShort": "Kaydol",
+    "reset": "Sıfırla",
+    "resetTitle": "Notu sıfırla?",
+    "resetDescription": "Bu tüm içeriği silecek ve geri alınamaz.",
+    "resetConfirm": "Sıfırla"
+  },
   "offline": {
     "offline": "Çevrimdışı",
     "online": "Çevrimiçi",
@@ -336,12 +379,5 @@
     "syncError": "Senkronizasyon hatası",
     "tapToRetry": "Yeniden denemek için dokunun",
     "loginRequiresNetwork": "Giriş yapmak için internet bağlantısı gerekli"
-  },
-  "webContent": {
-    "title": "Nota ekle",
-    "description": "Web'den seçilen içerikle yeni bir not oluşturun.",
-    "createNote": "Not oluştur",
-    "addToExisting": "Mevcut nota ekle",
-    "source": "Kaynak"
   }
 }

@@ -21,6 +21,8 @@ html {
   min-height: 100dvh;
   /* Ensure background extends to full screen including notch area */
   background-color: #fafafa;
+  /* Critical for edge-to-edge on iOS with black-translucent status bar */
+  /* Background must extend behind status bar */
 }
 
 body {
@@ -31,6 +33,10 @@ body {
   /* Prevent any margin/padding that could cause gaps */
   margin: 0;
   padding: 0;
+  /* Ensure body starts from absolute top (behind status bar) */
+  padding-top: 0 !important;
+  /* Allow system back gesture on horizontal swipe */
+  overscroll-behavior-x: contain;
 }
 
 /* Dark mode background - must use :where for proper specificity with Tailwind */
@@ -84,6 +90,7 @@ html.dark, html.dark body,
 
 /* Safe area padding utilities - CONSISTENT across all modes */
 /* Use env() directly with fallback, not CSS variables that may not update */
+/* In landscape fullscreen mode, safe-area is ignored - content goes edge to edge */
 .safe-top {
   padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
 }
@@ -115,6 +122,28 @@ html.dark, html.dark body,
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
   padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
   padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+}
+
+/* Landscape mode in fullscreen PWA: ignore safe-area completely */
+/* Content displays edge-to-edge just like portrait mode */
+@media (orientation: landscape) and (display-mode: fullscreen) {
+  .safe-left {
+    padding-left: 0.75rem;
+  }
+  
+  .safe-right {
+    padding-right: 0.75rem;
+  }
+  
+  .safe-x {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .safe-all {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
 }
 
 /* Disable text selection globally except for specific elements */
@@ -817,6 +846,28 @@ body {
 /* Disable pull-to-refresh on mobile when modal is open */
 body.modal-open {
   overscroll-behavior-y: contain;
+}
+
+/* Block pull-to-refresh globally on touch devices (mobile/tablet) */
+/* This prevents the browser's native pull-to-refresh gesture */
+@media (hover: none) and (pointer: coarse) {
+  html, body {
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Also block for standalone PWA mode */
+@media screen and (display-mode: standalone) {
+  html, body {
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Block for fullscreen PWA mode */
+@media screen and (display-mode: fullscreen) {
+  html, body {
+    overscroll-behavior-y: contain;
+  }
 }
 
 /* GPU acceleration for modals and animated elements */

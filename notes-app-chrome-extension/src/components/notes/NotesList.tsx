@@ -4,6 +4,7 @@ import { ChevronDown, MoreHorizontal, Pencil, Trash2, Plus } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import * as Popover from '@radix-ui/react-popover'
 import { EmptyState } from './EmptyState'
+import { NotesListSkeleton } from '@/components/ui/Skeleton'
 import {
   DndContext,
   DragOverlay,
@@ -43,6 +44,12 @@ export function NotesList() {
     addNote,
     searchQuery
   } = useNotesStore()
+  
+  // Get sync states
+  const isSyncing = useNotesStore(state => state.isSyncing)
+  const isInitialSync = useNotesStore(state => state.isInitialSync)
+  const isCheckingDriveData = useNotesStore(state => state.isCheckingDriveData)
+  const driveHasData = useNotesStore(state => state.driveHasData)
   
   const [activeNote, setActiveNote] = useState<Note | null>(null)
   const [editingCollectionId, setEditingCollectionId] = useState<string | null>(null)
@@ -117,6 +124,20 @@ export function NotesList() {
     }
     setEditingCollectionId(null)
     setEditingName('')
+  }
+
+  // Show skeleton when:
+  // 1. Initial sync is in progress and no local notes yet
+  // 2. Checking Drive data and Drive has data (or unknown)
+  // 3. Syncing and Drive confirmed to have data
+  const showSkeleton = notes.length === 0 && (
+    (isInitialSync && isSyncing) ||
+    isCheckingDriveData ||
+    (driveHasData === true && isSyncing)
+  )
+  
+  if (showSkeleton) {
+    return <NotesListSkeleton />
   }
 
   // Empty state: distinguish between no notes vs no search results

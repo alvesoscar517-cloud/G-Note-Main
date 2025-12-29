@@ -8,11 +8,13 @@ import { useNotesStore } from '@/stores/notesStore'
 import { useThemeStore } from '@/stores/themeStore'
 import { useNetworkStore } from '@/stores/networkStore'
 import { LoginScreen } from '@/components/auth/LoginScreen'
+import { DrivePermissionError } from '@/components/auth/DrivePermissionError'
 import { Header } from '@/components/layout/Header'
 import { InstallPrompt } from '@/components/layout/InstallPrompt'
 import { NotesList } from '@/components/notes/NotesList'
 import { NoteModal } from '@/components/notes/NoteModal'
 import { PublicNoteView } from '@/components/notes/PublicNoteView'
+import { FreeNoteView } from '@/components/notes/FreeNoteView'
 import { PrivacyPolicy, TermsOfService } from '@/components/legal'
 import { TooltipProvider } from '@/components/ui/Tooltip'
 import { useBlockContextMenu } from '@/components/ui/ContextMenuBlocker'
@@ -27,6 +29,10 @@ import {
   exchangeCodeForTokens
 } from '@/lib/tokenRefresh'
 
+// Key for pending note from free-note page
+const PENDING_NOTE_KEY = 'g-note-pending-from-free'
+const FROM_FREE_NOTE_FLAG = 'g-note-from-free-note'
+
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID'
 
 // Check for public view mode
@@ -37,30 +43,84 @@ function getViewFileId(): string | null {
 
 function AppContent() {
   const { user, setUser } = useAuthStore()
-  const { syncWithDrive, loadSharedNotes, notes, isSyncing, initOfflineStorage } = useNotesStore()
+  const { syncWithDrive, checkDriveHasData, loadSharedNotes, notes, isSyncing, initOfflineStorage, addNote, setSelectedNote, setModalOpen, syncError } = useNotesStore()
   const { initTheme } = useThemeStore()
   const initNetwork = useNetworkStore(state => state.initialize)
   const isOnline = useNetworkStore(state => state.isOnline)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showPermissionError, setShowPermissionError] = useState(false)
   
   // Block default context menu globally
   useBlockContextMenu()
   
   const viewFileId = getViewFileId()
   
+  // Save flag when coming from free-note page (before OAuth redirect clears URL)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const fromFreeNote = params.get('from') === 'free-note'
+    
+    if (fromFreeNote) {
+      // Save flag to localStorage so it persists through OAuth redirect
+      localStorage.setItem(FROM_FREE_NOTE_FLAG, 'true')
+      // Clean URL immediately
+      window.history.replaceState({}, '', '/')
+    }
+  }, [])
+  
+  // Check for pending note from free-note page after login
+  useEffect(() => {
+    if (!user?.accessToken) return
+    
+    // Check if coming from free-note page (flag saved before OAuth)
+    const fromFreeNote = localStorage.getItem(FROM_FREE_NOTE_FLAG) === 'true'
+    
+    if (fromFreeNote) {
+      // Clear flag immediately
+      localStorage.removeItem(FROM_FREE_NOTE_FLAG)
+      
+      try {
+        const pendingData = localStorage.getItem(PENDING_NOTE_KEY)
+        if (pendingData) {
+          const pending = JSON.parse(pendingData)
+          
+          // Create new note from pending data
+          const newNote = addNote()
+          if (newNote) {
+            // Update note with pending content
+            useNotesStore.getState().updateNote(newNote.id, {
+              title: pending.title || '',
+              content: pending.content || '',
+              style: pending.style
+            })
+            
+            // Open the note modal
+            setSelectedNote(newNote.id)
+            setModalOpen(true)
+            
+            // Clear pending data
+            localStorage.removeItem(PENDING_NOTE_KEY)
+          }
+        }
+      } catch (e) {
+        console.error('Failed to process pending note:', e)
+      }
+    }
+  }, [user?.accessToken, addNote, setSelectedNote, setModalOpen])
+  
   // Initialize network status monitoring and offline storage
   useEffect(() => {
     const cleanupNetwork = initNetwork()
     const cleanupOfflineSync = initOfflineSync()
     
-    // Initialize offline storage (IndexedDB) with user ID for data isolation
-    initOfflineStorage(user?.id)
+    // Initialize offline storage (IndexedDB)
+    initOfflineStorage()
     
     return () => {
       cleanupNetwork()
       cleanupOfflineSync()
     }
-  }, [initNetwork, initOfflineStorage, user?.id])
+  }, [initNetwork, initOfflineStorage])
 
   // Debounced sync - wait 2s after last change before syncing
   const debouncedSync = useDebouncedCallback(async () => {
@@ -75,17 +135,27 @@ function AppContent() {
       const code = parseAuthCode()
       if (code && hasAuthBackend()) {
         console.log('Processing auth callback...')
-        const result = await exchangeCodeForTokens(code)
-        if (result) {
-          setUser({
-            id: result.user.id,
-            email: result.user.email,
-            name: result.user.name,
-            avatar: result.user.avatar,
-            accessToken: result.accessToken,
-            tokenExpiry: Date.now() + (result.expiresIn * 1000)
-          })
-          console.log('Login successful via auth code flow')
+        try {
+          const result = await exchangeCodeForTokens(code)
+          if (result) {
+            setUser({
+              id: result.user.id,
+              email: result.user.email,
+              name: result.user.name,
+              avatar: result.user.avatar,
+              accessToken: result.accessToken,
+              tokenExpiry: Date.now() + (result.expiresIn * 1000)
+            })
+            console.log('Login successful via auth code flow')
+          }
+        } catch (error) {
+          // Handle permission error during login
+          if (error instanceof Error && error.message === 'DRIVE_PERMISSION_DENIED') {
+            console.log('Drive permission denied during login')
+            setShowPermissionError(true)
+          } else {
+            console.error('Auth callback error:', error)
+          }
         }
         // Hide splash after auth processing (success or fail)
         setTimeout(() => hideSplashScreen(), 300)
@@ -93,6 +163,13 @@ function AppContent() {
     }
     handleAuthCallback()
   }, [setUser])
+
+  // Show permission error dialog when sync fails due to permission
+  useEffect(() => {
+    if (syncError === 'DRIVE_PERMISSION_DENIED') {
+      setShowPermissionError(true)
+    }
+  }, [syncError])
 
   // Silent refresh using backend (no popup needed)
   // Graceful degradation: if offline + token expired, allow local editing
@@ -198,6 +275,12 @@ function AppContent() {
       const now = Date.now()
       if (now - lastSync < 5000) return
       lastSync = now
+      
+      // Check if Drive has data first (only on initial sync when no local notes)
+      if (notes.length === 0) {
+        await checkDriveHasData(user.accessToken)
+      }
+      
       await syncWithDrive(user.accessToken)
       await loadSharedNotes(user.accessToken)
     }
@@ -250,6 +333,11 @@ function AppContent() {
         <NoteModal />
         <InstallPrompt />
       </div>
+      
+      {/* Drive Permission Error Dialog */}
+      {showPermissionError && (
+        <DrivePermissionError onClose={() => setShowPermissionError(false)} />
+      )}
     </LayoutGroup>
   )
 }
@@ -262,6 +350,7 @@ function App() {
           <Routes>
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/free-note" element={<FreeNoteView />} />
             <Route path="*" element={<AppContent />} />
           </Routes>
         </BrowserRouter>

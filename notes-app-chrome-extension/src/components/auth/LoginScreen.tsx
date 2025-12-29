@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronRight, WifiOff } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
@@ -5,6 +6,7 @@ import { useThemeStore } from '@/stores/themeStore'
 import { VantaWaves } from '@/components/ui/VantaWaves'
 import { useNetworkStore } from '@/stores/networkStore'
 import { chromeGoogleLogin, isChromeExtension } from '@/lib/chromeAuth'
+import { DrivePermissionError } from './DrivePermissionError'
 
 // Apple Icon
 const AppleIcon = ({ className }: { className?: string }) => (
@@ -32,6 +34,7 @@ export function LoginScreen() {
   const { setUser, setLoading, setLoginTransition } = useAuthStore()
   const { theme } = useThemeStore()
   const { isOnline } = useNetworkStore()
+  const [showPermissionError, setShowPermissionError] = useState(false)
   
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
@@ -61,7 +64,12 @@ export function LoginScreen() {
         // Keep overlay visible briefly for smooth transition
         setTimeout(() => setLoginTransition(false), 500)
       } else {
-        console.error('Login failed:', result.error)
+        // Check for permission error
+        if (result.error === 'DRIVE_PERMISSION_DENIED') {
+          setShowPermissionError(true)
+        } else {
+          console.error('Login failed:', result.error)
+        }
         setLoginTransition(false)
       }
     } catch (error) {
@@ -177,9 +185,14 @@ export function LoginScreen() {
         </a>
 
         <p className="text-xs text-neutral-400 dark:text-white/50">
-          Chrome Extension v1.0.0
+          Chrome Extension v1.0.1
         </p>
       </div>
+      
+      {/* Drive Permission Error Dialog */}
+      {showPermissionError && (
+        <DrivePermissionError onClose={() => setShowPermissionError(false)} />
+      )}
     </div>
   )
 }

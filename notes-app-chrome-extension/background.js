@@ -147,6 +147,18 @@ async function handleGoogleAuth() {
       throw new Error('Failed to get auth token')
     }
     
+    // Validate that user granted Drive scope
+    const scopeValidation = await validateDriveScope(token)
+    if (!scopeValidation.valid) {
+      // Remove the token since it doesn't have required permissions
+      await chrome.identity.removeCachedAuthToken({ token })
+      return {
+        success: false,
+        error: 'DRIVE_PERMISSION_DENIED',
+        message: 'Drive permission is required to sync notes. Please sign in again and grant Drive access.'
+      }
+    }
+    
     // Get user info
     const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: { Authorization: `Bearer ${token}` }
@@ -176,6 +188,32 @@ async function handleGoogleAuth() {
   } catch (error) {
     console.error('Auth error:', error)
     return { success: false, error: error.message }
+  }
+}
+
+// Validate that the access token has Drive scope
+async function validateDriveScope(accessToken) {
+  try {
+    const response = await fetch(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`)
+    if (!response.ok) {
+      return { valid: false, error: 'token_invalid' }
+    }
+    const tokenInfo = await response.json()
+    const grantedScopes = tokenInfo.scope ? tokenInfo.scope.split(' ') : []
+    
+    const hasDriveScope = grantedScopes.some(scope => 
+      scope === 'https://www.googleapis.com/auth/drive.file' || 
+      scope === 'https://www.googleapis.com/auth/drive'
+    )
+    
+    return { 
+      valid: hasDriveScope, 
+      grantedScopes,
+      error: hasDriveScope ? null : 'drive_scope_missing'
+    }
+  } catch (error) {
+    console.error('Scope validation error:', error)
+    return { valid: false, error: 'validation_failed' }
   }
 }
 

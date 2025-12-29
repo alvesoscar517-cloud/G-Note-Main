@@ -11,7 +11,11 @@
       "terms": "Warunki korzystania z usługi",
       "and": "i",
       "privacy": "Politykę prywatności"
-    }
+    },
+    "drivePermissionRequired": "Wymagane uprawnienie Drive",
+    "drivePermissionDenied": "Nie przyznano dostępu do Google Drive. Zaloguj się ponownie i zezwól na dostęp do Drive, aby zsynchronizować notatki.",
+    "relogin": "Zaloguj się ponownie",
+    "continueWithoutSync": "Kontynuuj bez synchronizacji"
   },
   "header": {
     "search": "Szukaj...",
@@ -28,11 +32,22 @@
     "logout": "Wyloguj",
     "logoutDescription": "Wyloguj z konta",
     "loggingOut": "Wylogowywanie...",
+    "logoutConfirmTitle": "Wylogować się?",
+    "logoutWarningNormal": "Twoje dane są zsynchronizowane. Możesz zalogować się ponownie w dowolnym momencie, aby uzyskać dostęp do swoich notatek.",
+    "logoutWarningUnsynced": "Masz niezsynchronizowane zmiany. Zostaną przesłane, gdy zalogujesz się ponownie na tym urządzeniu.",
+    "logoutWarningOffline": "Jesteś offline z niezsynchronizowanymi zmianami. Te zmiany mogą zostać utracone, jeśli teraz się wylogujesz.",
+    "unsyncedWarning": "{{count}} niezsynchronizowanych zmian",
+    "allSynced": "Wszystkie zmiany zsynchronizowane",
+    "lastSync": "{{time}}",
+    "noDataToSync": "Brak danych do synchronizacji",
     "modalSize": "Rozmiar okna",
     "modalSizeDescription": "Dostosuj rozmiar edytora",
     "modalSizeDefault": "Domyślny",
     "modalSizeLarge": "Duży",
-    "modalSizeXLarge": "Bardzo duży"
+    "modalSizeXLarge": "Bardzo duży",
+    "offlineLogoutTitle": "Wylogować się offline?",
+    "offlineLogoutWarning": "Jesteś obecnie offline. Niezapisane zmiany mogły nie zostać zsynchronizowane z Google Drive. Jeśli teraz się wylogujesz, możesz stracić te zmiany.",
+    "logoutAnyway": "Wyloguj mimo to"
   },
   "credits": {
     "title": "Kup kredyty AI",
@@ -143,15 +158,19 @@
     "createLink": "Utwórz link",
     "updateLink": "Aktualizuj",
     "realtime": "Na żywo",
-    "realtimeDescription": "Udostępnij kod pokoju, aby współpracować w czasie rzeczywistym:",
-    "start": "Rozpocznij",
+    "realtimeDescription": "Rozpocznij sesję współpracy na żywo. Inni mogą dołączyć za pomocą kodu pokoju.",
+    "realtimeActive": "Sesja na żywo aktywna ({{count}} połączonych)",
+    "realtimeNote": "Musisz najpierw rozpocząć sesję przed udostępnieniem kodu. Dołączający zsynchronizują się z treścią Twojej notatki.",
+    "shareCodeToInvite": "Udostępnij ten kod, aby zaprosić innych:",
+    "start": "Rozpocznij sesję",
+    "stopSharing": "Zakończ sesję",
     "email": "E-mail",
     "emailDescription": "Udostępnij przez e-mail Google Drive:",
     "emailPlaceholder": "E-mail odbiorcy...",
     "shareSuccess": "Udostępniono pomyślnie!",
     "shareButton": "Udostępnij",
     "join": "Dołącz",
-    "joinDescription": "Wprowadź kod pokoju, aby dołączyć do współpracy:",
+    "joinDescription": "Wprowadź kod pokoju, aby dołączyć do sesji na żywo:",
     "joinPlaceholder": "Wprowadź kod pokoju...",
     "joinButton": "Dołącz",
     "close": "Zamknij",
@@ -181,13 +200,18 @@
     "alreadyInstalled": "Już zainstalowano!",
     "alreadyInstalledDescription": "Używasz wersji aplikacji G-Note.",
     "androidChromeInstructions": "Stuknij ikonę menu (⋮) u góry, następnie wybierz \"Zainstaluj aplikację\" lub \"Dodaj do ekranu głównego\"",
-    "desktopChromeInstructions": "Kliknij ikonę instalacji (⊕) w pasku adresu lub przejdź do Menu → Zainstaluj aplikację",
+    "desktopChromeInstructions": "Kliknij ikonę instalacji (⬇) w pasku adresu lub przejdź do Menu → Zainstaluj aplikację",
     "iosSafariInstructions": "Stuknij przycisk Udostępnij poniżej, następnie \"Dodaj do ekranu początkowego\"",
     "iosChromeInstructions": "Dla najlepszego doświadczenia otwórz w Safari i stuknij Udostępnij → Dodaj do ekranu początkowego",
     "androidFirefoxInstructions": "Stuknij menu (⋮) następnie \"Zainstaluj\"",
     "androidOtherInstructions": "Stuknij menu następnie \"Dodaj do ekranu głównego\" lub \"Zainstaluj\"",
     "desktopFirefoxInstructions": "Firefox nie obsługuje instalacji PWA. Wypróbuj Chrome lub Edge dla najlepszego doświadczenia.",
-    "desktopSafariInstructions": "Kliknij Plik → Dodaj do Docka, lub użyj Chrome/Edge dla pełnego wsparcia PWA."
+    "desktopSafariInstructions": "Kliknij Plik → Dodaj do Docka, lub użyj Chrome/Edge dla pełnego wsparcia PWA.",
+    "chromeExtension": "Rozszerzenie",
+    "chromeExtensionDescription": "Zainstaluj rozszerzenie Chrome, aby uzyskać szybki dostęp z paska narzędzi przeglądarki.",
+    "addToChrome": "Dodaj do Chrome",
+    "chromeExtensionInfo": "Rozszerzenie działa z Chrome, Edge, Brave i innymi przeglądarkami opartymi na Chromium.",
+    "new": "Nowe"
   },
   "packages": {
     "starter": "Starter",
@@ -212,7 +236,8 @@
     "cancel": "Anuluj",
     "rotate": "Obróć",
     "flipH": "Odbij poziomo",
-    "flipV": "Odbij pionowo"
+    "flipV": "Odbij pionowo",
+    "auto": "Auto"
   },
   "common": {
     "confirm": "Potwierdź",
@@ -317,6 +342,24 @@
     "noResults": "Brak wyników",
     "noResultsDescription": "Żadne notatki nie pasują do wyszukiwania"
   },
+  "freeNote": {
+    "freeMode": "Tryb darmowy",
+    "placeholder": "Zacznij pisać swoją notatkę tutaj...",
+    "titlePlaceholder": "Tytuł notatki",
+    "untitledNote": "Notatka bez tytułu",
+    "savePermanently": "Zapisz na stałe",
+    "save": "Zapisz",
+    "lastSaved": "Zapisano",
+    "localStorageWarning": "Twoja notatka jest zapisana tylko w tej przeglądarce. Może zostać utracona po wyczyszczeniu danych przeglądarki. Kliknij 'Zapisz na stałe', aby zachować ją na zawsze z darmowym kontem.",
+    "featureLocked": "Funkcja zablokowana",
+    "featureLockedDescription": "\"{{feature}}\" wymaga darmowego konta. Zarejestruj się, aby odblokować wszystkie funkcje i zapisać notatki na stałe.",
+    "goToApp": "Utwórz darmowe konto",
+    "goToAppShort": "Zarejestruj",
+    "reset": "Resetuj",
+    "resetTitle": "Zresetować notatkę?",
+    "resetDescription": "To usunie całą zawartość i nie można tego cofnąć.",
+    "resetConfirm": "Resetuj"
+  },
   "offline": {
     "offline": "Offline",
     "online": "Online",
@@ -336,12 +379,5 @@
     "syncError": "Błąd synchronizacji",
     "tapToRetry": "Dotknij, aby ponowić",
     "loginRequiresNetwork": "Logowanie wymaga połączenia z Internetem"
-  },
-  "webContent": {
-    "title": "Dodaj do notatki",
-    "description": "Utwórz nową notatkę z wybraną treścią z sieci.",
-    "createNote": "Utwórz notatkę",
-    "addToExisting": "Dodaj do istniejącej notatki",
-    "source": "Źródło"
   }
 }

@@ -144,12 +144,28 @@ export function isTouchDevice(): boolean {
   // If no touch capability, definitely not touch
   if (!hasTouchCapability()) return false
   
-  // If we know the last input type, use it
+  // Primary check: use pointer media query - most reliable
+  // If device only has coarse pointer (no mouse/trackpad), it's definitely touch
+  const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches
+  const hasFinePointer = window.matchMedia('(pointer: fine)').matches
+  const hasAnyFinePointer = window.matchMedia('(any-pointer: fine)').matches
+  
+  // Pure touch device (mobile/tablet without mouse)
+  if (hasCoarsePointer && !hasFinePointer && !hasAnyFinePointer) {
+    return true
+  }
+  
+  // If we know the last input type, use it for hybrid devices
   if (lastInputType === 'mouse') return false
   if (lastInputType === 'touch') return true
   
-  // Unknown - fall back to primary device detection
-  return isPrimaryTouchDevice()
+  // Unknown on hybrid device - default to touch-friendly behavior
+  // This ensures context menu is disabled by default on touch-capable devices
+  if (hasCoarsePointer) {
+    return true
+  }
+  
+  return false
 }
 
 /**

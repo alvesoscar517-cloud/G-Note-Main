@@ -11,7 +11,11 @@
       "terms": "شروط الخدمة",
       "and": "و",
       "privacy": "سياسة الخصوصية"
-    }
+    },
+    "drivePermissionRequired": "مطلوب إذن Drive",
+    "drivePermissionDenied": "لم يتم منح الوصول إلى Google Drive. يرجى تسجيل الدخول مرة أخرى والسماح بالوصول إلى Drive لمزامنة ملاحظاتك.",
+    "relogin": "تسجيل الدخول مرة أخرى",
+    "continueWithoutSync": "المتابعة بدون مزامنة"
   },
   "header": {
     "search": "بحث...",
@@ -28,11 +32,22 @@
     "logout": "تسجيل الخروج",
     "logoutDescription": "الخروج من الحساب",
     "loggingOut": "جارٍ تسجيل الخروج...",
+    "logoutConfirmTitle": "تسجيل الخروج؟",
+    "logoutWarningNormal": "بياناتك متزامنة. يمكنك تسجيل الدخول مرة أخرى في أي وقت للوصول إلى ملاحظاتك.",
+    "logoutWarningUnsynced": "لديك تغييرات غير متزامنة. سيتم رفعها عند تسجيل الدخول مرة أخرى على هذا الجهاز.",
+    "logoutWarningOffline": "أنت غير متصل مع تغييرات غير متزامنة. قد تفقد هذه التغييرات إذا قمت بتسجيل الخروج الآن.",
+    "unsyncedWarning": "{{count}} تغيير(ات) غير متزامنة",
+    "allSynced": "جميع التغييرات متزامنة",
+    "lastSync": "{{time}}",
+    "noDataToSync": "لا توجد بيانات للمزامنة",
     "modalSize": "حجم النافذة",
     "modalSizeDescription": "ضبط حجم المحرر",
     "modalSizeDefault": "افتراضي",
     "modalSizeLarge": "كبير",
-    "modalSizeXLarge": "كبير جداً"
+    "modalSizeXLarge": "كبير جداً",
+    "offlineLogoutTitle": "تسجيل الخروج وأنت غير متصل؟",
+    "offlineLogoutWarning": "أنت غير متصل بالإنترنت حالياً. قد لا تكون التغييرات غير المحفوظة قد تمت مزامنتها مع Google Drive. إذا قمت بتسجيل الخروج الآن، فقد تفقد هذه التغييرات.",
+    "logoutAnyway": "تسجيل الخروج على أي حال"
   },
   "credits": {
     "title": "شراء رصيد AI",
@@ -143,15 +158,19 @@
     "createLink": "إنشاء رابط",
     "updateLink": "تحديث",
     "realtime": "مباشر",
-    "realtimeDescription": "شارك رمز الغرفة للتعاون في الوقت الفعلي:",
-    "start": "بدء",
+    "realtimeDescription": "بدء جلسة تعاون مباشرة. يمكن للآخرين الانضمام باستخدام رمز الغرفة.",
+    "realtimeActive": "الجلسة المباشرة نشطة ({{count}} متصل)",
+    "realtimeNote": "يجب عليك بدء الجلسة أولاً قبل مشاركة الرمز. سيتم مزامنة المنضمين مع محتوى ملاحظتك.",
+    "shareCodeToInvite": "شارك هذا الرمز لدعوة الآخرين:",
+    "start": "بدء الجلسة",
+    "stopSharing": "إنهاء الجلسة",
     "email": "بريد إلكتروني",
     "emailDescription": "مشاركة عبر بريد Google Drive:",
     "emailPlaceholder": "بريد المستلم...",
     "shareSuccess": "تمت المشاركة بنجاح!",
     "shareButton": "مشاركة",
     "join": "انضمام",
-    "joinDescription": "أدخل رمز الغرفة للانضمام إلى التعاون:",
+    "joinDescription": "أدخل رمز الغرفة للانضمام إلى جلسة مباشرة:",
     "joinPlaceholder": "أدخل رمز الغرفة...",
     "joinButton": "انضمام",
     "close": "إغلاق",
@@ -181,13 +200,18 @@
     "alreadyInstalled": "مثبت بالفعل!",
     "alreadyInstalledDescription": "أنت تستخدم نسخة التطبيق من G-Note.",
     "androidChromeInstructions": "اضغط على أيقونة القائمة (⋮) في الأعلى، ثم اختر \"تثبيت التطبيق\" أو \"إضافة إلى الشاشة الرئيسية\"",
-    "desktopChromeInstructions": "انقر على أيقونة التثبيت (⊕) في شريط العنوان، أو اذهب إلى القائمة ← تثبيت التطبيق",
+    "desktopChromeInstructions": "انقر على أيقونة التثبيت (⬇) في شريط العنوان، أو اذهب إلى القائمة ← تثبيت التطبيق",
     "iosSafariInstructions": "اضغط على زر المشاركة أدناه، ثم \"إضافة إلى الشاشة الرئيسية\"",
     "iosChromeInstructions": "للحصول على أفضل تجربة، افتح في Safari واضغط مشاركة ← إضافة إلى الشاشة الرئيسية",
     "androidFirefoxInstructions": "اضغط على القائمة (⋮) ثم \"تثبيت\"",
     "androidOtherInstructions": "اضغط على القائمة ثم \"إضافة إلى الشاشة الرئيسية\" أو \"تثبيت\"",
     "desktopFirefoxInstructions": "Firefox لا يدعم تثبيت PWA. جرب Chrome أو Edge للحصول على أفضل تجربة.",
-    "desktopSafariInstructions": "انقر ملف ← إضافة إلى Dock، أو استخدم Chrome/Edge لدعم PWA الكامل."
+    "desktopSafariInstructions": "انقر ملف ← إضافة إلى Dock، أو استخدم Chrome/Edge لدعم PWA الكامل.",
+    "chromeExtension": "الإضافة",
+    "chromeExtensionDescription": "ثبّت إضافة Chrome للوصول السريع من شريط أدوات المتصفح.",
+    "addToChrome": "إضافة إلى Chrome",
+    "chromeExtensionInfo": "تعمل الإضافة مع Chrome و Edge و Brave والمتصفحات الأخرى المبنية على Chromium.",
+    "new": "جديد"
   },
   "packages": {
     "starter": "مبتدئ",
@@ -212,7 +236,8 @@
     "cancel": "إلغاء",
     "rotate": "تدوير",
     "flipH": "قلب أفقي",
-    "flipV": "قلب عمودي"
+    "flipV": "قلب عمودي",
+    "auto": "تلقائي"
   },
   "common": {
     "confirm": "تأكيد",
@@ -317,6 +342,24 @@
     "noResults": "لم يتم العثور على نتائج",
     "noResultsDescription": "لا توجد ملاحظات تطابق بحثك"
   },
+  "freeNote": {
+    "freeMode": "الوضع المجاني",
+    "placeholder": "ابدأ بكتابة ملاحظتك هنا...",
+    "titlePlaceholder": "عنوان الملاحظة",
+    "untitledNote": "ملاحظة بدون عنوان",
+    "savePermanently": "حفظ دائم",
+    "save": "حفظ",
+    "lastSaved": "تم الحفظ",
+    "localStorageWarning": "يتم حفظ ملاحظتك في هذا المتصفح فقط. قد تفقدها إذا مسحت بيانات المتصفح. انقر على 'حفظ دائم' للاحتفاظ بها للأبد مع حساب مجاني.",
+    "featureLocked": "الميزة مقفلة",
+    "featureLockedDescription": "\"{{feature}}\" يتطلب حساباً مجانياً. سجل لفتح جميع الميزات وحفظ ملاحظاتك بشكل دائم.",
+    "goToApp": "إنشاء حساب مجاني",
+    "goToAppShort": "تسجيل",
+    "reset": "إعادة تعيين",
+    "resetTitle": "إعادة تعيين الملاحظة؟",
+    "resetDescription": "سيؤدي هذا إلى مسح كل المحتوى ولا يمكن التراجع عنه.",
+    "resetConfirm": "إعادة تعيين"
+  },
   "offline": {
     "offline": "غير متصل",
     "online": "متصل",
@@ -336,12 +379,5 @@
     "syncError": "خطأ في المزامنة",
     "tapToRetry": "انقر لإعادة المحاولة",
     "loginRequiresNetwork": "تسجيل الدخول يتطلب اتصالاً بالإنترنت"
-  },
-  "webContent": {
-    "title": "إضافة إلى الملاحظة",
-    "description": "إنشاء ملاحظة جديدة بالمحتوى المحدد من الويب.",
-    "createNote": "إنشاء ملاحظة",
-    "addToExisting": "إضافة إلى ملاحظة موجودة",
-    "source": "المصدر"
   }
 }

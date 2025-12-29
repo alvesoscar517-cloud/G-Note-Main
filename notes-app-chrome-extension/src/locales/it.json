@@ -11,7 +11,11 @@
       "terms": "Termini di servizio",
       "and": "e",
       "privacy": "Informativa sulla privacy"
-    }
+    },
+    "drivePermissionRequired": "Autorizzazione Drive richiesta",
+    "drivePermissionDenied": "L'accesso a Google Drive non è stato concesso. Accedi di nuovo e consenti l'accesso a Drive per sincronizzare le tue note.",
+    "relogin": "Accedi di nuovo",
+    "continueWithoutSync": "Continua senza sincronizzazione"
   },
   "header": {
     "search": "Cerca...",
@@ -28,6 +32,14 @@
     "logout": "Esci",
     "logoutDescription": "Esci dall'account",
     "loggingOut": "Disconnessione...",
+    "logoutConfirmTitle": "Disconnettersi?",
+    "logoutWarningNormal": "I tuoi dati sono sincronizzati. Puoi accedere di nuovo in qualsiasi momento per accedere alle tue note.",
+    "logoutWarningUnsynced": "Hai modifiche non sincronizzate. Verranno caricate quando accederai di nuovo su questo dispositivo.",
+    "logoutWarningOffline": "Sei offline con modifiche non sincronizzate. Queste modifiche potrebbero andare perse se esci ora.",
+    "unsyncedWarning": "{{count}} modifica/e non sincronizzata/e",
+    "allSynced": "Tutte le modifiche sincronizzate",
+    "lastSync": "{{time}}",
+    "noDataToSync": "Nessun dato da sincronizzare",
     "modalSize": "Dimensione finestra",
     "modalSizeDescription": "Regola dimensione editor",
     "modalSizeDefault": "Predefinita",
@@ -143,15 +155,19 @@
     "createLink": "Crea link",
     "updateLink": "Aggiorna",
     "realtime": "Live",
-    "realtimeDescription": "Condividi il codice stanza per collaborare in tempo reale:",
-    "start": "Inizia",
+    "realtimeDescription": "Avvia una sessione di collaborazione live. Altri possono unirsi con il codice stanza.",
+    "realtimeActive": "Sessione live attiva ({{count}} connessi)",
+    "realtimeNote": "Devi prima avviare la sessione prima di condividere il codice. Chi si unisce si sincronizzerà con il contenuto della tua nota.",
+    "shareCodeToInvite": "Condividi questo codice per invitare altri:",
+    "start": "Avvia sessione",
+    "stopSharing": "Termina sessione",
     "email": "Email",
     "emailDescription": "Condividi via email Google Drive:",
     "emailPlaceholder": "Email destinatario...",
     "shareSuccess": "Condiviso con successo!",
     "shareButton": "Condividi",
     "join": "Unisciti",
-    "joinDescription": "Inserisci il codice stanza per unirti alla collaborazione:",
+    "joinDescription": "Inserisci il codice stanza per unirti a una sessione live:",
     "joinPlaceholder": "Inserisci codice stanza...",
     "joinButton": "Unisciti",
     "close": "Chiudi",
@@ -181,13 +197,18 @@
     "alreadyInstalled": "Già installato!",
     "alreadyInstalledDescription": "Stai usando la versione app di G-Note.",
     "androidChromeInstructions": "Tocca l'icona menu (⋮) in alto, poi seleziona \"Installa app\" o \"Aggiungi a schermata Home\"",
-    "desktopChromeInstructions": "Clicca l'icona di installazione (⊕) nella barra degli indirizzi, o vai su Menu → Installa app",
+    "desktopChromeInstructions": "Clicca l'icona di installazione (⬇) nella barra degli indirizzi, o vai su Menu → Installa app",
     "iosSafariInstructions": "Tocca il pulsante Condividi sotto, poi \"Aggiungi a Home\"",
     "iosChromeInstructions": "Per la migliore esperienza, apri in Safari e tocca Condividi → Aggiungi a Home",
     "androidFirefoxInstructions": "Tocca il menu (⋮) poi \"Installa\"",
     "androidOtherInstructions": "Tocca il menu poi \"Aggiungi a schermata Home\" o \"Installa\"",
     "desktopFirefoxInstructions": "Firefox non supporta l'installazione PWA. Prova Chrome o Edge per la migliore esperienza.",
-    "desktopSafariInstructions": "Clicca File → Aggiungi al Dock, o usa Chrome/Edge per il supporto PWA completo."
+    "desktopSafariInstructions": "Clicca File → Aggiungi al Dock, o usa Chrome/Edge per il supporto PWA completo.",
+    "chromeExtension": "Estensione",
+    "chromeExtensionDescription": "Installa l'estensione Chrome per un accesso rapido dalla barra degli strumenti del browser.",
+    "addToChrome": "Aggiungi a Chrome",
+    "chromeExtensionInfo": "L'estensione funziona con Chrome, Edge, Brave e altri browser basati su Chromium.",
+    "new": "Nuovo"
   },
   "packages": {
     "starter": "Starter",
@@ -212,7 +233,8 @@
     "cancel": "Annulla",
     "rotate": "Ruota",
     "flipH": "Capovolgi H",
-    "flipV": "Capovolgi V"
+    "flipV": "Capovolgi V",
+    "auto": "Auto"
   },
   "common": {
     "confirm": "Conferma",
@@ -317,6 +339,24 @@
     "noResults": "Nessun risultato trovato",
     "noResultsDescription": "Nessuna nota corrisponde alla tua ricerca"
   },
+  "freeNote": {
+    "freeMode": "Modalità gratuita",
+    "placeholder": "Inizia a scrivere la tua nota qui...",
+    "titlePlaceholder": "Titolo della nota",
+    "untitledNote": "Nota senza titolo",
+    "savePermanently": "Salva permanentemente",
+    "save": "Salva",
+    "lastSaved": "Salvato",
+    "localStorageWarning": "La tua nota è salvata solo in questo browser. Potrebbe essere persa se cancelli i dati del browser. Clicca su 'Salva permanentemente' per conservarla con un account gratuito.",
+    "featureLocked": "Funzione bloccata",
+    "featureLockedDescription": "\"{{feature}}\" richiede un account gratuito. Registrati per sbloccare tutte le funzioni e salvare le tue note permanentemente.",
+    "goToApp": "Crea account gratuito",
+    "goToAppShort": "Registrati",
+    "reset": "Reimposta",
+    "resetTitle": "Reimpostare la nota?",
+    "resetDescription": "Questo cancellerà tutto il contenuto e non può essere annullato.",
+    "resetConfirm": "Reimposta"
+  },
   "offline": {
     "offline": "Offline",
     "online": "Online",
@@ -336,12 +376,5 @@
     "syncError": "Errore di sincronizzazione",
     "tapToRetry": "Tocca per riprovare",
     "loginRequiresNetwork": "L'accesso richiede una connessione Internet"
-  },
-  "webContent": {
-    "title": "Aggiungi alla nota",
-    "description": "Crea una nuova nota con il contenuto selezionato dal web.",
-    "createNote": "Crea nota",
-    "addToExisting": "Aggiungi a nota esistente",
-    "source": "Fonte"
   }
 }

@@ -6,6 +6,7 @@ import { useNotesStore } from '@/stores/notesStore'
 import { useThemeStore } from '@/stores/themeStore'
 import { useNetworkStore } from '@/stores/networkStore'
 import { LoginScreen } from '@/components/auth/LoginScreen'
+import { DrivePermissionError } from '@/components/auth/DrivePermissionError'
 import { Header } from '@/components/layout/Header'
 import { NotesList } from '@/components/notes/NotesList'
 import { NoteModal } from '@/components/notes/NoteModal'
@@ -26,11 +27,12 @@ function getViewFileId(): string | null {
 
 function AppContent() {
   const { user, setUser } = useAuthStore()
-  const { syncWithDrive, loadSharedNotes, notes, isSyncing, initOfflineStorage } = useNotesStore()
+  const { syncWithDrive, checkDriveHasData, loadSharedNotes, notes, isSyncing, initOfflineStorage, syncError } = useNotesStore()
   const { initTheme } = useThemeStore()
   const initNetwork = useNetworkStore(state => state.initialize)
   const isOnline = useNetworkStore(state => state.isOnline)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showPermissionError, setShowPermissionError] = useState(false)
   
   // Block default context menu globally
   useBlockContextMenu()
@@ -62,6 +64,13 @@ function AppContent() {
   useEffect(() => {
     initTheme()
   }, [])
+
+  // Show permission error dialog when sync fails due to permission
+  useEffect(() => {
+    if (syncError === 'DRIVE_PERMISSION_DENIED') {
+      setShowPermissionError(true)
+    }
+  }, [syncError])
 
   // Chrome Extension token refresh
   const checkAndRefreshToken = useCallback(async () => {
@@ -150,6 +159,12 @@ function AppContent() {
       const now = Date.now()
       if (now - lastSync < 5000) return
       lastSync = now
+      
+      // Check if Drive has data first (only on initial sync when no local notes)
+      if (notes.length === 0) {
+        await checkDriveHasData(user.accessToken)
+      }
+      
       await syncWithDrive(user.accessToken)
       await loadSharedNotes(user.accessToken)
     }
@@ -202,6 +217,11 @@ function AppContent() {
         <NoteModal />
         <WebContentDialog />
       </div>
+      
+      {/* Drive Permission Error Dialog */}
+      {showPermissionError && (
+        <DrivePermissionError onClose={() => setShowPermissionError(false)} />
+      )}
     </LayoutGroup>
   )
 }

@@ -11,7 +11,11 @@
       "terms": "Điều khoản dịch vụ",
       "and": "và",
       "privacy": "Chính sách bảo mật"
-    }
+    },
+    "drivePermissionRequired": "Cần quyền truy cập Drive",
+    "drivePermissionDenied": "Quyền truy cập Google Drive chưa được cấp. Vui lòng đăng nhập lại và cho phép truy cập Drive để đồng bộ ghi chú.",
+    "relogin": "Đăng nhập lại",
+    "continueWithoutSync": "Tiếp tục không đồng bộ"
   },
   "header": {
     "search": "Tìm kiếm...",
@@ -28,6 +32,14 @@
     "logout": "Đăng xuất",
     "logoutDescription": "Thoát khỏi tài khoản",
     "loggingOut": "Đang đăng xuất...",
+    "logoutConfirmTitle": "Đăng xuất?",
+    "logoutWarningNormal": "Dữ liệu của bạn đã được đồng bộ. Bạn có thể đăng nhập lại bất cứ lúc nào để truy cập ghi chú.",
+    "logoutWarningUnsynced": "Bạn có thay đổi chưa đồng bộ. Chúng sẽ được tải lên khi bạn đăng nhập lại trên thiết bị này.",
+    "logoutWarningOffline": "Bạn đang ngoại tuyến với các thay đổi chưa đồng bộ. Những thay đổi này có thể bị mất nếu bạn đăng xuất ngay bây giờ.",
+    "unsyncedWarning": "{{count}} thay đổi chưa đồng bộ",
+    "allSynced": "Tất cả thay đổi đã đồng bộ",
+    "lastSync": "{{time}}",
+    "noDataToSync": "Không có dữ liệu để đồng bộ",
     "modalSize": "Kích thước cửa sổ",
     "modalSizeDescription": "Điều chỉnh kích thước ghi chú",
     "modalSizeDefault": "Mặc định",
@@ -326,6 +338,24 @@
     "searchPlaceholder": "Tìm trong thùng rác...",
     "noResults": "Không tìm thấy",
     "noResultsDescription": "Không có ghi chú nào khớp với tìm kiếm của bạn"
+  },
+  "freeNote": {
+    "freeMode": "Miễn phí",
+    "placeholder": "Bắt đầu ghi chú của bạn ở đây...",
+    "titlePlaceholder": "Tiêu đề ghi chú",
+    "untitledNote": "Ghi chú không có tiêu đề",
+    "savePermanently": "Lưu vĩnh viễn",
+    "save": "Lưu",
+    "lastSaved": "Đã lưu",
+    "localStorageWarning": "Ghi chú của bạn chỉ được lưu trong trình duyệt này. Nó có thể bị mất nếu bạn xóa dữ liệu trình duyệt. Nhấn 'Lưu vĩnh viễn' để giữ mãi mãi với tài khoản miễn phí.",
+    "featureLocked": "Tính năng bị khóa",
+    "featureLockedDescription": "\"{{feature}}\" cần tài khoản miễn phí. Đăng ký để mở khóa tất cả tính năng và lưu ghi chú vĩnh viễn.",
+    "goToApp": "Tạo tài khoản miễn phí",
+    "goToAppShort": "Đăng ký",
+    "reset": "Đặt lại",
+    "resetTitle": "Đặt lại ghi chú?",
+    "resetDescription": "Thao tác này sẽ xóa toàn bộ nội dung và không thể hoàn tác.",
+    "resetConfirm": "Đặt lại"
   },
   "offline": {
     "offline": "Ngoại tuyến",

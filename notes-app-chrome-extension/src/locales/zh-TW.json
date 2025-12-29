@@ -11,7 +11,11 @@
       "terms": "服務條款",
       "and": "和",
       "privacy": "隱私政策"
-    }
+    },
+    "drivePermissionRequired": "需要 Drive 權限",
+    "drivePermissionDenied": "未授予 Google Drive 存取權限。請重新登入並允許 Drive 存取以同步您的筆記。",
+    "relogin": "重新登入",
+    "continueWithoutSync": "不同步繼續"
   },
   "header": {
     "search": "搜尋...",
@@ -28,6 +32,14 @@
     "logout": "登出",
     "logoutDescription": "登出帳戶",
     "loggingOut": "正在登出...",
+    "logoutConfirmTitle": "登出？",
+    "logoutWarningNormal": "您的資料已同步。您可以隨時重新登入以存取您的筆記。",
+    "logoutWarningUnsynced": "您有未同步的變更。當您在此裝置上重新登入時，它們將被上傳。",
+    "logoutWarningOffline": "您處於離線狀態且有未同步的變更。如果現在登出，這些變更可能會遺失。",
+    "unsyncedWarning": "{{count}} 個未同步的變更",
+    "allSynced": "所有變更已同步",
+    "lastSync": "{{time}}",
+    "noDataToSync": "沒有資料需要同步",
     "modalSize": "視窗大小",
     "modalSizeDescription": "調整編輯器大小",
     "modalSizeDefault": "預設",
@@ -143,15 +155,19 @@
     "createLink": "建立連結",
     "updateLink": "更新",
     "realtime": "即時",
-    "realtimeDescription": "分享房間代碼以即時協作編輯：",
-    "start": "開始",
+    "realtimeDescription": "開始即時協作會話。其他人可以使用房間代碼加入。",
+    "realtimeActive": "即時會話進行中（{{count}} 人連線）",
+    "realtimeNote": "分享代碼前必須先開始會話。加入者將與您的筆記內容同步。",
+    "shareCodeToInvite": "分享此代碼邀請他人：",
+    "start": "開始會話",
+    "stopSharing": "結束會話",
     "email": "電子郵件",
     "emailDescription": "透過 Google Drive 電子郵件分享：",
     "emailPlaceholder": "收件人電子郵件...",
     "shareSuccess": "分享成功！",
     "shareButton": "分享",
     "join": "加入",
-    "joinDescription": "輸入房間代碼加入協作：",
+    "joinDescription": "輸入房間代碼加入即時會話：",
     "joinPlaceholder": "輸入房間代碼...",
     "joinButton": "加入",
     "close": "關閉",
@@ -181,13 +197,18 @@
     "alreadyInstalled": "已安裝！",
     "alreadyInstalledDescription": "您正在使用 G-Note 的應用程式版本。",
     "androidChromeInstructions": "點擊頂部的選單圖示 (⋮)，然後選擇「安裝應用程式」或「加入主畫面」",
-    "desktopChromeInstructions": "點擊網址列中的安裝圖示 (⊕)，或前往 選單 → 安裝應用程式",
+    "desktopChromeInstructions": "點擊網址列中的安裝圖示 (⬇)，或前往 選單 → 安裝應用程式",
     "iosSafariInstructions": "點擊下方的分享按鈕，然後選擇「加入主畫面」",
     "iosChromeInstructions": "為獲得最佳體驗，請在 Safari 中開啟並點擊 分享 → 加入主畫面",
     "androidFirefoxInstructions": "點擊選單 (⋮) 然後選擇「安裝」",
     "androidOtherInstructions": "點擊選單然後選擇「加入主畫面」或「安裝」",
     "desktopFirefoxInstructions": "Firefox 不支援 PWA 安裝。請嘗試使用 Chrome 或 Edge 以獲得最佳體驗。",
-    "desktopSafariInstructions": "點擊 檔案 → 加入 Dock，或使用 Chrome/Edge 獲得完整 PWA 支援。"
+    "desktopSafariInstructions": "點擊 檔案 → 加入 Dock，或使用 Chrome/Edge 獲得完整 PWA 支援。",
+    "chromeExtension": "擴充功能",
+    "chromeExtensionDescription": "安裝 Chrome 擴充功能，從瀏覽器工具列快速存取。",
+    "addToChrome": "加入 Chrome",
+    "chromeExtensionInfo": "此擴充功能適用於 Chrome、Edge、Brave 和其他基於 Chromium 的瀏覽器。",
+    "new": "新"
   },
   "packages": {
     "starter": "入門版",
@@ -212,7 +233,8 @@
     "cancel": "取消",
     "rotate": "旋轉",
     "flipH": "水平翻轉",
-    "flipV": "垂直翻轉"
+    "flipV": "垂直翻轉",
+    "auto": "自動"
   },
   "common": {
     "confirm": "確認",
@@ -317,6 +339,24 @@
     "noResults": "找不到結果",
     "noResultsDescription": "沒有與您的搜尋相符的筆記"
   },
+  "freeNote": {
+    "freeMode": "免費模式",
+    "placeholder": "在這裡輸入您的筆記...",
+    "titlePlaceholder": "筆記標題",
+    "untitledNote": "無標題筆記",
+    "savePermanently": "永久儲存",
+    "save": "儲存",
+    "lastSaved": "已儲存",
+    "localStorageWarning": "您的筆記僅儲存在此瀏覽器中。如果清除瀏覽器資料可能會遺失。點擊「永久儲存」使用免費帳戶永久保存。",
+    "featureLocked": "功能已鎖定",
+    "featureLockedDescription": "「{{feature}}」需要免費帳戶。註冊以解鎖所有功能並永久儲存您的筆記。",
+    "goToApp": "取得免費帳戶",
+    "goToAppShort": "註冊",
+    "reset": "重置",
+    "resetTitle": "重置筆記？",
+    "resetDescription": "這將清除所有內容，且無法撤銷。",
+    "resetConfirm": "重置"
+  },
   "offline": {
     "offline": "離線",
     "online": "在線",
@@ -336,12 +376,5 @@
     "syncError": "同步錯誤",
     "tapToRetry": "點擊重試",
     "loginRequiresNetwork": "登入需要網路連接"
-  },
-  "webContent": {
-    "title": "新增到筆記",
-    "description": "使用從網頁選擇的內容建立新筆記。",
-    "createNote": "建立筆記",
-    "addToExisting": "新增到現有筆記",
-    "source": "來源"
   }
 }

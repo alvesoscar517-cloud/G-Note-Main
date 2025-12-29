@@ -11,7 +11,11 @@
       "terms": "Hizmet Şartları",
       "and": "ve",
       "privacy": "Gizlilik Politikası"
-    }
+    },
+    "drivePermissionRequired": "Drive izni gerekli",
+    "drivePermissionDenied": "Google Drive erişimi verilmedi. Notlarınızı senkronize etmek için lütfen tekrar giriş yapın ve Drive erişimine izin verin.",
+    "relogin": "Tekrar giriş yap",
+    "continueWithoutSync": "Senkronizasyon olmadan devam et"
   },
   "header": {
     "search": "Ara...",
@@ -28,11 +32,22 @@
     "logout": "Çıkış yap",
     "logoutDescription": "Hesaptan çıkış yap",
     "loggingOut": "Çıkış yapılıyor...",
+    "logoutConfirmTitle": "Çıkış yap?",
+    "logoutWarningNormal": "Verileriniz senkronize edildi. Notlarınıza erişmek için istediğiniz zaman tekrar giriş yapabilirsiniz.",
+    "logoutWarningUnsynced": "Senkronize edilmemiş değişiklikleriniz var. Bu cihazda tekrar giriş yaptığınızda yüklenecekler.",
+    "logoutWarningOffline": "Senkronize edilmemiş değişikliklerle çevrimdışısınız. Şimdi çıkış yaparsanız bu değişiklikler kaybolabilir.",
+    "unsyncedWarning": "{{count}} senkronize edilmemiş değişiklik",
+    "allSynced": "Tüm değişiklikler senkronize edildi",
+    "lastSync": "{{time}}",
+    "noDataToSync": "Senkronize edilecek veri yok",
     "modalSize": "Pencere boyutu",
     "modalSizeDescription": "Editör boyutunu ayarla",
     "modalSizeDefault": "Varsayılan",
     "modalSizeLarge": "Büyük",
-    "modalSizeXLarge": "Çok büyük"
+    "modalSizeXLarge": "Çok büyük",
+    "offlineLogoutTitle": "Çevrimdışıyken çıkış yap?",
+    "offlineLogoutWarning": "Şu anda çevrimdışısınız. Kaydedilmemiş değişiklikler Google Drive ile senkronize edilmemiş olabilir. Şimdi çıkış yaparsanız bu değişiklikleri kaybedebilirsiniz.",
+    "logoutAnyway": "Yine de çıkış yap"
   },
   "credits": {
     "title": "AI Kredisi Satın Al",
@@ -326,6 +341,24 @@
     "searchPlaceholder": "Çöp kutusunda ara...",
     "noResults": "Sonuç bulunamadı",
     "noResultsDescription": "Aramanızla eşleşen not yok"
+  },
+  "freeNote": {
+    "freeMode": "Ücretsiz Mod",
+    "placeholder": "Notunuzu buraya yazmaya başlayın...",
+    "titlePlaceholder": "Not başlığı",
+    "untitledNote": "Başlıksız not",
+    "savePermanently": "Kalıcı olarak kaydet",
+    "save": "Kaydet",
+    "lastSaved": "Kaydedildi",
+    "localStorageWarning": "Notunuz yalnızca bu tarayıcıda kaydedilir. Tarayıcı verilerini temizlerseniz kaybolabilir. Ücretsiz bir hesapla sonsuza kadar saklamak için 'Kalıcı olarak kaydet'e tıklayın.",
+    "featureLocked": "Özellik kilitli",
+    "featureLockedDescription": "\"{{feature}}\" ücretsiz bir hesap gerektirir. Tüm özelliklerin kilidini açmak ve notlarınızı kalıcı olarak kaydetmek için kaydolun.",
+    "goToApp": "Ücretsiz hesap oluştur",
+    "goToAppShort": "Kaydol",
+    "reset": "Sıfırla",
+    "resetTitle": "Notu sıfırla?",
+    "resetDescription": "Bu tüm içeriği silecek ve geri alınamaz.",
+    "resetConfirm": "Sıfırla"
   },
   "offline": {
     "offline": "Çevrimdışı",

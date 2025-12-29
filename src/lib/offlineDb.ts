@@ -7,7 +7,7 @@ import { openDB, type IDBPDatabase } from 'idb'
 import type { Note, Collection } from '@/types'
 
 const DB_NAME = 'gnote-offline'
-const DB_VERSION = 5 // Bumped to fix syncQueue indexes
+const DB_VERSION = 6 // Bumped to fix syncQueue indexes properly
 
 // Sync queue item structure
 export interface SyncQueueItem {
@@ -74,7 +74,7 @@ export async function getDb(): Promise<IDBPDatabase<GNoteDB>> {
       }
 
       // Sync queue store - recreate if upgrading to ensure indexes exist
-      if (db.objectStoreNames.contains('syncQueue') && oldVersion < 5) {
+      if (db.objectStoreNames.contains('syncQueue') && oldVersion < 6) {
         db.deleteObjectStore('syncQueue')
       }
       if (!db.objectStoreNames.contains('syncQueue')) {
@@ -380,43 +380,6 @@ export async function clearAllData(): Promise<void> {
     db.clear('metadata'),
     db.clear('deletedIds')
   ])
-}
-
-/**
- * Get the current user ID stored in metadata
- */
-export async function getCurrentUserId(): Promise<string | undefined> {
-  return getMetadata<string>('currentUserId')
-}
-
-/**
- * Set the current user ID in metadata
- */
-export async function setCurrentUserId(userId: string): Promise<void> {
-  await setMetadata('currentUserId', userId)
-}
-
-/**
- * Check if user has changed and clear data if needed
- * Returns true if data was cleared (user changed), false otherwise
- */
-export async function handleUserChange(newUserId: string): Promise<boolean> {
-  const storedUserId = await getCurrentUserId()
-  
-  // If no stored user or same user, no need to clear
-  if (!storedUserId || storedUserId === newUserId) {
-    // Update/set the current user ID
-    await setCurrentUserId(newUserId)
-    return false
-  }
-  
-  // Different user - clear all data
-  console.log(`[OfflineDb] User changed from ${storedUserId} to ${newUserId}, clearing local data`)
-  await clearAllData()
-  
-  // Set new user ID
-  await setCurrentUserId(newUserId)
-  return true
 }
 
 /**

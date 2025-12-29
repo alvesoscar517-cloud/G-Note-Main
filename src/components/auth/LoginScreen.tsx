@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useGoogleLogin } from '@react-oauth/google'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -7,11 +8,20 @@ import { hasAuthBackend, getGoogleAuthUrl } from '@/lib/tokenRefresh'
 import { useNetworkStore } from '@/stores/networkStore'
 import { WifiOff } from 'lucide-react'
 import { DownloadAppPill } from '@/components/layout/DownloadAppPill'
+import { updateStatusBarColor } from '@/stores/themeStore'
 
 export function LoginScreen() {
   const { t } = useTranslation()
   const { setUser, setLoading, setLoginTransition } = useAuthStore()
   const { isOnline } = useNetworkStore()
+
+  // Update status bar color to match Vanta Clouds background
+  useEffect(() => {
+    updateStatusBarColor('login')
+    return () => {
+      updateStatusBarColor('app')
+    }
+  }, [])
 
   // Implicit flow (fallback when no backend)
   const implicitLogin = useGoogleLogin({
@@ -63,13 +73,7 @@ export function LoginScreen() {
 
   return (
     <div 
-      className="min-h-screen min-h-dvh flex flex-col items-center justify-center relative overflow-hidden"
-      style={{
-        paddingLeft: 'max(1rem, env(safe-area-inset-left, 0px))',
-        paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
-        paddingTop: 'max(1rem, env(safe-area-inset-top, 0px))',
-        paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))',
-      }}
+      className="min-h-screen min-h-dvh flex flex-col items-center justify-center relative overflow-hidden p-4 safe-top safe-bottom"
     >
       {/* Vanta Clouds Background */}
       <VantaWaves />

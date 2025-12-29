@@ -58,12 +58,15 @@ function getDeviceInfo() {
 
 type Platform = 'ios' | 'android' | 'desktop' | 'extension'
 
-// Chrome Extension Icon
-const ChromeExtensionIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-    <circle cx="12" cy="12" r="4"/>
-  </svg>
+// Extension Icon - uses external SVG file
+// Icon is black stroke, needs invert in dark mode only
+const ExtensionIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <img 
+    src="/extension-puzzle-outline-svgrepo-com.svg" 
+    alt="Extension" 
+    className={`${className} dark:invert`}
+    style={{ opacity: 0.7 }}
+  />
 )
 
 // Reusable card component for consistent styling
@@ -140,7 +143,7 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
     { id: 'ios', icon: <Smartphone className="w-4 h-4" />, label: 'iOS' },
     { id: 'android', icon: <Tablet className="w-4 h-4" />, label: 'Android' },
     { id: 'desktop', icon: <Monitor className="w-4 h-4" />, label: 'Desktop' },
-    { id: 'extension', icon: <ChromeExtensionIcon className="w-4 h-4" />, label: t('install.chromeExtension') },
+    { id: 'extension', icon: <ExtensionIcon className="w-4 h-4" />, label: t('install.chromeExtension') },
   ]
 
   // Step buttons component for consistent styling
@@ -270,7 +273,7 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
             <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl space-y-3">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center">
-                  <BrowserIcon browser="chrome" className="w-5 h-5" />
+                  <ExtensionIcon className="w-5 h-5" />
                 </div>
                 <span className="font-medium text-neutral-900 dark:text-white">{t('install.chromeExtension')}</span>
                 <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full">
@@ -341,13 +344,13 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
             </Button>
           </div>
 
-          {/* Platform tabs */}
-          <div className="flex gap-2 mt-4">
+          {/* Platform tabs - scrollable on mobile */}
+          <div className="flex gap-2 mt-4 overflow-x-auto pb-1 -mx-5 px-5 scrollbar-none">
             {platforms.map((platform) => (
               <button
                 key={platform.id}
                 onClick={() => setSelectedPlatform(platform.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap shrink-0 ${
                   selectedPlatform === platform.id
                     ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900'
                     : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'

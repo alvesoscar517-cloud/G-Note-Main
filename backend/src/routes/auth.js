@@ -4,6 +4,35 @@ import { db, collections } from '../config/firebase.js'
 
 const router = Router()
 
+// Required scope for Drive sync
+const REQUIRED_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file'
+
+// Validate that the user granted the required Drive scope
+async function validateDriveScope(accessToken) {
+  try {
+    const response = await fetch(`https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${accessToken}`)
+    if (!response.ok) {
+      return { valid: false, error: 'token_invalid' }
+    }
+    const tokenInfo = await response.json()
+    const grantedScopes = tokenInfo.scope ? tokenInfo.scope.split(' ') : []
+    
+    const hasDriveScope = grantedScopes.some(scope => 
+      scope === REQUIRED_DRIVE_SCOPE || 
+      scope === 'https://www.googleapis.com/auth/drive'
+    )
+    
+    return { 
+      valid: hasDriveScope, 
+      grantedScopes,
+      error: hasDriveScope ? null : 'drive_scope_missing'
+    }
+  } catch (error) {
+    console.error('Scope validation error:', error)
+    return { valid: false, error: 'validation_failed' }
+  }
+}
+
 // POST /auth/google - Exchange authorization code for tokens
 router.post('/google', async (req, res) => {
   try {
@@ -20,6 +49,16 @@ router.post('/google', async (req, res) => {
     // Exchange code for tokens
     const { tokens } = await oauth2Client.getToken(code)
     oauth2Client.setCredentials(tokens)
+
+    // Validate that user granted Drive scope
+    const scopeValidation = await validateDriveScope(tokens.access_token)
+    if (!scopeValidation.valid) {
+      return res.status(403).json({ 
+        error: scopeValidation.error,
+        message: 'Drive permission is required to sync notes. Please sign in again and grant Drive access.',
+        grantedScopes: scopeValidation.grantedScopes
+      })
+    }
 
     // Verify ID token - accept any of our configured client IDs
     const validClientIds = getAllClientIds()
@@ -55,7 +94,8 @@ router.post('/google', async (req, res) => {
       accessToken: tokens.access_token,
       expiresIn: tokens.expiry_date 
         ? Math.floor((tokens.expiry_date - Date.now()) / 1000)
-        : 3600
+        : 3600,
+      grantedScopes: scopeValidation.grantedScopes
     })
   } catch (error) {
     console.error('Auth error:', error)

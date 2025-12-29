@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User } from '@/types'
-import { clearAllData as clearOfflineData } from '@/lib/offlineDb'
+import { clearAllData } from '@/lib/offlineDb'
 import { chromeGoogleLogout, isChromeExtension } from '@/lib/chromeAuth'
 
 interface AuthState {
@@ -28,8 +28,21 @@ export const useAuthStore = create<AuthState>()(
         if (isChromeExtension()) {
           await chromeGoogleLogout()
         }
-        // Clear offline data (IndexedDB)
-        await clearOfflineData().catch(console.error)
+        
+        // Clear ALL local data - IndexedDB
+        await clearAllData().catch(console.error)
+        
+        // Clear localStorage
+        try {
+          localStorage.removeItem('notes-storage')
+        } catch (e) {
+          console.error('[AuthStore] Failed to clear notes-storage:', e)
+        }
+        
+        // Reset notes store state in memory
+        const { useNotesStore } = await import('./notesStore')
+        useNotesStore.getState().resetForNewUser()
+        
         set({ user: null })
       }
     }),

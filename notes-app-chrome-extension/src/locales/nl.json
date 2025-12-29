@@ -11,7 +11,11 @@
       "terms": "Servicevoorwaarden",
       "and": "en",
       "privacy": "Privacybeleid"
-    }
+    },
+    "drivePermissionRequired": "Drive-toestemming vereist",
+    "drivePermissionDenied": "Google Drive-toegang is niet verleend. Log opnieuw in en sta Drive-toegang toe om uw notities te synchroniseren.",
+    "relogin": "Opnieuw inloggen",
+    "continueWithoutSync": "Doorgaan zonder synchronisatie"
   },
   "header": {
     "search": "Zoeken...",
@@ -28,11 +32,22 @@
     "logout": "Uitloggen",
     "logoutDescription": "Afmelden bij account",
     "loggingOut": "Uitloggen...",
+    "logoutConfirmTitle": "Uitloggen?",
+    "logoutWarningNormal": "Je gegevens zijn gesynchroniseerd. Je kunt op elk moment opnieuw inloggen om toegang te krijgen tot je notities.",
+    "logoutWarningUnsynced": "Je hebt niet-gesynchroniseerde wijzigingen. Deze worden geüpload wanneer je opnieuw inlogt op dit apparaat.",
+    "logoutWarningOffline": "Je bent offline met niet-gesynchroniseerde wijzigingen. Deze wijzigingen kunnen verloren gaan als je nu uitlogt.",
+    "unsyncedWarning": "{{count}} niet-gesynchroniseerde wijziging(en)",
+    "allSynced": "Alle wijzigingen gesynchroniseerd",
+    "lastSync": "{{time}}",
+    "noDataToSync": "Geen gegevens om te synchroniseren",
     "modalSize": "Venstergrootte",
     "modalSizeDescription": "Editorgrootte aanpassen",
     "modalSizeDefault": "Standaard",
     "modalSizeLarge": "Groot",
-    "modalSizeXLarge": "Extra groot"
+    "modalSizeXLarge": "Extra groot",
+    "offlineLogoutTitle": "Uitloggen terwijl offline?",
+    "offlineLogoutWarning": "Je bent momenteel offline. Niet-opgeslagen wijzigingen zijn mogelijk niet gesynchroniseerd met Google Drive. Als je nu uitlogt, kun je deze wijzigingen verliezen.",
+    "logoutAnyway": "Toch uitloggen"
   },
   "credits": {
     "title": "AI-credits kopen",
@@ -143,15 +158,19 @@
     "createLink": "Link maken",
     "updateLink": "Bijwerken",
     "realtime": "Live",
-    "realtimeDescription": "Deel kamercode om realtime samen te werken:",
-    "start": "Starten",
+    "realtimeDescription": "Start een live samenwerkingssessie. Anderen kunnen deelnemen met de kamercode.",
+    "realtimeActive": "Live sessie actief ({{count}} verbonden)",
+    "realtimeNote": "U moet eerst de sessie starten voordat u de code deelt. Deelnemers synchroniseren met uw notitie-inhoud.",
+    "shareCodeToInvite": "Deel deze code om anderen uit te nodigen:",
+    "start": "Sessie starten",
+    "stopSharing": "Sessie beëindigen",
     "email": "E-mail",
     "emailDescription": "Delen via Google Drive e-mail:",
     "emailPlaceholder": "E-mail ontvanger...",
     "shareSuccess": "Succesvol gedeeld!",
     "shareButton": "Delen",
     "join": "Deelnemen",
-    "joinDescription": "Voer kamercode in om deel te nemen aan samenwerking:",
+    "joinDescription": "Voer kamercode in om deel te nemen aan een live sessie:",
     "joinPlaceholder": "Voer kamercode in...",
     "joinButton": "Deelnemen",
     "close": "Sluiten",
@@ -181,13 +200,18 @@
     "alreadyInstalled": "Al geïnstalleerd!",
     "alreadyInstalledDescription": "Je gebruikt de app-versie van G-Note.",
     "androidChromeInstructions": "Tik op het menu-icoon (⋮) bovenaan, selecteer dan \"App installeren\" of \"Toevoegen aan startscherm\"",
-    "desktopChromeInstructions": "Klik op het installatie-icoon (⊕) in de adresbalk, of ga naar Menu → App installeren",
+    "desktopChromeInstructions": "Klik op het installatie-icoon (⬇) in de adresbalk, of ga naar Menu → App installeren",
     "iosSafariInstructions": "Tik op de Deel-knop hieronder, dan \"Zet op beginscherm\"",
     "iosChromeInstructions": "Voor de beste ervaring, open in Safari en tik Deel → Zet op beginscherm",
     "androidFirefoxInstructions": "Tik op het menu (⋮) dan \"Installeren\"",
     "androidOtherInstructions": "Tik op het menu dan \"Toevoegen aan startscherm\" of \"Installeren\"",
     "desktopFirefoxInstructions": "Firefox ondersteunt geen PWA-installatie. Probeer Chrome of Edge voor de beste ervaring.",
-    "desktopSafariInstructions": "Klik Archief → Voeg toe aan Dock, of gebruik Chrome/Edge voor volledige PWA-ondersteuning."
+    "desktopSafariInstructions": "Klik Archief → Voeg toe aan Dock, of gebruik Chrome/Edge voor volledige PWA-ondersteuning.",
+    "chromeExtension": "Extensie",
+    "chromeExtensionDescription": "Installeer de Chrome-extensie voor snelle toegang vanuit de browserwerkbalk.",
+    "addToChrome": "Toevoegen aan Chrome",
+    "chromeExtensionInfo": "De extensie werkt met Chrome, Edge, Brave en andere Chromium-gebaseerde browsers.",
+    "new": "Nieuw"
   },
   "packages": {
     "starter": "Starter",
@@ -212,7 +236,8 @@
     "cancel": "Annuleren",
     "rotate": "Draaien",
     "flipH": "Horizontaal spiegelen",
-    "flipV": "Verticaal spiegelen"
+    "flipV": "Verticaal spiegelen",
+    "auto": "Auto"
   },
   "common": {
     "confirm": "Bevestigen",
@@ -317,6 +342,24 @@
     "noResults": "Geen resultaten gevonden",
     "noResultsDescription": "Geen notities komen overeen met uw zoekopdracht"
   },
+  "freeNote": {
+    "freeMode": "Gratis modus",
+    "placeholder": "Begin hier met je notitie...",
+    "titlePlaceholder": "Notitie titel",
+    "untitledNote": "Naamloze notitie",
+    "savePermanently": "Permanent opslaan",
+    "save": "Opslaan",
+    "lastSaved": "Opgeslagen",
+    "localStorageWarning": "Je notitie wordt alleen in deze browser opgeslagen. Het kan verloren gaan als je browsergegevens wist. Klik op 'Permanent opslaan' om het voor altijd te bewaren met een gratis account.",
+    "featureLocked": "Functie vergrendeld",
+    "featureLockedDescription": "\"{{feature}}\" vereist een gratis account. Meld je aan om alle functies te ontgrendelen en je notities permanent op te slaan.",
+    "goToApp": "Gratis account maken",
+    "goToAppShort": "Aanmelden",
+    "reset": "Resetten",
+    "resetTitle": "Notitie resetten?",
+    "resetDescription": "Dit wist alle inhoud en kan niet ongedaan worden gemaakt.",
+    "resetConfirm": "Resetten"
+  },
   "offline": {
     "offline": "Offline",
     "online": "Online",
@@ -336,12 +379,5 @@
     "syncError": "Synchronisatiefout",
     "tapToRetry": "Tik om opnieuw te proberen",
     "loginRequiresNetwork": "Inloggen vereist een internetverbinding"
-  },
-  "webContent": {
-    "title": "Toevoegen aan notitie",
-    "description": "Maak een nieuwe notitie met de geselecteerde inhoud van het web.",
-    "createNote": "Notitie maken",
-    "addToExisting": "Toevoegen aan bestaande notitie",
-    "source": "Bron"
   }
 }

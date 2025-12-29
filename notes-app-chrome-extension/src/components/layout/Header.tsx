@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useDebounce } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
-import { Search, Plus, Moon, Sun, LogOut, RefreshCw, Settings, X, Coins, ChevronRight, ArrowLeft, Maximize2, Trash2, Loader2 } from 'lucide-react'
+import { Search, Plus, Moon, Sun, LogOut, RefreshCw, Settings, X, Coins, ChevronRight, ArrowLeft, Maximize2, Trash2 } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
@@ -12,6 +12,8 @@ import { LanguageSelector, LanguageButton } from '@/components/ui/LanguageSelect
 import { OfflineIndicator } from '@/components/ui/OfflineIndicator'
 import { TrashView } from '@/components/notes/TrashView'
 import { DriveSearchResults } from '@/components/search/DriveSearchResults'
+import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
+import { LogoutConfirmDialog } from '@/components/auth/LogoutConfirmDialog'
 import { cn } from '@/lib/utils'
 
 // Modal size options
@@ -72,6 +74,7 @@ export function Header() {
   const [driveSearchEnabled, setDriveSearchEnabled] = useState(false)
   const [showDriveResults, setShowDriveResults] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   
   // Local search input state + debounce
   const [localSearch, setLocalSearch] = useState('')
@@ -130,6 +133,12 @@ export function Header() {
   }
 
   const handleLogout = async () => {
+    // Show confirmation dialog
+    setShowLogoutConfirm(true)
+  }
+
+  const handleConfirmLogout = async () => {
+    setShowLogoutConfirm(false)
     setIsLoggingOut(true)
     setSettingsOpen(false)
     try {
@@ -175,14 +184,14 @@ export function Header() {
   return (
     <>
       {/* Logout Loading Overlay */}
-      {isLoggingOut && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm">
-          <div className="flex flex-col items-center gap-3">
-            <Loader2 className="w-8 h-8 animate-spin text-neutral-600 dark:text-neutral-400" />
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">{t('settings.loggingOut')}</p>
-          </div>
-        </div>
-      )}
+      <LoadingOverlay isVisible={isLoggingOut} text={t('settings.loggingOut')} />
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutConfirmDialog
+        open={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleConfirmLogout}
+      />
 
       <header className="sticky top-0 z-30 px-4 pt-4 safe-top safe-x">
         <div className="max-w-6xl mx-auto bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg border border-neutral-200 dark:border-neutral-800 rounded-[16px] px-4 py-3">

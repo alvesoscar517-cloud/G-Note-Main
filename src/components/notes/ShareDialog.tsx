@@ -65,10 +65,10 @@ export function ShareDialog({
   }
 
   const handleStartRealtime = () => {
-    // Generate new roomId when starting
+    // Generate new roomId when starting - don't close dialog, show the code
     const newRoomId = generateRoomId()
     onCreateRoom(newRoomId)
-    onClose()
+    // Don't close - user needs to see and share the code
   }
 
   const handleJoinRoom = () => {
@@ -324,7 +324,7 @@ export function ShareDialog({
         )}
         
         {mode === 'realtime' && isInRealtimeSession && onStopSharing && (
-          <Button onClick={() => { onStopSharing(); onClose(); }} variant="destructive">
+          <Button onClick={() => { onStopSharing(); handleClose(); }} variant="destructive">
             {t('share.stopSharing')}
           </Button>
         )}

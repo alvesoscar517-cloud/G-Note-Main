@@ -11,7 +11,11 @@
       "terms": "Términos de servicio",
       "and": "y",
       "privacy": "Política de privacidad"
-    }
+    },
+    "drivePermissionRequired": "Se requiere permiso de Drive",
+    "drivePermissionDenied": "No se otorgó acceso a Google Drive. Por favor, inicia sesión de nuevo y permite el acceso a Drive para sincronizar tus notas.",
+    "relogin": "Iniciar sesión de nuevo",
+    "continueWithoutSync": "Continuar sin sincronización"
   },
   "header": {
     "search": "Buscar...",
@@ -28,6 +32,14 @@
     "logout": "Cerrar sesión",
     "logoutDescription": "Salir de la cuenta",
     "loggingOut": "Cerrando sesión...",
+    "logoutConfirmTitle": "¿Cerrar sesión?",
+    "logoutWarningNormal": "Tus datos están sincronizados. Puedes iniciar sesión de nuevo en cualquier momento para acceder a tus notas.",
+    "logoutWarningUnsynced": "Tienes cambios sin sincronizar. Se subirán cuando inicies sesión de nuevo en este dispositivo.",
+    "logoutWarningOffline": "Estás sin conexión con cambios sin sincronizar. Estos cambios pueden perderse si cierras sesión ahora.",
+    "unsyncedWarning": "{{count}} cambio(s) sin sincronizar",
+    "allSynced": "Todos los cambios sincronizados",
+    "lastSync": "{{time}}",
+    "noDataToSync": "No hay datos para sincronizar",
     "modalSize": "Tamaño de ventana",
     "modalSizeDescription": "Ajustar tamaño del editor",
     "modalSizeDefault": "Predeterminado",
@@ -326,6 +338,24 @@
     "searchPlaceholder": "Buscar en la papelera...",
     "noResults": "No se encontraron resultados",
     "noResultsDescription": "Ninguna nota coincide con tu búsqueda"
+  },
+  "freeNote": {
+    "freeMode": "Modo gratuito",
+    "placeholder": "Empieza a escribir tu nota aquí...",
+    "titlePlaceholder": "Título de la nota",
+    "untitledNote": "Nota sin título",
+    "savePermanently": "Guardar permanentemente",
+    "save": "Guardar",
+    "lastSaved": "Guardado",
+    "localStorageWarning": "Tu nota se guarda solo en este navegador. Puede perderse si borras los datos del navegador. Haz clic en 'Guardar permanentemente' para conservarla con una cuenta gratuita.",
+    "featureLocked": "Función bloqueada",
+    "featureLockedDescription": "\"{{feature}}\" requiere una cuenta gratuita. Regístrate para desbloquear todas las funciones y guardar tus notas permanentemente.",
+    "goToApp": "Crear cuenta gratuita",
+    "goToAppShort": "Registrarse",
+    "reset": "Restablecer",
+    "resetTitle": "¿Restablecer nota?",
+    "resetDescription": "Esto borrará todo el contenido y no se puede deshacer.",
+    "resetConfirm": "Restablecer"
   },
   "offline": {
     "offline": "Sin conexión",

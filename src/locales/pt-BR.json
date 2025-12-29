@@ -11,7 +11,11 @@
       "terms": "Termos de Serviço",
       "and": "e",
       "privacy": "Política de Privacidade"
-    }
+    },
+    "drivePermissionRequired": "Permissão do Drive necessária",
+    "drivePermissionDenied": "O acesso ao Google Drive não foi concedido. Por favor, faça login novamente e permita o acesso ao Drive para sincronizar suas notas.",
+    "relogin": "Entrar novamente",
+    "continueWithoutSync": "Continuar sem sincronização"
   },
   "header": {
     "search": "Pesquisar...",
@@ -28,6 +32,14 @@
     "logout": "Sair",
     "logoutDescription": "Sair da conta",
     "loggingOut": "Saindo...",
+    "logoutConfirmTitle": "Sair?",
+    "logoutWarningNormal": "Seus dados estão sincronizados. Você pode entrar novamente a qualquer momento para acessar suas notas.",
+    "logoutWarningUnsynced": "Você tem alterações não sincronizadas. Elas serão enviadas quando você entrar novamente neste dispositivo.",
+    "logoutWarningOffline": "Você está offline com alterações não sincronizadas. Essas alterações podem ser perdidas se você sair agora.",
+    "unsyncedWarning": "{{count}} alteração(ões) não sincronizada(s)",
+    "allSynced": "Todas as alterações sincronizadas",
+    "lastSync": "{{time}}",
+    "noDataToSync": "Nenhum dado para sincronizar",
     "modalSize": "Tamanho da janela",
     "modalSizeDescription": "Ajustar tamanho do editor",
     "modalSizeDefault": "Padrão",
@@ -326,6 +338,24 @@
     "searchPlaceholder": "Pesquisar na lixeira...",
     "noResults": "Nenhum resultado encontrado",
     "noResultsDescription": "Nenhuma nota corresponde à sua pesquisa"
+  },
+  "freeNote": {
+    "freeMode": "Modo gratuito",
+    "placeholder": "Comece a escrever sua nota aqui...",
+    "titlePlaceholder": "Título da nota",
+    "untitledNote": "Nota sem título",
+    "savePermanently": "Salvar permanentemente",
+    "save": "Salvar",
+    "lastSaved": "Salvo",
+    "localStorageWarning": "Sua nota é salva apenas neste navegador. Pode ser perdida se você limpar os dados do navegador. Clique em 'Salvar permanentemente' para mantê-la com uma conta gratuita.",
+    "featureLocked": "Recurso bloqueado",
+    "featureLockedDescription": "\"{{feature}}\" requer uma conta gratuita. Cadastre-se para desbloquear todos os recursos e salvar suas notas permanentemente.",
+    "goToApp": "Criar conta gratuita",
+    "goToAppShort": "Cadastrar",
+    "reset": "Redefinir",
+    "resetTitle": "Redefinir nota?",
+    "resetDescription": "Isso apagará todo o conteúdo e não pode ser desfeito.",
+    "resetConfirm": "Redefinir"
   },
   "offline": {
     "offline": "Offline",

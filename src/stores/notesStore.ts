@@ -23,6 +23,9 @@ interface NotesState {
   selectedNoteId: string | null
   isModalOpen: boolean
   isSyncing: boolean
+  isInitialSync: boolean // First sync after login - show skeleton
+  isCheckingDriveData: boolean // Checking if Drive has data
+  driveHasData: boolean | null // null = unknown, true/false = checked
   lastSyncTime: number | null
   syncError: string | null
   isOfflineReady: boolean
@@ -39,9 +42,10 @@ interface NotesState {
   
   // Sync actions
   syncWithDrive: (accessToken: string) => Promise<void>
+  checkDriveHasData: (accessToken: string) => Promise<boolean>
   loadSharedNotes: (accessToken: string) => Promise<void>
   markAllSynced: () => void
-  initOfflineStorage: (userId?: string) => Promise<void>
+  initOfflineStorage: () => Promise<void>
   saveToOfflineStorage: () => Promise<void>
   resetForNewUser: () => void
 
@@ -96,6 +100,9 @@ export const useNotesStore = create<NotesState>()(
       selectedNoteId: null,
       isModalOpen: false,
       isSyncing: false,
+      isInitialSync: true, // Start as true, set to false after first sync
+      isCheckingDriveData: false,
+      driveHasData: null, // null = not checked yet
       lastSyncTime: null,
       syncError: null,
       isOfflineReady: false,
@@ -119,6 +126,9 @@ export const useNotesStore = create<NotesState>()(
           selectedNoteId: null,
           isModalOpen: false,
           isSyncing: false,
+          isInitialSync: true,
+          isCheckingDriveData: false,
+          driveHasData: null,
           lastSyncTime: null,
           syncError: null,
           isOfflineReady: false
@@ -127,7 +137,7 @@ export const useNotesStore = create<NotesState>()(
       },
 
       // Initialize offline storage - IndexedDB is source of truth
-      initOfflineStorage: async (userId?: string) => {
+      initOfflineStorage: async () => {
         try {
           if (!offlineDb.isIndexedDBAvailable()) {
             console.log('[NotesStore] IndexedDB not available')
@@ -135,68 +145,19 @@ export const useNotesStore = create<NotesState>()(
             return
           }
 
-          // Check if user has changed and clear data if needed
-          if (userId) {
-            const userChanged = await offlineDb.handleUserChange(userId)
-            if (userChanged) {
-              // User changed - reset store state and start fresh
-              get().resetForNewUser()
-              set({ isOfflineReady: true })
-              console.log('[NotesStore] User changed, starting with fresh state')
-              return
-            }
-          }
-
           const [offlineNotes, offlineCollections] = await Promise.all([
             offlineDb.getAllNotes(),
             offlineDb.getAllCollections()
           ])
           
-          const { notes: currentNotes, collections: currentCollections } = get()
-          
-          // Merge notes - IndexedDB takes priority for offline data
-          const mergedNotesMap = new Map<string, Note>()
-          currentNotes.forEach(n => mergedNotesMap.set(n.id, n))
-          offlineNotes.forEach(offlineNote => {
-            const existing = mergedNotesMap.get(offlineNote.id)
-            // Prefer newer version or higher version number
-            if (!existing || 
-                (offlineNote.version || 1) > (existing.version || 1) ||
-                offlineNote.updatedAt > existing.updatedAt) {
-              mergedNotesMap.set(offlineNote.id, offlineNote)
-            }
-          })
-          
-          // Merge collections
-          const mergedCollectionsMap = new Map<string, Collection>()
-          currentCollections.forEach(c => mergedCollectionsMap.set(c.id, c))
-          offlineCollections.forEach(offlineCollection => {
-            const existing = mergedCollectionsMap.get(offlineCollection.id)
-            if (!existing ||
-                (offlineCollection.version || 1) > (existing.version || 1) ||
-                offlineCollection.updatedAt > existing.updatedAt) {
-              mergedCollectionsMap.set(offlineCollection.id, offlineCollection)
-            }
-          })
-          
-          const mergedNotes = Array.from(mergedNotesMap.values())
-          const mergedCollections = Array.from(mergedCollectionsMap.values())
-          
+          // Simply load from IndexedDB - no merge needed since logout clears everything
           set({ 
-            notes: mergedNotes, 
-            collections: mergedCollections,
+            notes: offlineNotes, 
+            collections: offlineCollections,
             isOfflineReady: true 
           })
           
           console.log(`[NotesStore] Loaded ${offlineNotes.length} notes, ${offlineCollections.length} collections from IndexedDB`)
-          
-          // Save merged state back to IndexedDB
-          if (mergedNotes.length > 0) {
-            await offlineDb.saveNotes(mergedNotes)
-          }
-          if (mergedCollections.length > 0) {
-            await offlineDb.saveCollections(mergedCollections)
-          }
         } catch (error) {
           console.error('[NotesStore] Failed to init offline storage:', error)
           set({ isOfflineReady: true })
@@ -590,6 +551,43 @@ export const useNotesStore = create<NotesState>()(
       setSelectedNote: (selectedNoteId) => set({ selectedNoteId }),
       setModalOpen: (isModalOpen) => set({ isModalOpen }),
 
+      // Check if Drive has data (lightweight check before full sync)
+      checkDriveHasData: async (accessToken: string) => {
+        const { isCheckingDriveData, notes } = get()
+        
+        // Skip if already checking or if we have local notes
+        if (isCheckingDriveData || notes.length > 0) {
+          return notes.length > 0
+        }
+        
+        const isOnline = useNetworkStore.getState().isOnline
+        if (!isOnline) {
+          return false
+        }
+
+        set({ isCheckingDriveData: true })
+        
+        try {
+          driveSync.setAccessToken(accessToken)
+          const result = await driveSync.checkHasData()
+          
+          set({ 
+            driveHasData: result.hasData,
+            isCheckingDriveData: false
+          })
+          
+          console.log(`[NotesStore] Drive has data: ${result.hasData}, noteCount: ${result.noteCount}`)
+          return result.hasData
+        } catch (error) {
+          console.error('[NotesStore] checkDriveHasData error:', error)
+          set({ 
+            driveHasData: false,
+            isCheckingDriveData: false
+          })
+          return false
+        }
+      },
+
       syncWithDrive: async (accessToken: string) => {
         const { notes, collections, isSyncing, deletedNoteIds, deletedCollectionIds } = get()
         if (isSyncing) return
@@ -666,7 +664,8 @@ export const useNotesStore = create<NotesState>()(
               notes: mergedNotes,
               collections: mergedCollections,
               lastSyncTime: Date.now(),
-              isSyncing: false 
+              isSyncing: false,
+              isInitialSync: false // First sync completed
             }
           })
           
@@ -684,10 +683,25 @@ export const useNotesStore = create<NotesState>()(
           const isAuthError = errorMessage.includes('401') || 
                               errorMessage.includes('authentication') ||
                               errorMessage.includes('credential')
+          const isPermissionError = errorMessage === 'DRIVE_PERMISSION_DENIED' ||
+                                    errorMessage.includes('403') ||
+                                    errorMessage.includes('insufficient')
+          
+          // Handle permission error - user didn't grant Drive access
+          if (isPermissionError) {
+            set({ 
+              syncError: 'DRIVE_PERMISSION_DENIED',
+              isSyncing: false,
+              isInitialSync: false
+            })
+            // Don't logout, just show error - user can re-login with correct permissions
+            return
+          }
           
           set({ 
             syncError: isAuthError ? 'Refreshing session...' : errorMessage,
             isSyncing: false,
+            isInitialSync: false, // Even on error, mark initial sync as done
             notes: get().notes.map(n => ({ ...n, syncStatus: 'error' as const }))
           })
           

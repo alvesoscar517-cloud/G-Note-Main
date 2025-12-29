@@ -11,7 +11,11 @@
       "terms": "서비스 약관",
       "and": "및",
       "privacy": "개인정보 처리방침"
-    }
+    },
+    "drivePermissionRequired": "Drive 권한 필요",
+    "drivePermissionDenied": "Google Drive 접근이 허용되지 않았습니다. 메모를 동기화하려면 다시 로그인하고 Drive 접근을 허용해 주세요.",
+    "relogin": "다시 로그인",
+    "continueWithoutSync": "동기화 없이 계속"
   },
   "header": {
     "search": "검색...",
@@ -28,6 +32,14 @@
     "logout": "로그아웃",
     "logoutDescription": "계정에서 로그아웃",
     "loggingOut": "로그아웃 중...",
+    "logoutConfirmTitle": "로그아웃하시겠습니까?",
+    "logoutWarningNormal": "데이터가 동기화되었습니다. 언제든지 다시 로그인하여 메모에 액세스할 수 있습니다.",
+    "logoutWarningUnsynced": "동기화되지 않은 변경 사항이 있습니다. 이 기기에서 다시 로그인하면 업로드됩니다.",
+    "logoutWarningOffline": "오프라인 상태에서 동기화되지 않은 변경 사항이 있습니다. 지금 로그아웃하면 이러한 변경 사항이 손실될 수 있습니다.",
+    "unsyncedWarning": "{{count}}개의 동기화되지 않은 변경 사항",
+    "allSynced": "모든 변경 사항이 동기화됨",
+    "lastSync": "{{time}}",
+    "noDataToSync": "동기화할 데이터 없음",
     "modalSize": "창 크기",
     "modalSizeDescription": "편집기 크기 조정",
     "modalSizeDefault": "기본",
@@ -326,6 +338,24 @@
     "searchPlaceholder": "휴지통에서 검색...",
     "noResults": "결과 없음",
     "noResultsDescription": "검색과 일치하는 메모가 없습니다"
+  },
+  "freeNote": {
+    "freeMode": "무료 모드",
+    "placeholder": "여기에 메모를 입력하세요...",
+    "titlePlaceholder": "메모 제목",
+    "untitledNote": "제목 없는 메모",
+    "savePermanently": "영구 저장",
+    "save": "저장",
+    "lastSaved": "저장됨",
+    "localStorageWarning": "메모는 이 브라우저에만 저장됩니다. 브라우저 데이터를 지우면 손실될 수 있습니다. '영구 저장'을 클릭하여 무료 계정으로 영구 보관하세요.",
+    "featureLocked": "기능 잠김",
+    "featureLockedDescription": "\"{{feature}}\"에는 무료 계정이 필요합니다. 가입하여 모든 기능을 잠금 해제하고 메모를 영구 저장하세요.",
+    "goToApp": "무료 계정 만들기",
+    "goToAppShort": "가입",
+    "reset": "초기화",
+    "resetTitle": "메모를 초기화하시겠습니까?",
+    "resetDescription": "모든 내용이 삭제되며 되돌릴 수 없습니다.",
+    "resetConfirm": "초기화"
   },
   "offline": {
     "offline": "오프라인",

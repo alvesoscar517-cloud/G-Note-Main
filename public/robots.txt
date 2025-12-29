@@ -13,6 +13,7 @@ Disallow: /callback
 # Allow important pages
 Allow: /privacy
 Allow: /terms
+Allow: /free-note
 
 # Sitemap location
 Sitemap: https://g-note.app/sitemap.xml

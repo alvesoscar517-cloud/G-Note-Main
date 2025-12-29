@@ -1601,8 +1601,36 @@ function ToolbarButton({
   tooltip?: string
   className?: string
 }) {
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  
+  // Use non-passive touch event listener to properly prevent default
+  // This fixes "Unable to preventDefault inside passive event listener" error
+  useEffect(() => {
+    const button = buttonRef.current
+    if (!button) return
+    
+    const preventFocusLoss = (e: TouchEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    
+    // Add non-passive listener to allow preventDefault
+    button.addEventListener('touchstart', preventFocusLoss, { passive: false })
+    
+    return () => {
+      button.removeEventListener('touchstart', preventFocusLoss)
+    }
+  }, [])
+
+  // Prevent keyboard from triggering when clicking toolbar buttons on mobile
+  const preventMouseFocusLoss = (e: React.MouseEvent) => {
+    e.preventDefault()
+  }
+
   const button = (
     <button
+      ref={buttonRef}
+      onMouseDown={preventMouseFocusLoss}
       onClick={onClick}
       disabled={disabled}
       className={cn(

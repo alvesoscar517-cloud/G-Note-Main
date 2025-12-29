@@ -85,8 +85,8 @@
     
     <!-- Viewport & PWA -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+    <!-- Single theme-color tag - will be updated dynamically by JS based on user's theme preference -->
+    <meta name="theme-color" content="#0a0a0a" />
     
     <!-- iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -418,13 +418,26 @@
           } else {
             document.documentElement.style.backgroundColor = '#fafafa';
           }
+          
+          // Update theme-color meta tag for Android status bar
+          var themeColor = isDark ? '#0a0a0a' : '#fafafa';
+          var metaTheme = document.querySelector('meta[name="theme-color"]');
+          if (metaTheme) {
+            metaTheme.setAttribute('content', themeColor);
+          }
         } catch (e) {
           // Fallback to system preference
-          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          var sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (sysDark) {
             document.documentElement.classList.add('dark');
             document.documentElement.style.backgroundColor = '#0a0a0a';
           } else {
             document.documentElement.style.backgroundColor = '#fafafa';
+          }
+          // Update theme-color for fallback
+          var metaFallback = document.querySelector('meta[name="theme-color"]');
+          if (metaFallback) {
+            metaFallback.setAttribute('content', sysDark ? '#0a0a0a' : '#fafafa');
           }
         }
       })();

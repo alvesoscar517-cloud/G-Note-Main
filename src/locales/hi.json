@@ -11,7 +11,11 @@
       "terms": "सेवा की शर्तें",
       "and": "और",
       "privacy": "गोपनीयता नीति"
-    }
+    },
+    "drivePermissionRequired": "Drive अनुमति आवश्यक",
+    "drivePermissionDenied": "Google Drive एक्सेस नहीं दी गई। कृपया फिर से साइन इन करें और अपने नोट्स सिंक करने के लिए Drive एक्सेस की अनुमति दें।",
+    "relogin": "फिर से साइन इन करें",
+    "continueWithoutSync": "सिंक के बिना जारी रखें"
   },
   "header": {
     "search": "खोजें...",
@@ -28,11 +32,22 @@
     "logout": "लॉग आउट",
     "logoutDescription": "खाते से साइन आउट करें",
     "loggingOut": "साइन आउट हो रहा है...",
+    "logoutConfirmTitle": "साइन आउट करें?",
+    "logoutWarningNormal": "आपका डेटा सिंक है। आप अपने नोट्स तक पहुंचने के लिए कभी भी फिर से साइन इन कर सकते हैं।",
+    "logoutWarningUnsynced": "आपके पास सिंक नहीं किए गए बदलाव हैं। जब आप इस डिवाइस पर फिर से साइन इन करेंगे तो वे अपलोड हो जाएंगे।",
+    "logoutWarningOffline": "आप सिंक नहीं किए गए बदलावों के साथ ऑफ़लाइन हैं। यदि आप अभी साइन आउट करते हैं तो ये बदलाव खो सकते हैं।",
+    "unsyncedWarning": "{{count}} सिंक नहीं किए गए बदलाव",
+    "allSynced": "सभी बदलाव सिंक हो गए",
+    "lastSync": "{{time}}",
+    "noDataToSync": "सिंक करने के लिए कोई डेटा नहीं",
     "modalSize": "विंडो का आकार",
     "modalSizeDescription": "एडिटर का आकार समायोजित करें",
     "modalSizeDefault": "डिफ़ॉल्ट",
     "modalSizeLarge": "बड़ा",
-    "modalSizeXLarge": "बहुत बड़ा"
+    "modalSizeXLarge": "बहुत बड़ा",
+    "offlineLogoutTitle": "ऑफ़लाइन होने पर लॉग आउट करें?",
+    "offlineLogoutWarning": "आप वर्तमान में ऑफ़लाइन हैं। सहेजे नहीं गए परिवर्तन Google Drive के साथ सिंक नहीं हुए हो सकते हैं। यदि आप अभी लॉग आउट करते हैं, तो आप इन परिवर्तनों को खो सकते हैं।",
+    "logoutAnyway": "फिर भी लॉग आउट करें"
   },
   "credits": {
     "title": "AI क्रेडिट खरीदें",
@@ -326,6 +341,24 @@
     "searchPlaceholder": "कचरे में खोजें...",
     "noResults": "कोई परिणाम नहीं मिला",
     "noResultsDescription": "आपकी खोज से कोई नोट मेल नहीं खाता"
+  },
+  "freeNote": {
+    "freeMode": "मुफ्त मोड",
+    "placeholder": "यहाँ अपना नोट लिखना शुरू करें...",
+    "titlePlaceholder": "नोट का शीर्षक",
+    "untitledNote": "बिना शीर्षक वाला नोट",
+    "savePermanently": "स्थायी रूप से सहेजें",
+    "save": "सहेजें",
+    "lastSaved": "सहेजा गया",
+    "localStorageWarning": "आपका नोट केवल इस ब्राउज़र में सहेजा गया है। ब्राउज़र डेटा साफ़ करने पर यह खो सकता है। मुफ्त खाते के साथ इसे हमेशा के लिए रखने के लिए 'स्थायी रूप से सहेजें' पर क्लिक करें।",
+    "featureLocked": "सुविधा लॉक है",
+    "featureLockedDescription": "\"{{feature}}\" के लिए मुफ्त खाता आवश्यक है। सभी सुविधाओं को अनलॉक करने और अपने नोट्स को स्थायी रूप से सहेजने के लिए साइन अप करें।",
+    "goToApp": "मुफ्त खाता बनाएं",
+    "goToAppShort": "साइन अप",
+    "reset": "रीसेट",
+    "resetTitle": "नोट रीसेट करें?",
+    "resetDescription": "यह सभी सामग्री को मिटा देगा और पूर्ववत नहीं किया जा सकता।",
+    "resetConfirm": "रीसेट"
   },
   "offline": {
     "offline": "ऑफ़लाइन",

@@ -11,7 +11,11 @@
       "terms": "Conditions d'utilisation",
       "and": "et",
       "privacy": "Politique de confidentialité"
-    }
+    },
+    "drivePermissionRequired": "Autorisation Drive requise",
+    "drivePermissionDenied": "L'accès à Google Drive n'a pas été accordé. Veuillez vous reconnecter et autoriser l'accès à Drive pour synchroniser vos notes.",
+    "relogin": "Se reconnecter",
+    "continueWithoutSync": "Continuer sans synchronisation"
   },
   "header": {
     "search": "Rechercher...",
@@ -28,6 +32,14 @@
     "logout": "Déconnexion",
     "logoutDescription": "Se déconnecter du compte",
     "loggingOut": "Déconnexion...",
+    "logoutConfirmTitle": "Se déconnecter ?",
+    "logoutWarningNormal": "Vos données sont synchronisées. Vous pouvez vous reconnecter à tout moment pour accéder à vos notes.",
+    "logoutWarningUnsynced": "Vous avez des modifications non synchronisées. Elles seront téléchargées lorsque vous vous reconnecterez sur cet appareil.",
+    "logoutWarningOffline": "Vous êtes hors ligne avec des modifications non synchronisées. Ces modifications peuvent être perdues si vous vous déconnectez maintenant.",
+    "unsyncedWarning": "{{count}} modification(s) non synchronisée(s)",
+    "allSynced": "Toutes les modifications synchronisées",
+    "lastSync": "{{time}}",
+    "noDataToSync": "Aucune donnée à synchroniser",
     "modalSize": "Taille de la fenêtre",
     "modalSizeDescription": "Ajuster la taille de l'éditeur",
     "modalSizeDefault": "Par défaut",
@@ -143,15 +155,19 @@
     "createLink": "Créer le lien",
     "updateLink": "Mettre à jour",
     "realtime": "En direct",
-    "realtimeDescription": "Partager le code de salle pour collaborer en temps réel :",
-    "start": "Démarrer",
+    "realtimeDescription": "Démarrer une session de collaboration en direct. D'autres peuvent rejoindre avec le code de salle.",
+    "realtimeActive": "Session en direct active ({{count}} connectés)",
+    "realtimeNote": "Vous devez d'abord démarrer la session avant de partager le code. Ceux qui rejoignent se synchroniseront avec le contenu de votre note.",
+    "shareCodeToInvite": "Partagez ce code pour inviter d'autres personnes :",
+    "start": "Démarrer la session",
+    "stopSharing": "Terminer la session",
     "email": "E-mail",
     "emailDescription": "Partager par e-mail via Google Drive :",
     "emailPlaceholder": "E-mail du destinataire...",
     "shareSuccess": "Partagé avec succès !",
     "shareButton": "Partager",
     "join": "Rejoindre",
-    "joinDescription": "Entrer le code de salle pour rejoindre la collaboration :",
+    "joinDescription": "Entrer le code de salle pour rejoindre une session en direct :",
     "joinPlaceholder": "Entrer le code de salle...",
     "joinButton": "Rejoindre",
     "close": "Fermer",
@@ -181,13 +197,18 @@
     "alreadyInstalled": "Déjà installé !",
     "alreadyInstalledDescription": "Vous utilisez la version app de G-Note.",
     "androidChromeInstructions": "Appuyez sur l'icône menu (⋮) en haut, puis sélectionnez \"Installer l'application\" ou \"Ajouter à l'écran d'accueil\"",
-    "desktopChromeInstructions": "Cliquez sur l'icône d'installation (⊕) dans la barre d'adresse, ou allez dans Menu → Installer l'application",
+    "desktopChromeInstructions": "Cliquez sur l'icône d'installation (⬇) dans la barre d'adresse, ou allez dans Menu → Installer l'application",
     "iosSafariInstructions": "Appuyez sur le bouton Partager ci-dessous, puis \"Sur l'écran d'accueil\"",
     "iosChromeInstructions": "Pour la meilleure expérience, ouvrez dans Safari et appuyez Partager → Sur l'écran d'accueil",
     "androidFirefoxInstructions": "Appuyez sur le menu (⋮) puis \"Installer\"",
     "androidOtherInstructions": "Appuyez sur le menu puis \"Ajouter à l'écran d'accueil\" ou \"Installer\"",
     "desktopFirefoxInstructions": "Firefox ne prend pas en charge l'installation PWA. Essayez Chrome ou Edge pour la meilleure expérience.",
-    "desktopSafariInstructions": "Cliquez sur Fichier → Ajouter au Dock, ou utilisez Chrome/Edge pour le support PWA complet."
+    "desktopSafariInstructions": "Cliquez sur Fichier → Ajouter au Dock, ou utilisez Chrome/Edge pour le support PWA complet.",
+    "chromeExtension": "Extension",
+    "chromeExtensionDescription": "Installez l'extension Chrome pour un accès rapide depuis la barre d'outils du navigateur.",
+    "addToChrome": "Ajouter à Chrome",
+    "chromeExtensionInfo": "L'extension fonctionne avec Chrome, Edge, Brave et d'autres navigateurs basés sur Chromium.",
+    "new": "Nouveau"
   },
   "packages": {
     "starter": "Starter",
@@ -212,7 +233,8 @@
     "cancel": "Annuler",
     "rotate": "Pivoter",
     "flipH": "Retourner H",
-    "flipV": "Retourner V"
+    "flipV": "Retourner V",
+    "auto": "Auto"
   },
   "common": {
     "confirm": "Confirmer",
@@ -317,6 +339,24 @@
     "noResults": "Aucun résultat trouvé",
     "noResultsDescription": "Aucune note ne correspond à votre recherche"
   },
+  "freeNote": {
+    "freeMode": "Mode gratuit",
+    "placeholder": "Commencez à écrire votre note ici...",
+    "titlePlaceholder": "Titre de la note",
+    "untitledNote": "Note sans titre",
+    "savePermanently": "Sauvegarder définitivement",
+    "save": "Sauvegarder",
+    "lastSaved": "Sauvegardé",
+    "localStorageWarning": "Votre note est enregistrée uniquement dans ce navigateur. Elle peut être perdue si vous effacez les données du navigateur. Cliquez sur 'Sauvegarder définitivement' pour la conserver avec un compte gratuit.",
+    "featureLocked": "Fonctionnalité verrouillée",
+    "featureLockedDescription": "\"{{feature}}\" nécessite un compte gratuit. Inscrivez-vous pour débloquer toutes les fonctionnalités et sauvegarder vos notes définitivement.",
+    "goToApp": "Créer un compte gratuit",
+    "goToAppShort": "S'inscrire",
+    "reset": "Réinitialiser",
+    "resetTitle": "Réinitialiser la note ?",
+    "resetDescription": "Cela effacera tout le contenu et ne peut pas être annulé.",
+    "resetConfirm": "Réinitialiser"
+  },
   "offline": {
     "offline": "Hors ligne",
     "online": "En ligne",
@@ -336,12 +376,5 @@
     "syncError": "Erreur de synchronisation",
     "tapToRetry": "Appuyez pour réessayer",
     "loginRequiresNetwork": "La connexion nécessite une connexion Internet"
-  },
-  "webContent": {
-    "title": "Ajouter à la note",
-    "description": "Créez une nouvelle note avec le contenu sélectionné sur le web.",
-    "createNote": "Créer une note",
-    "addToExisting": "Ajouter à une note existante",
-    "source": "Source"
   }
 }

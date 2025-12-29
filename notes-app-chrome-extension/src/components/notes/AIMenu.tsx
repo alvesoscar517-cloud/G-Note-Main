@@ -156,94 +156,52 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
             <MenuItem icon={MessageCircleQuestion} label={t('ai.ask')} onClick={() => handleAction('ask')} />
           </div>
 
-          {/* Language submenu - inline on mobile, side popup on desktop */}
+          {/* Language submenu - inline replacement for all screen sizes */}
           {showLanguages && (
-            <>
-              {/* Mobile: inline replacement */}
-              <div className="sm:hidden w-[200px] flex flex-col overflow-hidden">
-                {/* Back button */}
-                <button
-                  onClick={() => setShowLanguages(false)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg mb-1"
-                >
-                  <span>‹</span>
-                  {t('ai.translate')}
-                </button>
-                
-                {/* Search input */}
-                <div className="p-2 flex-shrink-0">
-                  <div className="flex items-center gap-2 px-2 py-1.5 bg-neutral-100 dark:bg-neutral-700 rounded-lg">
-                    <Search className="w-3.5 h-3.5 text-neutral-400" />
-                    <input
-                      type="text"
-                      value={langSearch}
-                      onChange={(e) => setLangSearch(e.target.value)}
-                      placeholder={t('ai.searchLanguage')}
-                      className="flex-1 bg-transparent border-0 outline-none text-sm text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-400"
-                      autoFocus
-                    />
-                  </div>
-                </div>
-                
-                {/* Language list */}
-                <div className="max-h-[200px] overflow-y-auto p-1 pt-0">
-                  {filteredLanguages.length > 0 ? (
-                    filteredLanguages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => handleTranslate(lang.name)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
-                      >
-                        {lang.name}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-3 py-2 text-sm text-neutral-400">
-                      {t('ai.notFound')}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Desktop: side popup */}
-              <div 
-                className="hidden sm:flex absolute left-full top-0 ml-2 w-[200px] h-full bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 animate-in fade-in zoom-in-95 duration-200 flex-col overflow-hidden"
+            <div className="w-[200px] flex flex-col overflow-hidden">
+              {/* Back button */}
+              <button
+                onClick={() => setShowLanguages(false)}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg mb-1"
               >
-                {/* Search input */}
-                <div className="p-2 flex-shrink-0">
-                  <div className="flex items-center gap-2 px-2 py-1.5 bg-neutral-100 dark:bg-neutral-700 rounded-lg">
-                    <Search className="w-3.5 h-3.5 text-neutral-400" />
-                    <input
-                      type="text"
-                      value={langSearch}
-                      onChange={(e) => setLangSearch(e.target.value)}
-                      placeholder={t('ai.searchLanguage')}
-                      className="flex-1 bg-transparent border-0 outline-none text-sm text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-400"
-                      autoFocus
-                    />
-                  </div>
-                </div>
-                
-                {/* Language list */}
-                <div className="flex-1 overflow-y-auto p-1 pt-0">
-                  {filteredLanguages.length > 0 ? (
-                    filteredLanguages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => handleTranslate(lang.name)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
-                      >
-                        {lang.name}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-3 py-2 text-sm text-neutral-400">
-                      {t('ai.notFound')}
-                    </div>
-                  )}
+                <span>‹</span>
+                {t('ai.translate')}
+              </button>
+              
+              {/* Search input */}
+              <div className="p-2 flex-shrink-0">
+                <div className="flex items-center gap-2 px-2 py-1.5 bg-neutral-100 dark:bg-neutral-700 rounded-lg">
+                  <Search className="w-3.5 h-3.5 text-neutral-400" />
+                  <input
+                    type="text"
+                    value={langSearch}
+                    onChange={(e) => setLangSearch(e.target.value)}
+                    placeholder={t('ai.searchLanguage')}
+                    className="flex-1 bg-transparent border-0 outline-none text-sm text-neutral-700 dark:text-neutral-300 placeholder:text-neutral-400"
+                    autoFocus
+                  />
                 </div>
               </div>
-            </>
+              
+              {/* Language list */}
+              <div className="max-h-[200px] overflow-y-auto p-1 pt-0">
+                {filteredLanguages.length > 0 ? (
+                  filteredLanguages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleTranslate(lang.name)}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+                    >
+                      {lang.name}
+                    </button>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-sm text-neutral-400">
+                    {t('ai.notFound')}
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </Popover.Content>
       </Popover.Portal>

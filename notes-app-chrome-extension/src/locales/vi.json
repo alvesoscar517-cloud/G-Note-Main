@@ -11,7 +11,11 @@
       "terms": "Điều khoản dịch vụ",
       "and": "và",
       "privacy": "Chính sách bảo mật"
-    }
+    },
+    "drivePermissionRequired": "Cần quyền truy cập Drive",
+    "drivePermissionDenied": "Quyền truy cập Google Drive chưa được cấp. Vui lòng đăng nhập lại và cho phép truy cập Drive để đồng bộ ghi chú.",
+    "relogin": "Đăng nhập lại",
+    "continueWithoutSync": "Tiếp tục không đồng bộ"
   },
   "header": {
     "search": "Tìm kiếm...",
@@ -28,6 +32,14 @@
     "logout": "Đăng xuất",
     "logoutDescription": "Thoát khỏi tài khoản",
     "loggingOut": "Đang đăng xuất...",
+    "logoutConfirmTitle": "Đăng xuất?",
+    "logoutWarningNormal": "Dữ liệu của bạn đã được đồng bộ. Bạn có thể đăng nhập lại bất cứ lúc nào để truy cập ghi chú.",
+    "logoutWarningUnsynced": "Bạn có thay đổi chưa đồng bộ. Chúng sẽ được tải lên khi bạn đăng nhập lại trên thiết bị này.",
+    "logoutWarningOffline": "Bạn đang ngoại tuyến với các thay đổi chưa đồng bộ. Những thay đổi này có thể bị mất nếu bạn đăng xuất ngay bây giờ.",
+    "unsyncedWarning": "{{count}} thay đổi chưa đồng bộ",
+    "allSynced": "Tất cả thay đổi đã đồng bộ",
+    "lastSync": "{{time}}",
+    "noDataToSync": "Không có dữ liệu để đồng bộ",
     "modalSize": "Kích thước cửa sổ",
     "modalSizeDescription": "Điều chỉnh kích thước ghi chú",
     "modalSizeDefault": "Mặc định",
@@ -143,15 +155,19 @@
     "createLink": "Tạo link",
     "updateLink": "Cập nhật",
     "realtime": "Live",
-    "realtimeDescription": "Chia sẻ mã phòng để cộng tác chỉnh sửa:",
-    "start": "Bắt đầu",
+    "realtimeDescription": "Bắt đầu phiên cộng tác trực tiếp. Người khác có thể tham gia bằng mã phòng.",
+    "realtimeActive": "Phiên live đang hoạt động ({{count}} người kết nối)",
+    "realtimeNote": "Bạn phải bắt đầu phiên trước khi chia sẻ mã. Người tham gia sẽ đồng bộ với nội dung ghi chú của bạn.",
+    "shareCodeToInvite": "Chia sẻ mã này để mời người khác:",
+    "start": "Bắt đầu phiên",
+    "stopSharing": "Kết thúc phiên",
     "email": "Email",
     "emailDescription": "Chia sẻ qua Google Drive với email:",
     "emailPlaceholder": "Email người nhận...",
     "shareSuccess": "Đã chia sẻ thành công!",
     "shareButton": "Chia sẻ",
     "join": "Join",
-    "joinDescription": "Nhập mã phòng để tham gia cộng tác:",
+    "joinDescription": "Nhập mã phòng để tham gia phiên live:",
     "joinPlaceholder": "Nhập mã phòng...",
     "joinButton": "Tham gia",
     "close": "Đóng",
@@ -181,13 +197,18 @@
     "alreadyInstalled": "Đã cài đặt!",
     "alreadyInstalledDescription": "Bạn đang sử dụng phiên bản ứng dụng của G-Note.",
     "androidChromeInstructions": "Nhấn vào biểu tượng menu (⋮) ở góc trên, sau đó chọn \"Cài đặt ứng dụng\" hoặc \"Thêm vào màn hình chính\"",
-    "desktopChromeInstructions": "Nhấn vào biểu tượng cài đặt (⊕) ở thanh địa chỉ, hoặc vào Menu → Cài đặt ứng dụng",
+    "desktopChromeInstructions": "Nhấn vào biểu tượng cài đặt (⬇) ở thanh địa chỉ, hoặc vào Menu → Cài đặt ứng dụng",
     "iosSafariInstructions": "Nhấn nút Chia sẻ bên dưới, sau đó chọn \"Thêm vào MH chính\"",
     "iosChromeInstructions": "Để có trải nghiệm tốt nhất, hãy mở trong Safari và nhấn Chia sẻ → Thêm vào MH chính",
     "androidFirefoxInstructions": "Nhấn menu (⋮) rồi chọn \"Cài đặt\"",
     "androidOtherInstructions": "Nhấn menu rồi chọn \"Thêm vào MH chính\" hoặc \"Cài đặt\"",
     "desktopFirefoxInstructions": "Firefox không hỗ trợ cài đặt PWA. Hãy dùng Chrome hoặc Edge để có trải nghiệm tốt nhất.",
-    "desktopSafariInstructions": "Nhấn File → Thêm vào Dock, hoặc dùng Chrome/Edge để cài đặt PWA."
+    "desktopSafariInstructions": "Nhấn File → Thêm vào Dock, hoặc dùng Chrome/Edge để cài đặt PWA.",
+    "chromeExtension": "Extension",
+    "chromeExtensionDescription": "Cài đặt tiện ích Chrome để truy cập nhanh từ thanh công cụ trình duyệt.",
+    "addToChrome": "Thêm vào Chrome",
+    "chromeExtensionInfo": "Tiện ích hoạt động với Chrome, Edge, Brave và các trình duyệt dựa trên Chromium khác.",
+    "new": "Mới"
   },
   "packages": {
     "starter": "Starter",
@@ -212,7 +233,8 @@
     "cancel": "Hủy",
     "rotate": "Xoay",
     "flipH": "Lật ngang",
-    "flipV": "Lật dọc"
+    "flipV": "Lật dọc",
+    "auto": "Tự động"
   },
   "common": {
     "confirm": "Xác nhận",
@@ -317,6 +339,24 @@
     "noResults": "Không tìm thấy",
     "noResultsDescription": "Không có ghi chú nào khớp với tìm kiếm của bạn"
   },
+  "freeNote": {
+    "freeMode": "Miễn phí",
+    "placeholder": "Bắt đầu ghi chú của bạn ở đây...",
+    "titlePlaceholder": "Tiêu đề ghi chú",
+    "untitledNote": "Ghi chú không có tiêu đề",
+    "savePermanently": "Lưu vĩnh viễn",
+    "save": "Lưu",
+    "lastSaved": "Đã lưu",
+    "localStorageWarning": "Ghi chú của bạn chỉ được lưu trong trình duyệt này. Nó có thể bị mất nếu bạn xóa dữ liệu trình duyệt. Nhấn 'Lưu vĩnh viễn' để giữ mãi mãi với tài khoản miễn phí.",
+    "featureLocked": "Tính năng bị khóa",
+    "featureLockedDescription": "\"{{feature}}\" cần tài khoản miễn phí. Đăng ký để mở khóa tất cả tính năng và lưu ghi chú vĩnh viễn.",
+    "goToApp": "Tạo tài khoản miễn phí",
+    "goToAppShort": "Đăng ký",
+    "reset": "Đặt lại",
+    "resetTitle": "Đặt lại ghi chú?",
+    "resetDescription": "Thao tác này sẽ xóa toàn bộ nội dung và không thể hoàn tác.",
+    "resetConfirm": "Đặt lại"
+  },
   "offline": {
     "offline": "Ngoại tuyến",
     "online": "Trực tuyến",
@@ -336,12 +376,5 @@
     "syncError": "Lỗi đồng bộ",
     "tapToRetry": "Nhấn để thử lại",
     "loginRequiresNetwork": "Đăng nhập cần kết nối internet"
-  },
-  "webContent": {
-    "title": "Thêm vào ghi chú",
-    "description": "Tạo ghi chú mới với nội dung đã chọn từ trang web.",
-    "createNote": "Tạo ghi chú",
-    "addToExisting": "Thêm vào ghi chú có sẵn",
-    "source": "Nguồn"
   }
 }

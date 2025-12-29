@@ -11,7 +11,11 @@
       "terms": "सेवा की शर्तें",
       "and": "और",
       "privacy": "गोपनीयता नीति"
-    }
+    },
+    "drivePermissionRequired": "Drive अनुमति आवश्यक",
+    "drivePermissionDenied": "Google Drive एक्सेस नहीं दी गई। कृपया फिर से साइन इन करें और अपने नोट्स सिंक करने के लिए Drive एक्सेस की अनुमति दें।",
+    "relogin": "फिर से साइन इन करें",
+    "continueWithoutSync": "सिंक के बिना जारी रखें"
   },
   "header": {
     "search": "खोजें...",
@@ -28,11 +32,22 @@
     "logout": "लॉग आउट",
     "logoutDescription": "खाते से साइन आउट करें",
     "loggingOut": "साइन आउट हो रहा है...",
+    "logoutConfirmTitle": "साइन आउट करें?",
+    "logoutWarningNormal": "आपका डेटा सिंक है। आप अपने नोट्स तक पहुंचने के लिए कभी भी फिर से साइन इन कर सकते हैं।",
+    "logoutWarningUnsynced": "आपके पास सिंक नहीं किए गए बदलाव हैं। जब आप इस डिवाइस पर फिर से साइन इन करेंगे तो वे अपलोड हो जाएंगे।",
+    "logoutWarningOffline": "आप सिंक नहीं किए गए बदलावों के साथ ऑफ़लाइन हैं। यदि आप अभी साइन आउट करते हैं तो ये बदलाव खो सकते हैं।",
+    "unsyncedWarning": "{{count}} सिंक नहीं किए गए बदलाव",
+    "allSynced": "सभी बदलाव सिंक हो गए",
+    "lastSync": "{{time}}",
+    "noDataToSync": "सिंक करने के लिए कोई डेटा नहीं",
     "modalSize": "विंडो का आकार",
     "modalSizeDescription": "एडिटर का आकार समायोजित करें",
     "modalSizeDefault": "डिफ़ॉल्ट",
     "modalSizeLarge": "बड़ा",
-    "modalSizeXLarge": "बहुत बड़ा"
+    "modalSizeXLarge": "बहुत बड़ा",
+    "offlineLogoutTitle": "ऑफ़लाइन होने पर लॉग आउट करें?",
+    "offlineLogoutWarning": "आप वर्तमान में ऑफ़लाइन हैं। सहेजे नहीं गए परिवर्तन Google Drive के साथ सिंक नहीं हुए हो सकते हैं। यदि आप अभी लॉग आउट करते हैं, तो आप इन परिवर्तनों को खो सकते हैं।",
+    "logoutAnyway": "फिर भी लॉग आउट करें"
   },
   "credits": {
     "title": "AI क्रेडिट खरीदें",
@@ -143,15 +158,19 @@
     "createLink": "लिंक बनाएं",
     "updateLink": "अपडेट करें",
     "realtime": "लाइव",
-    "realtimeDescription": "रीयल-टाइम में सहयोग के लिए रूम कोड साझा करें:",
-    "start": "शुरू करें",
+    "realtimeDescription": "लाइव सहयोग सत्र शुरू करें। अन्य लोग रूम कोड से जुड़ सकते हैं।",
+    "realtimeActive": "लाइव सत्र सक्रिय ({{count}} जुड़े हुए)",
+    "realtimeNote": "कोड साझा करने से पहले आपको सत्र शुरू करना होगा। जुड़ने वाले आपके नोट सामग्री के साथ सिंक होंगे।",
+    "shareCodeToInvite": "दूसरों को आमंत्रित करने के लिए यह कोड साझा करें:",
+    "start": "सत्र शुरू करें",
+    "stopSharing": "सत्र समाप्त करें",
     "email": "ईमेल",
     "emailDescription": "Google Drive ईमेल से साझा करें:",
     "emailPlaceholder": "प्राप्तकर्ता का ईमेल...",
     "shareSuccess": "सफलतापूर्वक साझा किया गया!",
     "shareButton": "साझा करें",
     "join": "शामिल हों",
-    "joinDescription": "सहयोग में शामिल होने के लिए रूम कोड दर्ज करें:",
+    "joinDescription": "लाइव सत्र में शामिल होने के लिए रूम कोड दर्ज करें:",
     "joinPlaceholder": "रूम कोड दर्ज करें...",
     "joinButton": "शामिल हों",
     "close": "बंद करें",
@@ -181,13 +200,18 @@
     "alreadyInstalled": "पहले से इंस्टॉल!",
     "alreadyInstalledDescription": "आप G-Note का ऐप संस्करण उपयोग कर रहे हैं।",
     "androidChromeInstructions": "ऊपर मेनू आइकन (⋮) टैप करें, फिर \"ऐप इंस्टॉल करें\" या \"होम स्क्रीन पर जोड़ें\" चुनें",
-    "desktopChromeInstructions": "एड्रेस बार में इंस्टॉल आइकन (⊕) क्लिक करें, या मेनू → ऐप इंस्टॉल करें पर जाएं",
+    "desktopChromeInstructions": "एड्रेस बार में इंस्टॉल आइकन (⬇) क्लिक करें, या मेनू → ऐप इंस्टॉल करें पर जाएं",
     "iosSafariInstructions": "नीचे शेयर बटन टैप करें, फिर \"होम स्क्रीन पर जोड़ें\"",
     "iosChromeInstructions": "सर्वोत्तम अनुभव के लिए, Safari में खोलें और शेयर → होम स्क्रीन पर जोड़ें टैप करें",
     "androidFirefoxInstructions": "मेनू (⋮) टैप करें फिर \"इंस्टॉल करें\"",
     "androidOtherInstructions": "मेनू टैप करें फिर \"होम स्क्रीन पर जोड़ें\" या \"इंस्टॉल करें\"",
     "desktopFirefoxInstructions": "Firefox PWA इंस्टॉलेशन का समर्थन नहीं करता। सर्वोत्तम अनुभव के लिए Chrome या Edge आज़माएं।",
-    "desktopSafariInstructions": "File → Dock में जोड़ें क्लिक करें, या पूर्ण PWA समर्थन के लिए Chrome/Edge का उपयोग करें।"
+    "desktopSafariInstructions": "File → Dock में जोड़ें क्लिक करें, या पूर्ण PWA समर्थन के लिए Chrome/Edge का उपयोग करें।",
+    "chromeExtension": "एक्सटेंशन",
+    "chromeExtensionDescription": "ब्राउज़र टूलबार से त्वरित पहुंच के लिए Chrome एक्सटेंशन इंस्टॉल करें।",
+    "addToChrome": "Chrome में जोड़ें",
+    "chromeExtensionInfo": "यह एक्सटेंशन Chrome, Edge, Brave और अन्य Chromium-आधारित ब्राउज़रों के साथ काम करता है।",
+    "new": "नया"
   },
   "packages": {
     "starter": "स्टार्टर",
@@ -212,7 +236,8 @@
     "cancel": "रद्द करें",
     "rotate": "घुमाएं",
     "flipH": "क्षैतिज पलटें",
-    "flipV": "लंबवत पलटें"
+    "flipV": "लंबवत पलटें",
+    "auto": "स्वचालित"
   },
   "common": {
     "confirm": "पुष्टि करें",
@@ -317,6 +342,24 @@
     "noResults": "कोई परिणाम नहीं मिला",
     "noResultsDescription": "आपकी खोज से कोई नोट मेल नहीं खाता"
   },
+  "freeNote": {
+    "freeMode": "मुफ्त मोड",
+    "placeholder": "यहाँ अपना नोट लिखना शुरू करें...",
+    "titlePlaceholder": "नोट का शीर्षक",
+    "untitledNote": "बिना शीर्षक वाला नोट",
+    "savePermanently": "स्थायी रूप से सहेजें",
+    "save": "सहेजें",
+    "lastSaved": "सहेजा गया",
+    "localStorageWarning": "आपका नोट केवल इस ब्राउज़र में सहेजा गया है। ब्राउज़र डेटा साफ़ करने पर यह खो सकता है। मुफ्त खाते के साथ इसे हमेशा के लिए रखने के लिए 'स्थायी रूप से सहेजें' पर क्लिक करें।",
+    "featureLocked": "सुविधा लॉक है",
+    "featureLockedDescription": "\"{{feature}}\" के लिए मुफ्त खाता आवश्यक है। सभी सुविधाओं को अनलॉक करने और अपने नोट्स को स्थायी रूप से सहेजने के लिए साइन अप करें।",
+    "goToApp": "मुफ्त खाता बनाएं",
+    "goToAppShort": "साइन अप",
+    "reset": "रीसेट",
+    "resetTitle": "नोट रीसेट करें?",
+    "resetDescription": "यह सभी सामग्री को मिटा देगा और पूर्ववत नहीं किया जा सकता।",
+    "resetConfirm": "रीसेट"
+  },
   "offline": {
     "offline": "ऑफ़लाइन",
     "online": "ऑनलाइन",
@@ -336,12 +379,5 @@
     "syncError": "सिंक त्रुटि",
     "tapToRetry": "पुनः प्रयास के लिए टैप करें",
     "loginRequiresNetwork": "लॉगिन के लिए इंटरनेट कनेक्शन आवश्यक है"
-  },
-  "webContent": {
-    "title": "नोट में जोड़ें",
-    "description": "वेब से चयनित सामग्री के साथ एक नया नोट बनाएं।",
-    "createNote": "नोट बनाएं",
-    "addToExisting": "मौजूदा नोट में जोड़ें",
-    "source": "स्रोत"
   }
 }

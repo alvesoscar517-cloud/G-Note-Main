@@ -11,7 +11,11 @@
       "terms": "Términos de servicio",
       "and": "y",
       "privacy": "Política de privacidad"
-    }
+    },
+    "drivePermissionRequired": "Se requiere permiso de Drive",
+    "drivePermissionDenied": "No se otorgó acceso a Google Drive. Por favor, inicia sesión de nuevo y permite el acceso a Drive para sincronizar tus notas.",
+    "relogin": "Iniciar sesión de nuevo",
+    "continueWithoutSync": "Continuar sin sincronización"
   },
   "header": {
     "search": "Buscar...",
@@ -28,6 +32,14 @@
     "logout": "Cerrar sesión",
     "logoutDescription": "Salir de la cuenta",
     "loggingOut": "Cerrando sesión...",
+    "logoutConfirmTitle": "¿Cerrar sesión?",
+    "logoutWarningNormal": "Tus datos están sincronizados. Puedes iniciar sesión de nuevo en cualquier momento para acceder a tus notas.",
+    "logoutWarningUnsynced": "Tienes cambios sin sincronizar. Se subirán cuando inicies sesión de nuevo en este dispositivo.",
+    "logoutWarningOffline": "Estás sin conexión con cambios sin sincronizar. Estos cambios pueden perderse si cierras sesión ahora.",
+    "unsyncedWarning": "{{count}} cambio(s) sin sincronizar",
+    "allSynced": "Todos los cambios sincronizados",
+    "lastSync": "{{time}}",
+    "noDataToSync": "No hay datos para sincronizar",
     "modalSize": "Tamaño de ventana",
     "modalSizeDescription": "Ajustar tamaño del editor",
     "modalSizeDefault": "Predeterminado",
@@ -143,15 +155,19 @@
     "createLink": "Crear enlace",
     "updateLink": "Actualizar",
     "realtime": "En vivo",
-    "realtimeDescription": "Comparte el código de sala para colaborar en tiempo real:",
-    "start": "Iniciar",
+    "realtimeDescription": "Iniciar sesión de colaboración en vivo. Otros pueden unirse con el código de sala.",
+    "realtimeActive": "Sesión en vivo activa ({{count}} conectados)",
+    "realtimeNote": "Debes iniciar la sesión antes de compartir el código. Los que se unan sincronizarán con el contenido de tu nota.",
+    "shareCodeToInvite": "Comparte este código para invitar a otros:",
+    "start": "Iniciar sesión",
+    "stopSharing": "Terminar sesión",
     "email": "Correo",
     "emailDescription": "Compartir por correo de Google Drive:",
     "emailPlaceholder": "Correo del destinatario...",
     "shareSuccess": "¡Compartido con éxito!",
     "shareButton": "Compartir",
     "join": "Unirse",
-    "joinDescription": "Ingresa el código de sala para unirte a la colaboración:",
+    "joinDescription": "Ingresa el código de sala para unirte a una sesión en vivo:",
     "joinPlaceholder": "Ingresar código de sala...",
     "joinButton": "Unirse",
     "close": "Cerrar",
@@ -181,13 +197,18 @@
     "alreadyInstalled": "¡Ya instalado!",
     "alreadyInstalledDescription": "Estás usando la versión app de G-Note.",
     "androidChromeInstructions": "Toca el icono de menú (⋮) arriba, luego selecciona \"Instalar aplicación\" o \"Añadir a pantalla de inicio\"",
-    "desktopChromeInstructions": "Haz clic en el icono de instalación (⊕) en la barra de direcciones, o ve a Menú → Instalar aplicación",
+    "desktopChromeInstructions": "Haz clic en el icono de instalación (⬇) en la barra de direcciones, o ve a Menú → Instalar aplicación",
     "iosSafariInstructions": "Toca el botón Compartir abajo, luego \"Añadir a pantalla de inicio\"",
     "iosChromeInstructions": "Para la mejor experiencia, abre en Safari y toca Compartir → Añadir a pantalla de inicio",
     "androidFirefoxInstructions": "Toca el menú (⋮) luego \"Instalar\"",
     "androidOtherInstructions": "Toca el menú luego \"Añadir a pantalla de inicio\" o \"Instalar\"",
     "desktopFirefoxInstructions": "Firefox no soporta instalación PWA. Prueba Chrome o Edge para la mejor experiencia.",
-    "desktopSafariInstructions": "Haz clic en Archivo → Añadir al Dock, o usa Chrome/Edge para soporte PWA completo."
+    "desktopSafariInstructions": "Haz clic en Archivo → Añadir al Dock, o usa Chrome/Edge para soporte PWA completo.",
+    "chromeExtension": "Extensión",
+    "chromeExtensionDescription": "Instala la extensión de Chrome para acceso rápido desde la barra de herramientas del navegador.",
+    "addToChrome": "Añadir a Chrome",
+    "chromeExtensionInfo": "La extensión funciona con Chrome, Edge, Brave y otros navegadores basados en Chromium.",
+    "new": "Nuevo"
   },
   "packages": {
     "starter": "Inicial",
@@ -212,7 +233,8 @@
     "cancel": "Cancelar",
     "rotate": "Rotar",
     "flipH": "Voltear H",
-    "flipV": "Voltear V"
+    "flipV": "Voltear V",
+    "auto": "Auto"
   },
   "common": {
     "confirm": "Confirmar",
@@ -317,6 +339,24 @@
     "noResults": "No se encontraron resultados",
     "noResultsDescription": "Ninguna nota coincide con tu búsqueda"
   },
+  "freeNote": {
+    "freeMode": "Modo gratuito",
+    "placeholder": "Empieza a escribir tu nota aquí...",
+    "titlePlaceholder": "Título de la nota",
+    "untitledNote": "Nota sin título",
+    "savePermanently": "Guardar permanentemente",
+    "save": "Guardar",
+    "lastSaved": "Guardado",
+    "localStorageWarning": "Tu nota se guarda solo en este navegador. Puede perderse si borras los datos del navegador. Haz clic en 'Guardar permanentemente' para conservarla con una cuenta gratuita.",
+    "featureLocked": "Función bloqueada",
+    "featureLockedDescription": "\"{{feature}}\" requiere una cuenta gratuita. Regístrate para desbloquear todas las funciones y guardar tus notas permanentemente.",
+    "goToApp": "Crear cuenta gratuita",
+    "goToAppShort": "Registrarse",
+    "reset": "Restablecer",
+    "resetTitle": "¿Restablecer nota?",
+    "resetDescription": "Esto borrará todo el contenido y no se puede deshacer.",
+    "resetConfirm": "Restablecer"
+  },
   "offline": {
     "offline": "Sin conexión",
     "online": "En línea",
@@ -336,12 +376,5 @@
     "syncError": "Error de sincronización",
     "tapToRetry": "Toca para reintentar",
     "loginRequiresNetwork": "Iniciar sesión requiere conexión a Internet"
-  },
-  "webContent": {
-    "title": "Agregar a nota",
-    "description": "Crea una nueva nota con el contenido seleccionado de la web.",
-    "createNote": "Crear nota",
-    "addToExisting": "Agregar a nota existente",
-    "source": "Fuente"
   }
 }

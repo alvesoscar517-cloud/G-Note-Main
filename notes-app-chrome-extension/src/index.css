@@ -782,6 +782,21 @@ body.modal-open {
   overscroll-behavior-y: contain;
 }
 
+/* Block pull-to-refresh globally on touch devices (mobile/tablet) */
+/* This prevents the browser's native pull-to-refresh gesture */
+@media (hover: none) and (pointer: coarse) {
+  html, body {
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Also block for standalone PWA mode */
+@media screen and (display-mode: standalone) {
+  html, body {
+    overscroll-behavior-y: contain;
+  }
+}
+
 /* GPU acceleration for modals and animated elements */
 .modal-content,
 .animate-in,

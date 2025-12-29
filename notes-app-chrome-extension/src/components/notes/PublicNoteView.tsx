@@ -187,8 +187,8 @@ export function PublicNoteView({ fileId }: PublicNoteViewProps) {
             </p>
             
             {/* TipTap Editor Content with Context Menu */}
-            <ContextMenu>
-              <ContextMenuTrigger asChild>
+            <ContextMenu disableOnTouch>
+              <ContextMenuTrigger asChild disableOnTouch>
                 <div className="mt-4">
                   <EditorContent 
                     editor={editor} 
@@ -196,7 +196,7 @@ export function PublicNoteView({ fileId }: PublicNoteViewProps) {
                   />
                 </div>
               </ContextMenuTrigger>
-              <ContextMenuContent>
+              <ContextMenuContent disableOnTouch>
                 <ContextMenuItem onClick={handleCopy}>
                   <Copy className="w-4 h-4 mr-2" />
                   {t('contextMenu.copy')}

@@ -148,55 +148,32 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
             <MenuItem icon={MessageCircleQuestion} label={t('ai.ask')} onClick={() => handleAction('ask')} />
           </div>
 
-          {/* Language submenu - inline on mobile, side popup on desktop */}
+          {/* Language submenu - inline replacement for all screen sizes */}
           {showLanguages && (
-            <>
-              {/* Mobile: inline replacement */}
-              <div className="sm:hidden w-[160px] flex flex-col overflow-hidden">
-                {/* Back button */}
-                <button
-                  onClick={() => setShowLanguages(false)}
-                  className="flex items-center gap-2 px-2.5 py-1.5 text-[13px] text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg mb-0.5"
-                >
-                  <span>‹</span>
-                  {t('ai.translate')}
-                </button>
-                
-                {/* Language list */}
-                <div className="max-h-[220px] overflow-y-auto p-1 pt-0">
-                  {AI.LANGUAGES.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => handleTranslate(lang.name)}
-                      className="w-full flex items-center gap-2 px-2 py-1.5 text-[13px] text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
-                    >
-                      <CircleFlag countryCode={lang.countryCode} size={16} className="flex-shrink-0" />
-                      <span className="truncate">{lang.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Desktop: side popup */}
-              <div 
-                className="hidden sm:flex absolute left-full top-0 ml-1 w-[160px] bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 animate-in fade-in zoom-in-95 duration-200 flex-col overflow-hidden"
-                style={{ maxHeight: '240px' }}
+            <div className="w-[180px] flex flex-col overflow-hidden">
+              {/* Back button */}
+              <button
+                onClick={() => setShowLanguages(false)}
+                className="flex items-center gap-2 px-2.5 py-1.5 text-[13px] text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg mb-0.5"
               >
-                {/* Language list */}
-                <div className="flex-1 overflow-y-auto p-1">
-                  {AI.LANGUAGES.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => handleTranslate(lang.name)}
-                      className="w-full flex items-center gap-2 px-2 py-1.5 text-[13px] text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
-                    >
-                      <CircleFlag countryCode={lang.countryCode} size={16} className="flex-shrink-0" />
-                      <span className="truncate">{lang.name}</span>
-                    </button>
-                  ))}
-                </div>
+                <span>‹</span>
+                {t('ai.translate')}
+              </button>
+              
+              {/* Language list */}
+              <div className="max-h-[220px] overflow-y-auto p-1 pt-0">
+                {AI.LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => handleTranslate(lang.name)}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 text-[13px] text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+                  >
+                    <CircleFlag countryCode={lang.countryCode} size={16} className="flex-shrink-0" />
+                    <span className="truncate">{lang.name}</span>
+                  </button>
+                ))}
               </div>
-            </>
+            </div>
           )}
         </Popover.Content>
       </Popover.Portal>

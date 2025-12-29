@@ -106,6 +106,13 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
   // On mobile: only activate on long press
   const handleImageClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
+    e.preventDefault()
+    
+    // Blur editor to prevent keyboard from opening
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
+    
     // On desktop/laptop: activate immediately on click
     if (!isMobile) {
       setIsActive(true)
@@ -114,8 +121,15 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
 
   // Touch handlers for mobile long press
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    // Prevent default to stop editor from focusing
+    e.stopPropagation()
+    
     if (!isMobile) {
       // On non-mobile touch devices (laptop), activate immediately
+      // Blur editor to prevent keyboard
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur()
+      }
       setIsActive(true)
       return
     }
@@ -125,6 +139,10 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
     touchStartPosRef.current = { x: touch.clientX, y: touch.clientY }
     
     longPressTimerRef.current = setTimeout(() => {
+      // Blur editor to prevent keyboard from opening
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur()
+      }
       setIsActive(true)
       // Haptic feedback if available
       if (navigator.vibrate) {
@@ -198,11 +216,17 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
           <div
             ref={containerRef}
             className="relative inline-block"
+            contentEditable={false}
             onClick={handleImageClick}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             onTouchCancel={handleTouchEnd}
+            onMouseDown={(e) => {
+              // Prevent editor from gaining focus when clicking image
+              e.preventDefault()
+              e.stopPropagation()
+            }}
           >
             <img
               ref={imageRef}
