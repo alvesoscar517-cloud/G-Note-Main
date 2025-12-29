@@ -167,7 +167,7 @@ export function TrashView({ open, onClose }: TrashViewProps) {
   return (
     <>
       <div 
-        className="fixed inset-0 z-[90] flex flex-col bg-neutral-50 dark:bg-neutral-950"
+        className="fixed inset-0 z-[90] flex flex-col bg-neutral-50 dark:bg-neutral-950 status-bar-bg"
         style={edgeSwipeState.isDragging ? edgeSwipeStyle : undefined}
         {...edgeSwipeHandlers}
       >

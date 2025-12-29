@@ -325,7 +325,7 @@ function AppContent() {
   return (
     <LayoutGroup>
       <SEOHead />
-      <div className="min-h-screen min-h-dvh bg-neutral-50 dark:bg-neutral-950 fixed inset-0 overflow-auto">
+      <div className="min-h-screen min-h-dvh bg-neutral-50 dark:bg-neutral-950 fixed inset-0 overflow-auto status-bar-bg">
         <Header />
         <main className="max-w-6xl mx-auto px-4 py-6 safe-x safe-bottom">
           <NotesList />

@@ -321,7 +321,7 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-white dark:bg-neutral-950 flex flex-col"
+      className="fixed inset-0 z-50 bg-white dark:bg-neutral-950 flex flex-col status-bar-bg"
       style={edgeSwipeState.isDragging ? edgeSwipeStyle : undefined}
       {...edgeSwipeHandlers}
     >

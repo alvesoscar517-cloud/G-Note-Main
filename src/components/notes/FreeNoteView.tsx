@@ -389,7 +389,7 @@ export function FreeNoteView() {
   const hasCustomBg = noteStyle?.backgroundColor || noteStyle?.backgroundImage
 
   return (
-    <div className="h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 overflow-hidden fixed inset-0">
+    <div className="h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 overflow-hidden fixed inset-0 status-bar-bg">
       <FreeNoteSEOHead />
       
       {/* Header */}

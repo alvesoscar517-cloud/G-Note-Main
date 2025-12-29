@@ -105,7 +105,7 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
   ].filter(Boolean).join(' ')
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
+    <div className="fixed inset-0 z-[9999] bg-black flex flex-col status-bar-bg">
       {/* Header - with safe area support */}
       <div className="flex items-center justify-between px-2 pb-2 sm:p-4 shrink-0 safe-top safe-x">
         <Tooltip>

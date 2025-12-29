@@ -71,35 +71,41 @@ html.dark, html.dark body,
   color: #F5F5F5;
 }
 
-/* Simple padding utilities */
+/* Safe area padding utilities - respects device notches and status bars */
 .safe-top {
-  padding-top: 0.75rem;
+  padding-top: max(0.75rem, env(safe-area-inset-top));
 }
 
 .safe-bottom {
-  padding-bottom: 0.75rem;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 .safe-left {
-  padding-left: 0.75rem;
+  padding-left: max(0.75rem, env(safe-area-inset-left));
 }
 
 .safe-right {
-  padding-right: 0.75rem;
+  padding-right: max(0.75rem, env(safe-area-inset-right));
 }
 
 .safe-x {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
+  padding-left: max(0.75rem, env(safe-area-inset-left));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
 }
 
 .safe-y {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 .safe-all {
-  padding: 0.75rem;
+  padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+}
+
+/* Status bar background - extends content under status bar with matching background */
+.status-bar-bg {
+  padding-top: env(safe-area-inset-top);
+  background-color: inherit;
 }
 
 /* Disable text selection globally except for specific elements */

@@ -15,7 +15,7 @@ export function LoadingOverlay({ isVisible, text }: LoadingOverlayProps) {
   if (!isVisible) return null
 
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-neutral-50 dark:bg-neutral-950 transition-opacity duration-300">
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-neutral-50 dark:bg-neutral-950 transition-opacity duration-300 status-bar-bg">
       <div className="flex flex-col items-center gap-4">
         <LoadingDots size="md" />
         {text && (

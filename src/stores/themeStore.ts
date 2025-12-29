@@ -15,17 +15,18 @@ const THEME_COLORS = {
   dark: '#0a0a0a'
 }
 
-// Update theme-color meta tag
+// Update theme-color meta tags for status bar
 export function updateStatusBarColor() {
   if (typeof document === 'undefined') return
   
   const isDark = document.documentElement.classList.contains('dark')
   const themeColor = isDark ? THEME_COLORS.dark : THEME_COLORS.light
   
-  const metaTheme = document.querySelector('meta[name="theme-color"]')
-  if (metaTheme) {
-    metaTheme.setAttribute('content', themeColor)
-  }
+  // Update all theme-color meta tags
+  const metaTags = document.querySelectorAll('meta[name="theme-color"]')
+  metaTags.forEach(meta => {
+    meta.setAttribute('content', themeColor)
+  })
 }
 
 function getSystemTheme(): boolean {
