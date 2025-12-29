@@ -1,15 +1,11 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Pin, PinOff } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from '@/components/ui/Button'
 import { NoteEditor } from './NoteEditor'
 import { useNotesStore } from '@/stores/notesStore'
 import { useUIStore, type ModalSize } from '@/stores/uiStore'
 import { cn } from '@/lib/utils'
 import { getPlainText } from '@/lib/utils'
 import { NoteBackground, getNoteBackgroundStyle } from './NoteStylePicker'
-import { useSwipeGesture } from '@/hooks/useSwipeGesture'
 import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
 import { useHistoryBack } from '@/hooks/useHistoryBack'
 import type { Note } from '@/types'
@@ -53,56 +49,11 @@ const CONTENT_TRANSITION = {
   mass: 0.8,
 }
 
-// Editable title component with ellipsis support for mobile
-function MobileEditableTitle({ 
-  value, 
-  onChange, 
-  placeholder
-}: { 
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-}) {
-  const [isEditing, setIsEditing] = useState(false)
-
-  if (isEditing) {
-    return (
-      <input
-        autoFocus
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onBlur={() => setIsEditing(false)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === 'Escape') {
-            setIsEditing(false)
-          }
-        }}
-        placeholder={placeholder}
-        className="w-full text-base font-medium bg-transparent border-0 outline-none text-neutral-900 dark:text-white placeholder:text-neutral-400"
-      />
-    )
-  }
-
-  return (
-    <div
-      onClick={() => setIsEditing(true)}
-      className={cn(
-        'overflow-hidden text-ellipsis whitespace-nowrap cursor-text text-base font-medium text-neutral-900 dark:text-white',
-        !value && 'text-neutral-400'
-      )}
-    >
-      {value || placeholder}
-    </div>
-  )
-}
-
 export function NoteModal() {
-  const { t } = useTranslation()
   const isModalOpen = useNotesStore(state => state.isModalOpen)
   const setModalOpen = useNotesStore(state => state.setModalOpen)
   const selectedNoteId = useNotesStore(state => state.selectedNoteId)
   const togglePin = useNotesStore(state => state.togglePin)
-  const updateNote = useNotesStore(state => state.updateNote)
   const modalSize = useUIStore(state => state.modalSize)
   
   // Subscribe to the specific note by ID - memoized selector
@@ -262,17 +213,6 @@ export function NoteModal() {
     if (displayNote) togglePin(displayNote.id)
   }
 
-  const handleUpdateTitle = (value: string) => {
-    if (displayNote) updateNote(displayNote.id, { title: value })
-  }
-
-  // Swipe down to close on mobile (only on fullscreen/mobile view)
-  const { handlers: swipeHandlers, swipeStyle } = useSwipeGesture({
-    onSwipeDown: handleClose,
-    threshold: 80,
-    enabled: isModalOpen
-  })
-
   // Edge swipe back gesture (swipe from left edge to close)
   const { 
     handlers: edgeSwipeHandlers, 
@@ -335,34 +275,6 @@ export function NoteModal() {
               isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
             />
             <NoteBackground style={displayNote.style} className="md:rounded-[12px]" />
-            
-            {/* Mobile Header - full width with safe areas */}
-            <div 
-              className={cn(
-                'flex items-center gap-1 relative z-10',
-                // Base padding - consistent across all orientations
-                'px-2 py-1.5',
-                // Safe area classes handle landscape automatically
-                'safe-top',
-                isFullscreen ? 'flex' : 'md:hidden'
-              )}
-              style={swipeStyle}
-              {...swipeHandlers}
-            >
-              <Button variant="ghost" size="icon" onClick={handleClose} className="shrink-0">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <div className="flex-1 min-w-0">
-                <MobileEditableTitle
-                  value={displayNote.title}
-                  onChange={handleUpdateTitle}
-                  placeholder={t('notes.title')}
-                />
-              </div>
-              <Button variant="ghost" size="icon" onClick={handleTogglePin} className="shrink-0">
-                {displayNote.isPinned ? <PinOff className="w-5 h-5" /> : <Pin className="w-5 h-5" />}
-              </Button>
-            </div>
 
             {/* Content */}
             <motion.div 

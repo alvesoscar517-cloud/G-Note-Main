@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Users, Link2, Mail, Loader2, Globe, WifiOff, AlertCircle } from 'lucide-react'
+import { Copy, Check, Users, Link2, Mail, Loader2, Globe, WifiOff } from 'lucide-react'
 import { Dialog, DialogHeader, DialogContent, DialogFooter } from '@/components/ui/Dialog'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -15,7 +15,6 @@ interface ShareDialogProps {
   onClose: () => void
   noteId: string
   existingRoomId?: string | null
-  collaboratorsCount?: number
   onCreateRoom: (roomId: string) => void
   onJoinRoom: (roomId: string) => void
   onStopSharing?: () => void
@@ -27,7 +26,6 @@ export function ShareDialog({
   open, 
   onClose, 
   existingRoomId,
-  collaboratorsCount = 0,
   onCreateRoom,
   onJoinRoom,
   onStopSharing
@@ -221,15 +219,7 @@ export function ShareDialog({
             <div className="space-y-3">
               {isInRealtimeSession ? (
                 <>
-                  {/* Currently in a session */}
-                  <div className="p-3 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                    <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                      <Users className="w-4 h-4" />
-                      <span className="text-sm font-medium">
-                        {t('share.realtimeActive', { count: collaboratorsCount })}
-                      </span>
-                    </div>
-                  </div>
+                  {/* Currently in a session - show room code */}
                   <p className="text-sm text-neutral-600 dark:text-neutral-400">
                     {t('share.shareCodeToInvite')}
                   </p>
@@ -250,14 +240,6 @@ export function ShareDialog({
                   <p className="text-sm">
                     {t('share.realtimeDescription')}
                   </p>
-                  <div className="p-3 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
-                    <div className="flex items-start gap-2 text-neutral-600 dark:text-neutral-400">
-                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span className="text-xs">
-                        {t('share.realtimeNote')}
-                      </span>
-                    </div>
-                  </div>
                 </>
               )}
             </div>

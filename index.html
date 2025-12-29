@@ -90,7 +90,7 @@
     
     <!-- iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="G-Note" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     
@@ -338,8 +338,8 @@
         justify-content: center;
         background-color: #fafafa;
         transition: opacity 0.3s ease-out;
-        /* Safe area for notched devices */
-        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        /* Safe area only for bottom and sides - top is handled by system status bar */
+        padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       }
       
       /* Dark mode support */

@@ -63,7 +63,8 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
-  RemoveFormatting
+  RemoveFormatting,
+  ArrowLeft
 } from 'lucide-react'
 import { useNotesStore } from '@/stores/notesStore'
 import { useAuthStore } from '@/stores/authStore'
@@ -1047,70 +1048,80 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         </div>
       )}
 
-      {/* Scrollable Content Area - includes title */}
+      {/* Scrollable Content Area - includes back button, title, pin */}
       <div 
         ref={editorContainerRef} 
         className="flex-1 overflow-y-auto px-4 relative"
       >
-        {/* Title + Pin - Desktop (now scrolls with content), hidden when fullscreen */}
-        {!isFullscreen && (
-          <div className="hidden md:flex items-center gap-2 pt-4 pb-2 min-w-0">
-            <div className="flex-1 min-w-0">
-              <EditableTitle
-                value={note.title}
-                onChange={(value) => updateNote(note.id, { title: value })}
-                placeholder={t('notes.title')}
-                className="text-xl font-medium text-neutral-900 dark:text-white"
-              />
-            </div>
-            
-            {/* Collaboration indicator */}
-            {roomId && collaborators.length > 0 && (
-              <div className="flex items-center gap-1">
-                <div className="flex -space-x-1">
-                  {collaborators.slice(0, 3).map((collab, i) => (
-                    collab.picture ? (
-                      <img
-                        key={i}
-                        src={collab.picture}
-                        alt={collab.name}
-                        className="w-6 h-6 rounded-full border-2 border-white dark:border-neutral-900 object-cover"
-                        title={collab.name}
-                      />
-                    ) : (
-                      <div
-                        key={i}
-                        className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium text-white border-2 border-white dark:border-neutral-900"
-                        style={{ backgroundColor: collab.color }}
-                        title={collab.name}
-                      >
-                        {collab.name.charAt(0).toUpperCase()}
-                      </div>
-                    )
-                  ))}
-                  {collaborators.length > 3 && (
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium bg-neutral-300 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-200 border-2 border-white dark:border-neutral-900">
-                      +{collaborators.length - 3}
-                    </div>
-                  )}
-                </div>
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              </div>
-            )}
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={onTogglePin}
-                  className="p-2 rounded-full text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-                >
-                  {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>{isPinned ? t('notes.unpin') : t('notes.pin')}</TooltipContent>
-            </Tooltip>
+        {/* Header row - Back + Title + Pin - scrolls with content on all devices */}
+        {/* On desktop fullscreen mode, this is hidden (handled by md:hidden when isFullscreen) */}
+        <div className={cn(
+          "flex items-center gap-2 pt-4 pb-2 min-w-0",
+          isFullscreen && "md:hidden"
+        )}>
+          {/* Back button - only on mobile */}
+          <button
+            onClick={onClose}
+            className="md:hidden p-2 -ml-2 rounded-full text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shrink-0"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          
+          <div className="flex-1 min-w-0">
+            <EditableTitle
+              value={note.title}
+              onChange={(value) => updateNote(note.id, { title: value })}
+              placeholder={t('notes.title')}
+              className="text-xl font-medium text-neutral-900 dark:text-white"
+            />
           </div>
-        )}
+          
+          {/* Collaboration indicator */}
+          {roomId && collaborators.length > 0 && (
+            <div className="flex items-center gap-1">
+              <div className="flex -space-x-1">
+                {collaborators.slice(0, 3).map((collab, i) => (
+                  collab.picture ? (
+                    <img
+                      key={i}
+                      src={collab.picture}
+                      alt={collab.name}
+                      className="w-6 h-6 rounded-full border-2 border-white dark:border-neutral-900 object-cover"
+                      title={collab.name}
+                    />
+                  ) : (
+                    <div
+                      key={i}
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium text-white border-2 border-white dark:border-neutral-900"
+                      style={{ backgroundColor: collab.color }}
+                      title={collab.name}
+                    >
+                      {collab.name.charAt(0).toUpperCase()}
+                    </div>
+                  )
+                ))}
+                {collaborators.length > 3 && (
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium bg-neutral-300 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-200 border-2 border-white dark:border-neutral-900">
+                    +{collaborators.length - 3}
+                  </div>
+                )}
+              </div>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            </div>
+          )}
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={onTogglePin}
+                className="p-2 rounded-full text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              >
+                {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{isPinned ? t('notes.unpin') : t('notes.pin')}</TooltipContent>
+          </Tooltip>
+        </div>
 
         {/* Editor Content or Skeleton Loading */}
         {isAILoading ? (
@@ -1184,7 +1195,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           </div>
         )}
 
-        <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-none">
+        <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-none" style={{ touchAction: 'pan-x' }}>
           {/* AI Menu - Priority 1 (always visible) */}
           {toolbarVisibility.ai && (
             <AIMenu 
@@ -1587,16 +1598,53 @@ function ToolbarButton({
   className?: string
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null)
   
-  // Handle touch events to prevent editor focus loss while still allowing click
+  // Track touch start position to detect swipe vs tap
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0]
+    touchStartRef.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      time: Date.now()
+    }
+  }, [])
+  
+  // Handle touch events - only trigger click if it's a tap, not a swipe
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     // Prevent default to stop focus from moving to button
     e.preventDefault()
-    // Manually trigger onClick
-    if (!disabled && onClick) {
+    
+    if (!touchStartRef.current || disabled || !onClick) {
+      touchStartRef.current = null
+      return
+    }
+    
+    const touch = e.changedTouches[0]
+    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x)
+    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y)
+    const deltaTime = Date.now() - touchStartRef.current.time
+    
+    // Only trigger click if:
+    // 1. Movement is less than 5px (very small movement = tap, not swipe)
+    // 2. Touch duration is less than 300ms (quick tap)
+    const isSwipe = deltaX > 5 || deltaY > 5
+    const isTooLong = deltaTime > 300
+    
+    if (!isSwipe && !isTooLong) {
       onClick()
     }
+    
+    touchStartRef.current = null
   }, [disabled, onClick])
+  
+  // Cancel touch if user moves finger (scrolling)
+  const handleTouchMove = useCallback(() => {
+    // Mark as swipe immediately when movement detected
+    if (touchStartRef.current) {
+      touchStartRef.current = null
+    }
+  }, [])
 
   // Prevent mouse events from stealing focus on desktop
   const preventMouseFocusLoss = (e: React.MouseEvent) => {
@@ -1607,6 +1655,8 @@ function ToolbarButton({
     <button
       ref={buttonRef}
       onMouseDown={preventMouseFocusLoss}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onClick={(e) => {
         // Only handle click for non-touch (mouse) interactions

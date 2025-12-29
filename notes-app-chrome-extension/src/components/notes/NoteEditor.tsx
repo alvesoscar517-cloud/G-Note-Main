@@ -20,7 +20,7 @@ import Link from '@tiptap/extension-link'
 import { marked } from 'marked'
 import * as Y from 'yjs'
 import { WebrtcProvider } from 'y-webrtc'
-import { Collaboration, CollaborationCursor } from '@/lib/collaboration'
+import { Collaboration } from '@/lib/collaboration'
 import {
   Undo2, 
   Redo2,
@@ -241,30 +241,46 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   // WebRTC provider and Y.Doc for collaboration
   const [provider, setProvider] = useState<WebrtcProvider | null>(null)
   const [ydoc, setYdoc] = useState<Y.Doc | null>(null)
+  const [isProviderReady, setIsProviderReady] = useState(false)
+  
+  // Use refs to track current provider/ydoc for cleanup
+  const providerRef = useRef<WebrtcProvider | null>(null)
+  const ydocRef = useRef<Y.Doc | null>(null)
 
   // Setup collaboration when roomId changes
   useEffect(() => {
+    // Cleanup previous provider/ydoc if exists
+    if (providerRef.current) {
+      providerRef.current.disconnect()
+      providerRef.current.destroy()
+      providerRef.current = null
+    }
+    if (ydocRef.current) {
+      ydocRef.current.destroy()
+      ydocRef.current = null
+    }
+    
     if (!roomId) {
-      if (provider) {
-        provider.disconnect()
-        provider.destroy()
-        setProvider(null)
-      }
-      if (ydoc) {
-        ydoc.destroy()
-        setYdoc(null)
-      }
+      setProvider(null)
+      setYdoc(null)
+      setIsProviderReady(false)
       return
     }
 
     const newYdoc = new Y.Doc()
+    
+    // Get signaling servers from environment variable
+    const signalingServers = import.meta.env.VITE_SIGNALING_SERVERS
+      ? import.meta.env.VITE_SIGNALING_SERVERS.split(',').map((s: string) => s.trim())
+      : []
+    
     const newProvider = new WebrtcProvider(`notes-app-${roomId}`, newYdoc, {
-      signaling: [
-        'wss://signaling.yjs.dev',
-        'wss://y-webrtc-signaling-eu.herokuapp.com',
-        'wss://y-webrtc-signaling-us.herokuapp.com'
-      ]
+      signaling: signalingServers
     })
+
+    // Store in refs for cleanup
+    providerRef.current = newProvider
+    ydocRef.current = newYdoc
 
     newProvider.awareness.setLocalStateField('user', {
       name: user?.name || 'Anonymous',
@@ -274,6 +290,16 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
 
     setYdoc(newYdoc)
     setProvider(newProvider)
+    
+    // Wait for provider to be ready
+    const checkReady = () => {
+      if (newProvider.awareness) {
+        setIsProviderReady(true)
+      } else {
+        setTimeout(checkReady, 100)
+      }
+    }
+    const readyTimeout = setTimeout(checkReady, 300)
 
     // Update collaborators list
     const updateCollaborators = () => {
@@ -290,16 +316,29 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     }
 
     newProvider.awareness.on('change', updateCollaborators)
+    updateCollaborators()
     const interval = setInterval(updateCollaborators, 2000)
 
     return () => {
+      clearTimeout(readyTimeout)
       clearInterval(interval)
       newProvider.awareness.off('change', updateCollaborators)
-      newProvider.disconnect()
-      newProvider.destroy()
-      newYdoc.destroy()
+      setIsProviderReady(false)
     }
   }, [roomId, user?.name, userColor])
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (providerRef.current) {
+        providerRef.current.disconnect()
+        providerRef.current.destroy()
+      }
+      if (ydocRef.current) {
+        ydocRef.current.destroy()
+      }
+    }
+  }, [])
 
   // Debounced update note content - reduced for snappier feel
   const debouncedUpdate = useDebouncedCallback((id: string, content: string) => {
@@ -314,6 +353,9 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   const noteIdRef = useRef(note.id)
   noteIdRef.current = note.id
 
+  // Determine if collaboration mode is fully ready
+  const isCollaborationReady = !!(roomId && ydoc && provider && isProviderReady)
+
   // Memoize extensions to prevent recreation on every render
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const extensions = useMemo(() => {
@@ -322,7 +364,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         heading: { levels: [1, 2, 3] },
         codeBlock: false,
         // Disable history when collaborating (y-prosemirror handles it)
-        ...(roomId && ydoc ? { history: false } : {})
+        ...(isCollaborationReady ? { history: false } : {})
       }),
       CodeBlockLowlight.configure({
         lowlight: createLowlight(common),
@@ -340,14 +382,23 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         HTMLAttributes: { class: 'task-item' }
       }),
       ResizableImage,
+      // Add Link BEFORE Markdown - Markdown will detect it exists and not add duplicate
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-500 underline cursor-pointer'
+        }
+      }),
+      // Add Underline BEFORE Markdown - Markdown will detect it exists and not add duplicate
+      Underline,
+      // Markdown extension - will use existing Link and Underline instead of adding new ones
       Markdown.configure({
         html: true,
         transformPastedText: true,
         transformCopiedText: true,
-        linkify: true,
+        linkify: false,
         breaks: false
       }),
-      Underline,
       Highlight.configure({
         multicolor: false
       }),
@@ -355,34 +406,23 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       Superscript,
       TextAlign.configure({
         types: ['heading', 'paragraph']
-      }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-blue-500 underline cursor-pointer'
-        }
       })
     ]
 
-    // Add collaboration extensions when in a room
-    if (roomId && ydoc && provider) {
+    // Add collaboration extensions when in a room and ready
+    if (isCollaborationReady && ydoc && provider) {
       baseExtensions.push(
         Collaboration.configure({
           document: ydoc,
-          field: 'prosemirror'
-        }),
-        CollaborationCursor.configure({
-          provider: provider,
-          user: {
-            name: user?.name || 'Anonymous',
-            color: userColor
-          }
         })
       )
+      // Note: CollaborationCursor is disabled due to compatibility issues
+      // with y-webrtc provider. The "Cannot read properties of undefined (reading 'doc')"
+      // error occurs because the provider's awareness is not properly initialized
     }
 
     return baseExtensions
-  }, [t, roomId, ydoc, provider, user?.name, userColor])
+  }, [t, isCollaborationReady, ydoc, provider, user?.name, userColor])
 
   // Editor - only recreate when roomId changes, NOT when note changes
   const editor = useEditor({
@@ -403,7 +443,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     parseOptions: {
       preserveWhitespace: 'full'
     }
-  }, [roomId, extensions]) // Only depend on roomId and memoized extensions
+  }, [isCollaborationReady, extensions]) // Only depend on collaboration state and memoized extensions
 
   // Update editor content when note changes (without recreating editor)
   useEffect(() => {
@@ -426,7 +466,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
 
   // When starting collaboration, initialize Y.js document with current content
   useEffect(() => {
-    if (roomId && provider && editor && ydoc) {
+    if (roomId && provider && editor && ydoc && isProviderReady) {
       const fragment = ydoc.getXmlFragment('prosemirror')
       
       // If this is a new collaboration session and Y.js doc is empty, 
@@ -456,7 +496,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         clearInterval(autoSaveInterval)
       }
     }
-  }, [roomId, provider, editor, ydoc, note.content, updateNote])
+  }, [roomId, provider, editor, ydoc, isProviderReady, note.content, updateNote])
 
   // Save on page unload or visibility change (prevent data loss)
   useEffect(() => {
