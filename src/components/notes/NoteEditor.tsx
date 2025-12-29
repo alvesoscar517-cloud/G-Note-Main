@@ -1121,12 +1121,12 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       {/* Scrollable Content Area - includes back button, title, pin */}
       <div 
         ref={editorContainerRef} 
-        className="flex-1 overflow-y-auto px-4 relative"
+        className="flex-1 overflow-y-auto px-4 relative safe-x"
       >
         {/* Header row - Back + Title + Pin - scrolls with content on all devices */}
         {/* On desktop fullscreen mode, this is hidden (handled by md:hidden when isFullscreen) */}
         <div className={cn(
-          "flex items-center gap-2 pt-4 pb-2 min-w-0",
+          "flex items-center gap-2 pt-4 pb-2 min-w-0 safe-top",
           isFullscreen && "md:hidden"
         )}>
           {/* Back button - only on mobile */}
