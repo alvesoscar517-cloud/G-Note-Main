@@ -1055,7 +1055,9 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       </div>
 
       {/* Footer Toolbar */}
-      <div className="relative flex items-center justify-between px-2 py-1.5 bg-neutral-100/80 dark:bg-neutral-800/60 backdrop-blur-sm rounded-b-[12px] safe-bottom safe-x">
+      <div 
+        className="flex items-center justify-between px-2 py-1.5 bg-neutral-100/80 dark:bg-neutral-800/60 backdrop-blur-sm safe-x relative rounded-b-[12px] safe-bottom"
+      >
         {/* AI Modals - positioned above toolbar */}
         <SummaryModal
           open={showSummary}
@@ -1413,26 +1415,17 @@ function ToolbarButton({
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
   
-  // Use non-passive touch event listener to properly prevent default
-  // This fixes "Unable to preventDefault inside passive event listener" error
-  useEffect(() => {
-    const button = buttonRef.current
-    if (!button) return
-    
-    const preventFocusLoss = (e: TouchEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
+  // Handle touch events to prevent editor focus loss while still allowing click
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    // Prevent default to stop focus from moving to button
+    e.preventDefault()
+    // Manually trigger onClick
+    if (!disabled && onClick) {
+      onClick()
     }
-    
-    // Add non-passive listener to allow preventDefault
-    button.addEventListener('touchstart', preventFocusLoss, { passive: false })
-    
-    return () => {
-      button.removeEventListener('touchstart', preventFocusLoss)
-    }
-  }, [])
+  }, [disabled, onClick])
 
-  // Prevent keyboard from triggering when clicking toolbar buttons on mobile
+  // Prevent mouse events from stealing focus on desktop
   const preventMouseFocusLoss = (e: React.MouseEvent) => {
     e.preventDefault()
   }
@@ -1441,7 +1434,14 @@ function ToolbarButton({
     <button
       ref={buttonRef}
       onMouseDown={preventMouseFocusLoss}
-      onClick={onClick}
+      onTouchEnd={handleTouchEnd}
+      onClick={(e) => {
+        // Only handle click for non-touch (mouse) interactions
+        // Touch is handled by onTouchEnd
+        if (e.detail > 0 && onClick && !disabled) {
+          onClick()
+        }
+      }}
       disabled={disabled}
       className={cn(
         'p-1.5 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors touch-manipulation',

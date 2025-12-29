@@ -50,7 +50,6 @@ import { SpeechButton } from './SpeechButton'
 import { NoteStylePicker, getNoteBackgroundStyle, NoteBackground } from './NoteStylePicker'
 import { NoteActionsMenu } from './NoteActionsMenu'
 import { useResponsiveToolbar } from '@/hooks/useResponsiveToolbar'
-import { useKeyboardHeight } from '@/hooks/useKeyboardHeight'
 import { FreeNoteSEOHead } from '../FreeNoteSEOHead'
 import type { NoteStyle } from '@/types'
 
@@ -171,8 +170,6 @@ export function FreeNoteView() {
   const capturedTextRef = useRef<string>('')
   
   const toolbarVisibility = useResponsiveToolbar(toolbarRef)
-  const keyboardHeight = useKeyboardHeight()
-  const isKeyboardVisible = keyboardHeight > 0
 
   // TipTap editor setup
   const extensions = useMemo(() => [
@@ -444,11 +441,7 @@ export function FreeNoteView() {
             {/* Toolbar */}
             <div 
               ref={toolbarRef}
-              className={cn(
-                "flex-shrink-0 border-b border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm relative z-20",
-                isKeyboardVisible && "fixed bottom-0 left-0 right-0 border-t border-b-0 rounded-none safe-x"
-              )}
-              style={isKeyboardVisible ? { bottom: keyboardHeight } : undefined}
+              className="flex-shrink-0 border-b border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm relative z-20"
             >
               <div className="flex items-center gap-0.5 p-1.5 sm:p-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 {/* Undo/Redo */}
@@ -1037,7 +1030,6 @@ export function FreeNoteView() {
             <div 
               ref={editorContainerRef}
               className="flex-1 overflow-y-auto p-4 sm:p-6 relative z-10"
-              style={isKeyboardVisible ? { paddingBottom: 80 } : undefined}
             >
               {/* Title Input */}
               <input

@@ -16,11 +16,13 @@ import {
 import type { Note } from '@/types'
 import { cn } from '@/lib/utils'
 
-// Smooth transition config - longer duration for more frames = smoother animation
+// Smooth transition config - optimized for layout animations
 const LAYOUT_TRANSITION = { 
   layout: { 
-    duration: 0.3, 
-    ease: [0.4, 0, 0.2, 1] as const // Material Design standard easing - smoother
+    type: 'spring' as const,
+    stiffness: 350,
+    damping: 30,
+    mass: 1,
   }
 }
 
@@ -43,9 +45,9 @@ export function NoteCard({ note, searchQuery }: NoteCardProps) {
   useEffect(() => {
     if (isThisNoteSelected && isModalOpen) {
       setIsAnimating(true)
-    } else if (isThisNoteSelected && !isModalOpen && isAnimating) {
-      // Modal just closed, keep animating state for animation duration
-      const timer = setTimeout(() => setIsAnimating(false), 300)
+    } else if (!isModalOpen && isAnimating) {
+      // Modal closed, keep animating state longer for smooth transition
+      const timer = setTimeout(() => setIsAnimating(false), 400)
       return () => clearTimeout(timer)
     }
   }, [isModalOpen, isThisNoteSelected, isAnimating])
@@ -168,9 +170,9 @@ export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
   useEffect(() => {
     if (isThisNoteSelected && isModalOpen) {
       setIsAnimating(true)
-    } else if (isThisNoteSelected && !isModalOpen && isAnimating) {
-      // Modal just closed, keep animating state for animation duration
-      const timer = setTimeout(() => setIsAnimating(false), 300)
+    } else if (!isModalOpen && isAnimating) {
+      // Modal closed, keep animating state longer for smooth transition
+      const timer = setTimeout(() => setIsAnimating(false), 400)
       return () => clearTimeout(timer)
     }
   }, [isModalOpen, isThisNoteSelected, isAnimating])

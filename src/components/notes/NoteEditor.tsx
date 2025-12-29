@@ -87,7 +87,6 @@ import { SpeechButton } from './SpeechButton'
 import { EditorSkeleton } from '@/components/ui/Skeleton'
 import { useNetworkRequiredOverlay } from '@/components/ui/OfflineIndicator'
 import { useResponsiveToolbar } from '@/hooks/useResponsiveToolbar'
-import { useKeyboardHeight } from '@/hooks/useKeyboardHeight'
 import * as AI from '@/lib/ai'
 import { InsufficientCreditsError } from '@/lib/ai'
 import type { Note, NoteStyle, AIChatMessage } from '@/types'
@@ -215,10 +214,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   
   // Responsive toolbar visibility
   const toolbarVisibility = useResponsiveToolbar(toolbarRef)
-  
-  // Keyboard height for mobile toolbar positioning
-  const keyboardHeight = useKeyboardHeight()
-  const isKeyboardVisible = keyboardHeight > 0
 
   // Clear AI error after 5 seconds
   useEffect(() => {
@@ -1056,7 +1051,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       <div 
         ref={editorContainerRef} 
         className="flex-1 overflow-y-auto px-4 relative"
-        style={isKeyboardVisible ? { paddingBottom: 60 } : undefined}
       >
         {/* Title + Pin - Desktop (now scrolls with content), hidden when fullscreen */}
         {!isFullscreen && (
@@ -1160,16 +1154,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       {/* Footer Toolbar */}
       <div 
         ref={toolbarRef} 
-        className={cn(
-          "flex items-center justify-between px-2 py-1.5 bg-neutral-100/80 dark:bg-neutral-800/60 backdrop-blur-sm safe-x",
-          isKeyboardVisible 
-            ? "fixed left-0 right-0 z-50 rounded-none shadow-lg border-t border-neutral-200 dark:border-neutral-700" 
-            : "relative rounded-b-[12px] safe-bottom"
-        )}
-        style={isKeyboardVisible ? { 
-          bottom: keyboardHeight,
-          transition: 'bottom 0.15s ease-out'
-        } : undefined}
+        className="flex items-center justify-between px-2 py-1.5 bg-neutral-100/80 dark:bg-neutral-800/60 backdrop-blur-sm safe-x relative rounded-b-[12px] safe-bottom"
       >
         {/* AI Modals - positioned above toolbar */}
         <SummaryModal
@@ -1603,26 +1588,17 @@ function ToolbarButton({
 }) {
   const buttonRef = useRef<HTMLButtonElement>(null)
   
-  // Use non-passive touch event listener to properly prevent default
-  // This fixes "Unable to preventDefault inside passive event listener" error
-  useEffect(() => {
-    const button = buttonRef.current
-    if (!button) return
-    
-    const preventFocusLoss = (e: TouchEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
+  // Handle touch events to prevent editor focus loss while still allowing click
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    // Prevent default to stop focus from moving to button
+    e.preventDefault()
+    // Manually trigger onClick
+    if (!disabled && onClick) {
+      onClick()
     }
-    
-    // Add non-passive listener to allow preventDefault
-    button.addEventListener('touchstart', preventFocusLoss, { passive: false })
-    
-    return () => {
-      button.removeEventListener('touchstart', preventFocusLoss)
-    }
-  }, [])
+  }, [disabled, onClick])
 
-  // Prevent keyboard from triggering when clicking toolbar buttons on mobile
+  // Prevent mouse events from stealing focus on desktop
   const preventMouseFocusLoss = (e: React.MouseEvent) => {
     e.preventDefault()
   }
@@ -1631,7 +1607,14 @@ function ToolbarButton({
     <button
       ref={buttonRef}
       onMouseDown={preventMouseFocusLoss}
-      onClick={onClick}
+      onTouchEnd={handleTouchEnd}
+      onClick={(e) => {
+        // Only handle click for non-touch (mouse) interactions
+        // Touch is handled by onTouchEnd
+        if (e.detail > 0 && onClick && !disabled) {
+          onClick()
+        }
+      }}
       disabled={disabled}
       className={cn(
         'p-1.5 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors touch-manipulation',

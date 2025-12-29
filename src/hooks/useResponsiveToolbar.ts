@@ -37,6 +37,7 @@ export interface ToolbarVisibility {
   share: boolean
   history: boolean
   fullscreen: boolean
+  image: boolean
   
   // Priority 2 - sm+
   strikethrough: boolean
@@ -65,7 +66,6 @@ export interface ToolbarVisibility {
   superscript: boolean
   horizontalRule: boolean
   clearFormatting: boolean
-  image: boolean
   exportImport: boolean
   
   // Dividers visibility
@@ -103,6 +103,7 @@ function getVisibilityForWidth(width: number): ToolbarVisibility {
     share: p1,
     history: p1,
     fullscreen: p1,
+    image: p1,
     
     // Priority 2 - sm+
     strikethrough: p2,
@@ -131,7 +132,6 @@ function getVisibilityForWidth(width: number): ToolbarVisibility {
     superscript: p5,
     horizontalRule: p5,
     clearFormatting: p5,
-    image: p5,
     exportImport: p5,
     
     // Dividers - show only when adjacent items are visible

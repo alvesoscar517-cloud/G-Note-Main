@@ -21,48 +21,14 @@ declare module '@tiptap/core' {
   }
 }
 
-/**
- * Detect if device is a mobile phone (not tablet or laptop with touch)
- * Uses screen size + touch capability + user agent hints
- */
-function isMobilePhone(): boolean {
-  if (typeof window === 'undefined') return false
-  
-  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-  if (!hasTouch) return false
-  
-  // Check screen size - mobile phones typically < 768px width
-  const isSmallScreen = window.innerWidth < 768
-  
-  // Additional check using user agent for mobile-specific keywords
-  const userAgent = navigator.userAgent.toLowerCase()
-  const isMobileUA = /android|webos|iphone|ipod|blackberry|iemobile|opera mini|mobile/i.test(userAgent)
-  
-  // Exclude tablets (iPad, Android tablets)
-  const isTablet = /ipad|tablet/i.test(userAgent) || (window.innerWidth >= 768 && window.innerWidth <= 1024)
-  
-  return hasTouch && (isSmallScreen || (isMobileUA && !isTablet))
-}
-
 // NodeView component for resizable image
 function ResizableImageComponent({ node, updateAttributes, deleteNode, selected }: NodeViewProps) {
   const { t } = useTranslation()
   const [showEditor, setShowEditor] = useState(false)
   const [isActive, setIsActive] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
   const imageRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const touchStartPosRef = useRef<{ x: number; y: number } | null>(null)
-
-  // Detect mobile on mount
-  useEffect(() => {
-    setIsMobile(isMobilePhone())
-    
-    const handleResize = () => setIsMobile(isMobilePhone())
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   const { src, alt, width, height } = node.attrs as { 
     src: string
@@ -102,8 +68,7 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
     document.body.removeChild(link)
   }, [src, alt])
 
-  // Activate on click/touch, deactivate on click outside
-  // On mobile: only activate on long press
+  // Activate on click/touch - show toolbar immediately
   const handleImageClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     e.preventDefault()
@@ -113,65 +78,41 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
       document.activeElement.blur()
     }
     
-    // On desktop/laptop: activate immediately on click
-    if (!isMobile) {
-      setIsActive(true)
-    }
-  }, [isMobile])
+    // Activate immediately on click (both mobile and desktop)
+    setIsActive(true)
+  }, [])
 
-  // Touch handlers for mobile long press
+  // Touch handlers - activate immediately on tap
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     // Prevent default to stop editor from focusing
     e.stopPropagation()
     
-    if (!isMobile) {
-      // On non-mobile touch devices (laptop), activate immediately
-      // Blur editor to prevent keyboard
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur()
-      }
-      setIsActive(true)
-      return
-    }
-    
-    // On mobile: start long press timer
+    // Store touch position to detect if it's a tap or scroll
     const touch = e.touches[0]
     touchStartPosRef.current = { x: touch.clientX, y: touch.clientY }
-    
-    longPressTimerRef.current = setTimeout(() => {
-      // Blur editor to prevent keyboard from opening
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur()
-      }
-      setIsActive(true)
-      // Haptic feedback if available
-      if (navigator.vibrate) {
-        navigator.vibrate(50)
-      }
-    }, 500) // 500ms long press
-  }, [isMobile])
+  }, [])
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isMobile || !touchStartPosRef.current) return
+    if (!touchStartPosRef.current) return
     
-    // Cancel long press if finger moved too much
+    // Cancel tap if finger moved too much (user is scrolling)
     const touch = e.touches[0]
     const deltaX = Math.abs(touch.clientX - touchStartPosRef.current.x)
     const deltaY = Math.abs(touch.clientY - touchStartPosRef.current.y)
     
     if (deltaX > 10 || deltaY > 10) {
-      if (longPressTimerRef.current) {
-        clearTimeout(longPressTimerRef.current)
-        longPressTimerRef.current = null
-      }
+      touchStartPosRef.current = null
     }
-  }, [isMobile])
+  }, [])
 
   const handleTouchEnd = useCallback(() => {
-    // Clear long press timer
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current)
-      longPressTimerRef.current = null
+    // If touch position still exists, it was a tap (not a scroll)
+    if (touchStartPosRef.current) {
+      // Blur editor to prevent keyboard from opening
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur()
+      }
+      setIsActive(true)
     }
     touchStartPosRef.current = null
   }, [])

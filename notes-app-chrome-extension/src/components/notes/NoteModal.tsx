@@ -249,15 +249,15 @@ export function NoteModal() {
   if (!displayNote) return null
 
   return (
-    <AnimatePresence mode="sync">
-      {isModalOpen && (
+    <AnimatePresence mode="wait">
+      {isModalOpen && displayNote && (
         <>
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: 0.2 }}
             className="hidden md:block fixed inset-0 bg-black/50 z-40"
             onClick={handleClose}
           />

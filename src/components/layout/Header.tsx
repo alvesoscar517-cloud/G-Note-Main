@@ -133,7 +133,8 @@ export function Header() {
   }
 
   const handleLogout = async () => {
-    // Show confirmation dialog
+    // Close settings modal and show confirmation dialog
+    setSettingsOpen(false)
     setShowLogoutConfirm(true)
   }
 
