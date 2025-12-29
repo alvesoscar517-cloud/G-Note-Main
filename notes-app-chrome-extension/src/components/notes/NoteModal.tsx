@@ -1,8 +1,5 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Pin, PinOff } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Button } from '@/components/ui/Button'
 import { NoteEditor } from './NoteEditor'
 import { useNotesStore } from '@/stores/notesStore'
 import { useUIStore, type ModalSize } from '@/stores/uiStore'
@@ -44,56 +41,11 @@ const CONTENT_TRANSITION = {
   ease: [0.4, 0, 0.2, 1] as const
 }
 
-// Editable title component with ellipsis support for mobile
-function MobileEditableTitle({ 
-  value, 
-  onChange, 
-  placeholder
-}: { 
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-}) {
-  const [isEditing, setIsEditing] = useState(false)
-
-  if (isEditing) {
-    return (
-      <input
-        autoFocus
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onBlur={() => setIsEditing(false)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === 'Escape') {
-            setIsEditing(false)
-          }
-        }}
-        placeholder={placeholder}
-        className="w-full text-base font-medium bg-transparent border-0 outline-none text-neutral-900 dark:text-white placeholder:text-neutral-400"
-      />
-    )
-  }
-
-  return (
-    <div
-      onClick={() => setIsEditing(true)}
-      className={cn(
-        'overflow-hidden text-ellipsis whitespace-nowrap cursor-text text-base font-medium text-neutral-900 dark:text-white',
-        !value && 'text-neutral-400'
-      )}
-    >
-      {value || placeholder}
-    </div>
-  )
-}
-
 export function NoteModal() {
-  const { t } = useTranslation()
   const isModalOpen = useNotesStore(state => state.isModalOpen)
   const setModalOpen = useNotesStore(state => state.setModalOpen)
   const selectedNoteId = useNotesStore(state => state.selectedNoteId)
   const togglePin = useNotesStore(state => state.togglePin)
-  const updateNote = useNotesStore(state => state.updateNote)
   const modalSize = useUIStore(state => state.modalSize)
   
   // Subscribe to the specific note by ID - memoized selector
@@ -234,12 +186,8 @@ export function NoteModal() {
     if (displayNote) togglePin(displayNote.id)
   }
 
-  const handleUpdateTitle = (value: string) => {
-    if (displayNote) updateNote(displayNote.id, { title: value })
-  }
-
   // Swipe down to close on mobile (only on fullscreen/mobile view)
-  const { handlers: swipeHandlers, swipeStyle } = useSwipeGesture({
+  const { handlers: swipeHandlers } = useSwipeGesture({
     onSwipeDown: handleClose,
     threshold: 80,
     enabled: isModalOpen
@@ -295,28 +243,8 @@ export function NoteModal() {
               <div className="w-10 h-1 bg-neutral-300 dark:bg-neutral-600 rounded-full swipe-indicator" />
             </div>
             
-            {/* Mobile Header OR Fullscreen Header */}
-            <div 
-              className={cn(
-                'flex items-center gap-1 px-2 py-1.5 relative z-10 safe-x',
-                isFullscreen ? 'flex safe-top' : 'md:hidden'
-              )}
-              style={swipeStyle}
-            >
-              <Button variant="ghost" size="icon" onClick={handleClose} className="shrink-0">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <div className="flex-1 min-w-0">
-                <MobileEditableTitle
-                  value={displayNote.title}
-                  onChange={handleUpdateTitle}
-                  placeholder={t('notes.title')}
-                />
-              </div>
-              <Button variant="ghost" size="icon" onClick={handleTogglePin} className="shrink-0">
-                {displayNote.isPinned ? <PinOff className="w-5 h-5" /> : <Pin className="w-5 h-5" />}
-              </Button>
-            </div>
+            {/* Mobile Header - only visible on mobile, scrolls with content via NoteEditor */}
+            {/* Desktop header is handled inside NoteEditor's scrollable area */}
 
             {/* Content */}
             <motion.div 

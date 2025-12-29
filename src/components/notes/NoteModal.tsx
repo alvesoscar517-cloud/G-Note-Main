@@ -255,7 +255,7 @@ export function NoteModal() {
               ...(edgeSwipeState.isDragging ? edgeSwipeStyle : {})
             }}
             className={cn(
-              'fixed z-50 flex flex-col overflow-hidden status-bar-bg',
+              'fixed z-50 flex flex-col overflow-hidden',
               'inset-0',
               'md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2',
               'md:rounded-[12px] md:shadow-2xl md:border md:border-neutral-200 md:dark:border-neutral-700',

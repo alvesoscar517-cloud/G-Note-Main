@@ -62,7 +62,8 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
-  RemoveFormatting
+  RemoveFormatting,
+  ArrowLeft
 } from 'lucide-react'
 import { useNotesStore } from '@/stores/notesStore'
 import { useAuthStore } from '@/stores/authStore'
@@ -1078,9 +1079,72 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
 
       {/* Scrollable Content Area - includes title */}
       <div ref={editorContainerRef} className="flex-1 overflow-y-auto px-4 relative">
-        {/* Title + Pin - Desktop (now scrolls with content), hidden when fullscreen */}
-        {!isFullscreen && (
-          <div className="hidden md:flex items-center gap-2 pt-4 pb-2 min-w-0">
+        {/* Mobile Header - Back + Title + Pin - scrolls with content */}
+        <div className="md:hidden flex items-center gap-2 pt-4 pb-2 min-w-0">
+          <button
+            onClick={onClose}
+            className="p-2 -ml-2 rounded-full text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shrink-0"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          
+          <div className="flex-1 min-w-0">
+            <EditableTitle
+              value={note.title}
+              onChange={(value) => updateNote(note.id, { title: value })}
+              placeholder={t('notes.title')}
+              className="text-xl font-medium text-neutral-900 dark:text-white"
+            />
+          </div>
+          
+          {/* Collaboration indicator */}
+          {roomId && collaborators.length > 0 && (
+            <div className="flex items-center gap-1">
+              <div className="flex -space-x-1">
+                {collaborators.slice(0, 3).map((collab, i) => (
+                  <div
+                    key={i}
+                    className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium text-white border-2 border-white dark:border-neutral-900"
+                    style={{ backgroundColor: collab.color }}
+                    title={collab.name}
+                  >
+                    {collab.name.charAt(0).toUpperCase()}
+                  </div>
+                ))}
+                {collaborators.length > 3 && (
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium bg-neutral-300 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-200 border-2 border-white dark:border-neutral-900">
+                    +{collaborators.length - 3}
+                  </div>
+                )}
+              </div>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            </div>
+          )}
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={onTogglePin}
+                className="p-2 rounded-full text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              >
+                {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{isPinned ? t('notes.unpin') : t('notes.pin')}</TooltipContent>
+          </Tooltip>
+        </div>
+
+        {/* Title + Pin - Desktop (now scrolls with content) */}
+        <div className="hidden md:flex items-center gap-2 pt-4 pb-2 min-w-0">
+            {/* Back button - only when fullscreen on desktop */}
+            {isFullscreen && (
+              <button
+                onClick={onClose}
+                className="p-2 -ml-2 rounded-full text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shrink-0"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
             <div className="flex-1 min-w-0">
               <EditableTitle
                 value={note.title}
@@ -1126,7 +1190,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <TooltipContent>{isPinned ? t('notes.unpin') : t('notes.pin')}</TooltipContent>
             </Tooltip>
           </div>
-        )}
 
         {/* Editor Content or Skeleton Loading */}
         {isAILoading ? (
