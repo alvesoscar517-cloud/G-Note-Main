@@ -37,6 +37,21 @@ export function generateRoomId(): string {
   return result
 }
 
+// Sanitize room ID - remove invalid characters, normalize to lowercase
+export function sanitizeRoomId(roomId: string): string {
+  // Remove all characters except lowercase letters and numbers
+  // Also convert to lowercase first to handle uppercase input
+  return roomId
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+}
+
+// Validate room ID format
+export function isValidRoomId(roomId: string): boolean {
+  // Must be exactly 8 characters of lowercase letters and numbers
+  return /^[a-z0-9]{8}$/.test(roomId)
+}
+
 // Create or join a collaboration room
 export function joinRoom(roomId: string, userName: string, userColor: string): CollaborationRoom {
   // Check if already connected to this room

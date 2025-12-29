@@ -29,6 +29,21 @@ export function generateRoomId(): string {
   return result
 }
 
+// Sanitize room ID - remove invalid characters, normalize to lowercase
+export function sanitizeRoomId(roomId: string): string {
+  // Remove all characters except lowercase letters and numbers
+  // Also convert to lowercase first to handle uppercase input
+  return roomId
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '')
+}
+
+// Validate room ID format
+export function isValidRoomId(roomId: string): boolean {
+  // Must be exactly 8 characters of lowercase letters and numbers
+  return /^[a-z0-9]{8}$/.test(roomId)
+}
+
 // Custom signaling server URL - can be configured via environment variable
 // For production, you should host your own signaling server
 const SIGNALING_SERVERS = import.meta.env.VITE_SIGNALING_SERVERS

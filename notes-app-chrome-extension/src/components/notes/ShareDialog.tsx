@@ -4,7 +4,7 @@ import { Copy, Check, Users, Link2, Mail, Loader2, Globe, WifiOff } from 'lucide
 import { Dialog, DialogHeader, DialogContent, DialogFooter } from '@/components/ui/Dialog'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { generateRoomId } from '@/lib/collaboration'
+import { generateRoomId, sanitizeRoomId, isValidRoomId } from '@/lib/collaboration'
 import { driveShare } from '@/lib/driveShare'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
@@ -70,8 +70,9 @@ export function ShareDialog({
   }
 
   const handleJoinRoom = () => {
-    if (joinRoomId.trim()) {
-      onJoinRoom(joinRoomId.trim())
+    const sanitized = sanitizeRoomId(joinRoomId)
+    if (sanitized && isValidRoomId(sanitized)) {
+      onJoinRoom(sanitized)
       onClose()
     }
   }
@@ -273,9 +274,10 @@ export function ShareDialog({
               </p>
               <Input 
                 value={joinRoomId}
-                onChange={(e) => setJoinRoomId(e.target.value)}
+                onChange={(e) => setJoinRoomId(sanitizeRoomId(e.target.value))}
                 placeholder={t('share.joinPlaceholder')}
-                className="font-mono text-center tracking-wider"
+                className="font-mono text-center tracking-wider uppercase"
+                maxLength={8}
               />
             </div>
           )}
@@ -318,7 +320,7 @@ export function ShareDialog({
         )}
         
         {mode === 'join' && (
-          <Button onClick={handleJoinRoom} disabled={!joinRoomId.trim() || !isOnline}>{t('share.joinButton')}</Button>
+          <Button onClick={handleJoinRoom} disabled={!isValidRoomId(sanitizeRoomId(joinRoomId)) || !isOnline}>{t('share.joinButton')}</Button>
         )}
       </DialogFooter>
     </Dialog>
