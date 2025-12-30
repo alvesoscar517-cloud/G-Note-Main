@@ -5,6 +5,7 @@ import { Search, Plus, Moon, Sun, LogOut, RefreshCw, Settings, X, Coins, Chevron
 import { Input } from '@/components/ui/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
+import { useNetworkStore } from '@/stores/networkStore'
 import { useThemeStore } from '@/stores/themeStore'
 import { useCreditsStore } from '@/stores/creditsStore'
 import { useUIStore, type ModalSize } from '@/stores/uiStore'
@@ -56,6 +57,7 @@ const CREDIT_PACKAGES = [
 export function Header() {
   const { t } = useTranslation()
   const { user, logout } = useAuthStore()
+  const isOnline = useNetworkStore(state => state.isOnline)
   
   // Use selectors to prevent unnecessary re-renders
   const setSearchQuery = useNotesStore(state => state.setSearchQuery)
