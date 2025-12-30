@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User } from '@/types'
 import { logoutFromBackend } from '@/lib/tokenRefresh'
-import { clearAllData } from '@/lib/offlineDb'
+import { clearAllData } from '@/lib/db/utils'
 
 interface AuthState {
   user: User | null

@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { X, Eraser, Undo2, Redo2, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ConfirmDialog } from '@/components/ui/Dialog'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
+import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
 
 interface Point {
   x: number
@@ -34,6 +36,18 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
   const [currentColor, setCurrentColor] = useState('#000000')
   const [currentWidth, setCurrentWidth] = useState(4)
   const [isEraser, setIsEraser] = useState(false)
+  
+  // Edge swipe back gesture
+  const { 
+    swipeStyle: edgeSwipeStyle,
+    swipeState: edgeSwipeState,
+    progress: edgeSwipeProgress 
+  } = useEdgeSwipeBack({
+    onSwipeBack: onClose,
+    edgeWidth: 25,
+    threshold: 100,
+    enabled: open
+  })
   
   // Use refs for performance-critical data
   const strokesRef = useRef<Stroke[]>([])
@@ -267,8 +281,16 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
 
   if (!open) return null
 
-  return (
-    <div className="fixed inset-0 z-50 bg-white dark:bg-neutral-900 flex flex-col">
+  return createPortal(
+    <div 
+      className="fixed inset-0 z-50 bg-white dark:bg-neutral-900 flex flex-col"
+      style={edgeSwipeStyle}
+    >
+      <EdgeSwipeIndicator 
+        progress={edgeSwipeProgress} 
+        isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
+      />
+      
       {/* Clear Confirm Dialog */}
       <ConfirmDialog
         open={showClearConfirm}
@@ -422,6 +444,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

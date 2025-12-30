@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
@@ -319,7 +320,7 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
   // Get user's first name
   const userName = user?.name?.split(' ')[0] || 'there'
 
-  return (
+  return createPortal(
     <div 
       className="fixed inset-0 z-50 bg-white dark:bg-neutral-950 flex flex-col status-bar-bg"
       style={edgeSwipeState.isDragging ? edgeSwipeStyle : undefined}
@@ -331,13 +332,12 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
         isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
       />
       
-      {/* Back button - badge style on left side */}
+      {/* Back button - icon only */}
       <button
         onClick={onClose}
-        className="absolute z-10 inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors text-sm font-medium top-3 left-3 safe-top"
+        className="absolute z-10 p-2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors top-3 left-3 safe-top"
       >
-        <ChevronLeft className="w-4 h-4" />
-        {t('notes.close')}
+        <ChevronLeft className="w-5 h-5" />
       </button>
 
       {/* Messages Area - with proper padding to prevent text cutoff */}
@@ -464,7 +464,7 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
                       'p-2 rounded-xl transition-colors',
                       !input.trim() || loading
                         ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-600 cursor-not-allowed'
-                        : 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100'
+                        : 'border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                     )}
                   >
                     {loading ? (
@@ -480,7 +480,8 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 

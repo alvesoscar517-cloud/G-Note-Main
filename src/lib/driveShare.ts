@@ -1,7 +1,44 @@
 import type { Note } from '@/types'
+import i18n from '@/locales'
 
 const DRIVE_API = 'https://www.googleapis.com/drive/v3'
 const SHARED_FOLDER_NAME = 'G-Note-Shared'
+
+// Default title translations for untitled notes
+const UNTITLED_NOTE_TRANSLATIONS: Record<string, string> = {
+  en: 'Untitled Note',
+  vi: 'Ghi chú không tiêu đề',
+  ja: '無題のノート',
+  ko: '제목 없는 노트',
+  'zh-CN': '无标题笔记',
+  'zh-TW': '無標題筆記',
+  de: 'Unbenannte Notiz',
+  fr: 'Note sans titre',
+  es: 'Nota sin título',
+  'pt-BR': 'Nota sem título',
+  it: 'Nota senza titolo',
+  nl: 'Naamloze notitie',
+  ar: 'ملاحظة بدون عنوان',
+  hi: 'बिना शीर्षक नोट',
+  tr: 'Başlıksız Not',
+  pl: 'Notatka bez tytułu',
+  th: 'โน้ตไม่มีชื่อ',
+  id: 'Catatan Tanpa Judul'
+}
+
+// Get default title based on current language
+function getDefaultTitle(): string {
+  const lang = i18n.language || 'en'
+  return UNTITLED_NOTE_TRANSLATIONS[lang] || UNTITLED_NOTE_TRANSLATIONS['en']
+}
+
+// Generate share file name with format: [G-Note] Title - note-{id}.json
+function generateShareFileName(note: Note): string {
+  const title = note.title?.trim() || getDefaultTitle()
+  // Sanitize title for file name (remove invalid characters)
+  const safeTitle = title.replace(/[<>:"/\\|?*]/g, '').substring(0, 50)
+  return `[G-Note] ${safeTitle} - note-${note.id}.json`
+}
 
 class DriveShare {
   private accessToken: string | null = null
@@ -81,7 +118,7 @@ class DriveShare {
     const folderId = await this.getOrCreateSharedFolder()
     
     const metadata = {
-      name: `note-${note.id}.json`,
+      name: generateShareFileName(note),
       mimeType: 'application/json',
       parents: [folderId]
     }
@@ -201,7 +238,7 @@ class DriveShare {
     const folderId = await this.getOrCreateSharedFolder()
     
     const metadata = {
-      name: `note-public-${note.id}.json`,
+      name: generateShareFileName(note),
       mimeType: 'application/json',
       parents: [folderId]
     }

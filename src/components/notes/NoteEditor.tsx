@@ -8,6 +8,7 @@ import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 import { ResizableImage } from './ResizableImageExtension'
 import { DrawingModal } from './DrawingModal'
+import { CollaborationCursors } from './CollaborationCursors'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import { common, createLowlight } from 'lowlight'
 import { Markdown } from 'tiptap-markdown'
@@ -1198,11 +1199,18 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         ) : (
           <ContextMenu>
             <ContextMenuTrigger asChild onContextMenu={handleContextMenuOpen}>
-              <div>
+              <div className="relative">
                 <EditorContent 
                   editor={editor} 
                   className="min-h-[200px] text-neutral-700 dark:text-neutral-300"
                 />
+                {/* Collaboration cursors overlay */}
+                {isCollaborationReady && provider && (
+                  <CollaborationCursors 
+                    editor={editor} 
+                    provider={provider}
+                  />
+                )}
               </div>
             </ContextMenuTrigger>
             <ContextMenuContent>
@@ -1234,7 +1242,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       {/* Footer Toolbar */}
       <div 
         ref={toolbarRef} 
-        className="flex items-center justify-between px-2 py-1.5 bg-neutral-100/80 dark:bg-neutral-800/60 backdrop-blur-sm safe-x relative rounded-b-[12px] safe-bottom"
+        className="flex items-center justify-between py-1.5 bg-neutral-100/80 dark:bg-neutral-800/60 backdrop-blur-sm safe-x relative rounded-b-[12px] safe-bottom"
       >
         {/* AI Modals - positioned above toolbar */}
         <SummaryModal
@@ -1285,12 +1293,10 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             />
           )}
           
-          {toolbarVisibility.dividerAfterVoice && <Divider />}
-          
           {/* Primary formatting tools - Priority 1 */}
           {toolbarVisibility.bold && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleBold().run()}
+              onClick={() => editor?.chain().toggleBold().run()}
               active={editor?.isActive('bold')}
               tooltip={t('editor.bold')}
             >
@@ -1299,7 +1305,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.italic && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleItalic().run()}
+              onClick={() => editor?.chain().toggleItalic().run()}
               active={editor?.isActive('italic')}
               tooltip={t('editor.italic')}
             >
@@ -1308,7 +1314,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.underline && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleUnderline().run()}
+              onClick={() => editor?.chain().toggleUnderline().run()}
               active={editor?.isActive('underline')}
               tooltip={t('editor.underline')}
             >
@@ -1319,7 +1325,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           {/* Priority 2 - sm+ */}
           {toolbarVisibility.strikethrough && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleStrike().run()}
+              onClick={() => editor?.chain().toggleStrike().run()}
               active={editor?.isActive('strike')}
               tooltip={t('editor.strikethrough')}
             >
@@ -1328,7 +1334,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.highlight && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleHighlight().run()}
+              onClick={() => editor?.chain().toggleHighlight().run()}
               active={editor?.isActive('highlight')}
               tooltip={t('editor.highlight')}
             >
@@ -1336,12 +1342,10 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
           
-          {toolbarVisibility.dividerAfterHighlight && <Divider />}
-          
           {/* Headings - Priority 2 & 3 */}
           {toolbarVisibility.heading1 && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+              onClick={() => editor?.chain().toggleHeading({ level: 1 }).run()}
               active={editor?.isActive('heading', { level: 1 })}
               tooltip={t('editor.heading1')}
             >
@@ -1350,7 +1354,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.heading2 && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+              onClick={() => editor?.chain().toggleHeading({ level: 2 }).run()}
               active={editor?.isActive('heading', { level: 2 })}
               tooltip={t('editor.heading2')}
             >
@@ -1359,7 +1363,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.heading3 && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
+              onClick={() => editor?.chain().toggleHeading({ level: 3 }).run()}
               active={editor?.isActive('heading', { level: 3 })}
               tooltip={t('editor.heading3')}
             >
@@ -1367,12 +1371,10 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
           
-          {toolbarVisibility.dividerAfterHeadings && <Divider />}
-          
           {/* Lists - Priority 2 & 3 */}
           {toolbarVisibility.bulletList && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleBulletList().run()}
+              onClick={() => editor?.chain().toggleBulletList().run()}
               active={editor?.isActive('bulletList')}
               tooltip={t('editor.bulletList')}
             >
@@ -1381,7 +1383,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.orderedList && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+              onClick={() => editor?.chain().toggleOrderedList().run()}
               active={editor?.isActive('orderedList')}
               tooltip={t('editor.numberedList')}
             >
@@ -1390,7 +1392,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.taskList && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleTaskList().run()}
+              onClick={() => editor?.chain().toggleTaskList().run()}
               active={editor?.isActive('taskList')}
               tooltip={t('editor.taskList')}
             >
@@ -1398,12 +1400,10 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
           
-          {toolbarVisibility.dividerAfterLists && <Divider />}
-          
           {/* Text alignment - Priority 3 & 4 */}
           {toolbarVisibility.alignLeft && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().setTextAlign('left').run()}
+              onClick={() => editor?.chain().setTextAlign('left').run()}
               active={editor?.isActive({ textAlign: 'left' })}
               tooltip={t('editor.alignLeft')}
             >
@@ -1412,7 +1412,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.alignCenter && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().setTextAlign('center').run()}
+              onClick={() => editor?.chain().setTextAlign('center').run()}
               active={editor?.isActive({ textAlign: 'center' })}
               tooltip={t('editor.alignCenter')}
             >
@@ -1421,7 +1421,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.alignRight && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().setTextAlign('right').run()}
+              onClick={() => editor?.chain().setTextAlign('right').run()}
               active={editor?.isActive({ textAlign: 'right' })}
               tooltip={t('editor.alignRight')}
             >
@@ -1430,7 +1430,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.alignJustify && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().setTextAlign('justify').run()}
+              onClick={() => editor?.chain().setTextAlign('justify').run()}
               active={editor?.isActive({ textAlign: 'justify' })}
               tooltip={t('editor.alignJustify')}
             >
@@ -1438,12 +1438,10 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
           
-          {toolbarVisibility.dividerAfterAlignment && <Divider />}
-          
           {/* Code & Quote - Priority 4 */}
           {toolbarVisibility.inlineCode && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleCode().run()}
+              onClick={() => editor?.chain().toggleCode().run()}
               active={editor?.isActive('code')}
               tooltip={t('editor.inlineCode')}
             >
@@ -1452,7 +1450,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.codeBlock && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+              onClick={() => editor?.chain().toggleCodeBlock().run()}
               active={editor?.isActive('codeBlock')}
               tooltip={t('editor.codeBlock')}
             >
@@ -1461,7 +1459,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.blockquote && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleBlockquote().run()}
+              onClick={() => editor?.chain().toggleBlockquote().run()}
               active={editor?.isActive('blockquote')}
               tooltip={t('editor.blockquote')}
             >
@@ -1469,12 +1467,10 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
           
-          {toolbarVisibility.dividerAfterCode && <Divider />}
-          
           {/* Subscript & Superscript - Priority 5 */}
           {toolbarVisibility.subscript && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleSubscript().run()}
+              onClick={() => editor?.chain().toggleSubscript().run()}
               active={editor?.isActive('subscript')}
               tooltip={t('editor.subscript')}
             >
@@ -1483,7 +1479,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.superscript && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().toggleSuperscript().run()}
+              onClick={() => editor?.chain().toggleSuperscript().run()}
               active={editor?.isActive('superscript')}
               tooltip={t('editor.superscript')}
             >
@@ -1491,14 +1487,12 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
           
-          {toolbarVisibility.dividerAfterSubscript && <Divider />}
-          
           {/* Link - Priority 4 */}
           {toolbarVisibility.link && (
             <ToolbarButton
               onClick={() => {
                 if (editor?.isActive('link')) {
-                  editor.chain().focus().unsetLink().run()
+                  editor.chain().unsetLink().run()
                 } else {
                   setShowLinkDialog(true)
                 }
@@ -1513,7 +1507,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           {/* Horizontal rule - Priority 5 */}
           {toolbarVisibility.horizontalRule && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+              onClick={() => editor?.chain().setHorizontalRule().run()}
               tooltip={t('editor.horizontalRule')}
             >
               <Minus className="w-[18px] h-[18px]" />
@@ -1523,14 +1517,12 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           {/* Clear formatting - Priority 5 */}
           {toolbarVisibility.clearFormatting && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().clearNodes().unsetAllMarks().run()}
+              onClick={() => editor?.chain().clearNodes().unsetAllMarks().run()}
               tooltip={t('editor.clearFormatting')}
             >
               <RemoveFormatting className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-
-          {toolbarVisibility.dividerAfterLink && <Divider />}
 
           {/* Image & Drawing - Priority 5 */}
           {toolbarVisibility.image && (
@@ -1555,12 +1547,10 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             />
           )}
 
-          {toolbarVisibility.dividerAfterStyle && <Divider />}
-
           {/* Undo/Redo - Priority 1 */}
           {toolbarVisibility.undo && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().undo().run()}
+              onClick={() => editor?.chain().undo().run()}
               disabled={!editor?.can().undo()}
               tooltip={t('editor.undo')}
             >
@@ -1569,15 +1559,13 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
           {toolbarVisibility.redo && (
             <ToolbarButton
-              onClick={() => editor?.chain().focus().redo().run()}
+              onClick={() => editor?.chain().redo().run()}
               disabled={!editor?.can().redo()}
               tooltip={t('editor.redo')}
             >
               <Redo2 className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-
-          {toolbarVisibility.dividerAfterUndoRedo && <Divider />}
 
           {/* Export/Import menu - Priority 5 */}
           {toolbarVisibility.exportImport && (
@@ -1645,10 +1633,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       </div>
     </div>
   )
-}
-
-function Divider() {
-  return <div className="w-px h-4 bg-neutral-300 dark:bg-neutral-600 mx-1" />
 }
 
 function ToolbarButton({

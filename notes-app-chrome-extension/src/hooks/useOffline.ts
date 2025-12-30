@@ -9,7 +9,7 @@ import {
   getSyncQueueCount, 
   getSyncQueue, 
   type SyncQueueItem 
-} from '@/lib/offlineDb'
+} from '@/lib/db/syncQueueRepository'
 import type { Note, Collection } from '@/types'
 
 /**

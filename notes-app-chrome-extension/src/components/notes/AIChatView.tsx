@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
@@ -7,15 +8,17 @@ import { common, createLowlight } from 'lowlight'
 import { Markdown } from 'tiptap-markdown'
 import Link from '@tiptap/extension-link'
 import { 
-  X, 
+  ChevronLeft, 
   Send, 
   Mic,
   MessageCircle,
-  FileText
+  FileText,
+  X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { useAuthStore } from '@/stores/authStore'
+import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
 import * as AI from '@/lib/ai'
 import { InsufficientCreditsError } from '@/lib/ai'
 import type { AIChatMessage } from '@/types'
@@ -116,6 +119,18 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
+
+  // Edge swipe back gesture
+  const { 
+    swipeStyle: edgeSwipeStyle,
+    swipeState: edgeSwipeState,
+    progress: edgeSwipeProgress 
+  } = useEdgeSwipeBack({
+    onSwipeBack: onClose,
+    edgeWidth: 25,
+    threshold: 100,
+    enabled: open
+  })
 
   // Check if speech recognition is supported
   const isSpeechSupported = typeof window !== 'undefined' && 
@@ -306,18 +321,26 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
   // Get user's first name
   const userName = user?.name?.split(' ')[0] || 'there'
 
-  return (
-    <div className="fixed inset-0 z-50 bg-white dark:bg-neutral-950 flex flex-col">
-      {/* Close button - floating */}
+  return createPortal(
+    <div 
+      className="fixed inset-0 z-50 bg-white dark:bg-neutral-950 flex flex-col"
+      style={edgeSwipeStyle}
+    >
+      <EdgeSwipeIndicator 
+        progress={edgeSwipeProgress} 
+        isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
+      />
+      
+      {/* Close button - icon only */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-10 p-2 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+        className="absolute z-10 p-2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors top-3 left-3 safe-top"
       >
-        <X className="w-5 h-5" />
+        <ChevronLeft className="w-5 h-5" />
       </button>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
+      <div className="flex-1 overflow-y-auto px-4 pt-14 pb-6">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <MessageCircle className="w-16 h-16 text-neutral-400 dark:text-neutral-600 mb-4" strokeWidth={1.5} />
@@ -438,7 +461,7 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
                       'p-2 rounded-xl transition-colors',
                       !input.trim() || loading
                         ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 dark:text-neutral-600 cursor-not-allowed'
-                        : 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100'
+                        : 'border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                     )}
                   >
                     {loading ? (
@@ -454,7 +477,8 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 

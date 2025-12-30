@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User } from '@/types'
-import { clearAllData } from '@/lib/offlineDb'
+import { clearAllData } from '@/lib/db/utils'
 import { chromeGoogleLogout, isChromeExtension } from '@/lib/chromeAuth'
 
 interface AuthState {

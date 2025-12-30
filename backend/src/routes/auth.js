@@ -83,10 +83,15 @@ router.post('/google', async (req, res) => {
       })
     }
 
+    // Check if user exists (to determine if new user)
+    const existingUser = await db.collection(collections.users).doc(user.id).get()
+    const isNewUser = !existingUser.exists
+
     // Store/update user in Firestore
     await db.collection(collections.users).doc(user.id).set({
       ...user,
-      lastLogin: Date.now()
+      lastLogin: Date.now(),
+      ...(isNewUser && { createdAt: Date.now() })
     }, { merge: true })
 
     res.json({
@@ -95,7 +100,8 @@ router.post('/google', async (req, res) => {
       expiresIn: tokens.expiry_date 
         ? Math.floor((tokens.expiry_date - Date.now()) / 1000)
         : 3600,
-      grantedScopes: scopeValidation.grantedScopes
+      grantedScopes: scopeValidation.grantedScopes,
+      isNewUser
     })
   } catch (error) {
     console.error('Auth error:', error)

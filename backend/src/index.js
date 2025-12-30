@@ -7,7 +7,7 @@ import aiRoutes from './routes/ai.js'
 import webhookRoutes from './routes/webhooks.js'
 import driveRoutes from './routes/drive.js'
 import { getConfiguredPlatforms } from './config/google.js'
-import { setupSignaling } from './signaling.js'
+import { setupSignaling, getRoomInfo } from './signaling.js'
 
 const app = express()
 const PORT = process.env.PORT || 8080
@@ -88,6 +88,13 @@ app.get('/health', (req, res) => {
     timestamp: Date.now(),
     configuredPlatforms: getConfiguredPlatforms()
   })
+})
+
+// Room check API - verify if a collaboration room exists
+app.get('/rooms/:roomId/check', (req, res) => {
+  const { roomId } = req.params
+  const roomInfo = getRoomInfo(roomId)
+  res.json(roomInfo)
 })
 
 // Setup WebRTC signaling server for real-time collaboration

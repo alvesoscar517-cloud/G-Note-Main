@@ -27,29 +27,51 @@ const SIGNALING_SERVERS = import.meta.env.VITE_SIGNALING_SERVERS
       // Consider self-hosting for production use
     ]
 
-// Generate a shareable room ID
+// Backend API URL for room verification
+const API_URL = import.meta.env.VITE_API_URL || ''
+
+// Free STUN servers for NAT traversal (enables cross-network connections)
+const ICE_SERVERS = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' },
+  { urls: 'stun:stun3.l.google.com:19302' },
+  { urls: 'stun:stun4.l.google.com:19302' },
+]
+
+// Generate a shareable room ID (6 digits for easy mobile input)
 export function generateRoomId(): string {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  // Generate 6 random digits
   let result = ''
-  for (let i = 0; i < 8; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  for (let i = 0; i < 6; i++) {
+    result += Math.floor(Math.random() * 10).toString()
   }
   return result
 }
 
-// Sanitize room ID - remove invalid characters, normalize to lowercase
+// Sanitize room ID - keep only digits
 export function sanitizeRoomId(roomId: string): string {
-  // Remove all characters except lowercase letters and numbers
-  // Also convert to lowercase first to handle uppercase input
-  return roomId
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '')
+  return roomId.replace(/[^0-9]/g, '')
 }
 
-// Validate room ID format
+// Validate room ID format (6 digits)
 export function isValidRoomId(roomId: string): boolean {
-  // Must be exactly 8 characters of lowercase letters and numbers
-  return /^[a-z0-9]{8}$/.test(roomId)
+  return /^[0-9]{6}$/.test(roomId)
+}
+
+// Check if a room exists on the signaling server
+export async function checkRoomExists(roomId: string): Promise<{ exists: boolean; peerCount: number }> {
+  try {
+    const response = await fetch(`${API_URL}/rooms/${roomId}/check`)
+    if (response.ok) {
+      return await response.json()
+    }
+    return { exists: false, peerCount: 0 }
+  } catch (error) {
+    console.error('Failed to check room:', error)
+    // If API fails, allow joining anyway (fallback behavior)
+    return { exists: true, peerCount: 0 }
+  }
 }
 
 // Create or join a collaboration room
@@ -65,13 +87,15 @@ export function joinRoom(roomId: string, userName: string, userColor: string): C
   // Get the XML fragment for ProseMirror content
   const type = doc.getXmlFragment('prosemirror')
   
-  // Connect via WebRTC
-  // Configure signaling servers via VITE_SIGNALING_SERVERS env variable
-  // For production, host your own signaling server for reliability
+  // Connect via WebRTC with STUN servers for NAT traversal
+  // This enables connections across different networks (WiFi, 4G, etc.)
   const provider = new WebrtcProvider(`notes-app-${roomId}`, doc, {
     signaling: SIGNALING_SERVERS,
-    // BroadcastChannel enables same-browser tab collaboration
-    // This works even without signaling servers for local testing
+    peerOpts: {
+      config: {
+        iceServers: ICE_SERVERS
+      }
+    }
   })
 
   // Set user awareness (cursor, name, etc.)

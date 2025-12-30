@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Copy, Check, Users, Link2, Mail, Loader2, Globe, WifiOff } from 'lucide-react'
+import { Copy, Check, Users, Link2, Mail, Loader2, Globe, WifiOff, AlertCircle } from 'lucide-react'
 import { Dialog, DialogHeader, DialogContent, DialogFooter } from '@/components/ui/Dialog'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { generateRoomId, sanitizeRoomId, isValidRoomId } from '@/lib/collaboration'
+import { generateRoomId, sanitizeRoomId, isValidRoomId, checkRoomExists } from '@/lib/collaboration'
 import { driveShare } from '@/lib/driveShare'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
@@ -41,8 +41,10 @@ export function ShareDialog({
   const [shareEmail, setShareEmail] = useState('')
   const [mode, setMode] = useState<TabType>('public')
   const [isSharing, setIsSharing] = useState(false)
+  const [isCheckingRoom, setIsCheckingRoom] = useState(false)
   const [shareSuccess, setShareSuccess] = useState(false)
   const [shareError, setShareError] = useState<string | null>(null)
+  const [joinError, setJoinError] = useState<string | null>(null)
   const [publicLink, setPublicLink] = useState<string | null>(null)
   
   // Check if currently in a realtime session
@@ -69,11 +71,30 @@ export function ShareDialog({
     // Don't close - user needs to see and share the code
   }
 
-  const handleJoinRoom = () => {
+  const handleJoinRoom = async () => {
     const sanitized = sanitizeRoomId(joinRoomId)
-    if (sanitized && isValidRoomId(sanitized)) {
+    if (!sanitized || !isValidRoomId(sanitized)) return
+    
+    setIsCheckingRoom(true)
+    setJoinError(null)
+    
+    try {
+      // Check if room exists before joining
+      const roomInfo = await checkRoomExists(sanitized)
+      
+      if (!roomInfo.exists) {
+        setJoinError(t('share.roomNotFound'))
+        return
+      }
+      
       onJoinRoom(sanitized)
       onClose()
+    } catch (error) {
+      // If check fails, try to join anyway
+      onJoinRoom(sanitized)
+      onClose()
+    } finally {
+      setIsCheckingRoom(false)
     }
   }
 
@@ -136,6 +157,7 @@ export function ShareDialog({
     }
     setShareSuccess(false)
     setShareError(null)
+    setJoinError(null)
   }
 
   const handleClose = () => {
@@ -143,6 +165,7 @@ export function ShareDialog({
     // Reset state but keep publicLink if note has publicFileId
     setShareSuccess(false)
     setShareError(null)
+    setJoinError(null)
     setShareEmail('')
     setJoinRoomId('')
     if (!note?.publicFileId) {
@@ -274,11 +297,22 @@ export function ShareDialog({
               </p>
               <Input 
                 value={joinRoomId}
-                onChange={(e) => setJoinRoomId(sanitizeRoomId(e.target.value))}
+                onChange={(e) => {
+                  setJoinRoomId(sanitizeRoomId(e.target.value))
+                  setJoinError(null)
+                }}
                 placeholder={t('share.joinPlaceholder')}
-                className="font-mono text-center tracking-wider uppercase"
-                maxLength={8}
+                className="font-mono text-center tracking-wider text-lg"
+                maxLength={6}
+                inputMode="numeric"
+                pattern="[0-9]*"
               />
+              {joinError && (
+                <div className="flex items-center gap-2 text-red-500 text-sm">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{joinError}</span>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -320,7 +354,12 @@ export function ShareDialog({
         )}
         
         {mode === 'join' && (
-          <Button onClick={handleJoinRoom} disabled={!isValidRoomId(sanitizeRoomId(joinRoomId)) || !isOnline}>{t('share.joinButton')}</Button>
+          <Button 
+            onClick={handleJoinRoom} 
+            disabled={!isValidRoomId(sanitizeRoomId(joinRoomId)) || !isOnline || isCheckingRoom}
+          >
+            {isCheckingRoom ? <Loader2 className="w-4 h-4 animate-spin" /> : t('share.joinButton')}
+          </Button>
         )}
       </DialogFooter>
     </Dialog>

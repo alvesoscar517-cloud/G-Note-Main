@@ -70,7 +70,7 @@ export function DrivePermissionError({ onClose }: DrivePermissionErrorProps) {
           <div className="space-y-3">
             <button
               onClick={handleRelogin}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-xl font-medium hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl font-medium hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               {t('auth.relogin')}

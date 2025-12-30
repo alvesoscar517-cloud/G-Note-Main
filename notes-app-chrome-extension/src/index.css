@@ -15,6 +15,38 @@
   --safe-area-right: env(safe-area-inset-right, 0px);
 }
 
+html {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #fafafa;
+  transition: background-color 0.15s ease-out;
+  /* Disable pull-to-refresh on mobile */
+  overscroll-behavior-y: contain;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #fafafa;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.15s ease-out;
+  /* Disable pull-to-refresh on mobile */
+  overscroll-behavior-y: contain;
+}
+
+html.dark,
+html.dark body {
+  background-color: #0a0a0a;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: inherit;
+  transition: background-color 0.15s ease-out;
+}
+
 .dark {
   color-scheme: dark;
 }

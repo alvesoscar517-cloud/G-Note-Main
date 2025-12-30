@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { X, Eraser, Undo2, Redo2, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -332,7 +333,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
   const colorSize = toolbarVisibility.compactMode ? 'w-5 h-5' : 'w-5 h-5 sm:w-6 sm:h-6'
   const iconSize = toolbarVisibility.compactMode ? 'w-4 h-4' : 'w-4 h-4 sm:w-5 sm:h-5'
 
-  return (
+  return createPortal(
     <div 
       className="fixed inset-0 z-50 bg-white dark:bg-neutral-900 flex flex-col status-bar-bg"
       style={edgeSwipeState.isDragging ? edgeSwipeStyle : undefined}
@@ -496,6 +497,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

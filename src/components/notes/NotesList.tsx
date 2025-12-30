@@ -50,6 +50,7 @@ export function NotesList() {
   // Get sync states
   const isSyncing = useNotesStore(state => state.isSyncing)
   const isInitialSync = useNotesStore(state => state.isInitialSync)
+  const isNewUser = useNotesStore(state => state.isNewUser)
   const isCheckingDriveData = useNotesStore(state => state.isCheckingDriveData)
   const driveHasData = useNotesStore(state => state.driveHasData)
   
@@ -129,10 +130,12 @@ export function NotesList() {
   }
 
   // Show skeleton when:
-  // 1. Initial sync is in progress and no local notes yet
+  // 1. Initial sync is in progress and no local notes yet (but NOT for new users)
   // 2. Checking Drive data and Drive has data (or unknown)
   // 3. Syncing and Drive confirmed to have data
-  const showSkeleton = notes.length === 0 && (
+  // Skip skeleton for new users - show welcome animation instead
+  const activeNotes = notes.filter(n => !n.isDeleted)
+  const showSkeleton = activeNotes.length === 0 && !isNewUser && (
     (isInitialSync && isSyncing) ||
     isCheckingDriveData ||
     (driveHasData === true && isSyncing)
@@ -144,7 +147,9 @@ export function NotesList() {
 
   // Empty state: distinguish between no notes vs no search results
   if (allNotes.length === 0) {
-    if (notes.length === 0) {
+    // Check if user has any non-deleted notes
+    const activeNotes = notes.filter(n => !n.isDeleted)
+    if (activeNotes.length === 0) {
       return <EmptyState type="no-notes" />
     }
     return <EmptyState type="no-results" searchQuery={searchQuery} />
@@ -290,7 +295,7 @@ export function NotesList() {
         <OutsideDropZone collectionId={activeNote.collectionId} />
       )}
 
-      <DragOverlay>
+      <DragOverlay dropAnimation={null}>
         {activeNote ? (
           <NoteCard note={activeNote} />
         ) : null}

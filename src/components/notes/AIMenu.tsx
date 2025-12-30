@@ -418,7 +418,7 @@ function PromptSubmitButton({
             'p-2 rounded-lg transition-colors',
             disabled
               ? 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 dark:text-neutral-500 cursor-not-allowed'
-              : 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100'
+              : 'border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800'
           )}
         >
           {isLoading ? (
@@ -671,7 +671,7 @@ export function InsufficientCreditsModal({ open, onClose, onBuyCredits }: Insuff
               onBuyCredits()
               onClose()
             }}
-            className="px-4 py-2 text-sm font-medium bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors"
+            className="px-4 py-2 text-sm font-medium border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
           >
             {t('credits.buyMore')}
           </button>

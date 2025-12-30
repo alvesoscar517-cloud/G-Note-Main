@@ -2,16 +2,58 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Note, Collection } from '@/types'
 import { generateId } from '@/lib/utils'
-import { driveSync } from '@/lib/driveSync'
 import { driveShare } from '@/lib/driveShare'
 import { searchNotes, type SearchResult } from '@/lib/search'
 import { useNetworkStore } from '@/stores/networkStore'
-import * as offlineDb from '@/lib/offlineDb'
+
+// Direct imports from new db layer
+import {
+  saveNote,
+  saveNotes,
+  getAllNotes,
+  deleteNote as deleteNoteFromDb
+} from '@/lib/db/noteRepository'
+import {
+  saveCollections,
+  getAllCollections,
+  deleteCollection as deleteCollectionFromDb
+} from '@/lib/db/collectionRepository'
+import {
+  addToSyncQueue,
+  getSyncQueue,
+  removeFromSyncQueue,
+  saveNoteWithQueue,
+  saveCollectionWithQueue
+} from '@/lib/db/syncQueueRepository'
+import {
+  addTombstone,
+  getAllTombstones
+} from '@/lib/db/tombstoneRepository'
+import { isIndexedDBAvailable, safeDbWrite } from '@/lib/db/utils'
+
+// Direct imports from new sync layer
+import {
+  syncWithDrive as engineSyncWithDrive,
+  checkHasData as engineCheckHasData,
+  deleteNoteDriveFile,
+  deleteCollectionDriveFile,
+  setSyncAccessToken,
+  getRemoteTombstones
+} from '@/lib/sync/syncEngine'
 
 const COLLECTION_COLORS = [
   '#ef4444', '#f97316', '#eab308', '#22c55e', 
   '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'
 ]
+
+// Debounce configuration
+const UPDATE_DEBOUNCE_MS = 500
+
+// Debounce timers for note updates
+const updateTimers = new Map<string, ReturnType<typeof setTimeout>>()
+
+// Pending updates waiting to be saved
+const pendingUpdates = new Map<string, Note>()
 
 interface NotesState {
   notes: Note[]
@@ -24,6 +66,7 @@ interface NotesState {
   isModalOpen: boolean
   isSyncing: boolean
   isInitialSync: boolean // First sync after login - show skeleton
+  isNewUser: boolean // New user - skip skeleton, show welcome
   isCheckingDriveData: boolean // Checking if Drive has data
   driveHasData: boolean | null // null = unknown, true/false = checked
   lastSyncTime: number | null
@@ -48,6 +91,7 @@ interface NotesState {
   initOfflineStorage: () => Promise<void>
   saveToOfflineStorage: () => Promise<void>
   resetForNewUser: () => void
+  setIsNewUser: (isNew: boolean) => void
 
   // Trash actions
   moveToTrash: (id: string) => void
@@ -84,7 +128,68 @@ async function queueOfflineOperation(
 ) {
   const isOnline = useNetworkStore.getState().isOnline
   if (!isOnline) {
-    await offlineDb.addToSyncQueue({ type, entityType, entityId, data })
+    await addToSyncQueue({ type, entityType, entityId, data })
+  }
+}
+
+// Debounced save function for note updates
+function debouncedSaveNote(note: Note): void {
+  // Clear existing timer for this note
+  const existingTimer = updateTimers.get(note.id)
+  if (existingTimer) {
+    clearTimeout(existingTimer)
+  }
+
+  // Store the pending update
+  pendingUpdates.set(note.id, note)
+
+  // Set new timer
+  const timer = setTimeout(async () => {
+    const pendingNote = pendingUpdates.get(note.id)
+    if (pendingNote) {
+      pendingUpdates.delete(note.id)
+      updateTimers.delete(note.id)
+      
+      await safeDbWrite(
+        () => saveNoteWithQueue(pendingNote, {
+          type: 'update',
+          entityType: 'note',
+          entityId: note.id,
+          data: pendingNote
+        }),
+        () => console.error('[NotesStore] Storage quota exceeded while saving note')
+      )
+    }
+  }, UPDATE_DEBOUNCE_MS)
+
+  updateTimers.set(note.id, timer)
+}
+
+// Flush all pending updates immediately (call before sync or navigation)
+async function flushPendingUpdates(): Promise<void> {
+  // Clear all timers
+  for (const timer of updateTimers.values()) {
+    clearTimeout(timer)
+  }
+  updateTimers.clear()
+
+  // Save all pending updates
+  const updates = Array.from(pendingUpdates.values())
+  pendingUpdates.clear()
+
+  if (updates.length > 0) {
+    console.log(`[NotesStore] Flushing ${updates.length} pending updates`)
+    for (const note of updates) {
+      await safeDbWrite(
+        () => saveNoteWithQueue(note, {
+          type: 'update',
+          entityType: 'note',
+          entityId: note.id,
+          data: note
+        }),
+        () => console.error('[NotesStore] Storage quota exceeded while flushing updates')
+      )
+    }
   }
 }
 
@@ -101,11 +206,15 @@ export const useNotesStore = create<NotesState>()(
       isModalOpen: false,
       isSyncing: false,
       isInitialSync: true, // Start as true, set to false after first sync
+      isNewUser: false, // New user flag - skip skeleton
       isCheckingDriveData: false,
       driveHasData: null, // null = not checked yet
       lastSyncTime: null,
       syncError: null,
       isOfflineReady: false,
+
+      // Set new user flag
+      setIsNewUser: (isNew: boolean) => set({ isNewUser: isNew }),
 
       // Reset store state for new user (called when user changes)
       resetForNewUser: () => {
@@ -127,6 +236,7 @@ export const useNotesStore = create<NotesState>()(
           isModalOpen: false,
           isSyncing: false,
           isInitialSync: true,
+          isNewUser: false,
           isCheckingDriveData: false,
           driveHasData: null,
           lastSyncTime: null,
@@ -139,15 +249,15 @@ export const useNotesStore = create<NotesState>()(
       // Initialize offline storage - IndexedDB is source of truth
       initOfflineStorage: async () => {
         try {
-          if (!offlineDb.isIndexedDBAvailable()) {
+          if (!isIndexedDBAvailable()) {
             console.log('[NotesStore] IndexedDB not available')
             set({ isOfflineReady: true })
             return
           }
 
           const [offlineNotes, offlineCollections] = await Promise.all([
-            offlineDb.getAllNotes(),
-            offlineDb.getAllCollections()
+            getAllNotes(),
+            getAllCollections()
           ])
           
           // Simply load from IndexedDB - no merge needed since logout clears everything
@@ -166,11 +276,11 @@ export const useNotesStore = create<NotesState>()(
 
       saveToOfflineStorage: async () => {
         try {
-          if (!offlineDb.isIndexedDBAvailable()) return
+          if (!isIndexedDBAvailable()) return
           const { notes, collections } = get()
           await Promise.all([
-            offlineDb.saveNotes(notes),
-            offlineDb.saveCollections(collections)
+            saveNotes(notes),
+            saveCollections(collections)
           ])
         } catch (error) {
           console.error('[NotesStore] Failed to save to offline storage:', error)
@@ -209,7 +319,7 @@ export const useNotesStore = create<NotesState>()(
         })
         
         // Save to IndexedDB atomically with queue
-        offlineDb.saveNoteWithQueue(newNote, { 
+        saveNoteWithQueue(newNote, { 
           type: 'create', 
           entityType: 'note', 
           entityId: newNote.id, 
@@ -247,13 +357,9 @@ export const useNotesStore = create<NotesState>()(
           return { notes: newNotes }
         })
         
+        // Use debounced save for better performance during rapid typing
         if (updatedNote) {
-          offlineDb.saveNoteWithQueue(updatedNote, {
-            type: 'update',
-            entityType: 'note',
-            entityId: id,
-            data: updatedNote
-          }).catch(console.error)
+          debouncedSaveNote(updatedNote)
         }
       },
       
@@ -311,7 +417,7 @@ export const useNotesStore = create<NotesState>()(
         })
         
         if (trashedNote) {
-          offlineDb.saveNoteWithQueue(trashedNote, {
+          saveNoteWithQueue(trashedNote, {
             type: 'update',
             entityType: 'note',
             entityId: id,
@@ -320,7 +426,7 @@ export const useNotesStore = create<NotesState>()(
         }
         
         if (updatedCollection) {
-          offlineDb.saveCollectionWithQueue(updatedCollection, {
+          saveCollectionWithQueue(updatedCollection, {
             type: 'update',
             entityType: 'collection',
             entityId: updatedCollection.id,
@@ -350,7 +456,7 @@ export const useNotesStore = create<NotesState>()(
         }))
         
         if (restoredNote) {
-          offlineDb.saveNoteWithQueue(restoredNote, {
+          saveNoteWithQueue(restoredNote, {
             type: 'update',
             entityType: 'note',
             entityId: id,
@@ -366,15 +472,15 @@ export const useNotesStore = create<NotesState>()(
         
         if (note?.driveFileId) {
           if (isOnline) {
-            driveSync.deleteNoteFile(id).catch(console.error)
+            deleteNoteDriveFile(id).catch(console.error)
           } else {
-            offlineDb.addToSyncQueue({ type: 'delete', entityType: 'note', entityId: id }).catch(console.error)
+            addToSyncQueue({ type: 'delete', entityType: 'note', entityId: id }).catch(console.error)
           }
         }
         
         // Track deletion for sync and delete from IndexedDB
-        offlineDb.addDeletedId(id, 'note').catch(console.error)
-        offlineDb.deleteNote(id).catch(console.error)
+        addTombstone(id, 'note').catch(console.error)
+        deleteNoteFromDb(id).catch(console.error)
         
         set((state) => ({
           notes: state.notes.filter(n => n.id !== id),
@@ -390,13 +496,13 @@ export const useNotesStore = create<NotesState>()(
         trashNotes.forEach(note => {
           if (note.driveFileId) {
             if (isOnline) {
-              driveSync.deleteNoteFile(note.id).catch(console.error)
+              deleteNoteDriveFile(note.id).catch(console.error)
             } else {
-              offlineDb.addToSyncQueue({ type: 'delete', entityType: 'note', entityId: note.id }).catch(console.error)
+              addToSyncQueue({ type: 'delete', entityType: 'note', entityId: note.id }).catch(console.error)
             }
           }
-          offlineDb.addDeletedId(note.id, 'note').catch(console.error)
-          offlineDb.deleteNote(note.id).catch(console.error)
+          addTombstone(note.id, 'note').catch(console.error)
+          deleteNoteFromDb(note.id).catch(console.error)
         })
         
         const trashIds = trashNotes.map(n => n.id)
@@ -429,7 +535,7 @@ export const useNotesStore = create<NotesState>()(
         }))
         
         restoredNotes.forEach(note => {
-          offlineDb.saveNoteWithQueue(note, {
+          saveNoteWithQueue(note, {
             type: 'update',
             entityType: 'note',
             entityId: note.id,
@@ -446,13 +552,13 @@ export const useNotesStore = create<NotesState>()(
           const note = notes.find(n => n.id === id)
           if (note?.driveFileId) {
             if (isOnline) {
-              driveSync.deleteNoteFile(id).catch(console.error)
+              deleteNoteDriveFile(id).catch(console.error)
             } else {
-              offlineDb.addToSyncQueue({ type: 'delete', entityType: 'note', entityId: id }).catch(console.error)
+              addToSyncQueue({ type: 'delete', entityType: 'note', entityId: id }).catch(console.error)
             }
           }
-          offlineDb.addDeletedId(id, 'note').catch(console.error)
-          offlineDb.deleteNote(id).catch(console.error)
+          addTombstone(id, 'note').catch(console.error)
+          deleteNoteFromDb(id).catch(console.error)
         })
         
         set((state) => ({
@@ -508,7 +614,7 @@ export const useNotesStore = create<NotesState>()(
           return newState
         })
         
-        offlineDb.saveNoteWithQueue(duplicatedNote, {
+        saveNoteWithQueue(duplicatedNote, {
           type: 'create',
           entityType: 'note',
           entityId: duplicatedNote.id,
@@ -538,7 +644,7 @@ export const useNotesStore = create<NotesState>()(
         }))
         
         if (updatedNote) {
-          offlineDb.saveNoteWithQueue(updatedNote, {
+          saveNoteWithQueue(updatedNote, {
             type: 'update',
             entityType: 'note',
             entityId: id,
@@ -568,8 +674,8 @@ export const useNotesStore = create<NotesState>()(
         set({ isCheckingDriveData: true })
         
         try {
-          driveSync.setAccessToken(accessToken)
-          const result = await driveSync.checkHasData()
+          setSyncAccessToken(accessToken)
+          const result = await engineCheckHasData(accessToken)
           
           set({ 
             driveHasData: result.hasData,
@@ -589,7 +695,7 @@ export const useNotesStore = create<NotesState>()(
       },
 
       syncWithDrive: async (accessToken: string) => {
-        const { notes, collections, isSyncing, deletedNoteIds, deletedCollectionIds } = get()
+        const { notes, collections, isSyncing } = get()
         if (isSyncing) return
         
         const isOnline = useNetworkStore.getState().isOnline
@@ -598,64 +704,138 @@ export const useNotesStore = create<NotesState>()(
           return
         }
 
+        // Flush any pending updates before sync
+        await flushPendingUpdates()
+
         set({ isSyncing: true, syncError: null })
         
         try {
-          driveSync.setAccessToken(accessToken)
+          setSyncAccessToken(accessToken)
           
-          // Sync with both notes and collections
-          const { notes: syncedNotes, collections: syncedCollections } = await driveSync.sync(
+          // Get tombstones from IndexedDB (for accurate offline delete tracking)
+          const tombstones = await getAllTombstones()
+          const localDeletedNotes = tombstones
+            .filter(d => d.entityType === 'note')
+            .map(d => ({ id: d.id, deletedAt: d.deletedAt }))
+          const localDeletedCollections = tombstones
+            .filter(d => d.entityType === 'collection')
+            .map(d => ({ id: d.id, deletedAt: d.deletedAt }))
+          
+          // Get sync queue IDs for stale device check (X.2 fix)
+          const syncQueue = await getSyncQueue()
+          const syncQueueIds = new Set(syncQueue.map(item => item.entityId))
+          
+          // Sync with new engine (returns new format)
+          const result = await engineSyncWithDrive(
+            accessToken,
             notes,
             collections,
-            deletedNoteIds,
-            deletedCollectionIds
+            localDeletedNotes,
+            localDeletedCollections,
+            syncQueueIds
           )
+          
+          const { syncedNotes, syncedCollections, staleLocalIds } = result
+          
+          // Handle stale local notes (X.2 fix) - remove them from IndexedDB
+          if (staleLocalIds && staleLocalIds.length > 0) {
+            console.log(`[NotesStore] Removing ${staleLocalIds.length} stale local notes`)
+            for (const id of staleLocalIds) {
+              await deleteNoteFromDb(id).catch(console.error)
+            }
+          }
+          
+          // Get remote tombstones to filter out deleted notes
+          const remoteTombstones = getRemoteTombstones()
+          
+          // Build set of stale IDs for filtering
+          const staleIdSet = new Set(staleLocalIds || [])
+          
+          // Helper to check if a note should be deleted based on tombstone
+          const shouldDeleteNote = (noteId: string, noteUpdatedAt: number): boolean => {
+            const deletedAt = remoteTombstones.get(noteId)
+            if (!deletedAt) return false
+            return deletedAt > noteUpdatedAt
+          }
+          
+          // Collect IDs to delete from IndexedDB (outside of set())
+          const noteIdsToDelete: string[] = []
+          const collectionIdsToDelete: string[] = []
           
           // Merge synced data with current state (handle edits during sync)
           set((state) => {
             const syncedNotesMap = new Map(syncedNotes.map(n => [n.id, n]))
             const syncedCollectionsMap = new Map(syncedCollections.map(c => [c.id, c]))
             
-            // Merge notes - preserve local pending changes
-            const mergedNotes = state.notes.map(currentNote => {
-              const syncedNote = syncedNotesMap.get(currentNote.id)
-              
-              if (!syncedNote) return currentNote
-              
-              // If local note was modified during sync, keep local version
-              if (currentNote.syncStatus === 'pending' && 
-                  (currentNote.version || 1) > (syncedNote.version || 1)) {
-                return currentNote
-              }
-              
-              return syncedNote
-            })
+            // Merge notes - preserve local pending changes, but respect tombstones and stale data
+            const mergedNotes = state.notes
+              .filter(currentNote => {
+                // Remove stale notes (X.2 fix)
+                if (staleIdSet.has(currentNote.id)) {
+                  console.log(`[NotesStore] Removing stale local note ${currentNote.id}`)
+                  noteIdsToDelete.push(currentNote.id)
+                  return false
+                }
+                // Remove notes that have been deleted on remote (tombstone wins if newer)
+                if (shouldDeleteNote(currentNote.id, currentNote.updatedAt)) {
+                  console.log(`[NotesStore] Removing local note ${currentNote.id} - deleted on remote`)
+                  noteIdsToDelete.push(currentNote.id)
+                  return false
+                }
+                return true
+              })
+              .map(currentNote => {
+                const syncedNote = syncedNotesMap.get(currentNote.id)
+                
+                if (!syncedNote) return currentNote
+                
+                // If local note was modified during sync, keep local version
+                if (currentNote.syncStatus === 'pending' && 
+                    (currentNote.version || 1) > (syncedNote.version || 1)) {
+                  return currentNote
+                }
+                
+                return syncedNote
+              })
             
             // Add new notes from sync (from other devices)
+            const localDeletedNoteIdSet = new Set(localDeletedNotes.map(d => d.id))
             syncedNotes.forEach(syncedNote => {
               const existsLocally = state.notes.find(n => n.id === syncedNote.id)
-              if (!existsLocally && !deletedNoteIds.includes(syncedNote.id)) {
+              if (!existsLocally && !localDeletedNoteIdSet.has(syncedNote.id)) {
                 mergedNotes.push(syncedNote)
               }
             })
             
             // Merge collections similarly
-            const mergedCollections = state.collections.map(currentCollection => {
-              const syncedCollection = syncedCollectionsMap.get(currentCollection.id)
-              
-              if (!syncedCollection) return currentCollection
-              
-              if (currentCollection.syncStatus === 'pending' &&
-                  (currentCollection.version || 1) > (syncedCollection.version || 1)) {
-                return currentCollection
-              }
-              
-              return syncedCollection
-            })
+            const mergedCollections = state.collections
+              .filter(currentCollection => {
+                // Remove collections that have been deleted on remote
+                const deletedAt = remoteTombstones.get(currentCollection.id)
+                if (deletedAt && deletedAt > currentCollection.updatedAt) {
+                  console.log(`[NotesStore] Removing local collection ${currentCollection.id} - deleted on remote`)
+                  collectionIdsToDelete.push(currentCollection.id)
+                  return false
+                }
+                return true
+              })
+              .map(currentCollection => {
+                const syncedCollection = syncedCollectionsMap.get(currentCollection.id)
+                
+                if (!syncedCollection) return currentCollection
+                
+                if (currentCollection.syncStatus === 'pending' &&
+                    (currentCollection.version || 1) > (syncedCollection.version || 1)) {
+                  return currentCollection
+                }
+                
+                return syncedCollection
+              })
             
             syncedCollections.forEach(syncedCollection => {
               const existsLocally = state.collections.find(c => c.id === syncedCollection.id)
-              if (!existsLocally && !deletedCollectionIds.includes(syncedCollection.id)) {
+              const localDeletedCollectionIdSet = new Set(localDeletedCollections.map(d => d.id))
+              if (!existsLocally && !localDeletedCollectionIdSet.has(syncedCollection.id)) {
                 mergedCollections.push(syncedCollection)
               }
             })
@@ -665,15 +845,24 @@ export const useNotesStore = create<NotesState>()(
               collections: mergedCollections,
               lastSyncTime: Date.now(),
               isSyncing: false,
-              isInitialSync: false // First sync completed
+              isInitialSync: false, // First sync completed
+              isNewUser: false // Reset new user flag after sync
             }
           })
+          
+          // Delete from IndexedDB outside of set() to avoid race conditions
+          if (noteIdsToDelete.length > 0) {
+            await Promise.all(noteIdsToDelete.map(id => deleteNoteFromDb(id).catch(console.error)))
+          }
+          if (collectionIdsToDelete.length > 0) {
+            await Promise.all(collectionIdsToDelete.map(id => deleteCollectionFromDb(id).catch(console.error)))
+          }
           
           // Save synced data to IndexedDB
           const { notes: finalNotes, collections: finalCollections } = get()
           await Promise.all([
-            offlineDb.saveNotes(finalNotes),
-            offlineDb.saveCollections(finalCollections)
+            saveNotes(finalNotes),
+            saveCollections(finalCollections)
           ])
           
         } catch (error) {
@@ -686,6 +875,42 @@ export const useNotesStore = create<NotesState>()(
           const isPermissionError = errorMessage === 'DRIVE_PERMISSION_DENIED' ||
                                     errorMessage.includes('403') ||
                                     errorMessage.includes('insufficient')
+          const isQuotaError = errorMessage === 'DRIVE_QUOTA_EXCEEDED'
+          const isConflictError = errorMessage === 'DRIVE_CONFLICT_412' || 
+                                  errorMessage === 'DRIVE_CONFLICT_MAX_RETRIES'
+          
+          // Handle quota exceeded (X.3)
+          if (isQuotaError) {
+            set({ 
+              syncError: 'DRIVE_QUOTA_EXCEEDED',
+              isSyncing: false,
+              isInitialSync: false
+            })
+            console.error('[NotesStore] Google Drive quota exceeded - sync paused')
+            return
+          }
+          
+          // Handle conflict errors (X.1) - retry sync
+          if (isConflictError) {
+            console.log('[NotesStore] Sync conflict detected, will retry...')
+            set({ 
+              syncError: null,
+              isSyncing: false
+            })
+            // Auto-retry after short delay
+            setTimeout(() => {
+              const user = (async () => {
+                const { useAuthStore } = await import('./authStore')
+                return useAuthStore.getState().user
+              })()
+              user.then(u => {
+                if (u?.accessToken) {
+                  get().syncWithDrive(u.accessToken)
+                }
+              })
+            }, 1000)
+            return
+          }
           
           // Handle permission error - user didn't grant Drive access
           if (isPermissionError) {
@@ -780,7 +1005,7 @@ export const useNotesStore = create<NotesState>()(
         }))
         
         // Save collection and queue for sync
-        offlineDb.saveCollectionWithQueue(newCollection, {
+        saveCollectionWithQueue(newCollection, {
           type: 'create',
           entityType: 'collection',
           entityId: newCollection.id,
@@ -792,7 +1017,7 @@ export const useNotesStore = create<NotesState>()(
         noteIds.forEach(noteId => {
           const note = notes.find(n => n.id === noteId)
           if (note) {
-            offlineDb.saveNote(note).catch(console.error)
+            saveNote(note).catch(console.error)
           }
         })
         
@@ -819,7 +1044,7 @@ export const useNotesStore = create<NotesState>()(
         }))
         
         if (updatedCollection) {
-          offlineDb.saveCollectionWithQueue(updatedCollection, {
+          saveCollectionWithQueue(updatedCollection, {
             type: 'update',
             entityType: 'collection',
             entityId: id,
@@ -835,28 +1060,28 @@ export const useNotesStore = create<NotesState>()(
         // Get notes that belong to this collection before deletion
         const notesInCollection = notes.filter(n => n.collectionId === id)
         
-        // Track deletion in deletedIds store
-        offlineDb.addDeletedId(id, 'collection').catch(console.error)
+        // Track deletion in tombstones
+        addTombstone(id, 'collection').catch(console.error)
         
         // Delete from IndexedDB
-        offlineDb.deleteCollection(id).catch(console.error)
+        deleteCollectionFromDb(id).catch(console.error)
         
         // Remove any pending sync queue items for this collection
-        offlineDb.getSyncQueue().then(queue => {
+        getSyncQueue().then(queue => {
           const collectionQueueItems = queue.filter(
             item => item.entityType === 'collection' && item.entityId === id
           )
           collectionQueueItems.forEach(item => {
-            offlineDb.removeFromSyncQueue(item.id).catch(console.error)
+            removeFromSyncQueue(item.id).catch(console.error)
           })
         }).catch(console.error)
         
         // Delete from Drive if online
         if (isOnline) {
-          driveSync.deleteCollectionFile(id).catch(console.error)
+          deleteCollectionDriveFile(id).catch(console.error)
         } else {
           // Queue deletion for when back online
-          offlineDb.addToSyncQueue({ 
+          addToSyncQueue({ 
             type: 'delete', 
             entityType: 'collection', 
             entityId: id 
@@ -882,7 +1107,7 @@ export const useNotesStore = create<NotesState>()(
             version: (note.version || 1) + 1, 
             syncStatus: 'pending' as const 
           }
-          offlineDb.saveNoteWithQueue(updatedNote, {
+          saveNoteWithQueue(updatedNote, {
             type: 'update',
             entityType: 'note',
             entityId: note.id,
@@ -924,7 +1149,7 @@ export const useNotesStore = create<NotesState>()(
         }))
         
         if (updatedNote) {
-          offlineDb.saveNoteWithQueue(updatedNote, {
+          saveNoteWithQueue(updatedNote, {
             type: 'update',
             entityType: 'note',
             entityId: noteId,
@@ -933,7 +1158,7 @@ export const useNotesStore = create<NotesState>()(
         }
         
         if (updatedCollection) {
-          offlineDb.saveCollectionWithQueue(updatedCollection, {
+          saveCollectionWithQueue(updatedCollection, {
             type: 'update',
             entityType: 'collection',
             entityId: collectionId,
@@ -1005,7 +1230,7 @@ export const useNotesStore = create<NotesState>()(
         })
         
         if (updatedNote) {
-          offlineDb.saveNoteWithQueue(updatedNote, {
+          saveNoteWithQueue(updatedNote, {
             type: 'update',
             entityType: 'note',
             entityId: noteId,
@@ -1014,7 +1239,7 @@ export const useNotesStore = create<NotesState>()(
         }
         
         if (updatedCollection) {
-          offlineDb.saveCollectionWithQueue(updatedCollection, {
+          saveCollectionWithQueue(updatedCollection, {
             type: 'update',
             entityType: 'collection',
             entityId: updatedCollection.id,
@@ -1023,8 +1248,8 @@ export const useNotesStore = create<NotesState>()(
         }
         
         if (deletedCollectionId) {
-          offlineDb.addDeletedId(deletedCollectionId, 'collection').catch(console.error)
-          offlineDb.deleteCollection(deletedCollectionId).catch(console.error)
+          addTombstone(deletedCollectionId, 'collection').catch(console.error)
+          deleteCollectionFromDb(deletedCollectionId).catch(console.error)
           queueOfflineOperation('collection', 'delete', deletedCollectionId)
         }
       },

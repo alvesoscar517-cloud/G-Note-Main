@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { LogOut, Cloud, CloudOff } from 'lucide-react'
+import { LogOut, Cloud, CloudOff, RefreshCw } from 'lucide-react'
 import { useNotesStore } from '@/stores/notesStore'
 import { useNetworkStore } from '@/stores/networkStore'
 import { cn } from '@/lib/utils'
@@ -53,17 +53,28 @@ export function LogoutConfirmDialog({ open, onClose, onConfirm }: LogoutConfirmD
         {/* Sync status indicator */}
         <div className="mb-4 p-3 rounded-xl bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
           <div className="flex items-center gap-2 mb-1">
-            {isOnline ? (
+            {isSyncing ? (
+              <RefreshCw className="w-4 h-4 text-neutral-500 dark:text-neutral-400 animate-spin" />
+            ) : isOnline ? (
               <Cloud className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
             ) : (
               <CloudOff className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
             )}
             <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              {isOnline ? t('offline.online') : t('offline.offline')}
+              {isSyncing 
+                ? t('settings.syncingInProgress')
+                : isOnline 
+                ? t('offline.online') 
+                : t('offline.offline')
+              }
             </span>
           </div>
           
-          {hasUnsyncedData ? (
+          {isSyncing ? (
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              {t('settings.waitForSync')}
+            </p>
+          ) : hasUnsyncedData ? (
             <p className="text-sm text-neutral-600 dark:text-neutral-400">
               {t('settings.unsyncedWarning', { count: totalPending })}
             </p>
@@ -85,7 +96,9 @@ export function LogoutConfirmDialog({ open, onClose, onConfirm }: LogoutConfirmD
         
         {/* Warning message */}
         <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6 text-center">
-          {isHighRisk 
+          {isSyncing
+            ? t('settings.logoutWarningSyncing')
+            : isHighRisk 
             ? t('settings.logoutWarningOffline')
             : isMediumRisk
             ? t('settings.logoutWarningUnsynced')
@@ -105,8 +118,10 @@ export function LogoutConfirmDialog({ open, onClose, onConfirm }: LogoutConfirmD
             onClick={onConfirm}
             disabled={isSyncing}
             className={cn(
-              "flex-1 px-4 py-2.5 rounded-xl font-medium transition-colors",
-              "bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100"
+              "flex-1 px-4 py-2.5 rounded-xl font-medium transition-colors border border-neutral-200 dark:border-neutral-700",
+              isSyncing
+                ? "text-neutral-400 dark:text-neutral-500 cursor-not-allowed"
+                : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
             )}
           >
             {t('settings.logout')}

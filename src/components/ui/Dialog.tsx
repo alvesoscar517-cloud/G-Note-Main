@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Button } from './Button'
 import { Input } from './Input'
+import { useEdgeSwipeBack } from '@/hooks/useEdgeSwipeBack'
+import { onModalOpen, onModalClose } from '@/stores/themeStore'
 
 interface DialogProps {
   open: boolean
@@ -13,6 +15,14 @@ interface DialogProps {
 export function Dialog({ open, onClose, children }: DialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
 
+  // Edge swipe to close dialog
+  const { swipeStyle } = useEdgeSwipeBack({
+    onSwipeBack: onClose,
+    edgeWidth: 25,
+    threshold: 80,
+    enabled: open
+  })
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -20,10 +30,16 @@ export function Dialog({ open, onClose, children }: DialogProps) {
     if (open) {
       document.addEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'hidden'
+      // Update status bar color for modal
+      onModalOpen()
     }
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = ''
+      if (open) {
+        // Restore status bar color when modal closes
+        onModalClose()
+      }
     }
   }, [open, onClose])
 
@@ -37,6 +53,7 @@ export function Dialog({ open, onClose, children }: DialogProps) {
       />
       <div
         ref={dialogRef}
+        style={swipeStyle}
         className={cn(
           'relative z-10 w-full max-w-sm max-h-[90vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-[16px] shadow-xl',
           'border border-neutral-200 dark:border-neutral-700',

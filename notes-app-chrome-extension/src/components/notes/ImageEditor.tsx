@@ -1,8 +1,10 @@
 import { useState, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop'
 import { X, Check, RotateCw, FlipHorizontal, FlipVertical } from 'lucide-react'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
+import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
 
 // Import CSS
 import 'react-image-crop/dist/ReactCrop.css'
@@ -64,6 +66,18 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
   const [flipV, setFlipV] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
+  // Edge swipe back gesture
+  const { 
+    swipeStyle: edgeSwipeStyle,
+    swipeState: edgeSwipeState,
+    progress: edgeSwipeProgress 
+  } = useEdgeSwipeBack({
+    onSwipeBack: onCancel,
+    edgeWidth: 25,
+    threshold: 100,
+    enabled: true
+  })
+
   const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget
     // Default crop: center 80% of image
@@ -104,15 +118,23 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
     flipV ? 'scaleY(-1)' : '',
   ].filter(Boolean).join(' ')
 
-  return (
-    <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
+  return createPortal(
+    <div 
+      className="fixed inset-0 z-[9999] bg-neutral-100 dark:bg-neutral-900 flex flex-col"
+      style={edgeSwipeStyle}
+    >
+      <EdgeSwipeIndicator 
+        progress={edgeSwipeProgress} 
+        isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
+      />
+      
       {/* Header */}
       <div className="flex items-center justify-between p-2 sm:p-4 shrink-0">
         <Tooltip>
           <TooltipTrigger asChild>
             <button
               onClick={onCancel}
-              className="p-2 rounded-full hover:bg-white/10 text-white transition-colors touch-manipulation"
+              className="p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 transition-colors touch-manipulation"
             >
               <X className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
@@ -122,7 +144,7 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
         <button
           onClick={handleSave}
           disabled={isSaving || !completedCrop}
-          className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-neutral-700 text-white text-sm sm:text-base font-medium transition-colors hover:bg-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+          className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 text-sm sm:text-base font-medium transition-colors hover:bg-neutral-300 dark:hover:bg-neutral-600 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
         >
           <Check className="w-4 h-4 sm:w-5 sm:h-5" />
           {isSaving ? t('imageEditor.saving') : t('imageEditor.apply')}
@@ -156,7 +178,7 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
         <div className="flex items-center justify-center gap-2 sm:gap-4">
           <button
             onClick={handleRotate}
-            className="flex flex-col items-center gap-0.5 sm:gap-1 p-2 sm:p-3 rounded-xl hover:bg-white/10 text-white transition-colors touch-manipulation"
+            className="flex flex-col items-center gap-0.5 sm:gap-1 p-2 sm:p-3 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300 transition-colors touch-manipulation"
           >
             <RotateCw className="w-5 h-5 sm:w-6 sm:h-6" />
             <span className="text-[10px] sm:text-xs">{t('imageEditor.rotate')}</span>
@@ -164,7 +186,7 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
           <button
             onClick={handleFlipH}
             className={`flex flex-col items-center gap-0.5 sm:gap-1 p-2 sm:p-3 rounded-xl transition-colors touch-manipulation ${
-              flipH ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white'
+              flipH ? 'bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-white' : 'hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
             }`}
           >
             <FlipHorizontal className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -173,7 +195,7 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
           <button
             onClick={handleFlipV}
             className={`flex flex-col items-center gap-0.5 sm:gap-1 p-2 sm:p-3 rounded-xl transition-colors touch-manipulation ${
-              flipV ? 'bg-white/20 text-white' : 'hover:bg-white/10 text-white'
+              flipV ? 'bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-white' : 'hover:bg-neutral-200 dark:hover:bg-neutral-800 text-neutral-700 dark:text-neutral-300'
             }`}
           >
             <FlipVertical className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -181,6 +203,7 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

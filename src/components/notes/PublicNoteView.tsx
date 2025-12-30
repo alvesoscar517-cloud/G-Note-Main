@@ -127,7 +127,7 @@ export function PublicNoteView({ fileId }: PublicNoteViewProps) {
           </p>
           <a 
             href="/"
-            className="mt-4 inline-block px-4 py-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-[12px] font-medium"
+            className="mt-4 inline-block px-4 py-2 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-[12px] font-medium hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
           >
             {t('publicNote.goHome')}
           </a>
@@ -155,7 +155,7 @@ export function PublicNoteView({ fileId }: PublicNoteViewProps) {
             </div>
             <a 
               href="/"
-              className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 text-xs sm:text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-[8px] sm:rounded-[10px] font-medium hover:opacity-90 transition-opacity flex-shrink-0"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 text-xs sm:text-sm border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-[8px] sm:rounded-[10px] font-medium hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex-shrink-0"
             >
               <span className="hidden sm:inline">{t('publicNote.startFree')}</span>
               <span className="sm:hidden">{t('publicNote.start')}</span>

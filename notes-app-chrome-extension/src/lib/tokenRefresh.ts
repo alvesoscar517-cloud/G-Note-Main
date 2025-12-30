@@ -21,6 +21,7 @@ interface AuthResponse {
   accessToken: string
   expiresIn: number
   grantedScopes?: string[]
+  isNewUser?: boolean
 }
 
 interface AuthError {

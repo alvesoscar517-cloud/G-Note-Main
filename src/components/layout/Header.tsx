@@ -14,6 +14,7 @@ import { TrashView } from '@/components/notes/TrashView'
 import { DriveSearchResults } from '@/components/search/DriveSearchResults'
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 import { LogoutConfirmDialog } from '@/components/auth/LogoutConfirmDialog'
+import { useModalStatusBar } from '@/hooks/useModalStatusBar'
 import { cn } from '@/lib/utils'
 
 // Modal size options
@@ -60,6 +61,7 @@ export function Header() {
   const setSearchQuery = useNotesStore(state => state.setSearchQuery)
   const addNote = useNotesStore(state => state.addNote)
   const syncWithDrive = useNotesStore(state => state.syncWithDrive)
+  const loadSharedNotes = useNotesStore(state => state.loadSharedNotes)
   const isSyncing = useNotesStore(state => state.isSyncing)
   const notes = useNotesStore(state => state.notes)
   
@@ -75,6 +77,10 @@ export function Header() {
   const [showDriveResults, setShowDriveResults] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  
+  // Update status bar color when any modal is open
+  const anyModalOpen = settingsOpen || packagesOpen || languageOpen || modalSizeOpen || trashOpen
+  useModalStatusBar(anyModalOpen)
   
   // Local search input state + debounce
   const [localSearch, setLocalSearch] = useState('')
@@ -126,9 +132,11 @@ export function Header() {
     addNote()
   }
 
-  const handleSync = () => {
+  const handleSync = async () => {
     if (user?.accessToken && !isSyncing) {
-      syncWithDrive(user.accessToken)
+      await syncWithDrive(user.accessToken)
+      // Also load shared notes after sync
+      await loadSharedNotes(user.accessToken)
     }
   }
 

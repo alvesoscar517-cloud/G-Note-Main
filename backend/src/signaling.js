@@ -16,6 +16,22 @@ const wsReadyStateOpen = 1
 const topics = new Map()
 
 /**
+ * Get room info - check if room exists and peer count
+ * @param {string} roomId - Room ID to check
+ * @returns {{ exists: boolean, peerCount: number }}
+ */
+export function getRoomInfo(roomId) {
+  const topicName = `notes-app-${roomId}`
+  const topic = topics.get(topicName)
+  
+  if (!topic || topic.size === 0) {
+    return { exists: false, peerCount: 0 }
+  }
+  
+  return { exists: true, peerCount: topic.size }
+}
+
+/**
  * Send a message to a WebSocket connection
  */
 const send = (conn, message) => {

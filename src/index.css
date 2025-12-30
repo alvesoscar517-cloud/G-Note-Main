@@ -13,22 +13,28 @@ html {
   min-height: 100vh;
   min-height: 100dvh;
   background-color: #fafafa;
+  transition: background-color 0.15s ease-out;
+  /* Disable pull-to-refresh on mobile */
+  overscroll-behavior-y: contain;
 }
 
 body {
   min-height: 100vh;
   min-height: 100dvh;
-  background-color: inherit;
+  background-color: #fafafa;
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.15s ease-out;
+  /* Disable pull-to-refresh on mobile */
+  overscroll-behavior-y: contain;
 }
 
-html.dark, html.dark body,
-:root:has(.dark), :root:has(.dark) body {
+html.dark,
+html.dark body {
   background-color: #0a0a0a;
 }
 
@@ -36,6 +42,7 @@ html.dark, html.dark body,
   min-height: 100vh;
   min-height: 100dvh;
   background-color: inherit;
+  transition: background-color 0.15s ease-out;
 }
 
 .min-h-dvh {
@@ -100,6 +107,29 @@ html.dark, html.dark body,
 
 .safe-all {
   padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+}
+
+/* Landscape mode: use symmetric padding for both sides to avoid uneven layout */
+/* When device is in landscape, notch/status bar is on one side only */
+/* We use fixed padding to ensure consistent appearance */
+@media (orientation: landscape) {
+  .safe-left {
+    padding-left: 0.75rem !important;
+  }
+  
+  .safe-right {
+    padding-right: 0.75rem !important;
+  }
+  
+  .safe-x {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  .safe-all {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
 }
 
 /* Status bar background - extends content under status bar with matching background */

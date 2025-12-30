@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { History, Loader2, FileText, RotateCcw, WifiOff } from 'lucide-react'
-import { Dialog, DialogHeader, DialogFooter } from '@/components/ui/Dialog'
-import { Button } from '@/components/ui/Button'
+import { History, Loader2, FileText, RotateCcw, WifiOff, X } from 'lucide-react'
+import { Dialog, DialogHeader } from '@/components/ui/Dialog'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -87,18 +86,23 @@ export function VersionHistoryPanel({
     return (
       <Dialog open={open} onClose={onClose}>
         <DialogHeader>
-          <div className="flex items-center gap-2">
-            <History className="w-5 h-5" />
-            {t('versionHistory.title')}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <History className="w-5 h-5" />
+              {t('versionHistory.title')}
+            </div>
+            <button
+              onClick={onClose}
+              className="p-1 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
         </DialogHeader>
-        <div className="flex flex-col items-center py-8 text-center px-4">
+        <div className="flex flex-col items-center py-8 text-center px-4 safe-bottom">
           <History className="w-12 h-12 text-neutral-300 dark:text-neutral-600 mb-3" />
           <p className="text-neutral-500">{t('versionHistory.noHistory')}</p>
         </div>
-        <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>{t('versionHistory.close')}</Button>
-        </DialogFooter>
       </Dialog>
     )
   }
@@ -106,13 +110,21 @@ export function VersionHistoryPanel({
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogHeader>
-        <div className="flex items-center gap-2">
-          <History className="w-5 h-5" />
-          {t('versionHistory.title')}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <History className="w-5 h-5" />
+            {t('versionHistory.title')}
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-lg text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
       </DialogHeader>
       
-      <div className="max-h-[400px] overflow-y-auto px-4 pt-2">
+      <div className="max-h-[400px] overflow-y-auto px-4 pt-2 pb-4 safe-bottom">
         {/* Offline Warning */}
         {!isOnline && (
           <div className="mb-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
@@ -190,10 +202,6 @@ export function VersionHistoryPanel({
           </div>
         )}
       </div>
-
-      <DialogFooter>
-        <Button variant="ghost" onClick={onClose}>{t('versionHistory.close')}</Button>
-      </DialogFooter>
     </Dialog>
   )
 }

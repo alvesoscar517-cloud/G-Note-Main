@@ -103,7 +103,7 @@ function LockedFeatureModal({
           </button>
           <button
             onClick={handleGoToApp}
-            className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-neutral-900 dark:bg-white dark:text-neutral-900 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 whitespace-nowrap"
+            className="flex-1 px-4 py-2.5 text-sm font-medium border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap"
           >
             {t('freeNote.goToAppShort')}
             <ArrowRight className="w-4 h-4 flex-shrink-0" />
@@ -409,7 +409,7 @@ export function FreeNoteView() {
             <button
               onClick={handleSavePermanently}
               disabled={isSaving}
-              className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 text-xs sm:text-sm bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 rounded-[8px] sm:rounded-[10px] font-medium hover:opacity-90 transition-opacity flex-shrink-0 disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 text-xs sm:text-sm border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-[8px] sm:rounded-[10px] font-medium hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex-shrink-0 disabled:opacity-50"
             >
               <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">{t('freeNote.savePermanently')}</span>

@@ -107,25 +107,17 @@ export function NoteCard({ note, searchQuery }: NoteCardProps) {
                 <h3 className="font-semibold text-base text-neutral-900 dark:text-white line-clamp-1">
                   <Highlight text={title} query={searchQuery} />
                 </h3>
-                {note.isShared && (
-                  <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs rounded-full">
-                    <Users className="w-3 h-3" />
-                  </span>
-                )}
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 {note.isPinned && (
                   <Pin className="w-4 h-4 text-neutral-400" />
                 )}
+                {note.isShared && (
+                  <Users className="w-4 h-4 text-neutral-400" />
+                )}
                 <SyncIcon status={note.syncStatus} isSyncing={isSyncing} />
               </div>
             </div>
-            
-            {note.sharedBy && (
-              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 relative z-10">
-                {t('publicNote.from')} {note.sharedBy}
-              </p>
-            )}
             
             {/* Content preview - always show with min-height for consistent card size */}
             <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 min-h-[2.5rem] relative z-10">
@@ -271,25 +263,17 @@ export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
                   <h3 className="font-semibold text-base text-neutral-900 dark:text-white line-clamp-1">
                     <Highlight text={title} query={searchQuery} />
                   </h3>
-                  {note.isShared && (
-                    <span className="shrink-0 flex items-center gap-1 px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs rounded-full">
-                      <Users className="w-3 h-3" />
-                    </span>
-                  )}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   {note.isPinned && (
                     <Pin className="w-4 h-4 text-neutral-400" />
                   )}
+                  {note.isShared && (
+                    <Users className="w-4 h-4 text-neutral-400" />
+                  )}
                   <SyncIcon status={note.syncStatus} isSyncing={isSyncing} />
                 </div>
               </div>
-              
-              {note.sharedBy && (
-                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 relative z-10">
-                  {t('publicNote.from')} {note.sharedBy}
-                </p>
-              )}
               
               {/* Content preview - always show with min-height for consistent card size */}
               <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 min-h-[2.5rem] relative z-10">
@@ -298,8 +282,7 @@ export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
                 ) : (
                   <span className="text-neutral-300 dark:text-neutral-600">&nbsp;</span>
                 )}
-              </p>
-              
+              </p>              
               <p className="mt-3 text-xs text-neutral-400 dark:text-neutral-500 relative z-10">
                 {formatDate(note.updatedAt)}
               </p>

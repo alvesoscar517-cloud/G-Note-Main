@@ -43,7 +43,7 @@ function getViewFileId(): string | null {
 
 function AppContent() {
   const { user, setUser } = useAuthStore()
-  const { syncWithDrive, checkDriveHasData, loadSharedNotes, notes, isSyncing, initOfflineStorage, addNote, setSelectedNote, setModalOpen, syncError } = useNotesStore()
+  const { syncWithDrive, checkDriveHasData, loadSharedNotes, initOfflineStorage, addNote, setSelectedNote, setModalOpen, syncError, setIsNewUser } = useNotesStore()
   const { initTheme } = useThemeStore()
   const initNetwork = useNetworkStore(state => state.initialize)
   const isOnline = useNetworkStore(state => state.isOnline)
@@ -138,6 +138,11 @@ function AppContent() {
         try {
           const result = await exchangeCodeForTokens(code)
           if (result) {
+            // Set isNewUser flag before setting user (to skip skeleton for new users)
+            if (result.isNewUser) {
+              setIsNewUser(true)
+            }
+            
             setUser({
               id: result.user.id,
               email: result.user.email,
@@ -146,7 +151,7 @@ function AppContent() {
               accessToken: result.accessToken,
               tokenExpiry: Date.now() + (result.expiresIn * 1000)
             })
-            console.log('Login successful via auth code flow')
+            console.log('Login successful via auth code flow', result.isNewUser ? '(new user)' : '(existing user)')
           }
         } catch (error) {
           // Handle permission error during login
@@ -277,7 +282,8 @@ function AppContent() {
       lastSync = now
       
       // Check if Drive has data first (only on initial sync when no local notes)
-      if (notes.length === 0) {
+      const currentNotes = useNotesStore.getState().notes
+      if (currentNotes.length === 0) {
         await checkDriveHasData(user.accessToken)
       }
       
@@ -302,16 +308,25 @@ function AppContent() {
 
   // Sync when notes change (debounced)
   // Skip if offline or token expired - changes are queued in IndexedDB
+  // Use interval-based check instead of effect dependency to avoid re-renders
   useEffect(() => {
     if (!user?.accessToken) return
-    if (!isOnline) return // Don't sync when offline - changes are queued
-    if (isTokenExpired(user.tokenExpiry)) return // Will sync after token refresh
-    
-    const hasPending = notes.some(n => n.syncStatus === 'pending')
-    if (!hasPending || isSyncing) return
+    if (!isOnline) return
+    if (isTokenExpired(user.tokenExpiry)) return
 
-    debouncedSync()
-  }, [notes, user?.accessToken, user?.tokenExpiry, isSyncing, isOnline, debouncedSync])
+    // Check for pending changes every 500ms instead of on every notes change
+    const checkPending = () => {
+      const state = useNotesStore.getState()
+      const hasPending = state.notes.some(n => n.syncStatus === 'pending')
+      const hasPendingCollections = state.collections.some(c => c.syncStatus === 'pending')
+      if ((hasPending || hasPendingCollections) && !state.isSyncing) {
+        debouncedSync()
+      }
+    }
+
+    const interval = setInterval(checkPending, 500)
+    return () => clearInterval(interval)
+  }, [user?.accessToken, user?.tokenExpiry, isOnline, debouncedSync])
 
   // If viewing a public note, show the view page
   if (viewFileId) {

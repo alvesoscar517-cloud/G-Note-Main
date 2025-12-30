@@ -9,11 +9,19 @@ import {
   updateSyncQueueItem,
   clearSyncQueue,
   getSyncQueueCount,
-  getDeletedIds,
-  removeDeletedId,
   type SyncQueueItem 
-} from './offlineDb'
-import { driveSync } from './driveSync'
+} from './db/syncQueueRepository'
+import {
+  getAllTombstones,
+  removeTombstone
+} from './db/tombstoneRepository'
+import {
+  uploadSingleNote,
+  uploadSingleCollection,
+  deleteNoteDriveFile,
+  deleteCollectionDriveFile,
+  setSyncAccessToken
+} from './sync/syncEngine'
 import { useNetworkStore } from '@/stores/networkStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
@@ -62,7 +70,7 @@ export async function processSyncQueue(): Promise<{ success: number; failed: num
     }
 
     console.log(`[OfflineSync] Processing ${queue.length} queued items...`)
-    driveSync.setAccessToken(user.accessToken)
+    setSyncAccessToken(user.accessToken)
 
     // Process notes first, then collections
     const noteItems = queue.filter(item => item.entityType === 'note')
@@ -121,12 +129,12 @@ async function processNoteQueueItem(item: SyncQueueItem): Promise<void> {
     case 'create':
     case 'update':
       if (item.data) {
-        await driveSync.uploadNote(item.data as Note)
+        await uploadSingleNote(item.data as Note)
       }
       break
     
     case 'delete':
-      await driveSync.deleteNoteFile(item.entityId)
+      await deleteNoteDriveFile(item.entityId)
       break
     
     default:
@@ -142,12 +150,12 @@ async function processCollectionQueueItem(item: SyncQueueItem): Promise<void> {
     case 'create':
     case 'update':
       if (item.data) {
-        await driveSync.uploadCollection(item.data as Collection)
+        await uploadSingleCollection(item.data as Collection)
       }
       break
     
     case 'delete':
-      await driveSync.deleteCollectionFile(item.entityId)
+      await deleteCollectionDriveFile(item.entityId)
       break
     
     default:
@@ -173,38 +181,38 @@ async function handleQueueItemError(item: SyncQueueItem, error: unknown): Promis
 }
 
 /**
- * Sync deleted IDs to Drive
+ * Sync deleted IDs (tombstones) to Drive
  * This ensures deletions are propagated across devices
  */
 async function syncDeletedIds(accessToken: string): Promise<void> {
   try {
-    const deletedIds = await getDeletedIds()
-    if (deletedIds.length === 0) return
+    const tombstones = await getAllTombstones()
+    if (tombstones.length === 0) return
 
-    console.log(`[OfflineSync] Syncing ${deletedIds.length} deleted IDs...`)
-    driveSync.setAccessToken(accessToken)
+    console.log(`[OfflineSync] Syncing ${tombstones.length} tombstones...`)
+    setSyncAccessToken(accessToken)
 
-    for (const item of deletedIds) {
+    for (const item of tombstones) {
       try {
         if (item.entityType === 'note') {
-          await driveSync.deleteNoteFile(item.id)
+          await deleteNoteDriveFile(item.id)
         } else {
-          await driveSync.deleteCollectionFile(item.id)
+          await deleteCollectionDriveFile(item.id)
         }
-        await removeDeletedId(item.id)
+        await removeTombstone(item.id)
         console.log(`[OfflineSync] Synced deletion: ${item.entityType} ${item.id}`)
       } catch (error) {
         // If file doesn't exist on Drive, that's fine - remove from local tracking
         const errorMsg = error instanceof Error ? error.message : ''
-        if (errorMsg.includes('404') || errorMsg.includes('not found')) {
-          await removeDeletedId(item.id)
+        if (errorMsg.includes('404') || errorMsg.includes('not found') || errorMsg.includes('DRIVE_NOT_FOUND')) {
+          await removeTombstone(item.id)
         } else {
           console.error(`[OfflineSync] Failed to sync deletion:`, error)
         }
       }
     }
   } catch (error) {
-    console.error('[OfflineSync] Failed to sync deleted IDs:', error)
+    console.error('[OfflineSync] Failed to sync tombstones:', error)
   }
 }
 
