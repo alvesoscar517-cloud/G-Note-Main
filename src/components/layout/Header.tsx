@@ -349,7 +349,7 @@ export function Header() {
                 label={t('settings.sync')}
                 description={t('settings.syncDescription')}
                 onClick={handleSync}
-                disabled={isSyncing}
+                disabled={!isOnline || isSyncing}
               />
               <MenuItem
                 icon={isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}

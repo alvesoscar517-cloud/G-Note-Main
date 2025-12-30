@@ -256,6 +256,12 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   // Use refs to track current provider/ydoc for cleanup
   const providerRef = useRef<WebrtcProvider | null>(null)
   const ydocRef = useRef<Y.Doc | null>(null)
+  
+  // Use refs for user info to avoid re-running effect when these change
+  const userNameRef = useRef(user?.name)
+  const userAvatarRef = useRef(user?.avatar)
+  userNameRef.current = user?.name
+  userAvatarRef.current = user?.avatar
 
   // Setup collaboration when roomId changes
   useEffect(() => {
@@ -334,10 +340,10 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       ydocRef.current = newYdoc
 
       newProvider.awareness.setLocalStateField('user', {
-        name: user?.name || 'Anonymous',
+        name: userNameRef.current || 'Anonymous',
         color: userColor,
         colorLight: userColor + '40',
-        picture: user?.avatar || null
+        picture: userAvatarRef.current || null
       })
 
       // Log connection status
@@ -410,7 +416,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       setIsProviderReady(false)
       // Cleanup will be done at the start of next effect run
     }
-  }, [roomId, user?.name, userColor])
+  }, [roomId, userColor]) // Only re-run when roomId or userColor changes, not user info
   
   // Cleanup on unmount
   useEffect(() => {
@@ -424,6 +430,27 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       }
     }
   }, [])
+
+  // Reconnect WebRTC when tab becomes visible again (after phone sleep/unlock)
+  useEffect(() => {
+    if (!roomId || !providerRef.current) return
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && providerRef.current) {
+        console.log('[Collab] Tab visible, checking connection...')
+        // WebrtcProvider will auto-reconnect, but we can force it
+        if (!providerRef.current.connected) {
+          console.log('[Collab] Reconnecting...')
+          providerRef.current.connect()
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [roomId])
 
   // Debounced update note content - reduced for snappier feel
   const debouncedUpdate = useDebouncedCallback((id: string, content: string) => {
@@ -1328,7 +1355,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           {toolbarVisibility.ai && (
             <AIMenu 
               onAction={handleAIAction} 
-              disabled={isAILoading || isStreaming}
+              disabled={!isOnline || isAILoading || isStreaming}
             />
           )}
           
@@ -1633,7 +1660,12 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             <ToolbarButton
               onClick={() => roomId ? handleStopSharing() : setShowShareDialog(true)}
               active={!!roomId}
-              tooltip={roomId ? t('editor.stopSharing') : t('editor.collaborate')}
+              disabled={!isOnline && !roomId} // Disable when offline and not already in a room
+              tooltip={
+                !isOnline && !roomId 
+                  ? t('offline.networkRequired')
+                  : roomId ? t('editor.stopSharing') : t('editor.collaborate')
+              }
             >
               {roomId ? <Users className="w-[18px] h-[18px]" /> : <Share2 className="w-[18px] h-[18px]" />}
             </ToolbarButton>
@@ -1643,7 +1675,8 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           {toolbarVisibility.history && (
             <ToolbarButton
               onClick={() => setShowVersionHistory(true)}
-              tooltip={t('editor.versionHistory')}
+              disabled={!isOnline}
+              tooltip={!isOnline ? t('offline.networkRequired') : t('editor.versionHistory')}
             >
               <History className="w-[18px] h-[18px]" />
             </ToolbarButton>
