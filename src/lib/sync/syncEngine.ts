@@ -26,8 +26,6 @@ import {
   deleteCollectionFile,
   getNoteFileId,
   getCollectionFileId,
-  setNoteFileId,
-  setCollectionFileId,
   initFileIdCache,
   batchSetFileIds
 } from '../drive/driveFiles'
@@ -100,42 +98,6 @@ function getStaleLocalNoteIds(
     }
   }
   return staleIds
-}
-
-/**
- * Helper function to run promises with concurrency limit
- */
-async function runWithConcurrency<T, R>(
-  items: T[],
-  fn: (item: T) => Promise<R>,
-  concurrency: number
-): Promise<R[]> {
-  const results: R[] = []
-  const executing: Promise<void>[] = []
-
-  for (const item of items) {
-    const promise = fn(item).then(result => {
-      results.push(result)
-    })
-    executing.push(promise)
-
-    if (executing.length >= concurrency) {
-      await Promise.race(executing)
-      // Remove completed promises
-      const completed = executing.filter(p => {
-        let resolved = false
-        p.then(() => { resolved = true }).catch(() => { resolved = true })
-        return resolved
-      })
-      for (const c of completed) {
-        const idx = executing.indexOf(c)
-        if (idx > -1) executing.splice(idx, 1)
-      }
-    }
-  }
-
-  await Promise.all(executing)
-  return results
 }
 
 /**

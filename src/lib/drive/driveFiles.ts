@@ -8,7 +8,6 @@ import type { Note, Collection } from '@/types'
 import {
   saveFileId,
   saveFileIds,
-  getFileId,
   deleteFileId,
   loadFileIdsToMemory
 } from '@/lib/db/fileIdCacheRepository'
