@@ -27,6 +27,8 @@ jobs:
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_SIGNALING_SERVERS: ${{ secrets.VITE_SIGNALING_SERVERS }}
+          VITE_METERED_API_KEY: ${{ secrets.VITE_METERED_API_KEY }}
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0

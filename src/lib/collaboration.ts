@@ -31,12 +31,10 @@ const SIGNALING_SERVERS = import.meta.env.VITE_SIGNALING_SERVERS
 const API_URL = import.meta.env.VITE_API_URL || ''
 
 // Free STUN servers for NAT traversal (enables cross-network connections)
-const ICE_SERVERS = [
+// Note: For full cross-network support, use Metered API in NoteEditor.tsx
+const ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: 'stun:stun2.l.google.com:19302' },
-  { urls: 'stun:stun3.l.google.com:19302' },
-  { urls: 'stun:stun4.l.google.com:19302' },
 ]
 
 // Generate a shareable room ID (6 digits for easy mobile input)
