@@ -1,17 +1,13 @@
 /* TEAM */
 App: G-Note
-Site: https://g-note.app
+Site: https://gnote.graphosai.com
 Description: Free note-taking app with Google Drive sync
 
 /* THANKS */
-React: https://react.dev
-Vite: https://vitejs.dev
-TailwindCSS: https://tailwindcss.com
-Google Drive API: https://developers.google.com/drive
+Thanks to all contributors and users!
 
 /* SITE */
-Last update: 2024/12/29
-Standards: HTML5, CSS3, ES6+
-Components: React, TypeScript, TailwindCSS
-Software: Vite, PWA, Service Worker
-Languages: English, Vietnamese, Japanese, Korean, Chinese (Simplified), Chinese (Traditional), German, French, Spanish, Portuguese (Brazil), Italian, Dutch, Arabic, Hindi, Turkish, Polish, Thai, Indonesian
+Last update: 2024/12/30
+Standards: HTML5, CSS3, JavaScript ES2022
+Components: React, TypeScript, Vite, TailwindCSS
+Software: Visual Studio Code

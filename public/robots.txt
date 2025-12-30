@@ -1,5 +1,5 @@
 # G-Note Robots.txt
-# https://g-note.app
+# https://gnote.graphosai.com
 
 User-agent: *
 Allow: /
@@ -16,7 +16,7 @@ Allow: /terms
 Allow: /free-note
 
 # Sitemap location
-Sitemap: https://g-note.app/sitemap.xml
+Sitemap: https://gnote.graphosai.com/sitemap.xml
 
 # Crawl-delay for polite crawling
 Crawl-delay: 1

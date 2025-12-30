@@ -1,13 +1,13 @@
 # G-Note Security Policy
-# https://g-note.app
+# https://gnote.graphosai.com
 
-Contact: mailto:security@g-note.app
+Contact: mailto:security@graphosai.com
 Expires: 2025-12-31T23:59:59.000Z
 Preferred-Languages: en, vi
-Canonical: https://g-note.app/.well-known/security.txt
+Canonical: https://gnote.graphosai.com/.well-known/security.txt
 
 # Security Policy
-Policy: https://g-note.app/security
+Policy: https://gnote.graphosai.com/security
 
 # Acknowledgments
-Acknowledgments: https://g-note.app/thanks
+Acknowledgments: https://gnote.graphosai.com/thanks

@@ -5,11 +5,10 @@
       <square70x70logo src="/pwa-64x64.png"/>
       <square150x150logo src="/pwa-192x192.png"/>
       <square310x310logo src="/pwa-512x512.png"/>
-      <wide310x150logo src="/pwa-512x512.png"/>
-      <TileColor>#fafafa</TileColor>
+      <TileColor>#0a0a0a</TileColor>
     </tile>
     <notification>
-      <polling-uri src="https://g-note.app/notifications.xml"/>
+      <polling-uri src="https://gnote.graphosai.com/notifications.xml"/>
       <frequency>30</frequency>
       <cycle>1</cycle>
     </notification>

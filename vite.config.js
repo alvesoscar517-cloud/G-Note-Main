@@ -45,7 +45,7 @@ export default defineConfig({
                 related_applications: [
                     {
                         platform: 'webapp',
-                        url: 'https://g-note.app'
+                        url: 'https://gnote.graphosai.com'
                     }
                 ],
                 icons: [

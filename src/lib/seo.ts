@@ -12,7 +12,7 @@ export interface SEOConfig {
 }
 
 // Base URL for the app
-export const SITE_URL = 'https://g-note.app'
+export const SITE_URL = 'https://gnote.graphosai.com'
 export const SITE_NAME = 'G-Note'
 
 // Supported languages with SEO-optimized content
@@ -190,7 +190,7 @@ export function generateStructuredData(lang: string) {
         applicationCategory: 'ProductivityApplication',
         operatingSystem: 'Any',
         browserRequirements: 'Requires JavaScript',
-        softwareVersion: '1.0.0',
+        softwareVersion: '1.0.3',
         offers: {
           '@type': 'Offer',
           price: '0',
