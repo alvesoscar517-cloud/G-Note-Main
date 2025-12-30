@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils'
 import { getPlainText } from '@/lib/utils'
 import { NoteBackground, getNoteBackgroundStyle } from './NoteStylePicker'
 import { useSwipeGesture } from '@/hooks/useSwipeGesture'
-import { onModalOpen, onModalClose } from '@/stores/themeStore'
 import type { Note } from '@/types'
 
 // Modal max-width in pixels for each size
@@ -151,8 +150,8 @@ export function NoteModal() {
     if (isModalOpen) {
       document.body.style.overflow = 'hidden'
       document.body.classList.add('modal-open')
-      // Update status bar color for modal backdrop
-      onModalOpen()
+      // Note: Don't call onModalOpen() here because NoteModal is fullscreen
+      // and doesn't need the status bar overlay effect
     } else {
       document.body.style.overflow = ''
       document.body.classList.remove('modal-open')
@@ -160,10 +159,6 @@ export function NoteModal() {
     return () => {
       document.body.style.overflow = ''
       document.body.classList.remove('modal-open')
-      if (isModalOpen) {
-        // Restore status bar color when modal closes
-        onModalClose()
-      }
     }
   }, [isModalOpen])
 

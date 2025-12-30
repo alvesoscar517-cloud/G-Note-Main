@@ -78,8 +78,9 @@ export function Header() {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   
-  // Update status bar color when any modal is open
-  const anyModalOpen = settingsOpen || packagesOpen || languageOpen || modalSizeOpen || trashOpen
+  // Update status bar color when any small modal is open
+  // Note: trashOpen is excluded because TrashView is fullscreen
+  const anyModalOpen = settingsOpen || packagesOpen || languageOpen || modalSizeOpen
   useModalStatusBar(anyModalOpen)
   
   // Local search input state + debounce
