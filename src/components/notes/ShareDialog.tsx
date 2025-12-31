@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { generateRoomId, sanitizeRoomId, isValidRoomId, checkRoomExists } from '@/lib/collaboration'
 import { driveShare } from '@/lib/driveShare'
-import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
 import { useNetworkStore } from '@/stores/networkStore'
 import { getValidAccessToken, TokenExpiredError } from '@/lib/tokenManager'
@@ -32,7 +31,6 @@ export function ShareDialog({
   onStopSharing
 }: ShareDialogProps) {
   const { t } = useTranslation()
-  const { user } = useAuthStore()
   const { getSelectedNote, updateNote } = useNotesStore()
   const isOnline = useNetworkStore(state => state.isOnline)
   const note = getSelectedNote()
