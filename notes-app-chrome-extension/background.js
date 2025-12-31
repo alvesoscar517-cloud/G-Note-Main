@@ -30,7 +30,21 @@ function getContextMenuTitle() {
   return contextMenuTitles[lang] || contextMenuTitles[lang.split('-')[0]] || contextMenuTitles.en
 }
 
-chrome.runtime.onInstalled.addListener(() => {
+// Update side panel behavior based on launch type setting
+async function updateSidePanelBehavior() {
+  const result = await chrome.storage.local.get('launchType')
+  const launchType = result.launchType || 'fullscreen'
+  
+  if (launchType === 'sidePanel') {
+    // Enable side panel to open on action click
+    await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
+  } else {
+    // Disable side panel on action click (will use our custom handler)
+    await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false })
+  }
+}
+
+chrome.runtime.onInstalled.addListener(async () => {
   console.log('G-Note extension installed')
   
   // Create context menu for adding selected text to notes
@@ -39,6 +53,21 @@ chrome.runtime.onInstalled.addListener(() => {
     title: getContextMenuTitle(),
     contexts: ['selection']
   })
+  
+  // Initialize side panel behavior
+  await updateSidePanelBehavior()
+})
+
+// Listen for storage changes to update side panel behavior
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'local' && changes.launchType) {
+    updateSidePanelBehavior()
+  }
+})
+
+// Also update on startup
+chrome.runtime.onStartup.addListener(async () => {
+  await updateSidePanelBehavior()
 })
 
 // Handle context menu click
@@ -60,19 +89,16 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
           }
         })
         
-        // Open the extension in a new tab
-        const url = chrome.runtime.getURL('index.html')
-        const tabs = await chrome.tabs.query({ url })
+        // Get user's launch preference
+        const result = await chrome.storage.local.get('launchType')
+        const launchType = result.launchType || 'fullscreen'
         
-        if (tabs.length > 0) {
-          // Focus existing tab and notify it
-          await chrome.tabs.update(tabs[0].id, { active: true })
-          await chrome.windows.update(tabs[0].windowId, { focused: true })
-          // Send message to the app to handle the pending content
-          chrome.tabs.sendMessage(tabs[0].id, { type: 'WEB_CONTENT_ADDED' })
+        if (launchType === 'sidePanel') {
+          // Open side panel - this is allowed from context menu click (user gesture)
+          await chrome.sidePanel.open({ windowId: tab.windowId })
         } else {
-          // Open new tab - the app will check for pending content on load
-          await chrome.tabs.create({ url })
+          // Open in fullscreen tab
+          await openAppInTab()
         }
       }
     } catch (error) {
@@ -89,15 +115,46 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
           }
         })
         
-        const url = chrome.runtime.getURL('index.html')
-        await chrome.tabs.create({ url })
+        // Get user's launch preference for fallback
+        const result = await chrome.storage.local.get('launchType')
+        const launchType = result.launchType || 'fullscreen'
+        
+        if (launchType === 'sidePanel') {
+          await chrome.sidePanel.open({ windowId: tab.windowId })
+        } else {
+          await openAppInTab()
+        }
       }
     }
   }
 })
 
-// Open app in new tab when clicking extension icon
+// Helper function to open app in a tab (used by context menu)
+async function openAppInTab() {
+  const url = chrome.runtime.getURL('index.html')
+  const tabs = await chrome.tabs.query({ url })
+  
+  if (tabs.length > 0) {
+    // Focus existing tab and notify it
+    await chrome.tabs.update(tabs[0].id, { active: true })
+    await chrome.windows.update(tabs[0].windowId, { focused: true })
+    // Send message to the app to handle the pending content
+    chrome.tabs.sendMessage(tabs[0].id, { type: 'WEB_CONTENT_ADDED' })
+  } else {
+    // Open new tab - the app will check for pending content on load
+    await chrome.tabs.create({ url })
+  }
+}
+
+// Open app in fullscreen tab when clicking extension icon (only when sidePanel is disabled)
+// When sidePanel is enabled, Chrome handles opening it automatically via setPanelBehavior
 chrome.action.onClicked.addListener(async () => {
+  // This handler only runs when openPanelOnActionClick is false (fullscreen mode)
+  await openInTab()
+})
+
+// Helper function to open app in a new tab
+async function openInTab() {
   const url = chrome.runtime.getURL('index.html')
   
   // Check if tab already exists
@@ -111,7 +168,7 @@ chrome.action.onClicked.addListener(async () => {
     // Open new tab
     await chrome.tabs.create({ url })
   }
-})
+}
 
 // Handle OAuth authentication
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

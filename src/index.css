@@ -676,6 +676,22 @@ select:focus,
   display: none;
 }
 
+/* Hide horizontal scrollbar globally */
+html, body {
+  overflow-x: hidden;
+}
+
+*::-webkit-scrollbar:horizontal {
+  display: none;
+  height: 0;
+}
+
+/* Prevent horizontal scroll on all containers */
+.overflow-y-auto,
+.overflow-auto {
+  overflow-x: hidden;
+}
+
 /* Touch optimization */
 .touch-manipulation {
   touch-action: manipulation;

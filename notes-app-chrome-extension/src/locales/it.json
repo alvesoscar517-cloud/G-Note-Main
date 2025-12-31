@@ -47,7 +47,14 @@
     "modalSizeDescription": "Regola dimensione editor",
     "modalSizeDefault": "Predefinita",
     "modalSizeLarge": "Grande",
-    "modalSizeXLarge": "Molto grande"
+    "modalSizeXLarge": "Molto grande",
+    "displayMode": "Modalità di visualizzazione",
+    "displayModeDescription": "Come si apre l'app",
+    "fullscreen": "Schermo intero",
+    "fullscreenDesc": "Apri in nuova scheda",
+    "sidePanel": "Pannello laterale",
+    "sidePanelDesc": "Apri nel pannello laterale",
+    "displayModeHint": "Le modifiche verranno applicate al prossimo clic sull'icona dell'estensione."
   },
   "credits": {
     "title": "Acquista crediti AI",
@@ -175,7 +182,8 @@
     "joinButton": "Unisciti",
     "roomNotFound": "Stanza non trovata. Controlla il codice e riprova.",
     "close": "Chiudi",
-    "error": "Impossibile condividere"
+    "error": "Impossibile condividere",
+    "sessionExpired": "Sessione scaduta. Effettua nuovamente l'accesso."
   },
   "versionHistory": {
     "title": "Cronologia versioni",
@@ -380,5 +388,22 @@
     "syncError": "Errore di sincronizzazione",
     "tapToRetry": "Tocca per riprovare",
     "loginRequiresNetwork": "L'accesso richiede una connessione Internet"
+  },
+  "errorBoundary": {
+    "retry": "Riprova",
+    "reloadApp": "Ricarica app",
+    "showDetails": "Mostra dettagli errore",
+    "editorError": "Errore dell'editor",
+    "editorErrorDescription": "Qualcosa è andato storto con l'editor. Le tue modifiche potrebbero non essere state salvate.",
+    "listError": "Impossibile caricare le note",
+    "listErrorDescription": "Qualcosa è andato storto durante il caricamento delle note. Riprova.",
+    "drawingError": "Errore di disegno",
+    "drawingErrorDescription": "Qualcosa è andato storto con lo strumento di disegno. Riprova.",
+    "modalError": "Impossibile aprire la nota",
+    "modalErrorDescription": "Qualcosa è andato storto durante l'apertura di questa nota. Riprova.",
+    "genericError": "Qualcosa è andato storto",
+    "genericErrorDescription": "Si è verificato un errore imprevisto. Riprova.",
+    "appError": "L'app si è bloccata",
+    "appErrorDescription": "Qualcosa è andato storto e l'app deve essere ricaricata. Ci scusiamo per l'inconveniente."
   }
 }

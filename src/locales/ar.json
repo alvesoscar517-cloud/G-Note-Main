@@ -178,7 +178,8 @@
     "joinButton": "انضمام",
     "roomNotFound": "الغرفة غير موجودة. يرجى التحقق من الرمز والمحاولة مرة أخرى.",
     "close": "إغلاق",
-    "error": "تعذرت المشاركة"
+    "error": "تعذرت المشاركة",
+    "sessionExpired": "انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى."
   },
   "versionHistory": {
     "title": "سجل الإصدارات",
@@ -383,5 +384,22 @@
     "syncError": "خطأ في المزامنة",
     "tapToRetry": "انقر لإعادة المحاولة",
     "loginRequiresNetwork": "تسجيل الدخول يتطلب اتصالاً بالإنترنت"
+  },
+  "errorBoundary": {
+    "retry": "حاول مرة أخرى",
+    "reloadApp": "إعادة تحميل التطبيق",
+    "showDetails": "عرض تفاصيل الخطأ",
+    "editorError": "خطأ في المحرر",
+    "editorErrorDescription": "حدث خطأ في المحرر. قد لا يتم حفظ تغييراتك.",
+    "listError": "فشل تحميل الملاحظات",
+    "listErrorDescription": "حدث خطأ أثناء تحميل ملاحظاتك. يرجى المحاولة مرة أخرى.",
+    "drawingError": "خطأ في الرسم",
+    "drawingErrorDescription": "حدث خطأ في أداة الرسم. يرجى المحاولة مرة أخرى.",
+    "modalError": "فشل فتح الملاحظة",
+    "modalErrorDescription": "حدث خطأ أثناء فتح هذه الملاحظة. يرجى المحاولة مرة أخرى.",
+    "genericError": "حدث خطأ",
+    "genericErrorDescription": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
+    "appError": "تعطل التطبيق",
+    "appErrorDescription": "حدث خطأ ويحتاج التطبيق إلى إعادة التحميل. نعتذر عن الإزعاج."
   }
 }

@@ -269,6 +269,7 @@ export function NoteActionsMenu({
                 />
               </div>
             )}
+            <Popover.Arrow className="fill-white dark:fill-neutral-800" />
           </Popover.Content>
         </Popover.Portal>
       </Popover.Root>

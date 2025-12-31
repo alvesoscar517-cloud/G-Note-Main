@@ -1,4 +1,5 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import SpeechRecognition, { useSpeechRecognition as useLibSpeechRecognition } from 'react-speech-recognition'
 
 // Language mapping from i18n locale to Web Speech API language code
 const LOCALE_TO_SPEECH_LANG: Record<string, string> = {
@@ -43,22 +44,10 @@ interface UseSpeechToTextReturn {
   toggleListening: () => void
 }
 
-// Check if Web Speech API is supported
-const isSpeechRecognitionSupported = (): boolean => {
-  return !!(
-    typeof window !== 'undefined' &&
-    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
-  )
-}
-
-// Get SpeechRecognition constructor
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getSpeechRecognition = (): (new () => any) | null => {
-  if (typeof window === 'undefined') return null
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null
-}
-
+/**
+ * Speech-to-text hook using react-speech-recognition library
+ * Provides a consistent API for speech recognition across browsers
+ */
 export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeechToTextReturn {
   const {
     locale = 'en',
@@ -68,148 +57,95 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
     onError,
   } = options
 
-  const [status, setStatus] = useState<SpeechStatus>('idle')
-  const [transcript, setTranscript] = useState('')
-  const [interimTranscript, setInterimTranscript] = useState('')
   const [error, setError] = useState<string | null>(null)
-  
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const recognitionRef = useRef<any>(null)
-  const isSupported = isSpeechRecognitionSupported()
+  const [accumulatedTranscript, setAccumulatedTranscript] = useState('')
 
-  // Cleanup on unmount
+  // Use the library's hook
+  const {
+    transcript: libTranscript,
+    interimTranscript: libInterimTranscript,
+    listening,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
+  } = useLibSpeechRecognition()
+
+  // Determine status based on library state
+  const status: SpeechStatus = error ? 'error' : listening ? 'listening' : 'idle'
+
+  // Track transcript changes and call onResult callback
   useEffect(() => {
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.abort()
-        recognitionRef.current = null
+    if (libTranscript && libTranscript !== accumulatedTranscript) {
+      const newText = libTranscript.slice(accumulatedTranscript.length)
+      if (newText) {
+        onResult?.(newText, true)
+        setAccumulatedTranscript(libTranscript)
       }
     }
-  }, [])
+  }, [libTranscript, accumulatedTranscript, onResult])
 
-  const startListening = useCallback(() => {
-    if (!isSupported) {
+  // Track interim transcript changes
+  useEffect(() => {
+    if (libInterimTranscript) {
+      onResult?.(libInterimTranscript, false)
+    }
+  }, [libInterimTranscript, onResult])
+
+  const startListening = useCallback(async () => {
+    if (!browserSupportsSpeechRecognition) {
       const errorMsg = 'Speech recognition is not supported in this browser'
       setError(errorMsg)
       onError?.(errorMsg)
       return
     }
 
-    // Stop any existing recognition
-    if (recognitionRef.current) {
-      recognitionRef.current.abort()
-    }
-
-    setError(null)
-    setTranscript('')
-    setInterimTranscript('')
-
-    const SpeechRecognitionClass = getSpeechRecognition()
-    if (!SpeechRecognitionClass) {
-      const errorMsg = 'Speech recognition is not available'
+    if (!isMicrophoneAvailable) {
+      const errorMsg = 'Microphone access denied'
       setError(errorMsg)
       onError?.(errorMsg)
       return
     }
-    
-    const recognition = new SpeechRecognitionClass()
 
-    recognition.lang = LOCALE_TO_SPEECH_LANG[locale] || 'en-US'
-    recognition.continuous = continuous
-    recognition.interimResults = interimResults
+    setError(null)
+    setAccumulatedTranscript('')
 
-    recognition.onstart = () => {
-      setStatus('listening')
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    recognition.onresult = (event: any) => {
-      let finalTranscript = ''
-      let interim = ''
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i]
-        if (result.isFinal) {
-          finalTranscript += result[0].transcript
-        } else {
-          interim += result[0].transcript
-        }
-      }
-
-      if (finalTranscript) {
-        setTranscript(prev => prev + finalTranscript)
-        onResult?.(finalTranscript, true)
-      }
-      
-      setInterimTranscript(interim)
-      if (interim) {
-        onResult?.(interim, false)
-      }
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    recognition.onerror = (event: any) => {
-      let errorMsg = 'Speech recognition error'
-      
-      switch (event.error) {
-        case 'not-allowed':
-          errorMsg = 'Microphone access denied'
-          break
-        case 'no-speech':
-          errorMsg = 'No speech detected'
-          break
-        case 'network':
-          errorMsg = 'Network error'
-          break
-        case 'aborted':
-          // User aborted, not an error
-          return
-      }
-      
-      setError(errorMsg)
-      setStatus('error')
-      onError?.(errorMsg)
-    }
-
-    recognition.onend = () => {
-      setStatus('idle')
-      setInterimTranscript('')
-    }
-
-    recognitionRef.current = recognition
-    
     try {
-      recognition.start()
+      await SpeechRecognition.startListening({
+        continuous,
+        interimResults,
+        language: LOCALE_TO_SPEECH_LANG[locale] || 'en-US',
+      })
     } catch (err) {
-      const errorMsg = 'Failed to start speech recognition'
+      const errorMsg = err instanceof Error ? err.message : 'Failed to start speech recognition'
       setError(errorMsg)
-      setStatus('error')
       onError?.(errorMsg)
     }
-  }, [isSupported, locale, continuous, interimResults, onResult, onError])
+  }, [browserSupportsSpeechRecognition, isMicrophoneAvailable, continuous, interimResults, locale, onError])
 
   const stopListening = useCallback(() => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop()
-      recognitionRef.current = null
-    }
-    setStatus('idle')
-    setInterimTranscript('')
+    SpeechRecognition.stopListening()
+    setError(null)
   }, [])
 
   const toggleListening = useCallback(() => {
-    if (status === 'listening') {
+    if (listening) {
       stopListening()
     } else {
       startListening()
     }
-  }, [status, startListening, stopListening])
+  }, [listening, startListening, stopListening])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      SpeechRecognition.abortListening()
+    }
+  }, [])
 
   return {
-    isSupported,
+    isSupported: browserSupportsSpeechRecognition,
     status,
-    transcript,
-    interimTranscript,
+    transcript: accumulatedTranscript,
+    interimTranscript: libInterimTranscript,
     error,
     startListening,
     stopListening,

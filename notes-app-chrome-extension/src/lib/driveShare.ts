@@ -179,29 +179,43 @@ class DriveShare {
 
   // Get notes shared with me
   async getSharedWithMe(): Promise<Note[]> {
-    const query = `sharedWithMe = true and mimeType = 'application/json' and name contains 'note-' and trashed = false`
-    const url = `${DRIVE_API}/files?q=${encodeURIComponent(query)}&fields=files(id,name,owners)`
+    // Query for files shared with me that look like G-Note files
+    // Note: Don't filter by mimeType as Google Drive may not always detect it correctly
+    const query = `sharedWithMe = true and (name contains '[G-Note]' or name contains 'note-') and name contains '.json' and trashed = false`
+    const url = `${DRIVE_API}/files?q=${encodeURIComponent(query)}&fields=files(id,name,mimeType,owners)`
     
     const response = await this.request(url)
     const data = await response.json()
+    
+    console.log('[DriveShare] Shared files found:', data.files?.length || 0, data.files?.map((f: { name: string }) => f.name))
     
     const notes: Note[] = []
     
     for (const file of data.files || []) {
       try {
+        // Only process files that match our naming pattern
+        if (!file.name.includes('note-') || !file.name.endsWith('.json')) {
+          continue
+        }
+        
         const contentRes = await this.request(`${DRIVE_API}/files/${file.id}?alt=media`)
         const noteData = await contentRes.json()
-        notes.push({
-          ...noteData,
-          driveFileId: file.id,
-          isShared: true,
-          sharedBy: file.owners?.[0]?.emailAddress || 'Unknown'
-        })
+        
+        // Validate that this is actually a note (has required fields)
+        if (noteData && noteData.id && (noteData.title !== undefined || noteData.content !== undefined)) {
+          notes.push({
+            ...noteData,
+            driveFileId: file.id,
+            isShared: true,
+            sharedBy: file.owners?.[0]?.emailAddress || 'Unknown'
+          })
+        }
       } catch (e) {
-        console.error('Failed to load shared note:', e)
+        console.error('Failed to load shared note:', file.name, e)
       }
     }
     
+    console.log('[DriveShare] Valid shared notes loaded:', notes.length)
     return notes
   }
 

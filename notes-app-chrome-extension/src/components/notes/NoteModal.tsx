@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { getPlainText } from '@/lib/utils'
 import { NoteBackground, getNoteBackgroundStyle } from './NoteStylePicker'
 import { useSwipeGesture } from '@/hooks/useSwipeGesture'
+import { EditorErrorBoundary } from '@/components/ui/ErrorBoundary'
 import type { Note } from '@/types'
 
 // Modal max-width in pixels for each size
@@ -26,19 +27,37 @@ const MODAL_SIZES: Record<ModalSize, string> = {
   xlarge: 'md:w-full md:max-w-5xl md:h-[85vh] md:max-h-[800px]'
 }
 
-// Smooth transition config - longer duration for more frames = smoother animation
+// High refresh rate optimized transition config
+// Uses critically damped spring for smooth, bounce-free animation at any frame rate
 const LAYOUT_TRANSITION = { 
   layout: { 
-    duration: 0.3, 
-    ease: [0.4, 0, 0.2, 1] as const // Material Design standard easing - smoother
+    type: 'spring' as const,
+    stiffness: 500,      // Higher = snappier response
+    damping: 40,         // Critical damping = no bounce
+    mass: 0.8,           // Lower = faster acceleration
+    restDelta: 0.001,    // Smaller = smoother finish
+    restSpeed: 0.001,
   }
 }
 
-// Content reveal synced with layout
+// Fullscreen transition - slightly faster for snappy feel
+const FULLSCREEN_TRANSITION = {
+  layout: {
+    type: 'spring' as const,
+    stiffness: 600,
+    damping: 45,
+    mass: 0.7,
+    restDelta: 0.001,
+    restSpeed: 0.001,
+  }
+}
+
+// Content reveal - quick fade with spring
 const CONTENT_TRANSITION = {
-  duration: 0.2,
-  delay: 0.05,
-  ease: [0.4, 0, 0.2, 1] as const
+  type: 'spring' as const,
+  stiffness: 600,
+  damping: 45,
+  mass: 0.7,
 }
 
 export function NoteModal() {
@@ -56,6 +75,7 @@ export function NoteModal() {
   }, [selectedNoteId]))
   
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isFullscreenAnimating, setIsFullscreenAnimating] = useState(false) // Track animation state
   const [canExitFullscreen, setCanExitFullscreen] = useState(true)
   const userToggledRef = useRef(false)
   
@@ -215,10 +235,15 @@ export function NoteModal() {
           {/* Modal */}
           <motion.div
             layoutId={`note-card-${displayNote.id}`}
-            transition={LAYOUT_TRANSITION}
+            transition={isFullscreenAnimating ? FULLSCREEN_TRANSITION : LAYOUT_TRANSITION}
+            onLayoutAnimationStart={() => setIsFullscreenAnimating(true)}
+            onLayoutAnimationComplete={() => setIsFullscreenAnimating(false)}
             style={{ 
               willChange: 'transform',
               contain: 'layout style paint',
+              backfaceVisibility: 'hidden',
+              perspective: 1000,
+              transformStyle: 'preserve-3d',
               ...backgroundStyle 
             }}
             className={cn(
@@ -255,19 +280,21 @@ export function NoteModal() {
               transition={CONTENT_TRANSITION}
               className="flex-1 overflow-hidden flex flex-col relative z-10"
             >
-              <NoteEditor 
-                key={displayNote.id}
-                note={displayNote}
-                onClose={handleClose} 
-                onTogglePin={handleTogglePin} 
-                isPinned={displayNote.isPinned}
-                isFullscreen={isFullscreen}
-                canToggleFullscreen={canExitFullscreen}
-                onToggleFullscreen={() => {
-                  userToggledRef.current = true
-                  setIsFullscreen(!isFullscreen)
-                }}
-              />
+              <EditorErrorBoundary onReset={handleClose}>
+                <NoteEditor 
+                  key={displayNote.id}
+                  note={displayNote}
+                  onClose={handleClose} 
+                  onTogglePin={handleTogglePin} 
+                  isPinned={displayNote.isPinned}
+                  isFullscreen={isFullscreen}
+                  canToggleFullscreen={canExitFullscreen}
+                  onToggleFullscreen={() => {
+                    userToggledRef.current = true
+                    setIsFullscreen(!isFullscreen)
+                  }}
+                />
+              </EditorErrorBoundary>
             </motion.div>
           </motion.div>
         </>

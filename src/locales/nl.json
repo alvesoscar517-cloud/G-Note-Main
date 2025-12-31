@@ -178,7 +178,8 @@
     "joinButton": "Deelnemen",
     "roomNotFound": "Kamer niet gevonden. Controleer de code en probeer opnieuw.",
     "close": "Sluiten",
-    "error": "Kan niet delen"
+    "error": "Kan niet delen",
+    "sessionExpired": "Sessie verlopen. Log opnieuw in."
   },
   "versionHistory": {
     "title": "Versiegeschiedenis",
@@ -383,5 +384,22 @@
     "syncError": "Synchronisatiefout",
     "tapToRetry": "Tik om opnieuw te proberen",
     "loginRequiresNetwork": "Inloggen vereist een internetverbinding"
+  },
+  "errorBoundary": {
+    "retry": "Opnieuw proberen",
+    "reloadApp": "App herladen",
+    "showDetails": "Foutdetails tonen",
+    "editorError": "Editorfout",
+    "editorErrorDescription": "Er is iets misgegaan met de editor. Je wijzigingen zijn mogelijk niet opgeslagen.",
+    "listError": "Notities laden mislukt",
+    "listErrorDescription": "Er is iets misgegaan bij het laden van je notities. Probeer het opnieuw.",
+    "drawingError": "Tekenfout",
+    "drawingErrorDescription": "Er is iets misgegaan met het tekengereedschap. Probeer het opnieuw.",
+    "modalError": "Notitie openen mislukt",
+    "modalErrorDescription": "Er is iets misgegaan bij het openen van deze notitie. Probeer het opnieuw.",
+    "genericError": "Er is iets misgegaan",
+    "genericErrorDescription": "Er is een onverwachte fout opgetreden. Probeer het opnieuw.",
+    "appError": "App gecrasht",
+    "appErrorDescription": "Er is iets misgegaan en de app moet opnieuw worden geladen. Onze excuses voor het ongemak."
   }
 }

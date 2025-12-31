@@ -126,27 +126,27 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
       <Popover.Portal>
         <Popover.Content
           className="z-50 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 animate-in fade-in zoom-in-95 duration-200"
-          sideOffset={5}
+          side="top"
+          sideOffset={8}
           align="start"
         >
-          {/* Main menu - hide on mobile when showing languages */}
-          <div className={cn(
-            "min-w-[180px] p-1",
-            showLanguages && "hidden sm:block"
-          )}>
-            <MenuItem icon={FileText} label={t('ai.summarize')} onClick={() => handleAction('summarize')} />
-            <MenuItem icon={PenLine} label={t('ai.continue')} onClick={() => handleAction('continue')} />
-            <MenuItem icon={Wand2} label={t('ai.improve')} onClick={() => handleAction('improve')} />
-            <MenuItem 
-              icon={Languages} 
-              label={t('ai.translate')} 
-              onClick={() => handleAction('translate')} 
-              hasSubmenu 
-              active={showLanguages}
-            />
-            <MenuItem icon={ListTodo} label={t('ai.extractTasks')} onClick={() => handleAction('extract-tasks')} />
-            <MenuItem icon={MessageCircleQuestion} label={t('ai.ask')} onClick={() => handleAction('ask')} />
-          </div>
+          {/* Main menu - hide when showing languages */}
+          {!showLanguages && (
+            <div className="min-w-[180px] p-1">
+              <MenuItem icon={FileText} label={t('ai.summarize')} onClick={() => handleAction('summarize')} />
+              <MenuItem icon={PenLine} label={t('ai.continue')} onClick={() => handleAction('continue')} />
+              <MenuItem icon={Wand2} label={t('ai.improve')} onClick={() => handleAction('improve')} />
+              <MenuItem 
+                icon={Languages} 
+                label={t('ai.translate')} 
+                onClick={() => handleAction('translate')} 
+                hasSubmenu 
+                active={showLanguages}
+              />
+              <MenuItem icon={ListTodo} label={t('ai.extractTasks')} onClick={() => handleAction('extract-tasks')} />
+              <MenuItem icon={MessageCircleQuestion} label={t('ai.ask')} onClick={() => handleAction('ask')} />
+            </div>
+          )}
 
           {/* Language submenu - inline replacement for all screen sizes */}
           {showLanguages && (
@@ -175,6 +175,7 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
               </div>
             </div>
           )}
+          <Popover.Arrow className="fill-white dark:fill-neutral-800" />
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>

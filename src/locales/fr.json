@@ -175,7 +175,8 @@
     "joinButton": "Rejoindre",
     "roomNotFound": "Salle introuvable. Veuillez vérifier le code et réessayer.",
     "close": "Fermer",
-    "error": "Impossible de partager"
+    "error": "Impossible de partager",
+    "sessionExpired": "Session expirée. Veuillez vous reconnecter."
   },
   "versionHistory": {
     "title": "Historique des versions",
@@ -380,5 +381,22 @@
     "syncError": "Erreur de synchronisation",
     "tapToRetry": "Appuyez pour réessayer",
     "loginRequiresNetwork": "La connexion nécessite une connexion Internet"
+  },
+  "errorBoundary": {
+    "retry": "Réessayer",
+    "reloadApp": "Recharger l'app",
+    "showDetails": "Afficher les détails de l'erreur",
+    "editorError": "Erreur de l'éditeur",
+    "editorErrorDescription": "Une erreur s'est produite avec l'éditeur. Vos modifications n'ont peut-être pas été enregistrées.",
+    "listError": "Échec du chargement des notes",
+    "listErrorDescription": "Une erreur s'est produite lors du chargement de vos notes. Veuillez réessayer.",
+    "drawingError": "Erreur de dessin",
+    "drawingErrorDescription": "Une erreur s'est produite avec l'outil de dessin. Veuillez réessayer.",
+    "modalError": "Échec de l'ouverture de la note",
+    "modalErrorDescription": "Une erreur s'est produite lors de l'ouverture de cette note. Veuillez réessayer.",
+    "genericError": "Une erreur s'est produite",
+    "genericErrorDescription": "Une erreur inattendue s'est produite. Veuillez réessayer.",
+    "appError": "L'app a planté",
+    "appErrorDescription": "Une erreur s'est produite et l'app doit être rechargée. Nous nous excusons pour la gêne occasionnée."
   }
 }

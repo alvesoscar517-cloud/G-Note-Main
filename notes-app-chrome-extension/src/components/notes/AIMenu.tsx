@@ -126,7 +126,8 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
       <Popover.Portal>
         <Popover.Content
           className="z-50 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 animate-in fade-in zoom-in-95 duration-200"
-          sideOffset={5}
+          side="top"
+          sideOffset={8}
           align="start"
         >
           {/* Main menu - hide when showing languages */}
@@ -174,6 +175,7 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
               </div>
             </div>
           )}
+          <Popover.Arrow className="fill-white dark:fill-neutral-800" />
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>

@@ -73,6 +73,7 @@ import { useNetworkStore, NetworkRequiredError } from '@/stores/networkStore'
 import { cn } from '@/lib/utils'
 import { ConfirmDialog, InputDialog } from '@/components/ui/Dialog'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
+import { DrawingErrorBoundary } from '@/components/ui/ErrorBoundary'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -109,6 +110,7 @@ function EditableTitle({
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const isPastingRef = useRef(false)
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -122,10 +124,22 @@ function EditableTitle({
       <input
         ref={inputRef}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          // Strip newlines from pasted text to keep title single-line
+          const newValue = e.target.value.replace(/[\r\n]+/g, ' ')
+          onChange(newValue)
+        }}
+        onPaste={() => {
+          // Mark that we're pasting to ignore Enter key from paste
+          isPastingRef.current = true
+          setTimeout(() => {
+            isPastingRef.current = false
+          }, 100)
+        }}
         onBlur={() => setIsEditing(false)}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === 'Escape') {
+          // Only handle Enter/Escape if not from paste event
+          if ((e.key === 'Enter' || e.key === 'Escape') && !isPastingRef.current) {
             setIsEditing(false)
           }
         }}
@@ -520,7 +534,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       Markdown.configure({
         html: true,
         transformPastedText: true,
-        transformCopiedText: true,
+        transformCopiedText: false, // Disable markdown in copied text - we handle plain text separately
         linkify: false,
         breaks: false,
       }),
@@ -1148,14 +1162,16 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         onRestore={handleRestoreVersion}
       />
 
-      <DrawingModal
-        open={showDrawingModal}
-        onClose={() => setShowDrawingModal(false)}
-        onSave={(imageDataUrl) => {
-          // Insert drawing as image into editor
-          editor?.chain().focus().setImage({ src: imageDataUrl }).run()
-        }}
-      />
+      <DrawingErrorBoundary onReset={() => setShowDrawingModal(false)}>
+        <DrawingModal
+          open={showDrawingModal}
+          onClose={() => setShowDrawingModal(false)}
+          onSave={(imageDataUrl) => {
+            // Insert drawing as image into editor
+            editor?.chain().focus().setImage({ src: imageDataUrl }).run()
+          }}
+        />
+      </DrawingErrorBoundary>
 
       <InputDialog
         open={showLinkDialog}

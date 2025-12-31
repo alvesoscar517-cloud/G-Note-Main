@@ -47,7 +47,14 @@
     "modalSizeDescription": "Ajustar tamaño del editor",
     "modalSizeDefault": "Predeterminado",
     "modalSizeLarge": "Grande",
-    "modalSizeXLarge": "Muy grande"
+    "modalSizeXLarge": "Muy grande",
+    "displayMode": "Modo de visualización",
+    "displayModeDescription": "Cómo se abre la aplicación",
+    "fullscreen": "Pantalla completa",
+    "fullscreenDesc": "Abrir en nueva pestaña",
+    "sidePanel": "Panel lateral",
+    "sidePanelDesc": "Abrir en panel lateral",
+    "displayModeHint": "Los cambios se aplicarán la próxima vez que hagas clic en el icono de la extensión."
   },
   "credits": {
     "title": "Comprar créditos AI",
@@ -175,7 +182,8 @@
     "joinButton": "Unirse",
     "roomNotFound": "Sala no encontrada. Por favor verifica el código e intenta de nuevo.",
     "close": "Cerrar",
-    "error": "No se puede compartir"
+    "error": "No se puede compartir",
+    "sessionExpired": "Sesión expirada. Por favor inicia sesión de nuevo."
   },
   "versionHistory": {
     "title": "Historial de versiones",
@@ -380,5 +388,22 @@
     "syncError": "Error de sincronización",
     "tapToRetry": "Toca para reintentar",
     "loginRequiresNetwork": "Iniciar sesión requiere conexión a Internet"
+  },
+  "errorBoundary": {
+    "retry": "Intentar de nuevo",
+    "reloadApp": "Recargar app",
+    "showDetails": "Mostrar detalles del error",
+    "editorError": "Error del editor",
+    "editorErrorDescription": "Algo salió mal con el editor. Es posible que tus cambios no se hayan guardado.",
+    "listError": "Error al cargar notas",
+    "listErrorDescription": "Algo salió mal al cargar tus notas. Por favor, inténtalo de nuevo.",
+    "drawingError": "Error de dibujo",
+    "drawingErrorDescription": "Algo salió mal con la herramienta de dibujo. Por favor, inténtalo de nuevo.",
+    "modalError": "Error al abrir nota",
+    "modalErrorDescription": "Algo salió mal al abrir esta nota. Por favor, inténtalo de nuevo.",
+    "genericError": "Algo salió mal",
+    "genericErrorDescription": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo.",
+    "appError": "La app falló",
+    "appErrorDescription": "Algo salió mal y la app necesita recargarse. Disculpa las molestias."
   }
 }

@@ -47,7 +47,14 @@
     "modalSizeDescription": "Adjust note editor size",
     "modalSizeDefault": "Default",
     "modalSizeLarge": "Large",
-    "modalSizeXLarge": "Extra large"
+    "modalSizeXLarge": "Extra large",
+    "displayMode": "Display Mode",
+    "displayModeDescription": "How the app opens",
+    "fullscreen": "Fullscreen",
+    "fullscreenDesc": "Open in new tab",
+    "sidePanel": "Side Panel",
+    "sidePanelDesc": "Open in side panel",
+    "displayModeHint": "Changes will apply the next time you click the extension icon."
   },
   "credits": {
     "title": "Buy AI Credits",
@@ -175,7 +182,8 @@
     "joinButton": "Join",
     "roomNotFound": "Room not found. Please check the code and try again.",
     "close": "Close",
-    "error": "Unable to share"
+    "error": "Unable to share",
+    "sessionExpired": "Session expired. Please sign in again."
   },
   "versionHistory": {
     "title": "Version history",
@@ -380,5 +388,22 @@
     "syncError": "Sync error",
     "tapToRetry": "Tap to retry",
     "loginRequiresNetwork": "Login requires an internet connection"
+  },
+  "errorBoundary": {
+    "retry": "Try again",
+    "reloadApp": "Reload app",
+    "showDetails": "Show error details",
+    "editorError": "Editor error",
+    "editorErrorDescription": "Something went wrong with the editor. Your changes may not be saved.",
+    "listError": "Failed to load notes",
+    "listErrorDescription": "Something went wrong while loading your notes. Please try again.",
+    "drawingError": "Drawing error",
+    "drawingErrorDescription": "Something went wrong with the drawing tool. Please try again.",
+    "modalError": "Failed to open note",
+    "modalErrorDescription": "Something went wrong while opening this note. Please try again.",
+    "genericError": "Something went wrong",
+    "genericErrorDescription": "An unexpected error occurred. Please try again.",
+    "appError": "App crashed",
+    "appErrorDescription": "Something went wrong and the app needs to reload. We apologize for the inconvenience."
   }
 }

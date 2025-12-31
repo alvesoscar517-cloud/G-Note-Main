@@ -194,7 +194,7 @@ export function FreeNoteView() {
     Markdown.configure({
       html: true,
       transformPastedText: true,
-      transformCopiedText: true,
+      transformCopiedText: false, // Disable markdown in copied text for clean plain text
       linkify: true,
       breaks: false
     }),

@@ -8,6 +8,7 @@ import { getPlainText } from '@/lib/utils'
 import { NoteBackground, getNoteBackgroundStyle } from './NoteStylePicker'
 import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
 import { useHistoryBack } from '@/hooks/useHistoryBack'
+import { EditorErrorBoundary } from '@/components/ui/ErrorBoundary'
 import type { Note } from '@/types'
 
 // Modal max-width in pixels for each size
@@ -28,25 +29,36 @@ const MODAL_SIZES: Record<ModalSize, string> = {
 }
 
 // High refresh rate optimized transition config
-// Uses spring physics for smoother interpolation at any frame rate (60Hz, 90Hz, 120Hz)
-// Spring animations are frame-rate independent - they calculate position based on physics, not fixed keyframes
+// Uses critically damped spring for smooth, bounce-free animation at any frame rate
 const LAYOUT_TRANSITION = { 
   layout: { 
     type: 'spring' as const,
-    stiffness: 400,    // Higher = snappier response
-    damping: 35,       // Higher = less bounce
-    mass: 1,           // Lower = faster acceleration
-    // Fallback for older devices
-    duration: 0.3,
+    stiffness: 500,      // Higher = snappier response
+    damping: 40,         // Critical damping = no bounce
+    mass: 0.8,           // Lower = faster acceleration
+    restDelta: 0.001,    // Smaller = smoother finish
+    restSpeed: 0.001,
   }
 }
 
-// Content reveal - spring for smooth fade at any refresh rate
+// Fullscreen transition - slightly faster for snappy feel
+const FULLSCREEN_TRANSITION = {
+  layout: {
+    type: 'spring' as const,
+    stiffness: 600,
+    damping: 45,
+    mass: 0.7,
+    restDelta: 0.001,
+    restSpeed: 0.001,
+  }
+}
+
+// Content reveal - quick fade with spring
 const CONTENT_TRANSITION = {
   type: 'spring' as const,
-  stiffness: 500,
-  damping: 40,
-  mass: 0.8,
+  stiffness: 600,
+  damping: 45,
+  mass: 0.7,
 }
 
 export function NoteModal() {
@@ -64,6 +76,7 @@ export function NoteModal() {
   }, [selectedNoteId]))
   
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isFullscreenAnimating, setIsFullscreenAnimating] = useState(false) // Track animation state
   const [canExitFullscreen, setCanExitFullscreen] = useState(true)
   const userToggledRef = useRef(false)
   
@@ -248,10 +261,15 @@ export function NoteModal() {
           {/* Modal */}
           <motion.div
             layoutId={`note-card-${displayNote.id}`}
-            transition={LAYOUT_TRANSITION}
+            transition={isFullscreenAnimating ? FULLSCREEN_TRANSITION : LAYOUT_TRANSITION}
+            onLayoutAnimationStart={() => setIsFullscreenAnimating(true)}
+            onLayoutAnimationComplete={() => setIsFullscreenAnimating(false)}
             style={{ 
               willChange: 'transform',
               contain: 'layout style paint',
+              backfaceVisibility: 'hidden',
+              perspective: 1000,
+              transformStyle: 'preserve-3d',
               ...backgroundStyle,
               // Apply edge swipe transform on mobile
               ...(edgeSwipeState.isDragging ? edgeSwipeStyle : {})
@@ -285,19 +303,21 @@ export function NoteModal() {
               transition={CONTENT_TRANSITION}
               className="flex-1 overflow-hidden flex flex-col relative z-10"
             >
-              <NoteEditor 
-                key={displayNote.id}
-                note={displayNote}
-                onClose={handleClose} 
-                onTogglePin={handleTogglePin} 
-                isPinned={displayNote.isPinned}
-                isFullscreen={isFullscreen}
-                canToggleFullscreen={canExitFullscreen}
-                onToggleFullscreen={() => {
-                  userToggledRef.current = true
-                  setIsFullscreen(!isFullscreen)
-                }}
-              />
+              <EditorErrorBoundary onReset={handleClose}>
+                <NoteEditor 
+                  key={displayNote.id}
+                  note={displayNote}
+                  onClose={handleClose} 
+                  onTogglePin={handleTogglePin} 
+                  isPinned={displayNote.isPinned}
+                  isFullscreen={isFullscreen}
+                  canToggleFullscreen={canExitFullscreen}
+                  onToggleFullscreen={() => {
+                    userToggledRef.current = true
+                    setIsFullscreen(!isFullscreen)
+                  }}
+                />
+              </EditorErrorBoundary>
             </motion.div>
           </motion.div>
         </>

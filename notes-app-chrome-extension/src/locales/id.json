@@ -48,6 +48,13 @@
     "modalSizeDefault": "Default",
     "modalSizeLarge": "Besar",
     "modalSizeXLarge": "Sangat besar",
+    "displayMode": "Mode tampilan",
+    "displayModeDescription": "Cara aplikasi dibuka",
+    "fullscreen": "Layar penuh",
+    "fullscreenDesc": "Buka di tab baru",
+    "sidePanel": "Panel samping",
+    "sidePanelDesc": "Buka di panel samping",
+    "displayModeHint": "Perubahan akan diterapkan saat Anda mengklik ikon ekstensi berikutnya.",
     "offlineLogoutTitle": "Keluar saat offline?",
     "offlineLogoutWarning": "Anda sedang offline. Perubahan yang belum disimpan mungkin belum disinkronkan ke Google Drive. Jika Anda keluar sekarang, Anda mungkin kehilangan perubahan tersebut.",
     "logoutAnyway": "Tetap keluar"
@@ -178,7 +185,8 @@
     "joinButton": "Gabung",
     "roomNotFound": "Ruangan tidak ditemukan. Silakan periksa kode dan coba lagi.",
     "close": "Tutup",
-    "error": "Tidak dapat membagikan"
+    "error": "Tidak dapat membagikan",
+    "sessionExpired": "Sesi kedaluwarsa. Silakan masuk lagi."
   },
   "versionHistory": {
     "title": "Riwayat versi",
@@ -383,5 +391,22 @@
     "syncError": "Kesalahan sinkronisasi",
     "tapToRetry": "Ketuk untuk mencoba lagi",
     "loginRequiresNetwork": "Login memerlukan koneksi internet"
+  },
+  "errorBoundary": {
+    "retry": "Coba lagi",
+    "reloadApp": "Muat ulang aplikasi",
+    "showDetails": "Tampilkan detail kesalahan",
+    "editorError": "Kesalahan editor",
+    "editorErrorDescription": "Terjadi kesalahan pada editor. Perubahan Anda mungkin tidak tersimpan.",
+    "listError": "Gagal memuat catatan",
+    "listErrorDescription": "Terjadi kesalahan saat memuat catatan Anda. Silakan coba lagi.",
+    "drawingError": "Kesalahan menggambar",
+    "drawingErrorDescription": "Terjadi kesalahan pada alat menggambar. Silakan coba lagi.",
+    "modalError": "Gagal membuka catatan",
+    "modalErrorDescription": "Terjadi kesalahan saat membuka catatan ini. Silakan coba lagi.",
+    "genericError": "Terjadi kesalahan",
+    "genericErrorDescription": "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
+    "appError": "Aplikasi error",
+    "appErrorDescription": "Terjadi kesalahan dan aplikasi perlu dimuat ulang. Kami mohon maaf atas ketidaknyamanan ini."
   }
 }

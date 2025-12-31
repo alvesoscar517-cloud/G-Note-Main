@@ -106,15 +106,15 @@ export async function searchDrive(
 }
 
 /**
- * Search within NotesApp folder only
+ * Search within G-Note folder only
  */
 export async function searchNotesAppFolder(
   accessToken: string,
   query: string,
   maxResults = 20
 ): Promise<DriveSearchResult[]> {
-  // First, find the NotesApp folder
-  const folderId = await getNotesAppFolderId(accessToken)
+  // First, find the G-Note folder
+  const folderId = await getGNoteFolderId(accessToken)
   
   if (!folderId) {
     return []
@@ -127,7 +127,7 @@ export async function searchNotesAppFolder(
 }
 
 /**
- * Search all documents (PDF, DOCX, TXT) in NotesApp folder only
+ * Search all documents (PDF, DOCX, TXT) in G-Note folder only
  * Since app only has access to its own folder, not entire Drive
  */
 export async function searchDocuments(
@@ -135,7 +135,7 @@ export async function searchDocuments(
   query: string,
   maxResults = 20
 ): Promise<DriveSearchResult[]> {
-  // Search only within NotesApp folder (app's scope)
+  // Search only within G-Note folder (app's scope)
   return searchNotesAppFolder(accessToken, query, maxResults)
 }
 
@@ -221,10 +221,10 @@ export async function getFilePreview(
   }
 }
 
-// Helper: Get NotesApp folder ID
-async function getNotesAppFolderId(accessToken: string): Promise<string | null> {
+// Helper: Get G-Note folder ID
+async function getGNoteFolderId(accessToken: string): Promise<string | null> {
   const params = new URLSearchParams({
-    q: "name='NotesApp' and mimeType='application/vnd.google-apps.folder' and trashed=false",
+    q: "name='G-Note' and mimeType='application/vnd.google-apps.folder' and trashed=false",
     fields: 'files(id)'
   })
 

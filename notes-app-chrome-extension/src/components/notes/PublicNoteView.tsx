@@ -55,7 +55,7 @@ export function PublicNoteView({ fileId }: PublicNoteViewProps) {
       Markdown.configure({
         html: true,
         transformPastedText: false,
-        transformCopiedText: true,
+        transformCopiedText: false, // Disable markdown in copied text for clean plain text
         linkify: true,
         breaks: false
       })

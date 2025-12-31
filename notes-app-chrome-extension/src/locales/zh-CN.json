@@ -47,7 +47,14 @@
     "modalSizeDescription": "调整编辑器大小",
     "modalSizeDefault": "默认",
     "modalSizeLarge": "大",
-    "modalSizeXLarge": "超大"
+    "modalSizeXLarge": "超大",
+    "displayMode": "显示模式",
+    "displayModeDescription": "应用打开方式",
+    "fullscreen": "全屏",
+    "fullscreenDesc": "在新标签页中打开",
+    "sidePanel": "侧边栏",
+    "sidePanelDesc": "在侧边栏中打开",
+    "displayModeHint": "更改将在下次点击扩展图标时生效。"
   },
   "credits": {
     "title": "购买 AI 积分",
@@ -175,7 +182,8 @@
     "joinButton": "加入",
     "roomNotFound": "房间不存在。请检查代码后重试。",
     "close": "关闭",
-    "error": "无法分享"
+    "error": "无法分享",
+    "sessionExpired": "会话已过期。请重新登录。"
   },
   "versionHistory": {
     "title": "版本历史",
@@ -380,5 +388,22 @@
     "syncError": "同步错误",
     "tapToRetry": "点击重试",
     "loginRequiresNetwork": "登录需要网络连接"
+  },
+  "errorBoundary": {
+    "retry": "重试",
+    "reloadApp": "重新加载应用",
+    "showDetails": "显示错误详情",
+    "editorError": "编辑器错误",
+    "editorErrorDescription": "编辑器出现问题。您的更改可能未保存。",
+    "listError": "加载笔记失败",
+    "listErrorDescription": "加载笔记时出现问题。请重试。",
+    "drawingError": "绘图错误",
+    "drawingErrorDescription": "绘图工具出现问题。请重试。",
+    "modalError": "打开笔记失败",
+    "modalErrorDescription": "打开此笔记时出现问题。请重试。",
+    "genericError": "出现问题",
+    "genericErrorDescription": "发生意外错误。请重试。",
+    "appError": "应用崩溃",
+    "appErrorDescription": "出现问题，应用需要重新加载。给您带来不便，深表歉意。"
   }
 }

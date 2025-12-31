@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { useAuthStore } from '@/stores/authStore'
 import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
+import { useHistoryBack } from '@/hooks/useHistoryBack'
 import * as AI from '@/lib/ai'
 import { InsufficientCreditsError } from '@/lib/ai'
 import type { AIChatMessage } from '@/types'
@@ -131,6 +132,13 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
     edgeWidth: 25,
     threshold: 100,
     enabled: open
+  })
+
+  // History back support for system back gesture (Android swipe, browser back button)
+  useHistoryBack({
+    isOpen: open,
+    onBack: onClose,
+    stateKey: 'ai-chat-view'
   })
 
   // Check if speech recognition is supported

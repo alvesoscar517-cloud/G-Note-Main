@@ -47,7 +47,14 @@
     "modalSizeDescription": "エディターのサイズを調整",
     "modalSizeDefault": "デフォルト",
     "modalSizeLarge": "大",
-    "modalSizeXLarge": "特大"
+    "modalSizeXLarge": "特大",
+    "displayMode": "表示モード",
+    "displayModeDescription": "アプリの開き方",
+    "fullscreen": "フルスクリーン",
+    "fullscreenDesc": "新しいタブで開く",
+    "sidePanel": "サイドパネル",
+    "sidePanelDesc": "サイドパネルで開く",
+    "displayModeHint": "変更は次回拡張機能アイコンをクリックした時に適用されます。"
   },
   "credits": {
     "title": "AIクレジットを購入",
@@ -175,7 +182,8 @@
     "joinButton": "参加",
     "roomNotFound": "ルームが見つかりません。コードを確認して再試行してください。",
     "close": "閉じる",
-    "error": "共有できません"
+    "error": "共有できません",
+    "sessionExpired": "セッションが期限切れです。再度ログインしてください。"
   },
   "versionHistory": {
     "title": "バージョン履歴",
@@ -380,5 +388,22 @@
     "syncError": "同期エラー",
     "tapToRetry": "タップして再試行",
     "loginRequiresNetwork": "ログインにはインターネット接続が必要です"
+  },
+  "errorBoundary": {
+    "retry": "再試行",
+    "reloadApp": "アプリを再読み込み",
+    "showDetails": "エラーの詳細を表示",
+    "editorError": "エディターエラー",
+    "editorErrorDescription": "エディターで問題が発生しました。変更が保存されていない可能性があります。",
+    "listError": "ノートの読み込みに失敗",
+    "listErrorDescription": "ノートの読み込み中に問題が発生しました。もう一度お試しください。",
+    "drawingError": "描画エラー",
+    "drawingErrorDescription": "描画ツールで問題が発生しました。もう一度お試しください。",
+    "modalError": "ノートを開けませんでした",
+    "modalErrorDescription": "このノートを開く際に問題が発生しました。もう一度お試しください。",
+    "genericError": "問題が発生しました",
+    "genericErrorDescription": "予期しないエラーが発生しました。もう一度お試しください。",
+    "appError": "アプリがクラッシュしました",
+    "appErrorDescription": "問題が発生し、アプリを再読み込みする必要があります。ご不便をおかけして申し訳ございません。"
   }
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pin, Loader2, AlertCircle, Users, CloudCheck, Copy, Trash2, PinOff } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -16,14 +16,92 @@ import {
 import type { Note } from '@/types'
 import { cn } from '@/lib/utils'
 
-// Smooth transition config - optimized for layout animations
+// Smooth transition config - optimized for 120Hz displays
+// Uses critically damped spring for smooth, bounce-free animation
 const LAYOUT_TRANSITION = { 
   layout: { 
     type: 'spring' as const,
-    stiffness: 350,
-    damping: 30,
-    mass: 1,
+    stiffness: 500,      // Higher stiffness = faster response
+    damping: 40,         // Critical damping = no bounce
+    mass: 0.8,           // Lower mass = snappier feel
+    restDelta: 0.001,    // Smaller = smoother finish
+    restSpeed: 0.001,
   }
+}
+
+// Hook to detect resize and temporarily disable layoutId to prevent ghost elements
+function useResizeGuard() {
+  const [isResizing, setIsResizing] = useState(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsResizing(true)
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      timeoutRef.current = setTimeout(() => setIsResizing(false), 200)
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
+  
+  return isResizing
+}
+
+/**
+ * Generate smart preview that shows context around search match
+ * If no search query or match is in first 120 chars, return normal preview
+ * Otherwise, return snippet around the match with ellipsis
+ */
+function getSmartPreview(plainContent: string, searchQuery?: string): string {
+  const maxLength = 120
+  
+  // No search query - return normal preview
+  if (!searchQuery?.trim()) {
+    return plainContent.slice(0, maxLength) + (plainContent.length > maxLength ? '...' : '')
+  }
+  
+  const query = searchQuery.toLowerCase()
+  const contentLower = plainContent.toLowerCase()
+  const matchIndex = contentLower.indexOf(query)
+  
+  // No match found or match is within first 120 chars - return normal preview
+  if (matchIndex === -1 || matchIndex < maxLength - 20) {
+    return plainContent.slice(0, maxLength) + (plainContent.length > maxLength ? '...' : '')
+  }
+  
+  // Match is beyond preview area - create smart snippet
+  const contextBefore = 40 // chars before match
+  const contextAfter = 80 // chars after match
+  
+  const start = Math.max(0, matchIndex - contextBefore)
+  const end = Math.min(plainContent.length, matchIndex + query.length + contextAfter)
+  
+  let snippet = plainContent.slice(start, end)
+  
+  // Add ellipsis
+  if (start > 0) {
+    // Find word boundary to avoid cutting words
+    const firstSpace = snippet.indexOf(' ')
+    if (firstSpace > 0 && firstSpace < 15) {
+      snippet = snippet.slice(firstSpace + 1)
+    }
+    snippet = '...' + snippet
+  }
+  
+  if (end < plainContent.length) {
+    // Find word boundary at end
+    const lastSpace = snippet.lastIndexOf(' ')
+    if (lastSpace > snippet.length - 15 && lastSpace > 0) {
+      snippet = snippet.slice(0, lastSpace)
+    }
+    snippet = snippet + '...'
+  }
+  
+  return snippet
 }
 
 interface NoteCardProps {
@@ -40,6 +118,7 @@ export function NoteCard({ note, searchQuery }: NoteCardProps) {
   const selectedNoteId = useNotesStore(state => state.selectedNoteId)
   const isThisNoteSelected = selectedNoteId === note.id
   const [isAnimating, setIsAnimating] = useState(false)
+  const isResizing = useResizeGuard()
   
   // Keep high z-index during close animation
   useEffect(() => {
@@ -72,23 +151,28 @@ export function NoteCard({ note, searchQuery }: NoteCardProps) {
   // Memoize expensive computations
   const plainContent = useMemo(() => getPlainText(note.content), [note.content])
   const preview = useMemo(() => 
-    plainContent.slice(0, 120) + (plainContent.length > 120 ? '...' : ''),
-    [plainContent]
+    getSmartPreview(plainContent, searchQuery),
+    [plainContent, searchQuery]
   )
   const title = note.title || t('notes.newNote')
   const backgroundStyle = useMemo(() => getNoteBackgroundStyle(note.style), [note.style])
   const hasCustomBg = note.style?.backgroundColor || note.style?.backgroundImage
+
+  // Disable layoutId during resize to prevent ghost elements
+  const layoutId = isResizing ? undefined : `note-card-${note.id}`
 
   return (
     <>
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <motion.div
-            layoutId={`note-card-${note.id}`}
+            layoutId={layoutId}
             transition={LAYOUT_TRANSITION}
             style={{ 
               willChange: 'transform',
               contain: 'layout style paint',
+              backfaceVisibility: 'hidden',
+              transform: 'translateZ(0)', // Force GPU layer
               ...backgroundStyle,
               // High z-index during morph animation
               zIndex: isAnimating ? 40 : 'auto',
@@ -119,10 +203,10 @@ export function NoteCard({ note, searchQuery }: NoteCardProps) {
               </div>
             </div>
             
-            {/* Content preview - always show with min-height for consistent card size */}
+            {/* Content preview - fixed 2 line height for consistent card size */}
             <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 min-h-[2.5rem] relative z-10">
               {preview ? (
-                <Highlight text={preview} query={searchQuery} />
+                searchQuery ? <Highlight text={preview} query={searchQuery} /> : preview
               ) : (
                 <span className="text-neutral-300 dark:text-neutral-600">&nbsp;</span>
               )}
@@ -160,6 +244,7 @@ export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
   // Track if this card is animating (for z-index during morph)
   const isThisNoteSelected = selectedNoteId === note.id
   const [isAnimating, setIsAnimating] = useState(false)
+  const isResizing = useResizeGuard()
   
   // Keep high z-index during close animation
   useEffect(() => {
@@ -202,8 +287,8 @@ export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
   // Memoize expensive computations
   const plainContent = useMemo(() => getPlainText(note.content), [note.content])
   const preview = useMemo(() => 
-    plainContent.slice(0, 120) + (plainContent.length > 120 ? '...' : ''),
-    [plainContent]
+    getSmartPreview(plainContent, searchQuery),
+    [plainContent, searchQuery]
   )
   const title = note.title || t('notes.newNote')
   const backgroundStyle = useMemo(() => getNoteBackgroundStyle(note.style), [note.style])
@@ -224,6 +309,9 @@ export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
 
   // Card is hidden when modal is open (morph effect shows modal instead)
   const isThisNoteOpen = isModalOpen && isThisNoteSelected
+  
+  // Disable layoutId during resize to prevent ghost elements
+  const layoutId = isResizing ? undefined : `note-card-${note.id}`
 
   return (
     <>
@@ -238,12 +326,14 @@ export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
             {...attributes}
           >
             <motion.div
-              layoutId={`note-card-${note.id}`}
+              layoutId={layoutId}
               onClick={handleClick}
               transition={LAYOUT_TRANSITION}
               style={{ 
                 willChange: 'transform',
                 contain: 'layout style paint',
+                backfaceVisibility: 'hidden',
+                transform: 'translateZ(0)', // Force GPU layer
                 opacity: isThisNoteOpen ? 0 : 1,
                 // High z-index during morph animation
                 zIndex: isAnimating ? 40 : 'auto',
@@ -275,10 +365,10 @@ export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
                 </div>
               </div>
               
-              {/* Content preview - always show with min-height for consistent card size */}
+              {/* Content preview - fixed 2 line height for consistent card size */}
               <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 min-h-[2.5rem] relative z-10">
                 {preview ? (
-                  <Highlight text={preview} query={searchQuery} />
+                  searchQuery ? <Highlight text={preview} query={searchQuery} /> : preview
                 ) : (
                   <span className="text-neutral-300 dark:text-neutral-600">&nbsp;</span>
                 )}

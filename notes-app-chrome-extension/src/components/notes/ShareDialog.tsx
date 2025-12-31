@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { generateRoomId, sanitizeRoomId, isValidRoomId, checkRoomExists } from '@/lib/collaboration'
 import { driveShare } from '@/lib/driveShare'
-import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
 import { useNetworkStore } from '@/stores/networkStore'
+import { getValidAccessToken, TokenExpiredError } from '@/lib/tokenManager'
 
 interface ShareDialogProps {
   open: boolean
@@ -31,7 +31,6 @@ export function ShareDialog({
   onStopSharing
 }: ShareDialogProps) {
   const { t } = useTranslation()
-  const { user } = useAuthStore()
   const { getSelectedNote, updateNote } = useNotesStore()
   const isOnline = useNetworkStore(state => state.isOnline)
   const note = getSelectedNote()
@@ -99,16 +98,24 @@ export function ShareDialog({
   }
 
   const handleSharePublic = async () => {
-    if (!note || !user?.accessToken) return
+    if (!note) return
     
     setIsSharing(true)
     setShareError(null)
     
     try {
-      driveShare.setAccessToken(user.accessToken)
+      // Get valid token (auto-refresh if expired)
+      const accessToken = await getValidAccessToken()
+      if (!accessToken) {
+        setShareError(t('share.sessionExpired'))
+        return
+      }
+      
+      driveShare.setAccessToken(accessToken)
       // Pass existing publicFileId to update instead of creating new
       const fileId = await driveShare.sharePublic(note, note.publicFileId)
-      const link = `https://gnote.graphoasai.com?view=${fileId}`
+      // Use web app URL for public links (extension can't display public notes directly)
+      const link = `https://gnote.graphosai.com?view=${fileId}`
       setPublicLink(link)
       setShareSuccess(true)
       
@@ -118,21 +125,32 @@ export function ShareDialog({
       }
     } catch (error) {
       console.error('Share failed:', error)
-      setShareError(error instanceof Error ? error.message : t('share.error'))
+      if (error instanceof TokenExpiredError) {
+        setShareError(t('share.sessionExpired'))
+      } else {
+        setShareError(error instanceof Error ? error.message : t('share.error'))
+      }
     } finally {
       setIsSharing(false)
     }
   }
 
   const handleShareViaEmail = async () => {
-    if (!shareEmail.trim() || !note || !user?.accessToken) return
+    if (!shareEmail.trim() || !note) return
     
     setIsSharing(true)
     setShareError(null)
     setShareSuccess(false)
     
     try {
-      driveShare.setAccessToken(user.accessToken)
+      // Get valid token (auto-refresh if expired)
+      const accessToken = await getValidAccessToken()
+      if (!accessToken) {
+        setShareError(t('share.sessionExpired'))
+        return
+      }
+      
+      driveShare.setAccessToken(accessToken)
       const fileId = await driveShare.createShareableNote(note)
       await driveShare.shareWithEmail(fileId, shareEmail.trim(), 'writer')
       
@@ -144,7 +162,11 @@ export function ShareDialog({
       }, 2000)
     } catch (error) {
       console.error('Share failed:', error)
-      setShareError(error instanceof Error ? error.message : t('share.error'))
+      if (error instanceof TokenExpiredError) {
+        setShareError(t('share.sessionExpired'))
+      } else {
+        setShareError(error instanceof Error ? error.message : t('share.error'))
+      }
     } finally {
       setIsSharing(false)
     }

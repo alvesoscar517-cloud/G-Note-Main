@@ -178,7 +178,8 @@
     "joinButton": "Katıl",
     "roomNotFound": "Oda bulunamadı. Lütfen kodu kontrol edin ve tekrar deneyin.",
     "close": "Kapat",
-    "error": "Paylaşılamıyor"
+    "error": "Paylaşılamıyor",
+    "sessionExpired": "Oturum süresi doldu. Lütfen tekrar giriş yapın."
   },
   "versionHistory": {
     "title": "Sürüm geçmişi",
@@ -383,5 +384,22 @@
     "syncError": "Senkronizasyon hatası",
     "tapToRetry": "Yeniden denemek için dokunun",
     "loginRequiresNetwork": "Giriş yapmak için internet bağlantısı gerekli"
+  },
+  "errorBoundary": {
+    "retry": "Tekrar dene",
+    "reloadApp": "Uygulamayı yeniden yükle",
+    "showDetails": "Hata ayrıntılarını göster",
+    "editorError": "Editör hatası",
+    "editorErrorDescription": "Editörde bir sorun oluştu. Değişiklikleriniz kaydedilmemiş olabilir.",
+    "listError": "Notlar yüklenemedi",
+    "listErrorDescription": "Notlarınız yüklenirken bir sorun oluştu. Lütfen tekrar deneyin.",
+    "drawingError": "Çizim hatası",
+    "drawingErrorDescription": "Çizim aracında bir sorun oluştu. Lütfen tekrar deneyin.",
+    "modalError": "Not açılamadı",
+    "modalErrorDescription": "Bu not açılırken bir sorun oluştu. Lütfen tekrar deneyin.",
+    "genericError": "Bir sorun oluştu",
+    "genericErrorDescription": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
+    "appError": "Uygulama çöktü",
+    "appErrorDescription": "Bir sorun oluştu ve uygulamanın yeniden yüklenmesi gerekiyor. Rahatsızlık için özür dileriz."
   }
 }

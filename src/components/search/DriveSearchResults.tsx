@@ -4,8 +4,6 @@ import {
   FileText, 
   Loader2, 
   X,
-  Trash2,
-  RotateCcw,
   WifiOff
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
@@ -39,7 +37,6 @@ export function DriveSearchResults({ query, onClose }: DriveSearchResultsProps) 
   const notes = useNotesStore(state => state.notes)
   const setSelectedNote = useNotesStore(state => state.setSelectedNote)
   const setModalOpen = useNotesStore(state => state.setModalOpen)
-  const restoreFromTrash = useNotesStore(state => state.restoreFromTrash)
   const isOnline = useNetworkStore(state => state.isOnline)
   
   const [results, setResults] = useState<DriveSearchResult[]>([])
@@ -64,16 +61,25 @@ export function DriveSearchResults({ query, onClose }: DriveSearchResultsProps) 
 
     try {
       const searchResults = await searchDocuments(user.accessToken, query, 20)
-      // Filter out system files and deduplicate by note ID
+      
+      // Get note IDs that are in trash
+      const trashedNoteIds = new Set(notes.filter(n => n.isDeleted).map(n => n.id))
+      
+      // Filter: exclude system files, exclude trashed notes, deduplicate
       const seenNoteIds = new Set<string>()
       const filteredResults = searchResults.filter(r => {
         if (isSystemFile(r.name)) return false
+        
+        const noteId = extractNoteId(r.name)
+        if (!noteId) return false
+        
+        // Exclude notes that are in trash
+        if (trashedNoteIds.has(noteId)) return false
+        
         // Deduplicate by note ID
-        const match = r.name.match(/^note-(.+)\.json$/)
-        if (match) {
-          if (seenNoteIds.has(match[1])) return false
-          seenNoteIds.add(match[1])
-        }
+        if (seenNoteIds.has(noteId)) return false
+        seenNoteIds.add(noteId)
+        
         return true
       })
       setResults(filteredResults)
@@ -84,7 +90,7 @@ export function DriveSearchResults({ query, onClose }: DriveSearchResultsProps) 
     } finally {
       setIsLoading(false)
     }
-  }, [query, user?.accessToken, isOnline, t])
+  }, [query, user?.accessToken, isOnline, t, notes])
 
   useEffect(() => {
     const debounceTimer = setTimeout(performSearch, 300)
@@ -105,21 +111,11 @@ export function DriveSearchResults({ query, onClose }: DriveSearchResultsProps) 
     const info = getNoteInfo(result)
     
     if (info?.note) {
-      if (info.note.isDeleted) {
-        // Note is in trash - restore and open
-        restoreFromTrash(info.noteId)
-      }
       // Open note in app
       setSelectedNote(info.noteId)
       setModalOpen(true)
       onClose?.()
     }
-  }
-
-  // Handle restore from trash
-  const handleRestore = (e: React.MouseEvent, noteId: string) => {
-    e.stopPropagation()
-    restoreFromTrash(noteId)
   }
 
   if (!query.trim()) {
@@ -184,7 +180,6 @@ export function DriveSearchResults({ query, onClose }: DriveSearchResultsProps) 
           <div>
             {noteResults.map((result) => {
               const info = getNoteInfo(result)
-              const isInTrash = info?.note?.isDeleted
               const noteTitle = info?.note?.title
               
               return (
@@ -198,28 +193,18 @@ export function DriveSearchResults({ query, onClose }: DriveSearchResultsProps) 
                 >
                   {/* File icon */}
                   <div className="flex-shrink-0">
-                    {isInTrash ? (
-                      <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-400" />
-                    ) : (
-                      <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-500 dark:text-neutral-400" />
-                    )}
+                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-500 dark:text-neutral-400" />
                   </div>
 
                   {/* File info */}
                   <div className="flex-1 min-w-0">
-                    <p className={`text-xs sm:text-sm font-medium truncate ${isInTrash ? 'text-neutral-500 dark:text-neutral-400' : 'text-neutral-900 dark:text-white'}`}>
+                    <p className="text-xs sm:text-sm font-medium truncate text-neutral-900 dark:text-white">
                       {noteTitle || t('publicNote.untitled')}
                     </p>
                     <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5">
-                      {isInTrash ? (
-                        <span className="text-[10px] sm:text-xs text-amber-600 dark:text-amber-400">
-                          {t('trash.deleted')}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400">
-                          {t('app.name')}
-                        </span>
-                      )}
+                      <span className="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400">
+                        {t('app.name')}
+                      </span>
                       {result.modifiedTime && (
                         <>
                           <span className="text-neutral-300 dark:text-neutral-600">•</span>
@@ -230,17 +215,6 @@ export function DriveSearchResults({ query, onClose }: DriveSearchResultsProps) 
                       )}
                     </div>
                   </div>
-
-                  {/* Restore button for trashed notes */}
-                  {isInTrash && info?.noteId && (
-                    <button
-                      onClick={(e) => handleRestore(e, info.noteId)}
-                      className="p-1 sm:p-1.5 rounded-lg text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
-                      title={t('trash.restore')}
-                    >
-                      <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    </button>
-                  )}
                 </div>
               )
             })}

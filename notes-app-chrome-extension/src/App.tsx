@@ -8,15 +8,17 @@ import { useNetworkStore } from '@/stores/networkStore'
 import { LoginScreen } from '@/components/auth/LoginScreen'
 import { DrivePermissionError } from '@/components/auth/DrivePermissionError'
 import { Header } from '@/components/layout/Header'
-import { NotesList } from '@/components/notes/NotesList'
+import { VirtualizedNotesList } from '@/components/notes/VirtualizedNotesList'
 import { NoteModal } from '@/components/notes/NoteModal'
 import { PublicNoteView } from '@/components/notes/PublicNoteView'
 import { WebContentDialog } from '@/components/notes/WebContentDialog'
 import { TooltipProvider } from '@/components/ui/Tooltip'
 import { useBlockContextMenu } from '@/components/ui/ContextMenuBlocker'
+import { AppErrorBoundary, ListErrorBoundary, ModalErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { initOfflineSync } from '@/lib/offlineSync'
 import { isTokenExpired } from '@/lib/tokenRefresh'
 import { chromeRefreshToken, isChromeExtension } from '@/lib/chromeAuth'
+import { getValidAccessToken } from '@/lib/tokenManager'
 
 // Check for public view mode
 function getViewFileId(): string | null {
@@ -153,20 +155,23 @@ function AppContent() {
     let lastSync = 0
     const doSync = async () => {
       if (!isOnline) return
-      if (isTokenExpired(user.tokenExpiry)) return
       
       const now = Date.now()
       if (now - lastSync < 5000) return
       lastSync = now
       
+      // Get valid token (auto-refresh if expired)
+      const accessToken = await getValidAccessToken()
+      if (!accessToken) return
+      
       // Check if Drive has data first (only on initial sync when no local notes)
       const currentNotes = useNotesStore.getState().notes
       if (currentNotes.length === 0) {
-        await checkDriveHasData(user.accessToken)
+        await checkDriveHasData(accessToken)
       }
       
-      await syncWithDrive(user.accessToken)
-      await loadSharedNotes(user.accessToken)
+      await syncWithDrive(accessToken)
+      await loadSharedNotes(accessToken)
     }
 
     doSync()
@@ -217,12 +222,16 @@ function AppContent() {
 
   return (
     <LayoutGroup>
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+      <div className="h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950">
         <Header />
-        <main className="max-w-6xl mx-auto px-4 py-6">
-          <NotesList />
+        <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 overflow-hidden">
+          <ListErrorBoundary>
+            <VirtualizedNotesList />
+          </ListErrorBoundary>
         </main>
-        <NoteModal />
+        <ModalErrorBoundary>
+          <NoteModal />
+        </ModalErrorBoundary>
         <WebContentDialog />
       </div>
       
@@ -236,9 +245,11 @@ function AppContent() {
 
 function App() {
   return (
-    <TooltipProvider delayDuration={300}>
-      <AppContent />
-    </TooltipProvider>
+    <AppErrorBoundary>
+      <TooltipProvider delayDuration={300}>
+        <AppContent />
+      </TooltipProvider>
+    </AppErrorBoundary>
   )
 }
 

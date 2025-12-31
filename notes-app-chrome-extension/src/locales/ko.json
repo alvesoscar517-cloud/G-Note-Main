@@ -47,7 +47,14 @@
     "modalSizeDescription": "편집기 크기 조정",
     "modalSizeDefault": "기본",
     "modalSizeLarge": "크게",
-    "modalSizeXLarge": "매우 크게"
+    "modalSizeXLarge": "매우 크게",
+    "displayMode": "표시 모드",
+    "displayModeDescription": "앱 열기 방식",
+    "fullscreen": "전체 화면",
+    "fullscreenDesc": "새 탭에서 열기",
+    "sidePanel": "사이드 패널",
+    "sidePanelDesc": "사이드 패널에서 열기",
+    "displayModeHint": "변경 사항은 다음에 확장 프로그램 아이콘을 클릭할 때 적용됩니다."
   },
   "credits": {
     "title": "AI 크레딧 구매",
@@ -175,7 +182,8 @@
     "joinButton": "참여",
     "roomNotFound": "방을 찾을 수 없습니다. 코드를 확인하고 다시 시도해 주세요.",
     "close": "닫기",
-    "error": "공유할 수 없습니다"
+    "error": "공유할 수 없습니다",
+    "sessionExpired": "세션이 만료되었습니다. 다시 로그인해 주세요."
   },
   "versionHistory": {
     "title": "버전 기록",
@@ -380,5 +388,22 @@
     "syncError": "동기화 오류",
     "tapToRetry": "탭하여 재시도",
     "loginRequiresNetwork": "로그인에는 인터넷 연결이 필요합니다"
+  },
+  "errorBoundary": {
+    "retry": "다시 시도",
+    "reloadApp": "앱 새로고침",
+    "showDetails": "오류 세부정보 보기",
+    "editorError": "편집기 오류",
+    "editorErrorDescription": "편집기에서 문제가 발생했습니다. 변경사항이 저장되지 않았을 수 있습니다.",
+    "listError": "노트 로드 실패",
+    "listErrorDescription": "노트를 로드하는 중 문제가 발생했습니다. 다시 시도해 주세요.",
+    "drawingError": "그리기 오류",
+    "drawingErrorDescription": "그리기 도구에서 문제가 발생했습니다. 다시 시도해 주세요.",
+    "modalError": "노트 열기 실패",
+    "modalErrorDescription": "이 노트를 여는 중 문제가 발생했습니다. 다시 시도해 주세요.",
+    "genericError": "문제가 발생했습니다",
+    "genericErrorDescription": "예기치 않은 오류가 발생했습니다. 다시 시도해 주세요.",
+    "appError": "앱이 충돌했습니다",
+    "appErrorDescription": "문제가 발생하여 앱을 새로고침해야 합니다. 불편을 드려 죄송합니다."
   }
 }

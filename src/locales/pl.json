@@ -178,7 +178,8 @@
     "joinButton": "Dołącz",
     "roomNotFound": "Pokój nie znaleziony. Sprawdź kod i spróbuj ponownie.",
     "close": "Zamknij",
-    "error": "Nie można udostępnić"
+    "error": "Nie można udostępnić",
+    "sessionExpired": "Sesja wygasła. Zaloguj się ponownie."
   },
   "versionHistory": {
     "title": "Historia wersji",
@@ -383,5 +384,22 @@
     "syncError": "Błąd synchronizacji",
     "tapToRetry": "Dotknij, aby ponowić",
     "loginRequiresNetwork": "Logowanie wymaga połączenia z Internetem"
+  },
+  "errorBoundary": {
+    "retry": "Spróbuj ponownie",
+    "reloadApp": "Przeładuj aplikację",
+    "showDetails": "Pokaż szczegóły błędu",
+    "editorError": "Błąd edytora",
+    "editorErrorDescription": "Coś poszło nie tak z edytorem. Twoje zmiany mogły nie zostać zapisane.",
+    "listError": "Nie udało się załadować notatek",
+    "listErrorDescription": "Coś poszło nie tak podczas ładowania notatek. Spróbuj ponownie.",
+    "drawingError": "Błąd rysowania",
+    "drawingErrorDescription": "Coś poszło nie tak z narzędziem do rysowania. Spróbuj ponownie.",
+    "modalError": "Nie udało się otworzyć notatki",
+    "modalErrorDescription": "Coś poszło nie tak podczas otwierania tej notatki. Spróbuj ponownie.",
+    "genericError": "Coś poszło nie tak",
+    "genericErrorDescription": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
+    "appError": "Aplikacja uległa awarii",
+    "appErrorDescription": "Coś poszło nie tak i aplikacja musi zostać przeładowana. Przepraszamy za niedogodności."
   }
 }

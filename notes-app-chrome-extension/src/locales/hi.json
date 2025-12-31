@@ -48,6 +48,13 @@
     "modalSizeDefault": "डिफ़ॉल्ट",
     "modalSizeLarge": "बड़ा",
     "modalSizeXLarge": "बहुत बड़ा",
+    "displayMode": "प्रदर्शन मोड",
+    "displayModeDescription": "ऐप कैसे खुलता है",
+    "fullscreen": "पूर्ण स्क्रीन",
+    "fullscreenDesc": "नए टैब में खोलें",
+    "sidePanel": "साइड पैनल",
+    "sidePanelDesc": "साइड पैनल में खोलें",
+    "displayModeHint": "परिवर्तन अगली बार एक्सटेंशन आइकन पर क्लिक करने पर लागू होंगे।",
     "offlineLogoutTitle": "ऑफ़लाइन होने पर लॉग आउट करें?",
     "offlineLogoutWarning": "आप वर्तमान में ऑफ़लाइन हैं। सहेजे नहीं गए परिवर्तन Google Drive के साथ सिंक नहीं हुए हो सकते हैं। यदि आप अभी लॉग आउट करते हैं, तो आप इन परिवर्तनों को खो सकते हैं।",
     "logoutAnyway": "फिर भी लॉग आउट करें"
@@ -178,7 +185,8 @@
     "joinButton": "शामिल हों",
     "roomNotFound": "कमरा नहीं मिला। कृपया कोड जांचें और पुनः प्रयास करें।",
     "close": "बंद करें",
-    "error": "साझा नहीं कर सकते"
+    "error": "साझा नहीं कर सकते",
+    "sessionExpired": "सत्र समाप्त हो गया। कृपया फिर से लॉगिन करें।"
   },
   "versionHistory": {
     "title": "संस्करण इतिहास",
@@ -383,5 +391,22 @@
     "syncError": "सिंक त्रुटि",
     "tapToRetry": "पुनः प्रयास के लिए टैप करें",
     "loginRequiresNetwork": "लॉगिन के लिए इंटरनेट कनेक्शन आवश्यक है"
+  },
+  "errorBoundary": {
+    "retry": "पुनः प्रयास करें",
+    "reloadApp": "ऐप रीलोड करें",
+    "showDetails": "त्रुटि विवरण दिखाएं",
+    "editorError": "संपादक त्रुटि",
+    "editorErrorDescription": "संपादक में कुछ गलत हो गया। आपके परिवर्तन सहेजे नहीं गए हो सकते हैं।",
+    "listError": "नोट्स लोड करने में विफल",
+    "listErrorDescription": "आपके नोट्स लोड करते समय कुछ गलत हो गया। कृपया पुनः प्रयास करें।",
+    "drawingError": "ड्राइंग त्रुटि",
+    "drawingErrorDescription": "ड्राइंग टूल में कुछ गलत हो गया। कृपया पुनः प्रयास करें।",
+    "modalError": "नोट खोलने में विफल",
+    "modalErrorDescription": "इस नोट को खोलते समय कुछ गलत हो गया। कृपया पुनः प्रयास करें।",
+    "genericError": "कुछ गलत हो गया",
+    "genericErrorDescription": "एक अप्रत्याशित त्रुटि हुई। कृपया पुनः प्रयास करें।",
+    "appError": "ऐप क्रैश हो गया",
+    "appErrorDescription": "कुछ गलत हो गया और ऐप को रीलोड करने की आवश्यकता है। असुविधा के लिए हम क्षमा चाहते हैं।"
   }
 }

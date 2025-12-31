@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "1.0.3",
+  "version": "1.1.2",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
   "icons": {
@@ -19,13 +19,17 @@
     },
     "default_title": "__MSG_extName__"
   },
+  "side_panel": {
+    "default_path": "index.html"
+  },
   "permissions": [
     "storage",
     "identity",
     "tabs",
     "contextMenus",
     "activeTab",
-    "scripting"
+    "scripting",
+    "sidePanel"
   ],
   "host_permissions": [
     "https://www.googleapis.com/*",

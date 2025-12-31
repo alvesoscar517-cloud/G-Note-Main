@@ -689,7 +689,7 @@ body {
   white-space: nowrap;
 }
 
-/* Scrollbar - Only show on desktop (large screens with hover devices) */
+/* Custom Scrollbar - Only show on desktop (large screens with hover devices) */
 @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
   ::-webkit-scrollbar {
     width: 6px;
@@ -738,6 +738,22 @@ body {
 
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+/* Hide horizontal scrollbar globally */
+html, body {
+  overflow-x: hidden;
+}
+
+*::-webkit-scrollbar:horizontal {
+  display: none;
+  height: 0;
+}
+
+/* Prevent horizontal scroll on all containers */
+.overflow-y-auto,
+.overflow-auto {
+  overflow-x: hidden;
 }
 
 /* Touch optimization - ONLY for true mobile/tablet devices (not touch laptops) */

@@ -49,11 +49,105 @@ const COLLECTION_COLORS = [
 // Debounce configuration
 const UPDATE_DEBOUNCE_MS = 500
 
-// Debounce timers for note updates
-const updateTimers = new Map<string, ReturnType<typeof setTimeout>>()
+/**
+ * Debounce Manager for per-note updates
+ * Handles debouncing of note saves with proper cleanup and flush support
+ */
+class NoteDebounceManager {
+  private timers = new Map<string, ReturnType<typeof setTimeout>>()
+  private pending = new Map<string, Note>()
+  private saveFunction: (note: Note) => Promise<void>
 
-// Pending updates waiting to be saved
-const pendingUpdates = new Map<string, Note>()
+  constructor(saveFunction: (note: Note) => Promise<void>) {
+    this.saveFunction = saveFunction
+  }
+
+  /**
+   * Schedule a debounced save for a note
+   */
+  schedule(note: Note): void {
+    // Cancel existing timer for this note
+    this.cancel(note.id)
+
+    // Store pending update
+    this.pending.set(note.id, note)
+
+    // Schedule new save
+    const timer = setTimeout(async () => {
+      const pendingNote = this.pending.get(note.id)
+      if (pendingNote) {
+        this.pending.delete(note.id)
+        this.timers.delete(note.id)
+        await this.saveFunction(pendingNote)
+      }
+    }, UPDATE_DEBOUNCE_MS)
+
+    this.timers.set(note.id, timer)
+  }
+
+  /**
+   * Cancel pending save for a specific note
+   */
+  cancel(noteId: string): void {
+    const timer = this.timers.get(noteId)
+    if (timer) {
+      clearTimeout(timer)
+      this.timers.delete(noteId)
+    }
+  }
+
+  /**
+   * Flush all pending saves immediately
+   */
+  async flush(): Promise<void> {
+    // Cancel all timers
+    for (const timer of this.timers.values()) {
+      clearTimeout(timer)
+    }
+    this.timers.clear()
+
+    // Save all pending notes
+    const pendingNotes = Array.from(this.pending.values())
+    this.pending.clear()
+
+    if (pendingNotes.length > 0) {
+      console.log(`[NotesStore] Flushing ${pendingNotes.length} pending updates`)
+      await Promise.all(pendingNotes.map(note => this.saveFunction(note)))
+    }
+  }
+
+  /**
+   * Check if there are pending saves
+   */
+  hasPending(): boolean {
+    return this.pending.size > 0
+  }
+
+  /**
+   * Get count of pending saves
+   */
+  getPendingCount(): number {
+    return this.pending.size
+  }
+}
+
+// Create debounce manager instance
+const noteDebounceManager = new NoteDebounceManager(async (note: Note) => {
+  await safeDbWrite(
+    () => saveNoteWithQueue(note, {
+      type: 'update',
+      entityType: 'note',
+      entityId: note.id,
+      data: note
+    }),
+    () => console.error('[NotesStore] Storage quota exceeded while saving note')
+  )
+})
+
+// Export flush function for external use (e.g., before sync)
+export async function flushPendingNoteUpdates(): Promise<void> {
+  await noteDebounceManager.flush()
+}
 
 interface NotesState {
   notes: Note[]
@@ -129,67 +223,6 @@ async function queueOfflineOperation(
   const isOnline = useNetworkStore.getState().isOnline
   if (!isOnline) {
     await addToSyncQueue({ type, entityType, entityId, data })
-  }
-}
-
-// Debounced save function for note updates
-function debouncedSaveNote(note: Note): void {
-  // Clear existing timer for this note
-  const existingTimer = updateTimers.get(note.id)
-  if (existingTimer) {
-    clearTimeout(existingTimer)
-  }
-
-  // Store the pending update
-  pendingUpdates.set(note.id, note)
-
-  // Set new timer
-  const timer = setTimeout(async () => {
-    const pendingNote = pendingUpdates.get(note.id)
-    if (pendingNote) {
-      pendingUpdates.delete(note.id)
-      updateTimers.delete(note.id)
-      
-      await safeDbWrite(
-        () => saveNoteWithQueue(pendingNote, {
-          type: 'update',
-          entityType: 'note',
-          entityId: note.id,
-          data: pendingNote
-        }),
-        () => console.error('[NotesStore] Storage quota exceeded while saving note')
-      )
-    }
-  }, UPDATE_DEBOUNCE_MS)
-
-  updateTimers.set(note.id, timer)
-}
-
-// Flush all pending updates immediately (call before sync or navigation)
-async function flushPendingUpdates(): Promise<void> {
-  // Clear all timers
-  for (const timer of updateTimers.values()) {
-    clearTimeout(timer)
-  }
-  updateTimers.clear()
-
-  // Save all pending updates
-  const updates = Array.from(pendingUpdates.values())
-  pendingUpdates.clear()
-
-  if (updates.length > 0) {
-    console.log(`[NotesStore] Flushing ${updates.length} pending updates`)
-    for (const note of updates) {
-      await safeDbWrite(
-        () => saveNoteWithQueue(note, {
-          type: 'update',
-          entityType: 'note',
-          entityId: note.id,
-          data: note
-        }),
-        () => console.error('[NotesStore] Storage quota exceeded while flushing updates')
-      )
-    }
   }
 }
 
@@ -359,7 +392,7 @@ export const useNotesStore = create<NotesState>()(
         
         // Use debounced save for better performance during rapid typing
         if (updatedNote) {
-          debouncedSaveNote(updatedNote)
+          noteDebounceManager.schedule(updatedNote)
         }
       },
       
@@ -705,7 +738,7 @@ export const useNotesStore = create<NotesState>()(
         }
 
         // Flush any pending updates before sync
-        await flushPendingUpdates()
+        await noteDebounceManager.flush()
 
         set({ isSyncing: true, syncError: null })
         

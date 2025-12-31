@@ -55,7 +55,7 @@ export function PublicNoteView({ fileId }: PublicNoteViewProps) {
       Markdown.configure({
         html: true,
         transformPastedText: false,
-        transformCopiedText: true,
+        transformCopiedText: false, // Disable markdown in copied text for clean plain text
         linkify: true,
         breaks: false
       })
@@ -149,7 +149,7 @@ export function PublicNoteView({ fileId }: PublicNoteViewProps) {
               <img src="/g-note.svg" alt="G-Note" className="w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0 dark:hidden" />
               <img src="/g-note-dark.svg" alt="G-Note" className="w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0 hidden dark:block" />
               <span className="font-semibold text-neutral-900 dark:text-white text-sm sm:text-base">G-Note</span>
-              <span className="hidden sm:inline text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full">
+              <span className="hidden sm:inline text-xs px-2 py-0.5 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-full">
                 {t('publicNote.viewMode')}
               </span>
             </div>
@@ -177,7 +177,7 @@ export function PublicNoteView({ fileId }: PublicNoteViewProps) {
           <NoteBackground style={note.style} className="rounded-[12px] sm:rounded-[16px]" />
           
           {/* Content layer */}
-          <div className="h-full overflow-y-auto p-4 sm:p-6 relative z-10">
+          <div className="h-full overflow-y-auto p-4 sm:p-6 pb-8 sm:pb-10 relative z-10">
             {/* Title */}
             <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
               {note.title || t('publicNote.untitled')}

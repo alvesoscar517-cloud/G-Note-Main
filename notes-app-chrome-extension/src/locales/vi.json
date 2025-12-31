@@ -47,7 +47,14 @@
     "modalSizeDescription": "Điều chỉnh kích thước ghi chú",
     "modalSizeDefault": "Mặc định",
     "modalSizeLarge": "Lớn",
-    "modalSizeXLarge": "Rất lớn"
+    "modalSizeXLarge": "Rất lớn",
+    "displayMode": "Chế độ hiển thị",
+    "displayModeDescription": "Cách ứng dụng mở",
+    "fullscreen": "Toàn màn hình",
+    "fullscreenDesc": "Mở trong tab mới",
+    "sidePanel": "Thanh bên",
+    "sidePanelDesc": "Mở trong thanh bên",
+    "displayModeHint": "Thay đổi sẽ được áp dụng khi bạn nhấn vào biểu tượng tiện ích lần sau."
   },
   "credits": {
     "title": "Mua AI Credits",
@@ -175,7 +182,8 @@
     "joinButton": "Tham gia",
     "roomNotFound": "Không tìm thấy phòng. Vui lòng kiểm tra lại mã và thử lại.",
     "close": "Đóng",
-    "error": "Không thể chia sẻ"
+    "error": "Không thể chia sẻ",
+    "sessionExpired": "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại."
   },
   "versionHistory": {
     "title": "Lịch sử phiên bản",
@@ -380,5 +388,22 @@
     "syncError": "Lỗi đồng bộ",
     "tapToRetry": "Nhấn để thử lại",
     "loginRequiresNetwork": "Đăng nhập cần kết nối internet"
+  },
+  "errorBoundary": {
+    "retry": "Thử lại",
+    "reloadApp": "Tải lại ứng dụng",
+    "showDetails": "Xem chi tiết lỗi",
+    "editorError": "Lỗi trình soạn thảo",
+    "editorErrorDescription": "Đã xảy ra lỗi với trình soạn thảo. Các thay đổi của bạn có thể chưa được lưu.",
+    "listError": "Không thể tải ghi chú",
+    "listErrorDescription": "Đã xảy ra lỗi khi tải ghi chú. Vui lòng thử lại.",
+    "drawingError": "Lỗi vẽ",
+    "drawingErrorDescription": "Đã xảy ra lỗi với công cụ vẽ. Vui lòng thử lại.",
+    "modalError": "Không thể mở ghi chú",
+    "modalErrorDescription": "Đã xảy ra lỗi khi mở ghi chú này. Vui lòng thử lại.",
+    "genericError": "Đã xảy ra lỗi",
+    "genericErrorDescription": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
+    "appError": "Ứng dụng gặp sự cố",
+    "appErrorDescription": "Đã xảy ra lỗi và ứng dụng cần tải lại. Chúng tôi xin lỗi vì sự bất tiện này."
   }
 }

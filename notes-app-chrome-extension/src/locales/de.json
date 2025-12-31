@@ -47,7 +47,14 @@
     "modalSizeDescription": "Größe des Notizeditors anpassen",
     "modalSizeDefault": "Standard",
     "modalSizeLarge": "Groß",
-    "modalSizeXLarge": "Sehr groß"
+    "modalSizeXLarge": "Sehr groß",
+    "displayMode": "Anzeigemodus",
+    "displayModeDescription": "Wie die App geöffnet wird",
+    "fullscreen": "Vollbild",
+    "fullscreenDesc": "In neuem Tab öffnen",
+    "sidePanel": "Seitenleiste",
+    "sidePanelDesc": "In Seitenleiste öffnen",
+    "displayModeHint": "Änderungen werden beim nächsten Klick auf das Erweiterungssymbol wirksam."
   },
   "credits": {
     "title": "AI-Credits kaufen",
@@ -175,7 +182,8 @@
     "joinButton": "Beitreten",
     "roomNotFound": "Raum nicht gefunden. Bitte überprüfen Sie den Code und versuchen Sie es erneut.",
     "close": "Schließen",
-    "error": "Teilen nicht möglich"
+    "error": "Teilen nicht möglich",
+    "sessionExpired": "Sitzung abgelaufen. Bitte melden Sie sich erneut an."
   },
   "versionHistory": {
     "title": "Versionsverlauf",
@@ -380,5 +388,22 @@
     "syncError": "Synchronisierungsfehler",
     "tapToRetry": "Tippen zum Wiederholen",
     "loginRequiresNetwork": "Anmeldung erfordert eine Internetverbindung"
+  },
+  "errorBoundary": {
+    "retry": "Erneut versuchen",
+    "reloadApp": "App neu laden",
+    "showDetails": "Fehlerdetails anzeigen",
+    "editorError": "Editor-Fehler",
+    "editorErrorDescription": "Beim Editor ist ein Fehler aufgetreten. Ihre Änderungen wurden möglicherweise nicht gespeichert.",
+    "listError": "Notizen konnten nicht geladen werden",
+    "listErrorDescription": "Beim Laden Ihrer Notizen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "drawingError": "Zeichenfehler",
+    "drawingErrorDescription": "Beim Zeichenwerkzeug ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "modalError": "Notiz konnte nicht geöffnet werden",
+    "modalErrorDescription": "Beim Öffnen dieser Notiz ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "genericError": "Etwas ist schiefgelaufen",
+    "genericErrorDescription": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "appError": "App abgestürzt",
+    "appErrorDescription": "Ein Fehler ist aufgetreten und die App muss neu geladen werden. Wir entschuldigen uns für die Unannehmlichkeiten."
   }
 }

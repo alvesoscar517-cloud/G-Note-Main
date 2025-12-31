@@ -11,16 +11,18 @@ import { LoginScreen } from '@/components/auth/LoginScreen'
 import { DrivePermissionError } from '@/components/auth/DrivePermissionError'
 import { Header } from '@/components/layout/Header'
 import { InstallPrompt } from '@/components/layout/InstallPrompt'
-import { NotesList } from '@/components/notes/NotesList'
+import { VirtualizedNotesList } from '@/components/notes/VirtualizedNotesList'
 import { NoteModal } from '@/components/notes/NoteModal'
 import { PublicNoteView } from '@/components/notes/PublicNoteView'
 import { FreeNoteView } from '@/components/notes/FreeNoteView'
 import { PrivacyPolicy, TermsOfService } from '@/components/legal'
 import { TooltipProvider } from '@/components/ui/Tooltip'
 import { useBlockContextMenu } from '@/components/ui/ContextMenuBlocker'
+import { AppErrorBoundary, ListErrorBoundary, ModalErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { SEOHead } from '@/components/SEOHead'
 import { initOfflineSync } from '@/lib/offlineSync'
 import { hideSplashScreen } from '@/lib/splashScreen'
+import { getValidAccessToken } from '@/lib/tokenManager'
 import { 
   isTokenExpired, 
   hasAuthBackend, 
@@ -281,14 +283,18 @@ function AppContent() {
       if (now - lastSync < 5000) return
       lastSync = now
       
+      // Get valid token (auto-refresh if expired)
+      const accessToken = await getValidAccessToken()
+      if (!accessToken) return
+      
       // Check if Drive has data first (only on initial sync when no local notes)
       const currentNotes = useNotesStore.getState().notes
       if (currentNotes.length === 0) {
-        await checkDriveHasData(user.accessToken)
+        await checkDriveHasData(accessToken)
       }
       
-      await syncWithDrive(user.accessToken)
-      await loadSharedNotes(user.accessToken)
+      await syncWithDrive(accessToken)
+      await loadSharedNotes(accessToken)
     }
 
     doSync()
@@ -340,12 +346,16 @@ function AppContent() {
   return (
     <LayoutGroup>
       <SEOHead />
-      <div className="min-h-screen min-h-dvh bg-neutral-50 dark:bg-neutral-950 fixed inset-0 overflow-auto status-bar-bg">
+      <div className="min-h-screen min-h-dvh bg-neutral-50 dark:bg-neutral-950 fixed inset-0 flex flex-col status-bar-bg">
         <Header />
-        <main className="max-w-6xl mx-auto px-4 py-6 safe-x safe-bottom">
-          <NotesList />
+        <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 safe-x safe-bottom overflow-hidden">
+          <ListErrorBoundary>
+            <VirtualizedNotesList />
+          </ListErrorBoundary>
         </main>
-        <NoteModal />
+        <ModalErrorBoundary>
+          <NoteModal />
+        </ModalErrorBoundary>
         <InstallPrompt />
       </div>
       
@@ -359,18 +369,20 @@ function AppContent() {
 
 function App() {
   return (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <TooltipProvider delayDuration={300}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/free-note" element={<FreeNoteView />} />
-            <Route path="*" element={<AppContent />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </GoogleOAuthProvider>
+    <AppErrorBoundary>
+      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <TooltipProvider delayDuration={300}>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/free-note" element={<FreeNoteView />} />
+              <Route path="*" element={<AppContent />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </GoogleOAuthProvider>
+    </AppErrorBoundary>
   )
 }
 

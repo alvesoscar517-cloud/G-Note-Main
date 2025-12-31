@@ -30,15 +30,18 @@ const langToCountry: Record<string, string> = {
 // Memoized flag component to prevent re-renders
 const MemoizedFlag = memo(function MemoizedFlag({ 
   countryCode, 
-  size = 24 
+  size = 24,
+  className
 }: { 
   countryCode: string
-  size?: number 
+  size?: number
+  className?: string
 }) {
   return (
     <CircleFlag 
       countryCode={countryCode} 
       size={size}
+      className={cn("flex-shrink-0", className)}
     />
   )
 })
@@ -89,24 +92,24 @@ export function LanguageSelector({ onClose }: LanguageSelectorProps) {
             key={lang.code}
             onClick={() => handleSelect(lang.code)}
             className={cn(
-              "w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-left transition-colors",
+              "w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-left transition-colors",
               "hover:bg-neutral-100 dark:hover:bg-neutral-800",
               i18n.language === lang.code && "bg-neutral-100 dark:bg-neutral-800"
             )}
           >
-            <div className="flex items-center gap-3">
-              <MemoizedFlag countryCode={langToCountry[lang.code] || 'us'} />
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-neutral-900 dark:text-white">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <MemoizedFlag countryCode={langToCountry[lang.code] || 'us'} size={20} />
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm font-medium text-neutral-900 dark:text-white truncate">
                   {lang.nativeName}
                 </span>
-                <span className="text-xs text-neutral-500">
+                <span className="text-xs text-neutral-500 truncate">
                   {lang.name}
                 </span>
               </div>
             </div>
             {i18n.language === lang.code && (
-              <Check className="w-4 h-4 text-neutral-900 dark:text-white" />
+              <Check className="w-4 h-4 text-neutral-900 dark:text-white flex-shrink-0" />
             )}
           </button>
         ))}
@@ -127,18 +130,18 @@ export function LanguageButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2.5 sm:py-3 rounded-xl text-left text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+      className="w-full flex items-center gap-2 px-2 py-2.5 rounded-xl text-left text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
     >
-      <div className="p-1.5 sm:p-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
-        <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+      <div className="p-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+        <Globe className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm sm:text-base font-medium">{currentLang.nativeName}</p>
-        <p className="text-[11px] sm:text-xs mt-0.5 text-neutral-500 dark:text-neutral-500 hidden sm:block">
+        <p className="text-sm font-medium truncate">{currentLang.nativeName}</p>
+        <p className="text-[11px] mt-0.5 text-neutral-500 dark:text-neutral-500 truncate">
           {currentLang.name}
         </p>
       </div>
-      <MemoizedFlag countryCode={langToCountry[currentLang.code] || 'us'} />
+      <MemoizedFlag countryCode={langToCountry[currentLang.code] || 'us'} size={20} />
     </button>
   )
 }

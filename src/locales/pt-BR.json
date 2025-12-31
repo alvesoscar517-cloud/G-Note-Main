@@ -175,7 +175,8 @@
     "joinButton": "Entrar",
     "roomNotFound": "Sala não encontrada. Verifique o código e tente novamente.",
     "close": "Fechar",
-    "error": "Não foi possível compartilhar"
+    "error": "Não foi possível compartilhar",
+    "sessionExpired": "Sessão expirada. Faça login novamente."
   },
   "versionHistory": {
     "title": "Histórico de versões",
@@ -380,5 +381,22 @@
     "syncError": "Erro de sincronização",
     "tapToRetry": "Toque para tentar novamente",
     "loginRequiresNetwork": "Login requer conexão com a Internet"
+  },
+  "errorBoundary": {
+    "retry": "Tentar novamente",
+    "reloadApp": "Recarregar app",
+    "showDetails": "Mostrar detalhes do erro",
+    "editorError": "Erro do editor",
+    "editorErrorDescription": "Algo deu errado com o editor. Suas alterações podem não ter sido salvas.",
+    "listError": "Falha ao carregar notas",
+    "listErrorDescription": "Algo deu errado ao carregar suas notas. Por favor, tente novamente.",
+    "drawingError": "Erro de desenho",
+    "drawingErrorDescription": "Algo deu errado com a ferramenta de desenho. Por favor, tente novamente.",
+    "modalError": "Falha ao abrir nota",
+    "modalErrorDescription": "Algo deu errado ao abrir esta nota. Por favor, tente novamente.",
+    "genericError": "Algo deu errado",
+    "genericErrorDescription": "Ocorreu um erro inesperado. Por favor, tente novamente.",
+    "appError": "App travou",
+    "appErrorDescription": "Algo deu errado e o app precisa ser recarregado. Pedimos desculpas pelo inconveniente."
   }
 }

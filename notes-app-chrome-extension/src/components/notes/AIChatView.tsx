@@ -122,6 +122,7 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
 
   // Edge swipe back gesture
   const { 
+    handlers: edgeSwipeHandlers, 
     swipeStyle: edgeSwipeStyle,
     swipeState: edgeSwipeState,
     progress: edgeSwipeProgress 
@@ -163,11 +164,9 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
     }
   }, [streamingContent])
 
-  // Focus input when opened
+  // Focus input when opened - DISABLED to prevent keyboard auto-open on mobile
   useEffect(() => {
-    if (open) {
-      setTimeout(() => textareaRef.current?.focus(), 100)
-    } else {
+    if (!open) {
       // Don't clear messages - keep history
       setInput('')
       if (recognitionRef.current) {
@@ -324,23 +323,27 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
   return createPortal(
     <div 
       className="fixed inset-0 z-50 bg-white dark:bg-neutral-950 flex flex-col"
-      style={edgeSwipeStyle}
+      style={edgeSwipeState.isDragging ? edgeSwipeStyle : undefined}
+      {...edgeSwipeHandlers}
     >
+      {/* Edge swipe indicator */}
       <EdgeSwipeIndicator 
         progress={edgeSwipeProgress} 
         isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
       />
       
-      {/* Close button - icon only */}
+      {/* Back button - icon only */}
       <button
         onClick={onClose}
-        className="absolute z-10 p-2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors top-3 left-3 safe-top"
+        className="absolute z-10 p-2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors top-4 left-3"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 pt-14 pb-6">
+      {/* Messages Area - with proper padding to prevent text cutoff */}
+      <div 
+        className="flex-1 overflow-y-auto px-4 pt-16 pb-4"
+      >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <MessageCircle className="w-16 h-16 text-neutral-400 dark:text-neutral-600 mb-4" strokeWidth={1.5} />
@@ -352,7 +355,7 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
             </p>
           </div>
         ) : (
-          <div className="max-w-3xl mx-auto space-y-4 pt-12">
+          <div className="max-w-3xl mx-auto space-y-4">
             {messages.map((message) => (
               <MessageBubble 
                 key={message.id} 
@@ -375,10 +378,10 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
         )}
       </div>
 
-      {/* Input Area - Prompt style */}
-      <div className="p-4">
+      {/* Input Area - Prompt style with border and safe area */}
+      <div className="pt-4 px-4 pb-4">
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-          <div className="bg-neutral-100 dark:bg-neutral-900 rounded-2xl overflow-hidden">
+          <div className="bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl overflow-hidden shadow-sm">
             {/* Context text attachment - shown above textarea */}
             {contextText && (
               <div className="px-4 pt-3">

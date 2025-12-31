@@ -17,6 +17,7 @@ import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 import { LogoutConfirmDialog } from '@/components/auth/LogoutConfirmDialog'
 import { useModalStatusBar } from '@/hooks/useModalStatusBar'
 import { cn } from '@/lib/utils'
+import { getValidAccessToken } from '@/lib/tokenManager'
 
 // Modal size options
 const MODAL_SIZE_OPTIONS: { value: ModalSize; labelKey: string }[] = [
@@ -136,10 +137,14 @@ export function Header() {
   }
 
   const handleSync = async () => {
-    if (user?.accessToken && !isSyncing) {
-      await syncWithDrive(user.accessToken)
-      // Also load shared notes after sync
-      await loadSharedNotes(user.accessToken)
+    if (!isSyncing) {
+      // Get valid token (auto-refresh if expired)
+      const accessToken = await getValidAccessToken()
+      if (accessToken) {
+        await syncWithDrive(accessToken)
+        // Also load shared notes after sync
+        await loadSharedNotes(accessToken)
+      }
     }
   }
 

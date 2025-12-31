@@ -175,7 +175,8 @@
     "joinButton": "加入",
     "roomNotFound": "房間不存在。請檢查代碼後重試。",
     "close": "關閉",
-    "error": "無法分享"
+    "error": "無法分享",
+    "sessionExpired": "會話已過期。請重新登入。"
   },
   "versionHistory": {
     "title": "版本紀錄",
@@ -380,5 +381,22 @@
     "syncError": "同步錯誤",
     "tapToRetry": "點擊重試",
     "loginRequiresNetwork": "登入需要網路連接"
+  },
+  "errorBoundary": {
+    "retry": "重試",
+    "reloadApp": "重新載入應用",
+    "showDetails": "顯示錯誤詳情",
+    "editorError": "編輯器錯誤",
+    "editorErrorDescription": "編輯器出現問題。您的變更可能未儲存。",
+    "listError": "載入筆記失敗",
+    "listErrorDescription": "載入筆記時出現問題。請重試。",
+    "drawingError": "繪圖錯誤",
+    "drawingErrorDescription": "繪圖工具出現問題。請重試。",
+    "modalError": "開啟筆記失敗",
+    "modalErrorDescription": "開啟此筆記時出現問題。請重試。",
+    "genericError": "出現問題",
+    "genericErrorDescription": "發生意外錯誤。請重試。",
+    "appError": "應用程式當機",
+    "appErrorDescription": "出現問題，應用程式需要重新載入。造成不便，深感抱歉。"
   }
 }

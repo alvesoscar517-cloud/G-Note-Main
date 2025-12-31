@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useDebounce } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
-import { Search, Plus, Moon, Sun, LogOut, RefreshCw, Settings, X, Coins, ChevronRight, ArrowLeft, Maximize2, Trash2 } from 'lucide-react'
+import { Search, Plus, Moon, Sun, LogOut, RefreshCw, Settings, X, Coins, ChevronRight, ArrowLeft, Maximize2, Trash2, PanelRight, Monitor } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
@@ -17,6 +17,7 @@ import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 import { LogoutConfirmDialog } from '@/components/auth/LogoutConfirmDialog'
 import { useModalStatusBar } from '@/hooks/useModalStatusBar'
 import { cn } from '@/lib/utils'
+import { getValidAccessToken } from '@/lib/tokenManager'
 
 // Modal size options
 const MODAL_SIZE_OPTIONS: { value: ModalSize; labelKey: string }[] = [
@@ -24,6 +25,16 @@ const MODAL_SIZE_OPTIONS: { value: ModalSize; labelKey: string }[] = [
   { value: 'large', labelKey: 'settings.modalSizeLarge' },
   { value: 'xlarge', labelKey: 'settings.modalSizeXLarge' }
 ]
+
+// Display mode options for extension
+type LaunchType = 'fullscreen' | 'sidePanel'
+const DISPLAY_MODE_OPTIONS: { value: LaunchType; labelKey: string; descKey: string; icon: 'monitor' | 'panel' }[] = [
+  { value: 'fullscreen', labelKey: 'settings.fullscreen', descKey: 'settings.fullscreenDesc', icon: 'monitor' },
+  { value: 'sidePanel', labelKey: 'settings.sidePanel', descKey: 'settings.sidePanelDesc', icon: 'panel' }
+]
+
+// Check if running in Chrome extension context
+const isExtension = typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id
 
 // Hardcoded packages - no API loading needed
 const CREDIT_PACKAGES = [
@@ -74,6 +85,8 @@ export function Header() {
   const [packagesOpen, setPackagesOpen] = useState(false)
   const [languageOpen, setLanguageOpen] = useState(false)
   const [modalSizeOpen, setModalSizeOpen] = useState(false)
+  const [displayModeOpen, setDisplayModeOpen] = useState(false)
+  const [displayMode, setDisplayMode] = useState<LaunchType>('fullscreen')
   const [trashOpen, setTrashOpen] = useState(false)
   const [driveSearchEnabled, setDriveSearchEnabled] = useState(false)
   const [showDriveResults, setShowDriveResults] = useState(false)
@@ -82,8 +95,19 @@ export function Header() {
   
   // Update status bar color when any small modal is open
   // Note: trashOpen is excluded because TrashView is fullscreen
-  const anyModalOpen = settingsOpen || packagesOpen || languageOpen || modalSizeOpen
+  const anyModalOpen = settingsOpen || packagesOpen || languageOpen || modalSizeOpen || displayModeOpen
   useModalStatusBar(anyModalOpen)
+  
+  // Load display mode from chrome storage
+  useEffect(() => {
+    if (isExtension) {
+      chrome.storage.local.get('launchType', (result: { launchType?: string }) => {
+        if (result.launchType) {
+          setDisplayMode(result.launchType as LaunchType)
+        }
+      })
+    }
+  }, [])
   
   // Local search input state + debounce
   const [localSearch, setLocalSearch] = useState('')
@@ -136,10 +160,14 @@ export function Header() {
   }
 
   const handleSync = async () => {
-    if (user?.accessToken && !isSyncing) {
-      await syncWithDrive(user.accessToken)
-      // Also load shared notes after sync
-      await loadSharedNotes(user.accessToken)
+    if (!isSyncing) {
+      // Get valid token (auto-refresh if expired)
+      const accessToken = await getValidAccessToken()
+      if (accessToken) {
+        await syncWithDrive(accessToken)
+        // Also load shared notes after sync
+        await loadSharedNotes(accessToken)
+      }
     }
   }
 
@@ -180,10 +208,11 @@ export function Header() {
         setPackagesOpen(false)
         setLanguageOpen(false)
         setModalSizeOpen(false)
+        setDisplayModeOpen(false)
         setTrashOpen(false)
       }
     }
-    if (settingsOpen || packagesOpen || languageOpen || modalSizeOpen || trashOpen) {
+    if (settingsOpen || packagesOpen || languageOpen || modalSizeOpen || displayModeOpen || trashOpen) {
       document.addEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'hidden'
     }
@@ -205,7 +234,7 @@ export function Header() {
         onConfirm={handleConfirmLogout}
       />
 
-      <header className="sticky top-0 z-30 px-4 pt-4 safe-top safe-x">
+      <header className="px-4 pt-3 relative z-40">
         <div className="max-w-6xl mx-auto bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg border border-neutral-200 dark:border-neutral-800 rounded-[16px] px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             {/* Logo & Search */}
@@ -285,7 +314,7 @@ export function Header() {
 
       {/* Settings Modal */}
       {settingsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 safe-x">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-black/50"
@@ -392,6 +421,20 @@ export function Header() {
                 />
               </div>
               
+              {/* Display Mode - only show in extension */}
+              {isExtension && (
+                <MenuItem
+                  icon={<PanelRight className="w-4 h-4" />}
+                  label={t('settings.displayMode')}
+                  description={t('settings.displayModeDescription')}
+                  onClick={() => {
+                    setSettingsOpen(false)
+                    setDisplayModeOpen(true)
+                  }}
+                  showArrow
+                />
+              )}
+              
               {user && (
                 <MenuItem
                   icon={<LogOut className="w-4 h-4" />}
@@ -407,7 +450,7 @@ export function Header() {
 
       {/* Credits Packages Modal */}
       {packagesOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 safe-x">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
           <div 
             className="absolute inset-0 bg-black/50"
             onClick={() => setPackagesOpen(false)}
@@ -497,7 +540,7 @@ export function Header() {
 
       {/* Language Modal */}
       {languageOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 safe-x">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
           <div 
             className="absolute inset-0 bg-black/50"
             onClick={() => setLanguageOpen(false)}
@@ -527,7 +570,7 @@ export function Header() {
 
       {/* Modal Size Selector */}
       {modalSizeOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 safe-x">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
           <div 
             className="absolute inset-0 bg-black/50"
             onClick={() => setModalSizeOpen(false)}
@@ -575,6 +618,86 @@ export function Header() {
                   )}
                 </button>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Display Mode Selector - Extension only */}
+      {displayModeOpen && isExtension && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setDisplayModeOpen(false)}
+          />
+          
+          <div className="relative w-full max-w-xs sm:max-w-sm max-h-[90vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl animate-in fade-in-0 zoom-in-95 border border-neutral-200 dark:border-neutral-700 modal-safe-area">
+            {/* Header */}
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-3">
+              <button
+                onClick={() => {
+                  setDisplayModeOpen(false)
+                  setSettingsOpen(true)
+                }}
+                className="p-1.5 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h3 className="text-sm sm:text-base font-semibold text-neutral-900 dark:text-white">
+                {t('settings.displayMode')}
+              </h3>
+            </div>
+            
+            {/* Display mode options */}
+            <div className="px-3 sm:px-4 space-y-2">
+              {DISPLAY_MODE_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setDisplayMode(option.value)
+                    chrome.storage.local.set({ launchType: option.value })
+                    setDisplayModeOpen(false)
+                    setSettingsOpen(true)
+                  }}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-3 sm:px-4 py-3 sm:py-4 rounded-xl transition-all",
+                    displayMode === option.value
+                      ? "bg-neutral-100 dark:bg-neutral-800"
+                      : "hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+                  )}
+                >
+                  <div className={cn(
+                    "p-2 rounded-lg",
+                    displayMode === option.value
+                      ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
+                      : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
+                  )}>
+                    {option.icon === 'monitor' ? (
+                      <Monitor className="w-5 h-5" />
+                    ) : (
+                      <PanelRight className="w-5 h-5" />
+                    )}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="text-sm font-medium text-neutral-900 dark:text-white">
+                      {t(option.labelKey)}
+                    </p>
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                      {t(option.descKey)}
+                    </p>
+                  </div>
+                  {displayMode === option.value && (
+                    <div className="w-2 h-2 rounded-full bg-neutral-900 dark:bg-white flex-shrink-0" />
+                  )}
+                </button>
+              ))}
+            </div>
+            
+            {/* Hint message */}
+            <div className="px-3 sm:px-4 py-3">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center bg-neutral-50 dark:bg-neutral-800 rounded-lg px-3 py-2">
+                {t('settings.displayModeHint')}
+              </p>
             </div>
           </div>
         </div>

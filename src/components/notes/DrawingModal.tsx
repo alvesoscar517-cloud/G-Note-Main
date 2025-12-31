@@ -1,26 +1,32 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { X, Eraser, Undo2, Redo2, Trash2 } from 'lucide-react'
+import { X, Eraser, Undo2, Redo2, RotateCcw, Pen } from 'lucide-react'
+import getStroke from 'perfect-freehand'
 import { cn } from '@/lib/utils'
-import { ConfirmDialog } from '@/components/ui/Dialog'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { useResponsiveDrawingToolbar } from '@/hooks/useResponsiveDrawingToolbar'
 import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
+import { useHistoryBack } from '@/hooks/useHistoryBack'
 
 interface Point {
   x: number
   y: number
+  pressure?: number
 }
 
 interface Stroke {
   points: Point[]
   color: string
-  width: number
+  size: number
+  isEraser: boolean
 }
 
+// Full color palette
 const COLORS = ['#000000', '#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff']
-const STROKE_WIDTHS = [2, 4, 8, 16]
+
+// Full stroke sizes
+const SIZES = [3, 6, 12, 20]
 
 interface DrawingModalProps {
   open: boolean
@@ -28,17 +34,56 @@ interface DrawingModalProps {
   onSave: (imageDataUrl: string) => void
 }
 
+// Convert perfect-freehand points to SVG path
+function getSvgPathFromStroke(stroke: number[][]): string {
+  if (!stroke.length) return ''
+
+  const d = stroke.reduce(
+    (acc, [x0, y0], i, arr) => {
+      const [x1, y1] = arr[(i + 1) % arr.length]
+      acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
+      return acc
+    },
+    ['M', ...stroke[0], 'Q']
+  )
+
+  d.push('Z')
+  return d.join(' ')
+}
+
+// Get stroke options based on size
+function getStrokeOptions(size: number, isEraser: boolean) {
+  return {
+    size: isEraser ? size * 2.5 : size,
+    thinning: isEraser ? 0 : 0.5,
+    smoothing: 0.5,
+    streamline: 0.5,
+    easing: (t: number) => t,
+    start: {
+      taper: 0,
+      cap: true,
+    },
+    end: {
+      taper: isEraser ? 0 : size * 2,
+      cap: true,
+    },
+  }
+}
+
 export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
   const { t } = useTranslation()
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const toolbarRef = useRef<HTMLDivElement>(null)
   
-  // State kept for potential future use, using ref for actual drawing logic
-  const [_isDrawing, setIsDrawing] = useState(false)
   const [currentColor, setCurrentColor] = useState('#000000')
-  const [currentWidth, setCurrentWidth] = useState(4)
+  const [currentSize, setCurrentSize] = useState(6)
   const [isEraser, setIsEraser] = useState(false)
+  const [strokes, setStrokes] = useState<Stroke[]>([])
+  const [currentStroke, setCurrentStroke] = useState<Point[]>([])
+  const [undoStack, setUndoStack] = useState<Stroke[][]>([])
+  const [redoStack, setRedoStack] = useState<Stroke[][]>([])
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 })
   
   // Responsive toolbar visibility
   const toolbarVisibility = useResponsiveDrawingToolbar(toolbarRef)
@@ -56,282 +101,210 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
     enabled: open
   })
   
-  // Use refs for performance-critical data
-  const strokesRef = useRef<Stroke[]>([])
-  const currentStrokeRef = useRef<Point[]>([])
-  const undoStackRef = useRef<Stroke[][]>([])
-  const redoStackRef = useRef<Stroke[][]>([])
-  
-  // Force re-render for UI updates
-  const [, forceUpdate] = useState(0)
-  const [showClearConfirm, setShowClearConfirm] = useState(false)
-
-  // Draw a single stroke on canvas
-  const drawStroke = useCallback((ctx: CanvasRenderingContext2D, stroke: Stroke) => {
-    if (stroke.points.length < 2) return
-    ctx.beginPath()
-    ctx.strokeStyle = stroke.color
-    ctx.lineWidth = stroke.width
-    ctx.lineCap = 'round'
-    ctx.lineJoin = 'round'
-    ctx.moveTo(stroke.points[0].x, stroke.points[0].y)
-    for (let i = 1; i < stroke.points.length; i++) {
-      ctx.lineTo(stroke.points[i].x, stroke.points[i].y)
-    }
-    ctx.stroke()
-  }, [])
-
-  // Full redraw
-  const redrawCanvas = useCallback(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-    strokesRef.current.forEach(stroke => drawStroke(ctx, stroke))
-  }, [drawStroke])
+  // History back support
+  useHistoryBack({
+    isOpen: open,
+    onBack: onClose,
+    stateKey: 'drawing-modal'
+  })
 
   // Setup canvas size
   useEffect(() => {
     if (!open) return
     
-    const canvas = canvasRef.current
     const container = containerRef.current
-    if (!canvas || !container) return
+    if (!container) return
 
     const resize = () => {
       const rect = container.getBoundingClientRect()
-      const dpr = window.devicePixelRatio || 1
-      
-      canvas.style.width = rect.width + 'px'
-      canvas.style.height = rect.height + 'px'
-      canvas.width = rect.width * dpr
-      canvas.height = rect.height * dpr
-      
-      const ctx = canvas.getContext('2d')
-      if (ctx) {
-        ctx.scale(dpr, dpr)
-      }
-      
-      redrawCanvas()
+      setCanvasSize({ width: rect.width, height: rect.height })
     }
 
-    requestAnimationFrame(resize)
-    
+    resize()
     window.addEventListener('resize', resize)
     return () => window.removeEventListener('resize', resize)
-  }, [open, redrawCanvas])
+  }, [open])
 
   // Reset state when modal opens
   useEffect(() => {
     if (open) {
-      strokesRef.current = []
-      currentStrokeRef.current = []
-      undoStackRef.current = []
-      redoStackRef.current = []
+      setStrokes([])
+      setCurrentStroke([])
+      setUndoStack([])
+      setRedoStack([])
       setCurrentColor('#000000')
-      setCurrentWidth(4)
+      setCurrentSize(6)
       setIsEraser(false)
-      forceUpdate(n => n + 1)
     }
   }, [open])
 
-  const getPoint = useCallback((e: MouseEvent | TouchEvent): Point => {
-    const canvas = canvasRef.current!
-    const rect = canvas.getBoundingClientRect()
+  const getPoint = useCallback((e: React.PointerEvent): Point => {
+    const svg = svgRef.current
+    if (!svg) return { x: 0, y: 0 }
     
-    if ('touches' in e && e.touches.length > 0) {
-      return {
-        x: e.touches[0].clientX - rect.left,
-        y: e.touches[0].clientY - rect.top
-      }
+    const rect = svg.getBoundingClientRect()
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      pressure: e.pressure || 0.5,
     }
-    if ('clientX' in e) {
-      return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      }
-    }
-    return { x: 0, y: 0 }
   }, [])
 
-  // Use refs to track drawing state for native event handlers
-  const isDrawingRef = useRef(false)
-  const isEraserRef = useRef(false)
-  const currentColorRef = useRef('#000000')
-  const currentWidthRef = useRef(4)
-  
-  // Keep refs in sync with state
-  useEffect(() => {
-    isEraserRef.current = isEraser
-    currentColorRef.current = currentColor
-    currentWidthRef.current = currentWidth
-  }, [isEraser, currentColor, currentWidth])
-
-  const startDrawing = useCallback((e: MouseEvent | TouchEvent) => {
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault()
-    setIsDrawing(true)
-    isDrawingRef.current = true
+    e.currentTarget.setPointerCapture(e.pointerId)
     const point = getPoint(e)
-    currentStrokeRef.current = [point]
+    setCurrentStroke([point])
   }, [getPoint])
 
-  const draw = useCallback((e: MouseEvent | TouchEvent) => {
-    if (!isDrawingRef.current) return
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (currentStroke.length === 0) return
     e.preventDefault()
-    
     const point = getPoint(e)
-    currentStrokeRef.current.push(point)
-    
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    
-    const points = currentStrokeRef.current
-    if (points.length < 2) return
-    
-    const color = isEraserRef.current ? '#ffffff' : currentColorRef.current
-    const width = isEraserRef.current ? 24 : currentWidthRef.current
-    
-    ctx.beginPath()
-    ctx.strokeStyle = color
-    ctx.lineWidth = width
-    ctx.lineCap = 'round'
-    ctx.lineJoin = 'round'
-    
-    const lastIndex = points.length - 1
-    ctx.moveTo(points[lastIndex - 1].x, points[lastIndex - 1].y)
-    ctx.lineTo(points[lastIndex].x, points[lastIndex].y)
-    ctx.stroke()
-  }, [getPoint])
+    setCurrentStroke(prev => [...prev, point])
+  }, [currentStroke.length, getPoint])
 
-  const stopDrawing = useCallback(() => {
-    if (!isDrawingRef.current) return
-    setIsDrawing(false)
-    isDrawingRef.current = false
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    e.currentTarget.releasePointerCapture(e.pointerId)
     
-    if (currentStrokeRef.current.length > 1) {
-      undoStackRef.current.push([...strokesRef.current])
-      redoStackRef.current = []
+    if (currentStroke.length > 1) {
+      setUndoStack(prev => [...prev, strokes])
+      setRedoStack([])
       
       const newStroke: Stroke = {
-        points: [...currentStrokeRef.current],
-        color: isEraserRef.current ? '#ffffff' : currentColorRef.current,
-        width: isEraserRef.current ? 24 : currentWidthRef.current
+        points: currentStroke,
+        color: isEraser ? '#ffffff' : currentColor,
+        size: currentSize,
+        isEraser,
       }
-      strokesRef.current.push(newStroke)
-      forceUpdate(n => n + 1)
+      setStrokes(prev => [...prev, newStroke])
     }
-    currentStrokeRef.current = []
-  }, [])
-
-  // Setup native event listeners with { passive: false } to allow preventDefault
-  useEffect(() => {
-    if (!open) return
-    
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    // Mouse events
-    canvas.addEventListener('mousedown', startDrawing)
-    canvas.addEventListener('mousemove', draw)
-    canvas.addEventListener('mouseup', stopDrawing)
-    canvas.addEventListener('mouseleave', stopDrawing)
-    
-    // Touch events with { passive: false }
-    canvas.addEventListener('touchstart', startDrawing, { passive: false })
-    canvas.addEventListener('touchmove', draw, { passive: false })
-    canvas.addEventListener('touchend', stopDrawing, { passive: false })
-
-    return () => {
-      canvas.removeEventListener('mousedown', startDrawing)
-      canvas.removeEventListener('mousemove', draw)
-      canvas.removeEventListener('mouseup', stopDrawing)
-      canvas.removeEventListener('mouseleave', stopDrawing)
-      canvas.removeEventListener('touchstart', startDrawing)
-      canvas.removeEventListener('touchmove', draw)
-      canvas.removeEventListener('touchend', stopDrawing)
-    }
-  }, [open, startDrawing, draw, stopDrawing])
+    setCurrentStroke([])
+  }, [currentStroke, strokes, isEraser, currentColor, currentSize])
 
   const handleUndo = useCallback(() => {
-    if (undoStackRef.current.length === 0) return
-    const prev = undoStackRef.current.pop()!
-    redoStackRef.current.push([...strokesRef.current])
-    strokesRef.current = prev
-    redrawCanvas()
-    forceUpdate(n => n + 1)
-  }, [redrawCanvas])
+    if (undoStack.length === 0) return
+    const prev = undoStack[undoStack.length - 1]
+    setUndoStack(stack => stack.slice(0, -1))
+    setRedoStack(stack => [...stack, strokes])
+    setStrokes(prev)
+  }, [undoStack, strokes])
 
   const handleRedo = useCallback(() => {
-    if (redoStackRef.current.length === 0) return
-    const next = redoStackRef.current.pop()!
-    undoStackRef.current.push([...strokesRef.current])
-    strokesRef.current = next
-    redrawCanvas()
-    forceUpdate(n => n + 1)
-  }, [redrawCanvas])
+    if (redoStack.length === 0) return
+    const next = redoStack[redoStack.length - 1]
+    setRedoStack(stack => stack.slice(0, -1))
+    setUndoStack(stack => [...stack, strokes])
+    setStrokes(next)
+  }, [redoStack, strokes])
 
   const handleClear = useCallback(() => {
-    if (strokesRef.current.length === 0) return
-    undoStackRef.current.push([...strokesRef.current])
-    redoStackRef.current = []
-    strokesRef.current = []
-    redrawCanvas()
-    forceUpdate(n => n + 1)
-    setShowClearConfirm(false)
-  }, [redrawCanvas])
+    if (strokes.length === 0) return
+    setUndoStack(prev => [...prev, strokes])
+    setRedoStack([])
+    setStrokes([])
+  }, [strokes])
 
   const handleSave = useCallback(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    
-    if (strokesRef.current.length === 0) {
+    if (strokes.length === 0) {
       onClose()
       return
     }
+
+    const svg = svgRef.current
+    if (!svg) return
+
+    // Create canvas for export
+    const canvas = document.createElement('canvas')
+    const dpr = window.devicePixelRatio || 1
+    canvas.width = canvasSize.width * dpr
+    canvas.height = canvasSize.height * dpr
     
-    const exportCanvas = document.createElement('canvas')
-    const container = containerRef.current
-    if (!container) return
-    
-    const rect = container.getBoundingClientRect()
-    exportCanvas.width = rect.width
-    exportCanvas.height = rect.height
-    
-    const ctx = exportCanvas.getContext('2d')
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
-    
+
+    ctx.scale(dpr, dpr)
     ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height)
-    strokesRef.current.forEach(stroke => drawStroke(ctx, stroke))
-    
-    const imageDataUrl = exportCanvas.toDataURL('image/png', 0.9)
+    ctx.fillRect(0, 0, canvasSize.width, canvasSize.height)
+
+    // Draw all strokes
+    strokes.forEach(stroke => {
+      const outlinePoints = getStroke(
+        stroke.points.map(p => [p.x, p.y, p.pressure || 0.5]),
+        getStrokeOptions(stroke.size, stroke.isEraser)
+      )
+      
+      const pathData = getSvgPathFromStroke(outlinePoints)
+      const path = new Path2D(pathData)
+      ctx.fillStyle = stroke.color
+      ctx.fill(path)
+    })
+
+    const imageDataUrl = canvas.toDataURL('image/png', 0.9)
     onSave(imageDataUrl)
     onClose()
-  }, [onSave, onClose, drawStroke])
+  }, [strokes, canvasSize, onSave, onClose])
 
-  // ESC to close
+  // ESC to close, Ctrl+Z/Ctrl+Shift+Z for undo/redo
   useEffect(() => {
     if (!open) return
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
+      if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault()
+        if (e.shiftKey) handleRedo()
+        else handleUndo()
+      }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [open, onClose])
+  }, [open, onClose, handleUndo, handleRedo])
 
   if (!open) return null
 
+  // Get visible items based on toolbar width
   const visibleColors = COLORS.slice(0, toolbarVisibility.visibleColorsCount)
-  const visibleStrokeWidths = STROKE_WIDTHS.slice(0, toolbarVisibility.visibleStrokeWidthsCount)
-  const buttonSize = toolbarVisibility.compactMode ? 'w-6 h-6' : 'w-7 h-7 sm:w-8 sm:h-8'
-  const colorSize = toolbarVisibility.compactMode ? 'w-5 h-5' : 'w-5 h-5 sm:w-6 sm:h-6'
-  const iconSize = toolbarVisibility.compactMode ? 'w-4 h-4' : 'w-4 h-4 sm:w-5 sm:h-5'
+  const visibleSizes = SIZES.slice(0, toolbarVisibility.visibleStrokeWidthsCount)
+  const { compactMode, breakpoint } = toolbarVisibility
+
+  // Dynamic sizing based on breakpoint
+  const buttonSize = compactMode ? 'w-7 h-7' : 'w-8 h-8'
+  const colorSize = compactMode ? 'w-6 h-6' : 'w-7 h-7'
+  const iconSize = compactMode ? 'w-4 h-4' : 'w-5 h-5'
+  const gap = breakpoint === 'xs' ? 'gap-0.5' : breakpoint === 'sm' ? 'gap-1' : 'gap-1.5'
+
+  // Render stroke as SVG path
+  const renderStroke = (stroke: Stroke, index: number) => {
+    const outlinePoints = getStroke(
+      stroke.points.map(p => [p.x, p.y, p.pressure || 0.5]),
+      getStrokeOptions(stroke.size, stroke.isEraser)
+    )
+    
+    return (
+      <path
+        key={index}
+        d={getSvgPathFromStroke(outlinePoints)}
+        fill={stroke.color}
+      />
+    )
+  }
+
+  // Render current stroke being drawn
+  const renderCurrentStroke = () => {
+    if (currentStroke.length < 2) return null
+    
+    const outlinePoints = getStroke(
+      currentStroke.map(p => [p.x, p.y, p.pressure || 0.5]),
+      getStrokeOptions(currentSize, isEraser)
+    )
+    
+    return (
+      <path
+        d={getSvgPathFromStroke(outlinePoints)}
+        fill={isEraser ? '#ffffff' : currentColor}
+      />
+    )
+  }
 
   return createPortal(
     <div 
@@ -344,21 +317,9 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
         progress={edgeSwipeProgress} 
         isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
       />
-      
-      <ConfirmDialog
-        open={showClearConfirm}
-        onClose={() => setShowClearConfirm(false)}
-        onConfirm={handleClear}
-        title={t('drawing.clear')}
-        description={t('notes.deleteConfirm')}
-        confirmText={t('notes.delete')}
-        cancelText={t('notes.cancel')}
-      />
 
       {/* Header */}
-      <div 
-        className="flex items-center justify-between pb-1.5 sm:py-2 border-b border-neutral-200 dark:border-neutral-700 px-2 safe-top"
-      >
+      <div className="flex items-center justify-between pb-1.5 sm:py-2 border-b border-neutral-200 dark:border-neutral-700 px-2 sm:px-3 safe-top">
         <button
           onClick={onClose}
           className="p-1.5 -ml-1 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
@@ -379,25 +340,67 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
       {/* Canvas Area */}
       <div 
         ref={containerRef}
-        className="flex-1 overflow-hidden bg-white"
+        className="flex-1 overflow-hidden bg-white touch-none"
       >
-        <canvas
-          ref={canvasRef}
+        <svg
+          ref={svgRef}
+          width={canvasSize.width}
+          height={canvasSize.height}
           className={cn(
             "touch-none",
             isEraser ? "cursor-cell" : "cursor-crosshair"
           )}
-        />
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+          style={{ touchAction: 'none' }}
+        >
+          {/* White background */}
+          <rect width="100%" height="100%" fill="#ffffff" />
+          
+          {/* Completed strokes */}
+          {strokes.map(renderStroke)}
+          
+          {/* Current stroke being drawn */}
+          {renderCurrentStroke()}
+        </svg>
       </div>
 
-      {/* Responsive Bottom Toolbar */}
+      {/* Bottom Toolbar - Responsive */}
       <div 
         ref={toolbarRef}
-        className="pt-1.5 sm:py-2 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 px-2 safe-bottom"
+        className="border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 px-2 py-1.5 sm:py-2 safe-bottom"
       >
-        <div className="flex items-center justify-between max-w-xl mx-auto gap-1 sm:gap-2">
-          {/* Colors - only show visible colors based on screen size */}
-          <div className="flex items-center gap-1">
+        <div className={cn("flex items-center justify-between max-w-xl mx-auto", gap)}>
+          {/* Tool Toggle: Pen/Eraser */}
+          <div className="flex items-center gap-0.5 bg-neutral-200 dark:bg-neutral-700 rounded-lg p-0.5 flex-shrink-0">
+            <button
+              onClick={() => setIsEraser(false)}
+              className={cn(
+                "p-1.5 rounded-md transition-colors touch-manipulation",
+                !isEraser 
+                  ? "bg-white dark:bg-neutral-600 shadow-sm" 
+                  : "hover:bg-neutral-300 dark:hover:bg-neutral-600"
+              )}
+            >
+              <Pen className={iconSize} />
+            </button>
+            <button
+              onClick={() => setIsEraser(true)}
+              className={cn(
+                "p-1.5 rounded-md transition-colors touch-manipulation",
+                isEraser 
+                  ? "bg-white dark:bg-neutral-600 shadow-sm" 
+                  : "hover:bg-neutral-300 dark:hover:bg-neutral-600"
+              )}
+            >
+              <Eraser className={iconSize} />
+            </button>
+          </div>
+
+          {/* Colors */}
+          <div className={cn("flex items-center flex-shrink-0", gap)}>
             {visibleColors.map(color => (
               <button
                 key={color}
@@ -415,53 +418,42 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
             ))}
           </div>
           
-          {/* Stroke Width - only show visible widths based on screen size */}
-          <div className="flex items-center gap-0.5">
-            {visibleStrokeWidths.map(width => (
+          {/* Stroke Sizes */}
+          <div className={cn("flex items-center flex-shrink-0", gap)}>
+            {visibleSizes.map(size => (
               <button
-                key={width}
-                onClick={() => { setCurrentWidth(width); setIsEraser(false) }}
+                key={size}
+                onClick={() => { setCurrentSize(size); setIsEraser(false) }}
                 className={cn(
                   buttonSize,
                   "rounded-lg flex items-center justify-center transition-colors touch-manipulation",
-                  currentWidth === width && !isEraser 
+                  currentSize === size && !isEraser 
                     ? "bg-blue-100 dark:bg-blue-900/40" 
                     : "hover:bg-neutral-200 dark:hover:bg-neutral-700"
                 )}
               >
                 <div 
                   className="rounded-full bg-neutral-800 dark:bg-neutral-200" 
-                  style={{ width: Math.min(width + 2, 14), height: Math.min(width + 2, 14) }}
+                  style={{ 
+                    width: Math.min(size + 2, 14), 
+                    height: Math.min(size + 2, 14) 
+                  }}
                 />
               </button>
             ))}
           </div>
 
-          {/* Tools */}
-          <div className="flex items-center gap-0.5">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setIsEraser(!isEraser)}
-                  className={cn(
-                    "p-1.5 rounded-lg transition-colors touch-manipulation",
-                    isEraser 
-                      ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400" 
-                      : "hover:bg-neutral-200 dark:hover:bg-neutral-700"
-                  )}
-                >
-                  <Eraser className={iconSize} />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>{t('drawing.eraser')}</TooltipContent>
-            </Tooltip>
-            
+          {/* Actions */}
+          <div className={cn("flex items-center flex-shrink-0", gap)}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
                   onClick={handleUndo}
-                  disabled={undoStackRef.current.length === 0}
-                  className="p-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 disabled:opacity-30 transition-colors touch-manipulation"
+                  disabled={undoStack.length === 0}
+                  className={cn(
+                    buttonSize,
+                    "rounded-lg flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 disabled:opacity-30 transition-colors touch-manipulation"
+                  )}
                 >
                   <Undo2 className={iconSize} />
                 </button>
@@ -473,8 +465,11 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
               <TooltipTrigger asChild>
                 <button
                   onClick={handleRedo}
-                  disabled={redoStackRef.current.length === 0}
-                  className="p-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 disabled:opacity-30 transition-colors touch-manipulation"
+                  disabled={redoStack.length === 0}
+                  className={cn(
+                    buttonSize,
+                    "rounded-lg flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 disabled:opacity-30 transition-colors touch-manipulation"
+                  )}
                 >
                   <Redo2 className={iconSize} />
                 </button>
@@ -485,11 +480,14 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => strokesRef.current.length > 0 && setShowClearConfirm(true)}
-                  disabled={strokesRef.current.length === 0}
-                  className="p-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 disabled:opacity-30 transition-colors touch-manipulation"
+                  onClick={handleClear}
+                  disabled={strokes.length === 0}
+                  className={cn(
+                    buttonSize,
+                    "rounded-lg flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 disabled:opacity-30 transition-colors touch-manipulation"
+                  )}
                 >
-                  <Trash2 className={iconSize} />
+                  <RotateCcw className={iconSize} />
                 </button>
               </TooltipTrigger>
               <TooltipContent>{t('drawing.clear')}</TooltipContent>

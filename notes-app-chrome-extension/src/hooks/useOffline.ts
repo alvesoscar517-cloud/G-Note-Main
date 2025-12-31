@@ -3,7 +3,7 @@
  * Provides easy access to offline functionality across the app
  */
 import { useCallback, useEffect, useState } from 'react'
-import { useNetworkStore, NetworkRequiredError } from '@/stores/networkStore'
+import { useNetworkStore, NetworkRequiredError, onBackOnline } from '@/stores/networkStore'
 import { 
   addToSyncQueue, 
   getSyncQueueCount, 
@@ -18,6 +18,7 @@ import type { Note, Collection } from '@/types'
 export function useOffline() {
   const isOnline = useNetworkStore(state => state.isOnline)
   const wasOffline = useNetworkStore(state => state.wasOffline)
+  const addToRetryQueue = useNetworkStore(state => state.addToRetryQueue)
   const [pendingCount, setPendingCount] = useState(0)
   const [pendingItems, setPendingItems] = useState<SyncQueueItem[]>([])
 
@@ -52,6 +53,7 @@ export function useOffline() {
 
   /**
    * Execute a function only if online, otherwise queue for later
+   * Now supports automatic retry when back online
    */
   const executeOrQueue = useCallback(async <T>(
     fn: () => Promise<T>,
@@ -60,10 +62,22 @@ export function useOffline() {
       entityType: 'note' | 'collection'
       entityId: string
       data?: Note | Collection
+    },
+    options?: {
+      retryOnReconnect?: boolean
+      retryId?: string
     }
   ): Promise<T | null> => {
     if (isOnline) {
-      return fn()
+      try {
+        return await fn()
+      } catch (error) {
+        // If failed due to network, queue for retry
+        if (options?.retryOnReconnect && options?.retryId) {
+          addToRetryQueue(options.retryId, async () => { await fn() })
+        }
+        throw error
+      }
     }
     
     // Queue for later if data provided
@@ -71,8 +85,13 @@ export function useOffline() {
       await addToSyncQueue(queueData)
     }
     
+    // Add to retry queue if requested
+    if (options?.retryOnReconnect && options?.retryId) {
+      addToRetryQueue(options.retryId, async () => { await fn() })
+    }
+    
     return null
-  }, [isOnline])
+  }, [isOnline, addToRetryQueue])
 
   /**
    * Get pending sync count
@@ -95,6 +114,13 @@ export function useOffline() {
     }
   }, [])
 
+  /**
+   * Register a callback to run when coming back online
+   */
+  const onReconnect = useCallback((callback: () => void) => {
+    return onBackOnline(callback)
+  }, [])
+
   return {
     isOnline,
     wasOffline,
@@ -103,7 +129,8 @@ export function useOffline() {
     requireNetwork,
     executeOrQueue,
     getPendingCount,
-    refreshPending
+    refreshPending,
+    onReconnect
   }
 }
 
@@ -154,6 +181,24 @@ export function useOfflineGraceful() {
     // User can always edit locally, sync will happen when online + token valid
     allowLocalEdit: true
   }
+}
+
+/**
+ * Hook to automatically sync when coming back online
+ */
+export function useAutoSyncOnReconnect(syncFn: () => Promise<void>) {
+  const isOnline = useNetworkStore(state => state.isOnline)
+  const wasOffline = useNetworkStore(state => state.wasOffline)
+
+  useEffect(() => {
+    // When coming back online after being offline, trigger sync
+    if (isOnline && wasOffline) {
+      console.log('[useAutoSyncOnReconnect] Back online, triggering sync')
+      syncFn().catch(err => {
+        console.error('[useAutoSyncOnReconnect] Sync failed:', err)
+      })
+    }
+  }, [isOnline, wasOffline, syncFn])
 }
 
 export { NetworkRequiredError }

@@ -5,6 +5,7 @@ import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop'
 import { X, Check, RotateCw, FlipHorizontal, FlipVertical } from 'lucide-react'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { useEdgeSwipeBack, EdgeSwipeIndicator } from '@/hooks/useEdgeSwipeBack'
+import { useHistoryBack } from '@/hooks/useHistoryBack'
 
 // Import CSS
 import 'react-image-crop/dist/ReactCrop.css'
@@ -76,6 +77,13 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
     edgeWidth: 25,
     threshold: 100,
     enabled: true
+  })
+
+  // History back support for system back gesture (Android swipe, browser back button)
+  useHistoryBack({
+    isOpen: true,
+    onBack: onCancel,
+    stateKey: 'image-editor'
   })
 
   const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {

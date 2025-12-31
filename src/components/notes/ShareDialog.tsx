@@ -9,6 +9,7 @@ import { driveShare } from '@/lib/driveShare'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
 import { useNetworkStore } from '@/stores/networkStore'
+import { getValidAccessToken, TokenExpiredError } from '@/lib/tokenManager'
 
 interface ShareDialogProps {
   open: boolean
@@ -99,13 +100,20 @@ export function ShareDialog({
   }
 
   const handleSharePublic = async () => {
-    if (!note || !user?.accessToken) return
+    if (!note) return
     
     setIsSharing(true)
     setShareError(null)
     
     try {
-      driveShare.setAccessToken(user.accessToken)
+      // Get valid token (auto-refresh if expired)
+      const accessToken = await getValidAccessToken()
+      if (!accessToken) {
+        setShareError(t('share.sessionExpired'))
+        return
+      }
+      
+      driveShare.setAccessToken(accessToken)
       // Pass existing publicFileId to update instead of creating new
       const fileId = await driveShare.sharePublic(note, note.publicFileId)
       const link = `${window.location.origin}?view=${fileId}`
@@ -118,21 +126,32 @@ export function ShareDialog({
       }
     } catch (error) {
       console.error('Share failed:', error)
-      setShareError(error instanceof Error ? error.message : t('share.error'))
+      if (error instanceof TokenExpiredError) {
+        setShareError(t('share.sessionExpired'))
+      } else {
+        setShareError(error instanceof Error ? error.message : t('share.error'))
+      }
     } finally {
       setIsSharing(false)
     }
   }
 
   const handleShareViaEmail = async () => {
-    if (!shareEmail.trim() || !note || !user?.accessToken) return
+    if (!shareEmail.trim() || !note) return
     
     setIsSharing(true)
     setShareError(null)
     setShareSuccess(false)
     
     try {
-      driveShare.setAccessToken(user.accessToken)
+      // Get valid token (auto-refresh if expired)
+      const accessToken = await getValidAccessToken()
+      if (!accessToken) {
+        setShareError(t('share.sessionExpired'))
+        return
+      }
+      
+      driveShare.setAccessToken(accessToken)
       const fileId = await driveShare.createShareableNote(note)
       await driveShare.shareWithEmail(fileId, shareEmail.trim(), 'writer')
       
@@ -144,7 +163,11 @@ export function ShareDialog({
       }, 2000)
     } catch (error) {
       console.error('Share failed:', error)
-      setShareError(error instanceof Error ? error.message : t('share.error'))
+      if (error instanceof TokenExpiredError) {
+        setShareError(t('share.sessionExpired'))
+      } else {
+        setShareError(error instanceof Error ? error.message : t('share.error'))
+      }
     } finally {
       setIsSharing(false)
     }

@@ -128,8 +128,8 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
         isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
       />
       
-      {/* Header */}
-      <div className="flex items-center justify-between p-2 sm:p-4 shrink-0">
+      {/* Header - with safe area support */}
+      <div className="flex items-center justify-between px-2 pb-2 pt-2 sm:p-4 shrink-0">
         <Tooltip>
           <TooltipTrigger asChild>
             <button
@@ -173,8 +173,8 @@ export function ImageEditor({ src, onSave, onCancel }: ImageEditorProps) {
         </ReactCrop>
       </div>
 
-      {/* Controls - compact for landscape */}
-      <div className="p-2 sm:p-4 shrink-0">
+      {/* Controls - with safe area support */}
+      <div className="pt-2 sm:p-4 shrink-0">
         <div className="flex items-center justify-center gap-2 sm:gap-4">
           <button
             onClick={handleRotate}

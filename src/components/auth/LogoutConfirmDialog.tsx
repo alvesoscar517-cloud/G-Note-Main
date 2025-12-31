@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { LogOut, Cloud, CloudOff, RefreshCw } from 'lucide-react'
 import { useNotesStore } from '@/stores/notesStore'
 import { useNetworkStore } from '@/stores/networkStore'
-import { cn } from '@/lib/utils'
+import { cn, formatDate } from '@/lib/utils'
 
 interface LogoutConfirmDialogProps {
   open: boolean
@@ -83,7 +83,7 @@ export function LogoutConfirmDialog({ open, onClose, onConfirm }: LogoutConfirmD
               {t('settings.allSynced')}
               {lastSyncTime && (
                 <span className="text-neutral-500 dark:text-neutral-500 ml-1">
-                  ({t('settings.lastSync', { time: formatRelativeTime(lastSyncTime, t) })})
+                  ({t('settings.lastSync', { time: formatRelativeTime(lastSyncTime) })})
                 </span>
               )}
             </p>
@@ -132,16 +132,7 @@ export function LogoutConfirmDialog({ open, onClose, onConfirm }: LogoutConfirmD
   )
 }
 
-// Helper function to format relative time
-function formatRelativeTime(timestamp: number, t: (key: string, options?: Record<string, unknown>) => string): string {
-  const now = Date.now()
-  const diff = now - timestamp
-  const minutes = Math.floor(diff / 60000)
-  const hours = Math.floor(diff / 3600000)
-  const days = Math.floor(diff / 86400000)
-  
-  if (minutes < 1) return t('time.justNow')
-  if (minutes < 60) return t('time.minutesAgo', { count: minutes })
-  if (hours < 24) return t('time.hoursAgo', { count: hours })
-  return t('time.daysAgo', { count: days })
+// Helper function to format relative time - uses date-fns via formatDate
+function formatRelativeTime(timestamp: number): string {
+  return formatDate(timestamp)
 }
