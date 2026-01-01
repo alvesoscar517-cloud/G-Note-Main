@@ -346,9 +346,11 @@ function AppContent() {
   return (
     <LayoutGroup>
       <SEOHead />
-      <div className="min-h-screen min-h-dvh bg-neutral-50 dark:bg-neutral-950 fixed inset-0 flex flex-col status-bar-bg">
-        <Header />
-        <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 safe-x safe-bottom overflow-hidden">
+      <div className="min-h-screen min-h-dvh bg-neutral-50 dark:bg-neutral-950 status-bar-bg">
+        <div className="pt-3 px-4 safe-top safe-x">
+          <Header />
+        </div>
+        <main className="max-w-6xl w-full mx-auto px-4 py-6 safe-x safe-bottom">
           <ListErrorBoundary>
             <VirtualizedNotesList />
           </ListErrorBoundary>

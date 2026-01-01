@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Trash2, RotateCcw, X, CheckSquare, Square, AlertTriangle, Search, Loader2 } from 'lucide-react'
-import { useVirtualizer } from '@tanstack/react-virtual'
+import { useWindowVirtualizer } from '@tanstack/react-virtual'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Dialog, DialogHeader, DialogContent, DialogFooter } from '@/components/ui/Dialog'
@@ -73,7 +73,8 @@ interface TrashViewProps {
 
 export function TrashView({ open, onClose }: TrashViewProps) {
   const { t } = useTranslation()
-  const parentRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const notes = useNotesStore(state => state.notes)
   const restoreFromTrash = useNotesStore(state => state.restoreFromTrash)
   const permanentlyDelete = useNotesStore(state => state.permanentlyDelete)
@@ -97,8 +98,8 @@ export function TrashView({ open, onClose }: TrashViewProps) {
   // Detect column count based on container width
   useEffect(() => {
     const updateColumnCount = () => {
-      if (!parentRef.current) return
-      const width = parentRef.current.offsetWidth
+      if (!listRef.current) return
+      const width = listRef.current.offsetWidth
       if (width < 640) setColumnCount(1)
       else if (width < 1024) setColumnCount(2)
       else setColumnCount(3)
@@ -107,7 +108,7 @@ export function TrashView({ open, onClose }: TrashViewProps) {
     if (open) {
       setTimeout(updateColumnCount, 50)
       const observer = new ResizeObserver(updateColumnCount)
-      if (parentRef.current) observer.observe(parentRef.current)
+      if (listRef.current) observer.observe(listRef.current)
       return () => observer.disconnect()
     }
   }, [open])
@@ -151,11 +152,11 @@ export function TrashView({ open, onClose }: TrashViewProps) {
   }, [filteredNotes, columnCount])
 
   // Virtualizer for trash notes
-  const virtualizer = useVirtualizer({
+  const virtualizer = useWindowVirtualizer({
     count: rows.length,
-    getScrollElement: () => parentRef.current,
     estimateSize: () => CARD_HEIGHT + GAP,
     overscan: OVERSCAN,
+    scrollMargin: listRef.current?.offsetTop ?? 0,
   })
 
   // Drive search for trash - only show notes that are in trash
@@ -225,11 +226,11 @@ export function TrashView({ open, onClose }: TrashViewProps) {
   }, [driveNotesFiltered, columnCount])
 
   // Virtualizer for drive results
-  const driveVirtualizer = useVirtualizer({
+  const driveVirtualizer = useWindowVirtualizer({
     count: driveRows.length,
-    getScrollElement: () => parentRef.current,
     estimateSize: () => CARD_HEIGHT + GAP,
     overscan: OVERSCAN,
+    scrollMargin: listRef.current?.offsetTop ?? 0,
   })
 
   const isAllSelected = filteredNotes.length > 0 && selectedIds.size === filteredNotes.length
@@ -278,8 +279,12 @@ export function TrashView({ open, onClose }: TrashViewProps) {
 
   return (
     <>
+      {/* Backdrop to cover home page content */}
+      <div className="fixed inset-0 z-[89] bg-neutral-50 dark:bg-neutral-950" />
+      
       <div 
-        className="fixed inset-0 z-[90] flex flex-col bg-neutral-50 dark:bg-neutral-950"
+        ref={scrollContainerRef}
+        className="fixed inset-0 z-[90] overflow-y-auto bg-neutral-50 dark:bg-neutral-950"
         style={edgeSwipeState.isDragging ? edgeSwipeStyle : undefined}
         {...edgeSwipeHandlers}
       >
@@ -290,7 +295,7 @@ export function TrashView({ open, onClose }: TrashViewProps) {
         />
         
         {/* Header */}
-        <div className="sticky top-0 z-30 px-3 sm:px-4 pt-3">
+        <div className="px-3 sm:px-4 pt-3">
           <div className="max-w-6xl mx-auto bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg border border-neutral-200 dark:border-neutral-800 rounded-[16px] px-3 sm:px-4 py-2.5 sm:py-3">
             <div className="flex items-center justify-between gap-2 sm:gap-4">
               <div className="flex items-center gap-2 sm:gap-3">
@@ -383,10 +388,10 @@ export function TrashView({ open, onClose }: TrashViewProps) {
 
         {/* Content */}
         <div 
-          ref={parentRef}
-          className="flex-1 overflow-y-auto px-3 sm:px-4 py-3 sm:py-4"
+          ref={listRef}
+          className="px-3 sm:px-4 py-3 sm:py-4"
         >
-          <div className="max-w-6xl mx-auto h-full">
+          <div className="max-w-6xl mx-auto">
             {trashNotes.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-[60vh] text-neutral-500">
                 <Trash2 className="w-12 sm:w-16 h-12 sm:h-16 mb-4 opacity-20" />
@@ -425,7 +430,7 @@ export function TrashView({ open, onClose }: TrashViewProps) {
                           left: 0,
                           width: '100%',
                           height: `${virtualRow.size}px`,
-                          transform: `translateY(${virtualRow.start}px)`,
+                          transform: `translateY(${virtualRow.start - driveVirtualizer.options.scrollMargin}px)`,
                         }}
                       >
                         <div 
@@ -475,7 +480,7 @@ export function TrashView({ open, onClose }: TrashViewProps) {
                         left: 0,
                         width: '100%',
                         height: `${virtualRow.size}px`,
-                        transform: `translateY(${virtualRow.start}px)`,
+                        transform: `translateY(${virtualRow.start - virtualizer.options.scrollMargin}px)`,
                       }}
                     >
                       <div 

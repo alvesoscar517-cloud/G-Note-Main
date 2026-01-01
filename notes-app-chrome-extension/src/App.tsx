@@ -222,9 +222,11 @@ function AppContent() {
 
   return (
     <LayoutGroup>
-      <div className="h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950">
-        <Header />
-        <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 overflow-hidden">
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+        <div className="pt-3 px-4">
+          <Header />
+        </div>
+        <main className="max-w-6xl w-full mx-auto px-4 py-6">
           <ListErrorBoundary>
             <VirtualizedNotesList />
           </ListErrorBoundary>

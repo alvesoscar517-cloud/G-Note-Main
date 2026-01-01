@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import SpeechRecognition, { useSpeechRecognition as useLibSpeechRecognition } from 'react-speech-recognition'
 
 // Language mapping from i18n locale to Web Speech API language code
@@ -59,6 +59,8 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
 
   const [error, setError] = useState<string | null>(null)
   const [accumulatedTranscript, setAccumulatedTranscript] = useState('')
+  const [isManuallyListening, setIsManuallyListening] = useState(false)
+  const lastTranscriptRef = useRef('')
 
   // Use the library's hook
   const {
@@ -66,29 +68,38 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
     interimTranscript: libInterimTranscript,
     listening,
     browserSupportsSpeechRecognition,
-    isMicrophoneAvailable,
+    resetTranscript,
   } = useLibSpeechRecognition()
 
-  // Determine status based on library state
-  const status: SpeechStatus = error ? 'error' : listening ? 'listening' : 'idle'
+  // Determine status based on library state and manual state
+  const status: SpeechStatus = error ? 'error' : (listening || isManuallyListening) ? 'listening' : 'idle'
 
   // Track transcript changes and call onResult callback
   useEffect(() => {
-    if (libTranscript && libTranscript !== accumulatedTranscript) {
-      const newText = libTranscript.slice(accumulatedTranscript.length)
+    if (libTranscript && libTranscript !== lastTranscriptRef.current) {
+      const newText = libTranscript.slice(lastTranscriptRef.current.length).trim()
       if (newText) {
         onResult?.(newText, true)
+        lastTranscriptRef.current = libTranscript
         setAccumulatedTranscript(libTranscript)
       }
     }
-  }, [libTranscript, accumulatedTranscript, onResult])
+  }, [libTranscript, onResult])
 
   // Track interim transcript changes
   useEffect(() => {
     if (libInterimTranscript) {
-      onResult?.(libInterimTranscript, false)
+      onResult?.(libInterimTranscript.trim(), false)
     }
   }, [libInterimTranscript, onResult])
+
+  // Sync manual listening state with actual listening state
+  useEffect(() => {
+    if (!listening && isManuallyListening) {
+      // Recognition stopped unexpectedly, update our state
+      setIsManuallyListening(false)
+    }
+  }, [listening, isManuallyListening])
 
   const startListening = useCallback(async () => {
     if (!browserSupportsSpeechRecognition) {
@@ -98,15 +109,11 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
       return
     }
 
-    if (!isMicrophoneAvailable) {
-      const errorMsg = 'Microphone access denied'
-      setError(errorMsg)
-      onError?.(errorMsg)
-      return
-    }
-
     setError(null)
     setAccumulatedTranscript('')
+    lastTranscriptRef.current = ''
+    resetTranscript()
+    setIsManuallyListening(true)
 
     try {
       await SpeechRecognition.startListening({
@@ -117,22 +124,24 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to start speech recognition'
       setError(errorMsg)
+      setIsManuallyListening(false)
       onError?.(errorMsg)
     }
-  }, [browserSupportsSpeechRecognition, isMicrophoneAvailable, continuous, interimResults, locale, onError])
+  }, [browserSupportsSpeechRecognition, continuous, interimResults, locale, onError, resetTranscript])
 
   const stopListening = useCallback(() => {
+    setIsManuallyListening(false)
     SpeechRecognition.stopListening()
     setError(null)
   }, [])
 
   const toggleListening = useCallback(() => {
-    if (listening) {
+    if (listening || isManuallyListening) {
       stopListening()
     } else {
       startListening()
     }
-  }, [listening, startListening, stopListening])
+  }, [listening, isManuallyListening, startListening, stopListening])
 
   // Cleanup on unmount
   useEffect(() => {

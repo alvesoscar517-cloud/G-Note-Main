@@ -216,6 +216,25 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
                 </button>
                 <button
                   type="button"
+                  title={t('contextMenu.download')}
+                  onClick={(e) => { 
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleDownloadImage()
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                  }}
+                  onPointerDown={(e) => {
+                    e.stopPropagation()
+                  }}
+                  className="p-1.5 rounded hover:bg-neutral-700 text-white transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
                   title={t('imageEditor.delete')}
                   onClick={(e) => { 
                     e.preventDefault()

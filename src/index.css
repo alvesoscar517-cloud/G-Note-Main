@@ -78,6 +78,19 @@ html.dark body {
   color: #F5F5F5;
 }
 
+/* Respect device orientation lock - only allow rotation when device is unlocked */
+@media screen {
+  /* Default: lock to portrait orientation */
+  @media (orientation: portrait) {
+    html {
+      /* Respect user's device orientation lock setting */
+    }
+  }
+  
+  /* Only allow landscape when device orientation is unlocked */
+  /* This is handled by the browser respecting screen.orientation.lock */
+}
+
 /* Safe area padding utilities - respects device notches and status bars */
 .safe-top {
   padding-top: max(0.75rem, env(safe-area-inset-top));

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown, MoreHorizontal, Pencil, Trash2, Plus } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import * as Popover from '@radix-ui/react-popover'
-import { useVirtualizer } from '@tanstack/react-virtual'
+import { useWindowVirtualizer } from '@tanstack/react-virtual'
 import { EmptyState } from './EmptyState'
 import { NotesListSkeleton } from '@/components/ui/Skeleton'
 import {
@@ -46,7 +46,7 @@ type GridItem =
 export function VirtualizedNotesList() {
   const { t } = useTranslation()
   const isTouchDevice = useIsTouchDevice()
-  const parentRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
   const { 
     notes,
     getSearchResults, 
@@ -81,8 +81,8 @@ export function VirtualizedNotesList() {
   // Detect column count based on container width
   useEffect(() => {
     const updateColumnCount = () => {
-      if (!parentRef.current) return
-      const width = parentRef.current.offsetWidth
+      if (!listRef.current) return
+      const width = listRef.current.offsetWidth
       if (width < 640) setColumnCount(1) // sm breakpoint
       else if (width < 1024) setColumnCount(2) // lg breakpoint
       else setColumnCount(3)
@@ -90,14 +90,14 @@ export function VirtualizedNotesList() {
     
     updateColumnCount()
     const observer = new ResizeObserver(updateColumnCount)
-    if (parentRef.current) observer.observe(parentRef.current)
+    if (listRef.current) observer.observe(listRef.current)
     return () => observer.disconnect()
   }, [])
 
   // Restore scroll position when modal closes
   useEffect(() => {
-    if (wasModalOpenRef.current && !isModalOpen && parentRef.current) {
-      parentRef.current.scrollTop = scrollPositionRef.current
+    if (wasModalOpenRef.current && !isModalOpen) {
+      window.scrollTo(0, scrollPositionRef.current)
     }
     wasModalOpenRef.current = isModalOpen
   }, [isModalOpen])
@@ -191,11 +191,11 @@ export function VirtualizedNotesList() {
     return CARD_HEIGHT + GAP
   }, [rows])
 
-  const virtualizer = useVirtualizer({
+  const virtualizer = useWindowVirtualizer({
     count: rows.length,
-    getScrollElement: () => parentRef.current,
     estimateSize: getRowHeight,
     overscan: OVERSCAN,
+    scrollMargin: listRef.current?.offsetTop ?? 0,
   })
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -251,10 +251,16 @@ export function VirtualizedNotesList() {
   }
 
   const handleScroll = () => {
-    if (parentRef.current && !isModalOpen) {
-      scrollPositionRef.current = parentRef.current.scrollTop
+    if (!isModalOpen) {
+      scrollPositionRef.current = window.scrollY
     }
   }
+
+  // Add scroll listener for window
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [isModalOpen])
 
   // Show skeleton
   const activeNotes = notes.filter(n => !n.isDeleted)
@@ -279,9 +285,8 @@ export function VirtualizedNotesList() {
   if (isSearching) {
     return (
       <div 
-        ref={parentRef} 
-        className="h-full overflow-auto relative"
-        onScroll={handleScroll}
+        ref={listRef} 
+        className="relative"
       >
         <div
           style={{
@@ -301,7 +306,7 @@ export function VirtualizedNotesList() {
                   left: 0,
                   width: '100%',
                   height: `${virtualRow.size}px`,
-                  transform: `translateY(${virtualRow.start}px)`,
+                  transform: `translateY(${virtualRow.start - virtualizer.options.scrollMargin}px)`,
                 }}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-1 px-1">
@@ -324,9 +329,8 @@ export function VirtualizedNotesList() {
   if (isTouchDevice) {
     return (
       <div 
-        ref={parentRef} 
-        className="h-full overflow-auto"
-        onScroll={handleScroll}
+        ref={listRef} 
+        className="relative"
       >
         <div
           style={{
@@ -346,7 +350,7 @@ export function VirtualizedNotesList() {
                   left: 0,
                   width: '100%',
                   height: `${virtualRow.size}px`,
-                  transform: `translateY(${virtualRow.start}px)`,
+                  transform: `translateY(${virtualRow.start - virtualizer.options.scrollMargin}px)`,
                 }}
               >
                 <VirtualRow
@@ -381,9 +385,8 @@ export function VirtualizedNotesList() {
       onDragEnd={handleDragEnd}
     >
       <div 
-        ref={parentRef} 
-        className="h-full overflow-auto"
-        onScroll={handleScroll}
+        ref={listRef} 
+        className="relative"
       >
         <div
           style={{
@@ -403,7 +406,7 @@ export function VirtualizedNotesList() {
                   left: 0,
                   width: '100%',
                   height: `${virtualRow.size}px`,
-                  transform: `translateY(${virtualRow.start}px)`,
+                  transform: `translateY(${virtualRow.start - virtualizer.options.scrollMargin}px)`,
                 }}
               >
                 <VirtualRow

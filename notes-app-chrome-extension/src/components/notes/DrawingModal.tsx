@@ -391,6 +391,9 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
             </button>
           </div>
 
+          {/* Separator */}
+          <div className="w-px h-6 bg-neutral-300 dark:bg-neutral-600 mx-1" />
+
           {/* Colors */}
           <div className={cn("flex items-center flex-shrink-0", gap)}>
             {visibleColors.map(color => (
@@ -409,6 +412,9 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
               />
             ))}
           </div>
+          
+          {/* Separator */}
+          <div className="w-px h-6 bg-neutral-300 dark:bg-neutral-600 mx-1" />
           
           {/* Stroke Sizes */}
           <div className={cn("flex items-center flex-shrink-0", gap)}>
@@ -434,6 +440,9 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
               </button>
             ))}
           </div>
+
+          {/* Separator */}
+          <div className="w-px h-6 bg-neutral-300 dark:bg-neutral-600 mx-1" />
 
           {/* Actions */}
           <div className={cn("flex items-center flex-shrink-0", gap)}>

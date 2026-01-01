@@ -9,35 +9,35 @@ import { useThemeStore } from '@/stores/themeStore'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import type { NoteStyle } from '@/types'
 
-// Color palettes - vibrant and distinguishable in both modes
+// Google Keep color palettes - optimized for readability
 const LIGHT_COLORS = [
   { name: 'Default', value: '#ffffff', textColor: '#171717' },
-  { name: 'Rose', value: '#fecdd3', textColor: '#171717' },
-  { name: 'Peach', value: '#fed7aa', textColor: '#171717' },
-  { name: 'Lemon', value: '#fef08a', textColor: '#171717' },
-  { name: 'Lime', value: '#d9f99d', textColor: '#171717' },
-  { name: 'Mint', value: '#a7f3d0', textColor: '#171717' },
-  { name: 'Cyan', value: '#a5f3fc', textColor: '#171717' },
-  { name: 'Sky', value: '#bae6fd', textColor: '#171717' },
-  { name: 'Lavender', value: '#ddd6fe', textColor: '#171717' },
-  { name: 'Pink', value: '#fbcfe8', textColor: '#171717' },
-  { name: 'Cream', value: '#fef3c7', textColor: '#171717' },
-  { name: 'Stone', value: '#d6d3d1', textColor: '#171717' },
+  { name: 'Coral', value: '#F28B82', textColor: '#171717' },
+  { name: 'Peach', value: '#FBBC04', textColor: '#171717' },
+  { name: 'Sand', value: '#FFF475', textColor: '#171717' },
+  { name: 'Mint', value: '#CCFF90', textColor: '#171717' },
+  { name: 'Sage', value: '#A7FFEB', textColor: '#171717' },
+  { name: 'Fog', value: '#CBF0F8', textColor: '#171717' },
+  { name: 'Storm', value: '#AECBFA', textColor: '#171717' },
+  { name: 'Dusk', value: '#D7AEFB', textColor: '#171717' },
+  { name: 'Blossom', value: '#FDCFE8', textColor: '#171717' },
+  { name: 'Clay', value: '#E6C9A8', textColor: '#171717' },
+  { name: 'Chalk', value: '#E8EAED', textColor: '#171717' },
 ]
 
 const DARK_COLORS = [
-  { name: 'Default', value: '#171717', textColor: '#fafafa' },
-  { name: 'Rose', value: '#9f1239', textColor: '#fafafa' },
-  { name: 'Peach', value: '#9a3412', textColor: '#fafafa' },
-  { name: 'Lemon', value: '#a16207', textColor: '#fafafa' },
-  { name: 'Lime', value: '#3f6212', textColor: '#fafafa' },
-  { name: 'Mint', value: '#166534', textColor: '#fafafa' },
-  { name: 'Cyan', value: '#0e7490', textColor: '#fafafa' },
-  { name: 'Sky', value: '#0369a1', textColor: '#fafafa' },
-  { name: 'Lavender', value: '#6d28d9', textColor: '#fafafa' },
-  { name: 'Pink', value: '#a21caf', textColor: '#fafafa' },
-  { name: 'Cream', value: '#78716c', textColor: '#fafafa' },
-  { name: 'Stone', value: '#44403c', textColor: '#fafafa' },
+  { name: 'Default', value: '#202124', textColor: '#fafafa' },
+  { name: 'Coral', value: '#5C2B29', textColor: '#fafafa' },
+  { name: 'Peach', value: '#614A19', textColor: '#fafafa' },
+  { name: 'Sand', value: '#635D19', textColor: '#fafafa' },
+  { name: 'Mint', value: '#345920', textColor: '#fafafa' },
+  { name: 'Sage', value: '#16504B', textColor: '#fafafa' },
+  { name: 'Fog', value: '#2D555E', textColor: '#fafafa' },
+  { name: 'Storm', value: '#1E3A5F', textColor: '#fafafa' },
+  { name: 'Dusk', value: '#42275E', textColor: '#fafafa' },
+  { name: 'Blossom', value: '#5B2245', textColor: '#fafafa' },
+  { name: 'Clay', value: '#442F19', textColor: '#fafafa' },
+  { name: 'Chalk', value: '#3C3F43', textColor: '#fafafa' },
 ]
 
 // Instagram-inspired filters
@@ -80,17 +80,33 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
   const { theme } = useThemeStore()
   
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS
+  // Always show light colors in picker for better visibility, but apply dark colors when in dark mode
+  const displayColors = LIGHT_COLORS
+  const applyColors = isDark ? DARK_COLORS : LIGHT_COLORS
   const defaultBgOpacity = isDark ? DEFAULT_BG_OPACITY_DARK : DEFAULT_BG_OPACITY_LIGHT
 
-  const handleColorSelect = (color: typeof colors[0]) => {
+  // Handle open change with event prevention to avoid triggering note close
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen)
+  }
+
+  const handleColorSelect = (index: number) => {
+    const applyColor = applyColors[index]
     onChange({
       ...style,
-      backgroundColor: color.value === (isDark ? '#171717' : '#ffffff') ? undefined : color.value,
+      backgroundColor: applyColor.value === (isDark ? '#202124' : '#ffffff') ? undefined : applyColor.value,
       backgroundImage: undefined,
       backgroundFilter: undefined,
     })
   }
+
+  // Find which color index is currently selected
+  const getSelectedIndex = () => {
+    if (!style?.backgroundColor) return 0 // Default
+    const index = applyColors.findIndex(c => c.value === style.backgroundColor)
+    return index >= 0 ? index : 0
+  }
+  const selectedIndex = getSelectedIndex()
 
   const handleImageUpload = useCallback(async (file: File) => {
     try {
@@ -154,32 +170,35 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
   const hasCustomStyle = style?.backgroundColor || style?.backgroundImage
 
   return (
-    <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger asChild>
-        <span>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                className={cn(
-                  'p-2 sm:p-1.5 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors touch-manipulation',
-                  hasCustomStyle && 'bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-white'
-                )}
-              >
-                <Palette className="w-5 h-5 sm:w-[18px] sm:h-[18px]" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="top">{t('stylePicker.colorAndBackground')}</TooltipContent>
-          </Tooltip>
-        </span>
-      </Popover.Trigger>
+    <Popover.Root open={open} onOpenChange={handleOpenChange}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Popover.Trigger asChild>
+            <button
+              className={cn(
+                'p-2 sm:p-1.5 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors touch-manipulation',
+                hasCustomStyle && 'bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-white'
+              )}
+            >
+              <Palette className="w-5 h-5 sm:w-[18px] sm:h-[18px]" />
+            </button>
+          </Popover.Trigger>
+        </TooltipTrigger>
+        <TooltipContent side="top">{t('stylePicker.colorAndBackground')}</TooltipContent>
+      </Tooltip>
 
-      <Popover.Portal>
-        <Popover.Content
-          side="top"
-          align="start"
-          sideOffset={8}
-          className="z-[100] w-72 bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 p-3 animate-in fade-in-0 zoom-in-95"
-        >
+      <Popover.Content
+        side="top"
+        align="center"
+        sideOffset={8}
+        collisionPadding={16}
+        avoidCollisions={true}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
+        onClick={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+        className="z-[100] w-[280px] max-w-[calc(100vw-32px)] bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 p-3 animate-in fade-in-0 zoom-in-95"
+      >
           {/* Tabs */}
           <div className="flex gap-1 mb-3">
             <button
@@ -208,20 +227,20 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
 
           {tab === 'color' && (
             <div className="grid grid-cols-6 gap-2">
-              {colors.map((color) => (
+              {displayColors.map((color, index) => (
                 <Tooltip key={color.name}>
                   <TooltipTrigger asChild>
                     <button
-                      onClick={() => handleColorSelect(color)}
+                      onClick={() => handleColorSelect(index)}
                       className={cn(
                         'w-8 h-8 rounded-full border-2 transition-all hover:scale-110 flex items-center justify-center',
-                        style?.backgroundColor === color.value || (!style?.backgroundColor && color.name === 'Default')
+                        selectedIndex === index
                           ? 'border-neutral-900 dark:border-white'
-                          : 'border-neutral-300 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-500'
+                          : 'border-neutral-300 dark:border-neutral-600'
                       )}
                       style={{ backgroundColor: color.value }}
                     >
-                      {(style?.backgroundColor === color.value || (!style?.backgroundColor && color.name === 'Default')) && (
+                      {selectedIndex === index && (
                         <Check className="w-4 h-4" style={{ color: color.textColor }} />
                       )}
                     </button>
@@ -350,7 +369,6 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
 
           <Popover.Arrow className="fill-white dark:fill-neutral-800" />
         </Popover.Content>
-      </Popover.Portal>
     </Popover.Root>
   )
 }

@@ -166,7 +166,9 @@ class DriveShare {
 
   // Share note with email
   async shareWithEmail(fileId: string, email: string, role: 'reader' | 'writer' = 'reader'): Promise<void> {
-    await this.request(`${DRIVE_API}/files/${fileId}/permissions`, {
+    // Use sendNotificationEmail=true to ensure the file appears in recipient's "Shared with me"
+    // and supportsAllDrives=true for full Drive support
+    await this.request(`${DRIVE_API}/files/${fileId}/permissions?sendNotificationEmail=true&supportsAllDrives=true`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -181,8 +183,9 @@ class DriveShare {
   async getSharedWithMe(): Promise<Note[]> {
     // Query for files shared with me that look like G-Note files
     // Note: Don't filter by mimeType as Google Drive may not always detect it correctly
+    // Use supportsAllDrives=true and includeItemsFromAllDrives=true for full Drive support
     const query = `sharedWithMe = true and (name contains '[G-Note]' or name contains 'note-') and name contains '.json' and trashed = false`
-    const url = `${DRIVE_API}/files?q=${encodeURIComponent(query)}&fields=files(id,name,mimeType,owners)`
+    const url = `${DRIVE_API}/files?q=${encodeURIComponent(query)}&fields=files(id,name,mimeType,owners)&supportsAllDrives=true&includeItemsFromAllDrives=true`
     
     const response = await this.request(url)
     const data = await response.json()
