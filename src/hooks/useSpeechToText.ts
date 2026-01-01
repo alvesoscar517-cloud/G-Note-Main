@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import SpeechRecognition, { useSpeechRecognition as useLibSpeechRecognition } from 'react-speech-recognition'
+import { useIsTouchDevice } from './useIsTouchDevice'
 
 // Language mapping from i18n locale to Web Speech API language code
 const LOCALE_TO_SPEECH_LANG: Record<string, string> = {
@@ -57,6 +58,7 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
     onError,
   } = options
 
+  const isTouchDevice = useIsTouchDevice()
   const [error, setError] = useState<string | null>(null)
   const [accumulatedTranscript, setAccumulatedTranscript] = useState('')
   const [isManuallyListening, setIsManuallyListening] = useState(false)
@@ -131,9 +133,14 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
 
   const stopListening = useCallback(() => {
     setIsManuallyListening(false)
-    SpeechRecognition.stopListening()
+    // On mobile, stopListening() is not reliable, so we use abortListening()
+    if (isTouchDevice) {
+      SpeechRecognition.abortListening()
+    } else {
+      SpeechRecognition.stopListening()
+    }
     setError(null)
-  }, [])
+  }, [isTouchDevice])
 
   const toggleListening = useCallback(() => {
     if (listening || isManuallyListening) {
