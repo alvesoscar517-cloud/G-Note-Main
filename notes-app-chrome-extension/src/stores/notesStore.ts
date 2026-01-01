@@ -180,7 +180,7 @@ interface NotesState {
   // Sync actions
   syncWithDrive: (accessToken: string) => Promise<void>
   checkDriveHasData: (accessToken: string) => Promise<boolean>
-  loadSharedNotes: (accessToken: string) => Promise<void>
+  loadSharedNotes: (accessToken: string, forceRefresh?: boolean) => Promise<void>
   markAllSynced: () => void
   initOfflineStorage: () => Promise<void>
   saveToOfflineStorage: () => Promise<void>
@@ -988,7 +988,7 @@ export const useNotesStore = create<NotesState>()(
         }
       },
 
-      loadSharedNotes: async (accessToken: string) => {
+      loadSharedNotes: async (accessToken: string, forceRefresh: boolean = false) => {
         const isOnline = useNetworkStore.getState().isOnline
         if (!isOnline) {
           console.log('[NotesStore] Offline, skipping shared notes load')
@@ -996,8 +996,10 @@ export const useNotesStore = create<NotesState>()(
         }
         
         try {
+          console.log('[NotesStore] Loading shared notes...', forceRefresh ? '(force refresh)' : '')
           driveShare.setAccessToken(accessToken)
-          const shared = await driveShare.getSharedWithMe()
+          const shared = await driveShare.getSharedWithMe(forceRefresh)
+          console.log('[NotesStore] Shared notes loaded:', shared.length)
           set({ sharedNotes: shared })
         } catch (error) {
           console.error('Failed to load shared notes:', error)

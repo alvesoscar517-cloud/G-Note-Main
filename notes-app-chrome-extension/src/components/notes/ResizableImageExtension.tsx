@@ -10,6 +10,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/ContextMenu'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { ImageEditor } from './ImageEditor'
 
 // Extend commands interface
@@ -191,67 +192,79 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
                 onMouseDown={(e) => e.stopPropagation()}
                 onPointerDown={(e) => e.stopPropagation()}
               >
-                <button
-                  type="button"
-                  title={t('imageEditor.edit')}
-                  onClick={(e) => { 
-                    e.preventDefault()
-                    e.stopPropagation()
-                    // Blur any focused element to prevent keyboard from opening
-                    if (document.activeElement instanceof HTMLElement) {
-                      document.activeElement.blur()
-                    }
-                    setShowEditor(true) 
-                  }}
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  onPointerDown={(e) => {
-                    e.stopPropagation()
-                  }}
-                  className="p-1.5 rounded hover:bg-neutral-700 text-white transition-colors"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  title={t('contextMenu.download')}
-                  onClick={(e) => { 
-                    e.preventDefault()
-                    e.stopPropagation()
-                    handleDownloadImage()
-                  }}
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  onPointerDown={(e) => {
-                    e.stopPropagation()
-                  }}
-                  className="p-1.5 rounded hover:bg-neutral-700 text-white transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  title={t('imageEditor.delete')}
-                  onClick={(e) => { 
-                    e.preventDefault()
-                    e.stopPropagation()
-                    deleteNode() 
-                  }}
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  onPointerDown={(e) => {
-                    e.stopPropagation()
-                  }}
-                  className="p-1.5 rounded hover:bg-neutral-700 text-white transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={(e) => { 
+                        e.preventDefault()
+                        e.stopPropagation()
+                        // Blur any focused element to prevent keyboard from opening
+                        if (document.activeElement instanceof HTMLElement) {
+                          document.activeElement.blur()
+                        }
+                        setShowEditor(true) 
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                      }}
+                      onPointerDown={(e) => {
+                        e.stopPropagation()
+                      }}
+                      className="p-1.5 rounded hover:bg-neutral-700 text-white transition-colors"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{t('imageEditor.edit')}</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={(e) => { 
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleDownloadImage()
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                      }}
+                      onPointerDown={(e) => {
+                        e.stopPropagation()
+                      }}
+                      className="p-1.5 rounded hover:bg-neutral-700 text-white transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{t('contextMenu.download')}</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={(e) => { 
+                        e.preventDefault()
+                        e.stopPropagation()
+                        deleteNode() 
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                      }}
+                      onPointerDown={(e) => {
+                        e.stopPropagation()
+                      }}
+                      className="p-1.5 rounded hover:bg-neutral-700 text-white transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">{t('imageEditor.delete')}</TooltipContent>
+                </Tooltip>
               </div>
             )}
           </div>

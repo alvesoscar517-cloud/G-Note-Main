@@ -156,22 +156,26 @@ function EditableTitle({
   const displayValue = value?.replace(/\s+/g, ' ').trimEnd() || placeholder
 
   return (
-    <div
-      onClick={() => setIsEditing(true)}
-      className={cn(
-        'overflow-hidden cursor-text',
-        !value && 'text-neutral-400',
-        className
-      )}
-      style={{
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        wordBreak: 'break-all'
-      }}
-      title={value || placeholder}
-    >
-      {displayValue}
-    </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div
+          onClick={() => setIsEditing(true)}
+          className={cn(
+            'overflow-hidden cursor-text',
+            !value && 'text-neutral-400',
+            className
+          )}
+          style={{
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            wordBreak: 'break-all'
+          }}
+        >
+          {displayValue}
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">{value || placeholder}</TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -1189,24 +1193,25 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         <div className="md:hidden flex items-center gap-1 px-4 pt-2">
           <div className="flex -space-x-1">
             {collaborators.slice(0, 2).map((collab, i) => (
-              collab.picture ? (
-                <img
-                  key={i}
-                  src={collab.picture}
-                  alt={collab.name}
-                  className="w-5 h-5 rounded-full border border-white dark:border-neutral-900 object-cover"
-                  title={collab.name}
-                />
-              ) : (
-                <div
-                  key={i}
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-medium text-white border border-white dark:border-neutral-900"
-                  style={{ backgroundColor: collab.color }}
-                  title={collab.name}
-                >
-                  {collab.name.charAt(0).toUpperCase()}
-                </div>
-              )
+              <Tooltip key={i}>
+                <TooltipTrigger asChild>
+                  {collab.picture ? (
+                    <img
+                      src={collab.picture}
+                      alt={collab.name}
+                      className="w-5 h-5 rounded-full border border-white dark:border-neutral-900 object-cover"
+                    />
+                  ) : (
+                    <div
+                      className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-medium text-white border border-white dark:border-neutral-900"
+                      style={{ backgroundColor: collab.color }}
+                    >
+                      {collab.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </TooltipTrigger>
+                <TooltipContent side="bottom">{collab.name}</TooltipContent>
+              </Tooltip>
             ))}
           </div>
           <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
@@ -1245,24 +1250,25 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             <div className="hidden md:flex items-center gap-1">
               <div className="flex -space-x-1">
                 {collaborators.slice(0, 3).map((collab, i) => (
-                  collab.picture ? (
-                    <img
-                      key={i}
-                      src={collab.picture}
-                      alt={collab.name}
-                      className="w-6 h-6 rounded-full border-2 border-white dark:border-neutral-900 object-cover"
-                      title={collab.name}
-                    />
-                  ) : (
-                    <div
-                      key={i}
-                      className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium text-white border-2 border-white dark:border-neutral-900"
-                      style={{ backgroundColor: collab.color }}
-                      title={collab.name}
-                    >
-                      {collab.name.charAt(0).toUpperCase()}
-                    </div>
-                  )
+                  <Tooltip key={i}>
+                    <TooltipTrigger asChild>
+                      {collab.picture ? (
+                        <img
+                          src={collab.picture}
+                          alt={collab.name}
+                          className="w-6 h-6 rounded-full border-2 border-white dark:border-neutral-900 object-cover"
+                        />
+                      ) : (
+                        <div
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium text-white border-2 border-white dark:border-neutral-900"
+                          style={{ backgroundColor: collab.color }}
+                        >
+                          {collab.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">{collab.name}</TooltipContent>
+                  </Tooltip>
                 ))}
                 {collaborators.length > 3 && (
                   <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium bg-neutral-300 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-200 border-2 border-white dark:border-neutral-900">

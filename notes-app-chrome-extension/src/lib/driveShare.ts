@@ -180,17 +180,27 @@ class DriveShare {
   }
 
   // Get notes shared with me
-  async getSharedWithMe(): Promise<Note[]> {
+  async getSharedWithMe(forceRefresh: boolean = false): Promise<Note[]> {
     // Query for files shared with me that look like G-Note files
     // Note: Don't filter by mimeType as Google Drive may not always detect it correctly
     // Use supportsAllDrives=true and includeItemsFromAllDrives=true for full Drive support
+    // Add orderBy to get newest files first, and sharedWithMeTime for better detection
     const query = `sharedWithMe = true and (name contains '[G-Note]' or name contains 'note-') and name contains '.json' and trashed = false`
-    const url = `${DRIVE_API}/files?q=${encodeURIComponent(query)}&fields=files(id,name,mimeType,owners)&supportsAllDrives=true&includeItemsFromAllDrives=true`
     
-    const response = await this.request(url)
+    // Build URL with additional fields for better shared file detection
+    // Include sharedWithMeTime and modifiedTime to help with ordering
+    const url = `${DRIVE_API}/files?q=${encodeURIComponent(query)}&fields=files(id,name,mimeType,owners,sharedWithMeTime,modifiedTime)&supportsAllDrives=true&includeItemsFromAllDrives=true&orderBy=sharedWithMeTime desc`
+    
+    // Use Cache-Control header for force refresh instead of query param
+    const headers: Record<string, string> = {}
+    if (forceRefresh) {
+      headers['Cache-Control'] = 'no-cache'
+    }
+    
+    const response = await this.request(url, { headers })
     const data = await response.json()
     
-    console.log('[DriveShare] Shared files found:', data.files?.length || 0, data.files?.map((f: { name: string }) => f.name))
+    console.log('[DriveShare] Shared files found:', data.files?.length || 0, data.files?.map((f: { name: string; sharedWithMeTime?: string }) => `${f.name} (shared: ${f.sharedWithMeTime || 'unknown'})`))
     
     const notes: Note[] = []
     
@@ -210,7 +220,8 @@ class DriveShare {
             ...noteData,
             driveFileId: file.id,
             isShared: true,
-            sharedBy: file.owners?.[0]?.emailAddress || 'Unknown'
+            sharedBy: file.owners?.[0]?.emailAddress || 'Unknown',
+            sharedWithMeTime: file.sharedWithMeTime ? new Date(file.sharedWithMeTime).getTime() : undefined
           })
         }
       } catch (e) {

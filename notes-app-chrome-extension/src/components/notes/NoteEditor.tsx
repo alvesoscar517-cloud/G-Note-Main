@@ -155,22 +155,26 @@ function EditableTitle({
   const displayValue = value?.replace(/\s+/g, ' ').trimEnd() || placeholder
 
   return (
-    <div
-      onClick={() => setIsEditing(true)}
-      className={cn(
-        'overflow-hidden cursor-text',
-        !value && 'text-neutral-400',
-        className
-      )}
-      style={{
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        wordBreak: 'break-all'
-      }}
-      title={value || placeholder}
-    >
-      {displayValue}
-    </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div
+          onClick={() => setIsEditing(true)}
+          className={cn(
+            'overflow-hidden cursor-text',
+            !value && 'text-neutral-400',
+            className
+          )}
+          style={{
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            wordBreak: 'break-all'
+          }}
+        >
+          {displayValue}
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">{value || placeholder}</TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -1194,14 +1198,17 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             <div className="hidden md:flex items-center gap-1">
               <div className="flex -space-x-1">
                 {collaborators.slice(0, 3).map((collab, i) => (
-                  <div
-                    key={i}
-                    className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium text-white border-2 border-white dark:border-neutral-900"
-                    style={{ backgroundColor: collab.color }}
-                    title={collab.name}
-                  >
-                    {collab.name.charAt(0).toUpperCase()}
-                  </div>
+                  <Tooltip key={i}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium text-white border-2 border-white dark:border-neutral-900"
+                        style={{ backgroundColor: collab.color }}
+                      >
+                        {collab.name.charAt(0).toUpperCase()}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">{collab.name}</TooltipContent>
+                  </Tooltip>
                 ))}
                 {collaborators.length > 3 && (
                   <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium bg-neutral-300 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-200 border-2 border-white dark:border-neutral-900">
@@ -1251,14 +1258,17 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <div className="hidden md:flex items-center gap-1">
                 <div className="flex -space-x-1">
                   {collaborators.slice(0, 3).map((collab, i) => (
-                    <div
-                      key={i}
-                      className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium text-white border-2 border-white dark:border-neutral-900"
-                      style={{ backgroundColor: collab.color }}
-                      title={collab.name}
-                    >
-                      {collab.name.charAt(0).toUpperCase()}
-                    </div>
+                    <Tooltip key={i}>
+                      <TooltipTrigger asChild>
+                        <div
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium text-white border-2 border-white dark:border-neutral-900"
+                          style={{ backgroundColor: collab.color }}
+                        >
+                          {collab.name.charAt(0).toUpperCase()}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">{collab.name}</TooltipContent>
+                    </Tooltip>
                   ))}
                   {collaborators.length > 3 && (
                     <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium bg-neutral-300 dark:bg-neutral-600 text-neutral-700 dark:text-neutral-200 border-2 border-white dark:border-neutral-900">
