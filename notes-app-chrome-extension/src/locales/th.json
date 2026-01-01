@@ -48,13 +48,6 @@
     "modalSizeDefault": "ค่าเริ่มต้น",
     "modalSizeLarge": "ใหญ่",
     "modalSizeXLarge": "ใหญ่มาก",
-    "displayMode": "โหมดการแสดงผล",
-    "displayModeDescription": "วิธีเปิดแอป",
-    "fullscreen": "เต็มหน้าจอ",
-    "fullscreenDesc": "เปิดในแท็บใหม่",
-    "sidePanel": "แผงด้านข้าง",
-    "sidePanelDesc": "เปิดในแผงด้านข้าง",
-    "displayModeHint": "การเปลี่ยนแปลงจะมีผลเมื่อคุณคลิกไอคอนส่วนขยายครั้งถัดไป",
     "offlineLogoutTitle": "ออกจากระบบขณะออฟไลน์?",
     "offlineLogoutWarning": "คุณออฟไลน์อยู่ การเปลี่ยนแปลงที่ยังไม่ได้บันทึกอาจยังไม่ได้ซิงค์กับ Google Drive หากคุณออกจากระบบตอนนี้ คุณอาจสูญเสียการเปลี่ยนแปลงเหล่านั้น",
     "logoutAnyway": "ออกจากระบบต่อไป"
@@ -175,7 +168,7 @@
     "start": "เริ่มเซสชัน",
     "stopSharing": "สิ้นสุดเซสชัน",
     "email": "อีเมล",
-    "emailDescription": "แชร์ผ่านอีเมล Google Drive:",
+    "emailDescription": "แชร์โดยตรงกับผู้ใช้ G-Note คนอื่น:",
     "emailPlaceholder": "อีเมลผู้รับ...",
     "shareSuccess": "แชร์สำเร็จ!",
     "shareButton": "แชร์",
@@ -186,7 +179,10 @@
     "roomNotFound": "ไม่พบห้อง กรุณาตรวจสอบรหัสและลองอีกครั้ง",
     "close": "ปิด",
     "error": "ไม่สามารถแชร์ได้",
-    "sessionExpired": "เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง"
+    "sessionExpired": "เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง",
+    "fileTooLarge": "โน้ตใหญ่เกินไปที่จะแชร์ (สูงสุด 1 MB) ลองลบรูปภาพออก",
+    "userNotFound": "ไม่พบผู้ใช้ พวกเขาต้องมีบัญชี G-Note เพื่อรับโน้ตที่แชร์",
+    "emailSent": "แชร์โน้ตแล้ว! ส่งการแจ้งเตือนทางอีเมลแล้ว"
   },
   "versionHistory": {
     "title": "ประวัติเวอร์ชัน",

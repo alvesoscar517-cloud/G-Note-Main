@@ -165,7 +165,7 @@
     "start": "开始会话",
     "stopSharing": "结束会话",
     "email": "邮件",
-    "emailDescription": "通过 Google Drive 邮件分享：",
+    "emailDescription": "直接分享给其他 G-Note 用户：",
     "emailPlaceholder": "收件人邮箱...",
     "shareSuccess": "分享成功！",
     "shareButton": "分享",
@@ -176,7 +176,10 @@
     "roomNotFound": "房间不存在。请检查代码后重试。",
     "close": "关闭",
     "error": "无法分享",
-    "sessionExpired": "会话已过期。请重新登录。"
+    "sessionExpired": "会话已过期。请重新登录。",
+    "fileTooLarge": "笔记太大无法分享（最大1MB）。请尝试删除一些图片。",
+    "userNotFound": "未找到用户。对方需要有 G-Note 账户才能接收分享的笔记。",
+    "emailSent": "已分享！邮件通知已发送。"
   },
   "versionHistory": {
     "title": "版本历史",

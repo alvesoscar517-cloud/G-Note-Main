@@ -6,6 +6,7 @@ import userRoutes from './routes/users.js'
 import aiRoutes from './routes/ai.js'
 import webhookRoutes from './routes/webhooks.js'
 import driveRoutes from './routes/drive.js'
+import shareRoutes from './routes/share.js'
 import { getConfiguredPlatforms } from './config/google.js'
 import { setupSignaling, getRoomInfo } from './signaling.js'
 
@@ -80,6 +81,7 @@ app.use('/auth', authRoutes)
 app.use('/users', userRoutes)
 app.use('/ai', aiRoutes)
 app.use('/drive', driveRoutes)
+app.use('/share', shareRoutes)
 
 // Health check
 app.get('/health', (req, res) => {

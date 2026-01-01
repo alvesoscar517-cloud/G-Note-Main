@@ -165,7 +165,7 @@
     "start": "Iniciar sessão",
     "stopSharing": "Encerrar sessão",
     "email": "E-mail",
-    "emailDescription": "Compartilhar por e-mail do Google Drive:",
+    "emailDescription": "Compartilhar diretamente com outro usuário G-Note:",
     "emailPlaceholder": "E-mail do destinatário...",
     "shareSuccess": "Compartilhado com sucesso!",
     "shareButton": "Compartilhar",
@@ -176,7 +176,10 @@
     "roomNotFound": "Sala não encontrada. Verifique o código e tente novamente.",
     "close": "Fechar",
     "error": "Não foi possível compartilhar",
-    "sessionExpired": "Sessão expirada. Faça login novamente."
+    "sessionExpired": "Sessão expirada. Faça login novamente.",
+    "fileTooLarge": "A nota é muito grande para compartilhar (máx. 1 MB). Tente remover imagens.",
+    "userNotFound": "Usuário não encontrado. Eles precisam de uma conta G-Note para receber notas compartilhadas.",
+    "emailSent": "Nota compartilhada! Uma notificação por e-mail foi enviada."
   },
   "versionHistory": {
     "title": "Histórico de versões",

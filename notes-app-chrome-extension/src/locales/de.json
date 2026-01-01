@@ -47,14 +47,7 @@
     "modalSizeDescription": "Größe des Notizeditors anpassen",
     "modalSizeDefault": "Standard",
     "modalSizeLarge": "Groß",
-    "modalSizeXLarge": "Sehr groß",
-    "displayMode": "Anzeigemodus",
-    "displayModeDescription": "Wie die App geöffnet wird",
-    "fullscreen": "Vollbild",
-    "fullscreenDesc": "In neuem Tab öffnen",
-    "sidePanel": "Seitenleiste",
-    "sidePanelDesc": "In Seitenleiste öffnen",
-    "displayModeHint": "Änderungen werden beim nächsten Klick auf das Erweiterungssymbol wirksam."
+    "modalSizeXLarge": "Sehr groß"
   },
   "credits": {
     "title": "AI-Credits kaufen",
@@ -172,7 +165,7 @@
     "start": "Sitzung starten",
     "stopSharing": "Sitzung beenden",
     "email": "E-Mail",
-    "emailDescription": "Per Google Drive E-Mail teilen:",
+    "emailDescription": "Direkt mit einem anderen G-Note-Benutzer teilen:",
     "emailPlaceholder": "Empfänger-E-Mail...",
     "shareSuccess": "Erfolgreich geteilt!",
     "shareButton": "Teilen",
@@ -183,7 +176,10 @@
     "roomNotFound": "Raum nicht gefunden. Bitte überprüfen Sie den Code und versuchen Sie es erneut.",
     "close": "Schließen",
     "error": "Teilen nicht möglich",
-    "sessionExpired": "Sitzung abgelaufen. Bitte melden Sie sich erneut an."
+    "sessionExpired": "Sitzung abgelaufen. Bitte melden Sie sich erneut an.",
+    "fileTooLarge": "Notiz ist zu groß zum Teilen (max. 1 MB). Versuchen Sie, Bilder zu entfernen.",
+    "userNotFound": "Benutzer nicht gefunden. Sie benötigen ein G-Note-Konto, um geteilte Notizen zu empfangen.",
+    "emailSent": "Notiz geteilt! Eine E-Mail-Benachrichtigung wurde gesendet."
   },
   "versionHistory": {
     "title": "Versionsverlauf",

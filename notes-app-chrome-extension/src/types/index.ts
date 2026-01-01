@@ -24,6 +24,8 @@ export interface Note {
   driveFileId?: string
   isShared?: boolean
   sharedBy?: string
+  sharedByName?: string        // Name of the person who shared
+  shareId?: string             // Firestore document ID for shared notes
   collectionId?: string
   style?: NoteStyle
   isDeleted?: boolean

@@ -165,7 +165,7 @@
     "start": "Start session",
     "stopSharing": "End session",
     "email": "Email",
-    "emailDescription": "Share via Google Drive with email:",
+    "emailDescription": "Share directly with another G-Note user:",
     "emailPlaceholder": "Recipient email...",
     "shareSuccess": "Shared successfully!",
     "shareButton": "Share",
@@ -176,7 +176,10 @@
     "roomNotFound": "Room not found. Please check the code and try again.",
     "close": "Close",
     "error": "Unable to share",
-    "sessionExpired": "Session expired. Please sign in again."
+    "sessionExpired": "Session expired. Please sign in again.",
+    "fileTooLarge": "Note is too large to share (max 1MB). Try removing images.",
+    "userNotFound": "User not found. They need a G-Note account to receive shared notes.",
+    "emailSent": "Note shared! An email notification has been sent."
   },
   "versionHistory": {
     "title": "Version history",

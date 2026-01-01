@@ -48,13 +48,6 @@
     "modalSizeDefault": "Default",
     "modalSizeLarge": "Besar",
     "modalSizeXLarge": "Sangat besar",
-    "displayMode": "Mode tampilan",
-    "displayModeDescription": "Cara aplikasi dibuka",
-    "fullscreen": "Layar penuh",
-    "fullscreenDesc": "Buka di tab baru",
-    "sidePanel": "Panel samping",
-    "sidePanelDesc": "Buka di panel samping",
-    "displayModeHint": "Perubahan akan diterapkan saat Anda mengklik ikon ekstensi berikutnya.",
     "offlineLogoutTitle": "Keluar saat offline?",
     "offlineLogoutWarning": "Anda sedang offline. Perubahan yang belum disimpan mungkin belum disinkronkan ke Google Drive. Jika Anda keluar sekarang, Anda mungkin kehilangan perubahan tersebut.",
     "logoutAnyway": "Tetap keluar"
@@ -175,7 +168,7 @@
     "start": "Mulai sesi",
     "stopSharing": "Akhiri sesi",
     "email": "Email",
-    "emailDescription": "Bagikan melalui email Google Drive:",
+    "emailDescription": "Bagikan langsung dengan pengguna G-Note lain:",
     "emailPlaceholder": "Email penerima...",
     "shareSuccess": "Berhasil dibagikan!",
     "shareButton": "Bagikan",
@@ -186,7 +179,10 @@
     "roomNotFound": "Ruangan tidak ditemukan. Silakan periksa kode dan coba lagi.",
     "close": "Tutup",
     "error": "Tidak dapat membagikan",
-    "sessionExpired": "Sesi kedaluwarsa. Silakan masuk lagi."
+    "sessionExpired": "Sesi kedaluwarsa. Silakan masuk lagi.",
+    "fileTooLarge": "Catatan terlalu besar untuk dibagikan (maks 1 MB). Coba hapus gambar.",
+    "userNotFound": "Pengguna tidak ditemukan. Mereka memerlukan akun G-Note untuk menerima catatan yang dibagikan.",
+    "emailSent": "Catatan dibagikan! Notifikasi email telah dikirim."
   },
   "versionHistory": {
     "title": "Riwayat versi",

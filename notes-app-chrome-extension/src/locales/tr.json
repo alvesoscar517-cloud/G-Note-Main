@@ -48,13 +48,6 @@
     "modalSizeDefault": "Varsayılan",
     "modalSizeLarge": "Büyük",
     "modalSizeXLarge": "Çok büyük",
-    "displayMode": "Görüntüleme modu",
-    "displayModeDescription": "Uygulama nasıl açılır",
-    "fullscreen": "Tam ekran",
-    "fullscreenDesc": "Yeni sekmede aç",
-    "sidePanel": "Yan panel",
-    "sidePanelDesc": "Yan panelde aç",
-    "displayModeHint": "Değişiklikler, uzantı simgesine bir sonraki tıklamanızda uygulanacaktır.",
     "offlineLogoutTitle": "Çevrimdışıyken çıkış yap?",
     "offlineLogoutWarning": "Şu anda çevrimdışısınız. Kaydedilmemiş değişiklikler Google Drive ile senkronize edilmemiş olabilir. Şimdi çıkış yaparsanız bu değişiklikleri kaybedebilirsiniz.",
     "logoutAnyway": "Yine de çıkış yap"
@@ -175,7 +168,7 @@
     "start": "Oturumu başlat",
     "stopSharing": "Oturumu sonlandır",
     "email": "E-posta",
-    "emailDescription": "Google Drive e-postası ile paylaş:",
+    "emailDescription": "Başka bir G-Note kullanıcısıyla doğrudan paylaş:",
     "emailPlaceholder": "Alıcı e-postası...",
     "shareSuccess": "Başarıyla paylaşıldı!",
     "shareButton": "Paylaş",
@@ -186,7 +179,10 @@
     "roomNotFound": "Oda bulunamadı. Lütfen kodu kontrol edin ve tekrar deneyin.",
     "close": "Kapat",
     "error": "Paylaşılamıyor",
-    "sessionExpired": "Oturum süresi doldu. Lütfen tekrar giriş yapın."
+    "sessionExpired": "Oturum süresi doldu. Lütfen tekrar giriş yapın.",
+    "fileTooLarge": "Not paylaşmak için çok büyük (maks. 1 MB). Resimleri kaldırmayı deneyin.",
+    "userNotFound": "Kullanıcı bulunamadı. Paylaşılan notları almak için G-Note hesabına ihtiyaçları var.",
+    "emailSent": "Not paylaşıldı! E-posta bildirimi gönderildi."
   },
   "versionHistory": {
     "title": "Sürüm geçmişi",

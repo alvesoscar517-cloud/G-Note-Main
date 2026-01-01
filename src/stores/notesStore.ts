@@ -2,9 +2,10 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Note, Collection } from '@/types'
 import { generateId } from '@/lib/utils'
-import { driveShare } from '@/lib/driveShare'
+import { shareService, type SharedNote } from '@/lib/shareService'
 import { searchNotes, type SearchResult } from '@/lib/search'
 import { useNetworkStore } from '@/stores/networkStore'
+import { useAuthStore } from '@/stores/authStore'
 
 // Direct imports from new db layer
 import {
@@ -151,7 +152,7 @@ export async function flushPendingNoteUpdates(): Promise<void> {
 
 interface NotesState {
   notes: Note[]
-  sharedNotes: Note[]
+  sharedNotes: SharedNote[]
   collections: Collection[]
   deletedNoteIds: string[]
   deletedCollectionIds: string[]
@@ -180,7 +181,9 @@ interface NotesState {
   // Sync actions
   syncWithDrive: (accessToken: string) => Promise<void>
   checkDriveHasData: (accessToken: string) => Promise<boolean>
-  loadSharedNotes: (accessToken: string, forceRefresh?: boolean) => Promise<void>
+  loadSharedNotes: () => Promise<void>
+  acceptSharedNote: (shareId: string) => Promise<void>
+  declineSharedNote: (shareId: string) => Promise<void>
   markAllSynced: () => void
   initOfflineStorage: () => Promise<void>
   saveToOfflineStorage: () => Promise<void>
@@ -988,21 +991,82 @@ export const useNotesStore = create<NotesState>()(
         }
       },
 
-      loadSharedNotes: async (accessToken: string, forceRefresh: boolean = false) => {
+      loadSharedNotes: async () => {
         const isOnline = useNetworkStore.getState().isOnline
         if (!isOnline) {
           console.log('[NotesStore] Offline, skipping shared notes load')
           return
         }
         
+        const user = useAuthStore.getState().user
+        if (!user?.id) {
+          console.log('[NotesStore] No user, skipping shared notes load')
+          return
+        }
+        
         try {
-          console.log('[NotesStore] Loading shared notes...', forceRefresh ? '(force refresh)' : '')
-          driveShare.setAccessToken(accessToken)
-          const shared = await driveShare.getSharedWithMe(forceRefresh)
-          console.log('[NotesStore] Shared notes loaded:', shared.length)
+          const shared = await shareService.getReceivedNotes(user.id)
           set({ sharedNotes: shared })
         } catch (error) {
           console.error('Failed to load shared notes:', error)
+        }
+      },
+
+      acceptSharedNote: async (shareId: string) => {
+        const { sharedNotes, notes } = get()
+        const sharedNote = sharedNotes.find(n => n.shareId === shareId)
+        
+        if (!sharedNote) {
+          console.error('Shared note not found:', shareId)
+          return
+        }
+
+        try {
+          // Create a new note from the shared note data
+          const newNote: Note = {
+            id: generateId(),
+            title: sharedNote.title || '',
+            content: sharedNote.content || '',
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            isPinned: false,
+            syncStatus: 'pending',
+            version: 1,
+            style: sharedNote.style,
+            isShared: true,
+            sharedBy: sharedNote.sharedBy,
+            sharedByName: sharedNote.sharedByName
+          }
+
+          // Add to local notes
+          set({ 
+            notes: [newNote, ...notes],
+            sharedNotes: sharedNotes.filter(n => n.shareId !== shareId)
+          })
+
+          // Save to IndexedDB
+          await saveNoteWithQueue(newNote, { 
+            type: 'create', 
+            entityType: 'note', 
+            entityId: newNote.id, 
+            data: newNote 
+          })
+
+          // Mark as accepted on server (this deletes from Firestore)
+          await shareService.acceptSharedNote(shareId)
+        } catch (error) {
+          console.error('Failed to accept shared note:', error)
+        }
+      },
+
+      declineSharedNote: async (shareId: string) => {
+        const { sharedNotes } = get()
+        
+        try {
+          await shareService.declineSharedNote(shareId)
+          set({ sharedNotes: sharedNotes.filter(n => n.shareId !== shareId) })
+        } catch (error) {
+          console.error('Failed to decline shared note:', error)
         }
       },
 

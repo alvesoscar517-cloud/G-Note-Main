@@ -142,8 +142,8 @@ export function Header() {
       const accessToken = await getValidAccessToken()
       if (accessToken) {
         await syncWithDrive(accessToken)
-        // Also load shared notes after sync with force refresh to get latest shared files
-        await loadSharedNotes(accessToken, true)
+        // Also load shared notes after sync
+        await loadSharedNotes()
       }
     }
   }

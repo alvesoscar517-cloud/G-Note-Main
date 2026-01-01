@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { generateRoomId, sanitizeRoomId, isValidRoomId, checkRoomExists } from '@/lib/collaboration'
 import { driveShare } from '@/lib/driveShare'
+import { shareService } from '@/lib/shareService'
 import { useNotesStore } from '@/stores/notesStore'
 import { useNetworkStore } from '@/stores/networkStore'
+import { useAuthStore } from '@/stores/authStore'
 import { getValidAccessToken, TokenExpiredError } from '@/lib/tokenManager'
 
 interface ShareDialogProps {
@@ -33,6 +35,7 @@ export function ShareDialog({
   const { t } = useTranslation()
   const { getSelectedNote, updateNote } = useNotesStore()
   const isOnline = useNetworkStore(state => state.isOnline)
+  const user = useAuthStore(state => state.user)
   const note = getSelectedNote()
   
   const [copied, setCopied] = useState(false)
@@ -135,23 +138,45 @@ export function ShareDialog({
   }
 
   const handleShareViaEmail = async () => {
-    if (!shareEmail.trim() || !note) return
+    if (!shareEmail.trim() || !note || !user) return
     
     setIsSharing(true)
     setShareError(null)
     setShareSuccess(false)
     
     try {
-      // Get valid token (auto-refresh if expired)
-      const accessToken = await getValidAccessToken()
-      if (!accessToken) {
-        setShareError(t('share.sessionExpired'))
+      // Check note size locally first
+      const sizeCheck = shareService.checkNoteSize(note)
+      if (!sizeCheck.valid) {
+        setShareError(t('share.fileTooLarge'))
         return
       }
-      
-      driveShare.setAccessToken(accessToken)
-      const fileId = await driveShare.createShareableNote(note)
-      await driveShare.shareWithEmail(fileId, shareEmail.trim(), 'writer')
+
+      // Check if user exists
+      const userExists = await shareService.checkUserExists(shareEmail.trim())
+      if (!userExists) {
+        setShareError(t('share.userNotFound'))
+        return
+      }
+
+      // Share via Firestore
+      const result = await shareService.shareViaEmail(
+        note,
+        shareEmail.trim(),
+        user.email,
+        user.name
+      )
+
+      if (!result.success) {
+        if (result.error === 'FILE_TOO_LARGE') {
+          setShareError(t('share.fileTooLarge'))
+        } else if (result.error === 'USER_NOT_FOUND') {
+          setShareError(t('share.userNotFound'))
+        } else {
+          setShareError(result.message || t('share.error'))
+        }
+        return
+      }
       
       setShareSuccess(true)
       setShareEmail('')
@@ -161,11 +186,7 @@ export function ShareDialog({
       }, 2000)
     } catch (error) {
       console.error('Share failed:', error)
-      if (error instanceof TokenExpiredError) {
-        setShareError(t('share.sessionExpired'))
-      } else {
-        setShareError(error instanceof Error ? error.message : t('share.error'))
-      }
+      setShareError(t('share.error'))
     } finally {
       setIsSharing(false)
     }

@@ -168,7 +168,7 @@
     "start": "Sessie starten",
     "stopSharing": "Sessie beëindigen",
     "email": "E-mail",
-    "emailDescription": "Delen via Google Drive e-mail:",
+    "emailDescription": "Deel direct met een andere G-Note-gebruiker:",
     "emailPlaceholder": "E-mail ontvanger...",
     "shareSuccess": "Succesvol gedeeld!",
     "shareButton": "Delen",
@@ -179,7 +179,10 @@
     "roomNotFound": "Kamer niet gevonden. Controleer de code en probeer opnieuw.",
     "close": "Sluiten",
     "error": "Kan niet delen",
-    "sessionExpired": "Sessie verlopen. Log opnieuw in."
+    "sessionExpired": "Sessie verlopen. Log opnieuw in.",
+    "fileTooLarge": "Notitie is te groot om te delen (max 1 MB). Probeer afbeeldingen te verwijderen.",
+    "userNotFound": "Gebruiker niet gevonden. Ze hebben een G-Note-account nodig om gedeelde notities te ontvangen.",
+    "emailSent": "Notitie gedeeld! Er is een e-mailmelding verzonden."
   },
   "versionHistory": {
     "title": "Versiegeschiedenis",

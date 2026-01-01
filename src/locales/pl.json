@@ -168,7 +168,7 @@
     "start": "Rozpocznij sesję",
     "stopSharing": "Zakończ sesję",
     "email": "E-mail",
-    "emailDescription": "Udostępnij przez e-mail Google Drive:",
+    "emailDescription": "Udostępnij bezpośrednio innemu użytkownikowi G-Note:",
     "emailPlaceholder": "E-mail odbiorcy...",
     "shareSuccess": "Udostępniono pomyślnie!",
     "shareButton": "Udostępnij",
@@ -179,7 +179,10 @@
     "roomNotFound": "Pokój nie znaleziony. Sprawdź kod i spróbuj ponownie.",
     "close": "Zamknij",
     "error": "Nie można udostępnić",
-    "sessionExpired": "Sesja wygasła. Zaloguj się ponownie."
+    "sessionExpired": "Sesja wygasła. Zaloguj się ponownie.",
+    "fileTooLarge": "Notatka jest za duża do udostępnienia (maks. 1 MB). Spróbuj usunąć obrazy.",
+    "userNotFound": "Użytkownik nie znaleziony. Potrzebują konta G-Note, aby otrzymywać udostępnione notatki.",
+    "emailSent": "Notatka udostępniona! Wysłano powiadomienie e-mail."
   },
   "versionHistory": {
     "title": "Historia wersji",

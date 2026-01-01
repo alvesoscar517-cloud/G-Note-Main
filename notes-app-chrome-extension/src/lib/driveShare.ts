@@ -113,7 +113,7 @@ class DriveShare {
     return this.sharedFolderId!
   }
 
-  // Create a shareable file for a note
+  // Create a shareable file for a note (kept for backward compatibility, but not used for email share)
   async createShareableNote(note: Note): Promise<string> {
     const folderId = await this.getOrCreateSharedFolder()
     
@@ -164,74 +164,9 @@ class DriveShare {
     })
   }
 
-  // Share note with email
-  async shareWithEmail(fileId: string, email: string, role: 'reader' | 'writer' = 'reader'): Promise<void> {
-    // Use sendNotificationEmail=true to ensure the file appears in recipient's "Shared with me"
-    // and supportsAllDrives=true for full Drive support
-    await this.request(`${DRIVE_API}/files/${fileId}/permissions?sendNotificationEmail=true&supportsAllDrives=true`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'user',
-        role: role,
-        emailAddress: email
-      })
-    })
-  }
-
-  // Get notes shared with me
-  async getSharedWithMe(forceRefresh: boolean = false): Promise<Note[]> {
-    // Query for files shared with me that look like G-Note files
-    // Note: Don't filter by mimeType as Google Drive may not always detect it correctly
-    // Use supportsAllDrives=true and includeItemsFromAllDrives=true for full Drive support
-    // Add orderBy to get newest files first, and sharedWithMeTime for better detection
-    const query = `sharedWithMe = true and (name contains '[G-Note]' or name contains 'note-') and name contains '.json' and trashed = false`
-    
-    // Build URL with additional fields for better shared file detection
-    // Include sharedWithMeTime and modifiedTime to help with ordering
-    const url = `${DRIVE_API}/files?q=${encodeURIComponent(query)}&fields=files(id,name,mimeType,owners,sharedWithMeTime,modifiedTime)&supportsAllDrives=true&includeItemsFromAllDrives=true&orderBy=sharedWithMeTime desc`
-    
-    // Use Cache-Control header for force refresh instead of query param
-    const headers: Record<string, string> = {}
-    if (forceRefresh) {
-      headers['Cache-Control'] = 'no-cache'
-    }
-    
-    const response = await this.request(url, { headers })
-    const data = await response.json()
-    
-    console.log('[DriveShare] Shared files found:', data.files?.length || 0, data.files?.map((f: { name: string; sharedWithMeTime?: string }) => `${f.name} (shared: ${f.sharedWithMeTime || 'unknown'})`))
-    
-    const notes: Note[] = []
-    
-    for (const file of data.files || []) {
-      try {
-        // Only process files that match our naming pattern
-        if (!file.name.includes('note-') || !file.name.endsWith('.json')) {
-          continue
-        }
-        
-        const contentRes = await this.request(`${DRIVE_API}/files/${file.id}?alt=media`)
-        const noteData = await contentRes.json()
-        
-        // Validate that this is actually a note (has required fields)
-        if (noteData && noteData.id && (noteData.title !== undefined || noteData.content !== undefined)) {
-          notes.push({
-            ...noteData,
-            driveFileId: file.id,
-            isShared: true,
-            sharedBy: file.owners?.[0]?.emailAddress || 'Unknown',
-            sharedWithMeTime: file.sharedWithMeTime ? new Date(file.sharedWithMeTime).getTime() : undefined
-          })
-        }
-      } catch (e) {
-        console.error('Failed to load shared note:', file.name, e)
-      }
-    }
-    
-    console.log('[DriveShare] Valid shared notes loaded:', notes.length)
-    return notes
-  }
+  // NOTE: Email sharing is now handled via Firestore (see shareService.ts)
+  // The old shareWithEmail and getSharedWithMe methods have been removed
+  // as they required Drive permissions that users don't have for "Shared with me" files
 
   // Share note publicly (anyone with link) - creates new or updates existing
   async sharePublic(note: Note, existingFileId?: string): Promise<string> {

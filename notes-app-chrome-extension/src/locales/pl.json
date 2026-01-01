@@ -48,13 +48,6 @@
     "modalSizeDefault": "Domyślny",
     "modalSizeLarge": "Duży",
     "modalSizeXLarge": "Bardzo duży",
-    "displayMode": "Tryb wyświetlania",
-    "displayModeDescription": "Jak otwiera się aplikacja",
-    "fullscreen": "Pełny ekran",
-    "fullscreenDesc": "Otwórz w nowej karcie",
-    "sidePanel": "Panel boczny",
-    "sidePanelDesc": "Otwórz w panelu bocznym",
-    "displayModeHint": "Zmiany zostaną zastosowane przy następnym kliknięciu ikony rozszerzenia.",
     "offlineLogoutTitle": "Wylogować się offline?",
     "offlineLogoutWarning": "Jesteś obecnie offline. Niezapisane zmiany mogły nie zostać zsynchronizowane z Google Drive. Jeśli teraz się wylogujesz, możesz stracić te zmiany.",
     "logoutAnyway": "Wyloguj mimo to"
@@ -175,7 +168,7 @@
     "start": "Rozpocznij sesję",
     "stopSharing": "Zakończ sesję",
     "email": "E-mail",
-    "emailDescription": "Udostępnij przez e-mail Google Drive:",
+    "emailDescription": "Udostępnij bezpośrednio innemu użytkownikowi G-Note:",
     "emailPlaceholder": "E-mail odbiorcy...",
     "shareSuccess": "Udostępniono pomyślnie!",
     "shareButton": "Udostępnij",
@@ -186,7 +179,10 @@
     "roomNotFound": "Pokój nie znaleziony. Sprawdź kod i spróbuj ponownie.",
     "close": "Zamknij",
     "error": "Nie można udostępnić",
-    "sessionExpired": "Sesja wygasła. Zaloguj się ponownie."
+    "sessionExpired": "Sesja wygasła. Zaloguj się ponownie.",
+    "fileTooLarge": "Notatka jest za duża do udostępnienia (maks. 1 MB). Spróbuj usunąć obrazy.",
+    "userNotFound": "Użytkownik nie znaleziony. Potrzebują konta G-Note, aby otrzymywać udostępnione notatki.",
+    "emailSent": "Notatka udostępniona! Wysłano powiadomienie e-mail."
   },
   "versionHistory": {
     "title": "Historia wersji",

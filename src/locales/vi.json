@@ -165,7 +165,7 @@
     "start": "Bắt đầu phiên",
     "stopSharing": "Kết thúc phiên",
     "email": "Email",
-    "emailDescription": "Chia sẻ qua Google Drive với email:",
+    "emailDescription": "Chia sẻ trực tiếp với người dùng G-Note khác:",
     "emailPlaceholder": "Email người nhận...",
     "shareSuccess": "Đã chia sẻ thành công!",
     "shareButton": "Chia sẻ",
@@ -176,7 +176,10 @@
     "roomNotFound": "Không tìm thấy phòng. Vui lòng kiểm tra lại mã và thử lại.",
     "close": "Đóng",
     "error": "Không thể chia sẻ",
-    "sessionExpired": "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại."
+    "sessionExpired": "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.",
+    "fileTooLarge": "Ghi chú quá lớn để chia sẻ (tối đa 1MB). Hãy thử xóa bớt hình ảnh.",
+    "userNotFound": "Không tìm thấy người dùng. Họ cần có tài khoản G-Note để nhận ghi chú được chia sẻ.",
+    "emailSent": "Đã chia sẻ! Email thông báo đã được gửi."
   },
   "versionHistory": {
     "title": "Lịch sử phiên bản",

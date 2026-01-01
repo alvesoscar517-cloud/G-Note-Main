@@ -171,7 +171,7 @@ function AppContent() {
       }
       
       await syncWithDrive(accessToken)
-      await loadSharedNotes(accessToken)
+      await loadSharedNotes()
     }
 
     doSync()

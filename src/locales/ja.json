@@ -165,7 +165,7 @@
     "start": "セッション開始",
     "stopSharing": "セッション終了",
     "email": "メール",
-    "emailDescription": "Google Driveでメールで共有：",
+    "emailDescription": "他の G-Note ユーザーに直接共有：",
     "emailPlaceholder": "受信者のメール...",
     "shareSuccess": "共有しました！",
     "shareButton": "共有",
@@ -176,7 +176,10 @@
     "roomNotFound": "ルームが見つかりません。コードを確認して再試行してください。",
     "close": "閉じる",
     "error": "共有できません",
-    "sessionExpired": "セッションが期限切れです。再度ログインしてください。"
+    "sessionExpired": "セッションが期限切れです。再度ログインしてください。",
+    "fileTooLarge": "メモが大きすぎて共有できません（最大1MB）。画像を削除してみてください。",
+    "userNotFound": "ユーザーが見つかりません。共有メモを受け取るには G-Note アカウントが必要です。",
+    "emailSent": "共有しました！メール通知が送信されました。"
   },
   "versionHistory": {
     "title": "バージョン履歴",

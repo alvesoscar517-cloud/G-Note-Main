@@ -47,14 +47,7 @@
     "modalSizeDescription": "調整編輯器大小",
     "modalSizeDefault": "預設",
     "modalSizeLarge": "大",
-    "modalSizeXLarge": "超大",
-    "displayMode": "顯示模式",
-    "displayModeDescription": "應用程式開啟方式",
-    "fullscreen": "全螢幕",
-    "fullscreenDesc": "在新分頁中開啟",
-    "sidePanel": "側邊欄",
-    "sidePanelDesc": "在側邊欄中開啟",
-    "displayModeHint": "變更將在下次點擊擴充功能圖示時生效。"
+    "modalSizeXLarge": "超大"
   },
   "credits": {
     "title": "購買 AI 點數",
@@ -172,7 +165,7 @@
     "start": "開始會話",
     "stopSharing": "結束會話",
     "email": "電子郵件",
-    "emailDescription": "透過 Google Drive 電子郵件分享：",
+    "emailDescription": "直接分享給其他 G-Note 用戶：",
     "emailPlaceholder": "收件人電子郵件...",
     "shareSuccess": "分享成功！",
     "shareButton": "分享",
@@ -183,7 +176,10 @@
     "roomNotFound": "房間不存在。請檢查代碼後重試。",
     "close": "關閉",
     "error": "無法分享",
-    "sessionExpired": "會話已過期。請重新登入。"
+    "sessionExpired": "會話已過期。請重新登入。",
+    "fileTooLarge": "筆記太大無法分享（最大1MB）。請嘗試刪除一些圖片。",
+    "userNotFound": "找不到用戶。對方需要有 G-Note 帳戶才能接收分享的筆記。",
+    "emailSent": "已分享！郵件通知已發送。"
   },
   "versionHistory": {
     "title": "版本紀錄",

@@ -47,14 +47,7 @@
     "modalSizeDescription": "Regola dimensione editor",
     "modalSizeDefault": "Predefinita",
     "modalSizeLarge": "Grande",
-    "modalSizeXLarge": "Molto grande",
-    "displayMode": "Modalità di visualizzazione",
-    "displayModeDescription": "Come si apre l'app",
-    "fullscreen": "Schermo intero",
-    "fullscreenDesc": "Apri in nuova scheda",
-    "sidePanel": "Pannello laterale",
-    "sidePanelDesc": "Apri nel pannello laterale",
-    "displayModeHint": "Le modifiche verranno applicate al prossimo clic sull'icona dell'estensione."
+    "modalSizeXLarge": "Molto grande"
   },
   "credits": {
     "title": "Acquista crediti AI",
@@ -172,7 +165,7 @@
     "start": "Avvia sessione",
     "stopSharing": "Termina sessione",
     "email": "Email",
-    "emailDescription": "Condividi via email Google Drive:",
+    "emailDescription": "Condividi direttamente con un altro utente G-Note:",
     "emailPlaceholder": "Email destinatario...",
     "shareSuccess": "Condiviso con successo!",
     "shareButton": "Condividi",
@@ -183,7 +176,10 @@
     "roomNotFound": "Stanza non trovata. Controlla il codice e riprova.",
     "close": "Chiudi",
     "error": "Impossibile condividere",
-    "sessionExpired": "Sessione scaduta. Effettua nuovamente l'accesso."
+    "sessionExpired": "Sessione scaduta. Effettua nuovamente l'accesso.",
+    "fileTooLarge": "La nota è troppo grande per essere condivisa (max 1 MB). Prova a rimuovere le immagini.",
+    "userNotFound": "Utente non trovato. Hanno bisogno di un account G-Note per ricevere note condivise.",
+    "emailSent": "Nota condivisa! È stata inviata una notifica via email."
   },
   "versionHistory": {
     "title": "Cronologia versioni",

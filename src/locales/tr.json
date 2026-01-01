@@ -168,7 +168,7 @@
     "start": "Oturumu başlat",
     "stopSharing": "Oturumu sonlandır",
     "email": "E-posta",
-    "emailDescription": "Google Drive e-postası ile paylaş:",
+    "emailDescription": "Başka bir G-Note kullanıcısıyla doğrudan paylaş:",
     "emailPlaceholder": "Alıcı e-postası...",
     "shareSuccess": "Başarıyla paylaşıldı!",
     "shareButton": "Paylaş",
@@ -179,7 +179,10 @@
     "roomNotFound": "Oda bulunamadı. Lütfen kodu kontrol edin ve tekrar deneyin.",
     "close": "Kapat",
     "error": "Paylaşılamıyor",
-    "sessionExpired": "Oturum süresi doldu. Lütfen tekrar giriş yapın."
+    "sessionExpired": "Oturum süresi doldu. Lütfen tekrar giriş yapın.",
+    "fileTooLarge": "Not paylaşmak için çok büyük (maks. 1 MB). Resimleri kaldırmayı deneyin.",
+    "userNotFound": "Kullanıcı bulunamadı. Paylaşılan notları almak için G-Note hesabına ihtiyaçları var.",
+    "emailSent": "Not paylaşıldı! E-posta bildirimi gönderildi."
   },
   "versionHistory": {
     "title": "Sürüm geçmişi",
