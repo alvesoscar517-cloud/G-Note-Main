@@ -15,12 +15,17 @@ const getTransporter = () => {
     transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER,
+        user: process.env.EMAIL_USER, // Main account for authentication
         pass: process.env.EMAIL_APP_PASSWORD
       }
     })
   }
   return transporter
+}
+
+// Email sender address (can be alias of the main account)
+const getEmailFrom = () => {
+  return process.env.EMAIL_FROM || process.env.EMAIL_USER
 }
 
 // Check if user exists in the system
@@ -102,27 +107,77 @@ router.post('/email', async (req, res) => {
       const noteTitle = note.title || 'Untitled Note'
       
       try {
+        const emailFrom = getEmailFrom()
         await emailTransporter.sendMail({
-          from: `"G-Note" <${process.env.EMAIL_USER}>`,
+          from: `"G-Note" <${emailFrom}>`,
           to: recipientEmail,
           subject: `${senderName || senderEmail} shared a note with you`,
-          text: `${senderName || senderEmail} shared "${noteTitle}" with you.\n\nOpen G-Note to view: ${appUrl}`,
+          text: `${senderName || senderEmail} has shared a note with you on G-Note.\n\nNote: "${noteTitle}"\n\nOpen G-Note to view: ${appUrl}\n\n--\nG-Note\nThis is an automated message.`,
           html: `
-            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-              <h2 style="color: #333; margin-bottom: 16px;">New shared note</h2>
-              <p style="color: #666; font-size: 16px; line-height: 1.5;">
-                <strong>${senderName || senderEmail}</strong> shared a note with you:
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 480px; margin: 0 auto;">
+    <tr>
+      <td style="padding: 40px 24px;">
+        
+        <!-- Header -->
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding-bottom: 32px; border-bottom: 1px solid #e5e5e5;">
+              <span style="font-size: 20px; font-weight: 600; color: #171717;">G-Note</span>
+            </td>
+          </tr>
+        </table>
+        
+        <!-- Content -->
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding: 32px 0;">
+              <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #171717;">
+                <strong>${senderName || senderEmail}</strong> shared a note with you.
               </p>
-              <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
-                <p style="color: #333; font-size: 18px; font-weight: 500; margin: 0;">${noteTitle}</p>
-              </div>
-              <a href="${appUrl}" style="display: inline-block; background: #4F46E5; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 500;">
-                Open G-Note
-              </a>
-              <p style="color: #999; font-size: 12px; margin-top: 24px;">
-                This email was sent by G-Note. If you didn't expect this, you can ignore it.
-              </p>
-            </div>
+              
+              <!-- Note Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+                <tr>
+                  <td style="background-color: #fafafa; border: 1px solid #e5e5e5; padding: 16px;">
+                    <p style="margin: 0 0 4px 0; font-size: 12px; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">Note</p>
+                    <p style="margin: 0; font-size: 15px; color: #171717; font-weight: 500;">${noteTitle}</p>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Button -->
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background-color: #171717; padding: 12px 24px;">
+                    <a href="${appUrl}" style="color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">Open G-Note</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+        
+        <!-- Footer -->
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding-top: 32px; border-top: 1px solid #e5e5e5;">
+              <p style="margin: 0; font-size: 12px; color: #a3a3a3;">This is an automated message from G-Note.</p>
+            </td>
+          </tr>
+        </table>
+        
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
           `
         })
       } catch (emailError) {
