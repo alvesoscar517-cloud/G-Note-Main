@@ -120,46 +120,55 @@ router.post('/email', async (req, res) => {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+<body style="margin: 0; padding: 0; background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 480px; margin: 0 auto;">
     <tr>
       <td style="padding: 40px 24px;">
         
-        <!-- Header -->
-        <table width="100%" cellpadding="0" cellspacing="0">
+        <!-- Main Card -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden;">
           <tr>
-            <td style="padding-bottom: 32px; border-bottom: 1px solid #e5e5e5;">
-              <span style="font-size: 20px; font-weight: 600; color: #171717;">G-Note</span>
-            </td>
-          </tr>
-        </table>
-        
-        <!-- Content -->
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="padding: 32px 0;">
-              <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #171717;">
-                <strong>${senderName || senderEmail}</strong> shared a note with you.
-              </p>
+            <td style="padding: 32px 24px;">
               
-              <!-- Note Box -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+              <!-- Header -->
+              <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="background-color: #fafafa; border: 1px solid #e5e5e5; padding: 16px;">
-                    <p style="margin: 0 0 4px 0; font-size: 12px; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">Note</p>
-                    <p style="margin: 0; font-size: 15px; color: #171717; font-weight: 500;">${noteTitle}</p>
+                  <td style="padding-bottom: 24px; text-align: center;">
+                    <span style="font-size: 24px; font-weight: 700;"><span style="color: #EAB308;">G</span><span style="color: #171717;">-Note</span></span>
                   </td>
                 </tr>
               </table>
               
-              <!-- Button -->
-              <table cellpadding="0" cellspacing="0">
+              <!-- Content -->
+              <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="background-color: #171717; padding: 12px 24px;">
-                    <a href="${appUrl}" style="color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">Open G-Note</a>
+                  <td style="padding: 16px 0; text-align: center;">
+                    <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #171717;">
+                      <strong>${senderName || senderEmail}</strong> shared a note with you.
+                    </p>
+                    
+                    <!-- Note Box -->
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+                      <tr>
+                        <td style="background-color: #fafafa; border-radius: 12px; padding: 16px; text-align: left;">
+                          <p style="margin: 0 0 4px 0; font-size: 12px; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">Note</p>
+                          <p style="margin: 0; font-size: 15px; color: #171717; font-weight: 500;">${noteTitle}</p>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Button -->
+                    <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                      <tr>
+                        <td style="background-color: #171717; padding: 12px 24px; border-radius: 8px;">
+                          <a href="${appUrl}" style="color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">Open G-Note</a>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
+              
             </td>
           </tr>
         </table>
@@ -167,7 +176,7 @@ router.post('/email', async (req, res) => {
         <!-- Footer -->
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="padding-top: 32px; border-top: 1px solid #e5e5e5;">
+            <td style="padding-top: 24px; text-align: center;">
               <p style="margin: 0; font-size: 12px; color: #a3a3a3;">This is an automated message from G-Note.</p>
             </td>
           </tr>
