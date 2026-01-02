@@ -153,6 +153,12 @@
     "chatDescription": "Zapytaj mnie o cokolwiek dotyczącego tej notatki. Odpowiem na podstawie kontekstu notatki.",
     "send": "Wyślij"
   },
+  "sharedNotes": {
+    "title": "Udostępnione Tobie",
+    "empty": "Brak udostępnionych notatek",
+    "accept": "Akceptuj",
+    "decline": "Odrzuć"
+  },
   "share": {
     "title": "Udostępnij notatkę",
     "public": "Publiczny",

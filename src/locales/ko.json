@@ -150,6 +150,12 @@
     "chatDescription": "이 메모에 대해 무엇이든 물어보세요. 메모의 맥락을 바탕으로 답변하겠습니다.",
     "send": "보내기"
   },
+  "sharedNotes": {
+    "title": "공유된 메모",
+    "empty": "공유된 메모가 없습니다",
+    "accept": "수락",
+    "decline": "거절"
+  },
   "share": {
     "title": "메모 공유",
     "public": "공개",

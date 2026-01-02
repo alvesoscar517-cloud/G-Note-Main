@@ -6,7 +6,13 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip
 import { useSpeechToText, SpeechStatus } from '@/hooks/useSpeechToText'
 
 interface SpeechButtonProps {
-  onTranscript: (text: string, isFinal: boolean) => void
+  /**
+   * Called with transcript updates
+   * @param text - The text to insert
+   * @param isFinal - If true, this is confirmed text. If false, it's interim (may change)
+   * @param replaceLength - Number of characters to delete before inserting (for interim updates)
+   */
+  onTranscript: (text: string, isFinal: boolean, replaceLength?: number) => void
   disabled?: boolean
   className?: string
 }
@@ -25,8 +31,8 @@ export function SpeechButton({ onTranscript, disabled, className }: SpeechButton
     locale: i18n.language,
     continuous: true,
     interimResults: true,
-    onResult: (transcript, isFinal) => {
-      onTranscriptRef.current(transcript, isFinal)
+    onResult: (transcript, isFinal, replaceLength) => {
+      onTranscriptRef.current(transcript, isFinal, replaceLength)
     },
   })
 

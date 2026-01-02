@@ -150,6 +150,12 @@
     "chatDescription": "问我关于这个笔记的任何问题。我会根据笔记的内容回答。",
     "send": "发送"
   },
+  "sharedNotes": {
+    "title": "与您分享",
+    "empty": "没有分享的笔记",
+    "accept": "接受",
+    "decline": "拒绝"
+  },
   "share": {
     "title": "分享笔记",
     "public": "公开",

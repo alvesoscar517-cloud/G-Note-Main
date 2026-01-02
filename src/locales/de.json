@@ -150,6 +150,12 @@
     "chatDescription": "Fragen Sie mich alles über diese Notiz. Ich antworte basierend auf dem Kontext der Notiz.",
     "send": "Senden"
   },
+  "sharedNotes": {
+    "title": "Mit Ihnen geteilt",
+    "empty": "Keine geteilten Notizen",
+    "accept": "Akzeptieren",
+    "decline": "Ablehnen"
+  },
   "share": {
     "title": "Notiz teilen",
     "public": "Öffentlich",

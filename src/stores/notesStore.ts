@@ -1013,7 +1013,7 @@ export const useNotesStore = create<NotesState>()(
       },
 
       acceptSharedNote: async (shareId: string) => {
-        const { sharedNotes, notes } = get()
+        const { sharedNotes, notes, syncWithDrive } = get()
         const sharedNote = sharedNotes.find(n => n.shareId === shareId)
         
         if (!sharedNote) {
@@ -1052,8 +1052,21 @@ export const useNotesStore = create<NotesState>()(
             data: newNote 
           })
 
-          // Mark as accepted on server (this deletes from Firestore)
-          await shareService.acceptSharedNote(shareId)
+          // Mark as accepted on server FIRST (this deletes from Firestore)
+          // This prevents the note from being re-fetched on next login
+          const acceptResult = await shareService.acceptSharedNote(shareId)
+          if (!acceptResult) {
+            console.warn('[NotesStore] Failed to mark shared note as accepted on server')
+          }
+
+          // Trigger sync with Drive to upload the new note
+          const user = useAuthStore.getState().user
+          if (user?.accessToken) {
+            // Sync in background - don't await to avoid blocking UI
+            syncWithDrive(user.accessToken).catch(err => {
+              console.error('[NotesStore] Background sync after accept failed:', err)
+            })
+          }
         } catch (error) {
           console.error('Failed to accept shared note:', error)
         }
@@ -1383,8 +1396,8 @@ export const useNotesStore = create<NotesState>()(
       },
       
       getFilteredNotes: () => {
-        const { notes, sharedNotes, searchQuery } = get()
-        const allNotes = [...notes.filter(n => !n.isDeleted), ...sharedNotes]
+        const { notes, searchQuery } = get()
+        const allNotes = notes.filter(n => !n.isDeleted)
         
         if (!searchQuery.trim()) {
           return allNotes.sort((a, b) => {
@@ -1398,8 +1411,8 @@ export const useNotesStore = create<NotesState>()(
       },
 
       getSearchResults: () => {
-        const { notes, sharedNotes, searchQuery } = get()
-        const allNotes = [...notes.filter(n => !n.isDeleted), ...sharedNotes]
+        const { notes, searchQuery } = get()
+        const allNotes = notes.filter(n => !n.isDeleted)
         
         const sortedNotes = allNotes.sort((a, b) => {
           if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1
@@ -1414,8 +1427,8 @@ export const useNotesStore = create<NotesState>()(
       },
       
       getSelectedNote: () => {
-        const { notes, sharedNotes, selectedNoteId } = get()
-        return [...notes, ...sharedNotes].find((note) => note.id === selectedNoteId)
+        const { notes, selectedNoteId } = get()
+        return notes.find((note) => note.id === selectedNoteId)
       },
 
       getNotesInCollection: (collectionId: string) => {

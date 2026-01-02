@@ -29,7 +29,13 @@ interface UseSpeechToTextOptions {
   locale?: string
   continuous?: boolean
   interimResults?: boolean
-  onResult?: (transcript: string, isFinal: boolean) => void
+  /**
+   * Called with transcript updates
+   * @param transcript - The text to display/insert
+   * @param isFinal - If true, this is confirmed text. If false, it's interim (may change)
+   * @param replaceLength - Number of characters to replace (for interim updates)
+   */
+  onResult?: (transcript: string, isFinal: boolean, replaceLength?: number) => void
   onError?: (error: string) => void
 }
 
@@ -45,8 +51,12 @@ interface UseSpeechToTextReturn {
 }
 
 /**
- * Speech-to-text hook using react-speech-recognition library
- * Provides a consistent API for speech recognition across browsers
+ * Speech-to-text hook with live typing experience
+ * 
+ * Features:
+ * - Real-time display of interim results (like Apple dictation)
+ * - Smooth replacement of interim text with final confirmed text
+ * - No word fragmentation issues
  */
 export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeechToTextReturn {
   const {
@@ -59,47 +69,80 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
 
   const [error, setError] = useState<string | null>(null)
   const [accumulatedTranscript, setAccumulatedTranscript] = useState('')
-  const [isManuallyListening, setIsManuallyListening] = useState(false)
-  const lastTranscriptRef = useRef('')
+  const isStartingRef = useRef(false)
+  
+  // Track what we've inserted
+  const lastFinalTranscriptRef = useRef('')
+  const lastInterimLengthRef = useRef(0)
+  
+  const onResultRef = useRef(onResult)
+  onResultRef.current = onResult
 
   // Use the library's hook
   const {
-    transcript: libTranscript,
     interimTranscript: libInterimTranscript,
+    finalTranscript: libFinalTranscript,
     listening,
     browserSupportsSpeechRecognition,
     resetTranscript,
   } = useLibSpeechRecognition()
 
-  // Determine status based on library state and manual state
-  const status: SpeechStatus = error ? 'error' : (listening || isManuallyListening) ? 'listening' : 'idle'
+  // Determine status based on library's listening state only
+  const status: SpeechStatus = error ? 'error' : listening ? 'listening' : 'idle'
 
-  // Track transcript changes and call onResult callback
+  // Handle final transcript - this is confirmed text
   useEffect(() => {
-    if (libTranscript && libTranscript !== lastTranscriptRef.current) {
-      const newText = libTranscript.slice(lastTranscriptRef.current.length).trim()
-      if (newText) {
-        onResult?.(newText, true)
-        lastTranscriptRef.current = libTranscript
-        setAccumulatedTranscript(libTranscript)
+    if (!libFinalTranscript) return
+    
+    // Get only the new part of final transcript
+    const newFinalText = libFinalTranscript.slice(lastFinalTranscriptRef.current.length)
+    
+    if (newFinalText) {
+      // Replace any interim text with the final confirmed text
+      const replaceLength = lastInterimLengthRef.current
+      
+      onResultRef.current?.(newFinalText, true, replaceLength)
+      
+      // Update tracking
+      lastFinalTranscriptRef.current = libFinalTranscript
+      lastInterimLengthRef.current = 0
+      setAccumulatedTranscript(libFinalTranscript)
+    }
+  }, [libFinalTranscript])
+
+  // Handle interim transcript - live preview that may change
+  useEffect(() => {
+    if (!listening) return
+    if (!libInterimTranscript) {
+      // Interim cleared, reset tracking
+      if (lastInterimLengthRef.current > 0) {
+        lastInterimLengthRef.current = 0
       }
+      return
     }
-  }, [libTranscript, onResult])
+    
+    // Calculate what to show
+    const interimText = libInterimTranscript.trim()
+    
+    if (interimText) {
+      // Tell the editor to replace previous interim with new interim
+      const replaceLength = lastInterimLengthRef.current
+      
+      onResultRef.current?.(interimText, false, replaceLength)
+      
+      // Track the length of interim text we inserted
+      lastInterimLengthRef.current = interimText.length
+    }
+  }, [libInterimTranscript, listening])
 
-  // Track interim transcript changes
+  // When listening stops, clean up any remaining interim
   useEffect(() => {
-    if (libInterimTranscript) {
-      onResult?.(libInterimTranscript.trim(), false)
+    if (!listening) {
+      // If there's remaining interim text that wasn't finalized, keep it
+      // The final transcript effect will handle it
+      lastInterimLengthRef.current = 0
     }
-  }, [libInterimTranscript, onResult])
-
-  // Sync manual listening state with actual listening state
-  useEffect(() => {
-    if (!listening && isManuallyListening) {
-      // Recognition stopped unexpectedly, update our state
-      setIsManuallyListening(false)
-    }
-  }, [listening, isManuallyListening])
+  }, [listening])
 
   const startListening = useCallback(async () => {
     if (!browserSupportsSpeechRecognition) {
@@ -109,11 +152,17 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
       return
     }
 
+    if (isStartingRef.current || listening) {
+      return
+    }
+
+    isStartingRef.current = true
     setError(null)
     setAccumulatedTranscript('')
-    lastTranscriptRef.current = ''
+    lastFinalTranscriptRef.current = ''
+    lastInterimLengthRef.current = 0
+    
     resetTranscript()
-    setIsManuallyListening(true)
 
     try {
       await SpeechRecognition.startListening({
@@ -124,24 +173,28 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to start speech recognition'
       setError(errorMsg)
-      setIsManuallyListening(false)
       onError?.(errorMsg)
+    } finally {
+      isStartingRef.current = false
     }
-  }, [browserSupportsSpeechRecognition, continuous, interimResults, locale, onError, resetTranscript])
+  }, [browserSupportsSpeechRecognition, continuous, interimResults, locale, onError, resetTranscript, listening])
 
-  const stopListening = useCallback(() => {
-    setIsManuallyListening(false)
-    SpeechRecognition.stopListening()
+  const stopListening = useCallback(async () => {
+    try {
+      await SpeechRecognition.stopListening()
+    } catch {
+      // Ignore errors when stopping
+    }
     setError(null)
   }, [])
 
   const toggleListening = useCallback(() => {
-    if (listening || isManuallyListening) {
+    if (listening) {
       stopListening()
     } else {
       startListening()
     }
-  }, [listening, isManuallyListening, startListening, stopListening])
+  }, [listening, startListening, stopListening])
 
   // Cleanup on unmount
   useEffect(() => {

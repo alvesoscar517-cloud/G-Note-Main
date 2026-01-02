@@ -15,6 +15,7 @@ import { TrashView } from '@/components/notes/TrashView'
 import { DriveSearchResults } from '@/components/search/DriveSearchResults'
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 import { LogoutConfirmDialog } from '@/components/auth/LogoutConfirmDialog'
+import { SharedNotesPanel, SharedNotesBadge } from '@/components/notes/SharedNotesPanel'
 import { useModalStatusBar } from '@/hooks/useModalStatusBar'
 import { cn } from '@/lib/utils'
 import { getValidAccessToken } from '@/lib/tokenManager'
@@ -88,6 +89,7 @@ export function Header() {
   const [displayModeOpen, setDisplayModeOpen] = useState(false)
   const [displayMode, setDisplayMode] = useState<LaunchType>('fullscreen')
   const [trashOpen, setTrashOpen] = useState(false)
+  const [sharedNotesOpen, setSharedNotesOpen] = useState(false)
   const [driveSearchEnabled, setDriveSearchEnabled] = useState(false)
   const [showDriveResults, setShowDriveResults] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -95,7 +97,7 @@ export function Header() {
   
   // Update status bar color when any small modal is open
   // Note: trashOpen is excluded because TrashView is fullscreen
-  const anyModalOpen = settingsOpen || packagesOpen || languageOpen || modalSizeOpen || displayModeOpen
+  const anyModalOpen = settingsOpen || packagesOpen || languageOpen || modalSizeOpen || displayModeOpen || sharedNotesOpen
   useModalStatusBar(anyModalOpen)
   
   // Load display mode from chrome storage
@@ -210,9 +212,10 @@ export function Header() {
         setModalSizeOpen(false)
         setDisplayModeOpen(false)
         setTrashOpen(false)
+        setSharedNotesOpen(false)
       }
     }
-    if (settingsOpen || packagesOpen || languageOpen || modalSizeOpen || displayModeOpen || trashOpen) {
+    if (settingsOpen || packagesOpen || languageOpen || modalSizeOpen || displayModeOpen || trashOpen || sharedNotesOpen) {
       document.addEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'hidden'
     }
@@ -220,7 +223,7 @@ export function Header() {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = ''
     }
-  }, [settingsOpen, packagesOpen, languageOpen, modalSizeOpen, trashOpen])
+  }, [settingsOpen, packagesOpen, languageOpen, modalSizeOpen, trashOpen, sharedNotesOpen])
 
   return (
     <>
@@ -293,6 +296,9 @@ export function Header() {
             <div className="flex items-center gap-1">
               {/* Offline Indicator */}
               <OfflineIndicator className="mr-1" />
+              
+              {/* Shared Notes Badge */}
+              <SharedNotesBadge onClick={() => setSharedNotesOpen(true)} />
               
               <button 
                 onClick={handleAddNote} 
@@ -705,6 +711,9 @@ export function Header() {
 
       {/* Trash View */}
       <TrashView open={trashOpen} onClose={() => setTrashOpen(false)} />
+
+      {/* Shared Notes Panel */}
+      <SharedNotesPanel open={sharedNotesOpen} onClose={() => setSharedNotesOpen(false)} />
     </>
   )
 }

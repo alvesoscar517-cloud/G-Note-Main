@@ -1,0 +1,4230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chrome Web Store Images Generator - Graphos AI Studio (i18n)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: white;
+      padding: 40px;
+    }
+    h1 { text-align: center; margin-bottom: 20px; font-size: 28px; color: #94a3b8; }
+    .instructions { 
+      text-align: center; margin-bottom: 40px; color: #64748b; font-size: 14px; line-height: 1.8;
+      max-width: 800px; margin-left: auto; margin-right: auto;
+    }
+    
+    /* Language Selector */
+    .language-selector {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 30px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .lang-btn {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      background: rgba(139, 92, 246, 0.1);
+      color: #a78bfa;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lang-btn:hover {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.5);
+    }
+    .lang-btn.active {
+      background: #8b5cf6;
+      color: white;
+      border-color: #8b5cf6;
+    }
+
+    .size-info { 
+      background: rgba(139, 92, 246, 0.1); 
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px; 
+      padding: 20px; 
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .size-info h3 { color: #a78bfa; margin-bottom: 12px; font-size: 16px; }
+    .size-info ul { list-style: none; }
+    .size-info li { 
+      padding: 8px 0; 
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-between;
+    }
+    .size-info li:last-child { border-bottom: none; }
+    .size-info .label { color: #94a3b8; }
+    .size-info .value { color: #22d3ee; font-weight: 600; }
+    
+    .og-container { display: flex; flex-direction: column; gap: 60px; align-items: center; }
+    .og-wrapper { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .og-label { font-size: 14px; color: #94a3b8; font-weight: 500; }
+    .og-actions { display: flex; gap: 12px; margin-top: 8px; }
+    .btn-download {
+      padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer;
+      font-size: 13px; font-weight: 600; transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-download.primary { background: #8b5cf6; color: white; }
+    .btn-download.primary:hover { background: #7c3aed; }
+    .btn-download.og { background: #f59e0b; color: white; }
+    .btn-download.og:hover { background: #d97706; }
+    .btn-download-all {
+      margin-bottom: 30px; padding: 14px 28px; border-radius: 12px;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white;
+      border: none; cursor: pointer; font-size: 16px; font-weight: 700;
+      display: flex; align-items: center; gap: 10px; transition: all 0.2s;
+    }
+    .btn-download-all:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); }
+    
+    .section-title {
+      font-size: 20px;
+      color: #e2e8f0;
+      margin: 40px 0 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+      width: 100%;
+      max-width: 1400px;
+      text-align: center;
+    }
+
+    /* ============================================== */
+    /* SCREENSHOT CARDS - 1280x800 */
+    /* ============================================== */
+    
+    .screenshot-card {
+      width: 1280px; height: 800px;
+      overflow: hidden; position: relative;
+      display: flex; flex-direction: column;
+      background: #f8fafc;
+    }
+    
+    .screenshot-marketing { background: transparent; }
+    
+    .marketing-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    
+    .ai-detection-bg {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #1e40af 70%, #0f172a 100%);
+    }
+    
+    .marketing-glow {
+      position: absolute;
+      top: 50%;
+      left: 30%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    
+    .ai-detection-glow {
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.1) 40%, transparent 70%);
+    }
+    
+    .radar-bg {
+      position: absolute;
+      top: 50%;
+      left: 25%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 700px;
+      opacity: 0.8;
+    }
+
+    /* HUMANIZATION STYLES */
+    .humanization-bg {
+      background: linear-gradient(135deg, #1c1917 0%, #451a03 40%, #78350f 70%, #1c1917 100%);
+    }
+    .humanization-glow {
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, rgba(245, 158, 11, 0.1) 40%, transparent 70%);
+      left: 70%;
+    }
+    .transformation-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1000px;
+      height: 800px;
+      opacity: 0.9;
+    }
+    .marketing-layout-reversed {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: row-reverse;
+      padding: 40px;
+      gap: 40px;
+    }
+    .marketing-content-right {
+      flex: 0 0 360px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px 0;
+      text-align: left;
+    }
+    .humanization-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .humanization-title {
+      background: linear-gradient(135deg, #ffffff 0%, #fcd34d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .pill-amber-solid {
+      background: rgba(251, 191, 36, 0.25);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+    }
+
+    /* Perspective Demo Window */
+    .demo-window-perspective {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      perspective: 1200px;
+      padding-right: 20px;
+    }
+    .demo-app-frame-perspective {
+      width: 680px;
+      height: 500px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 
+        -30px 30px 80px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      transform: rotateY(12deg) rotateX(2deg) translateZ(0);
+      transform-style: preserve-3d;
+    }
+    .demo-humanization-content {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .demo-humanization-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .demo-humanization-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .demo-humanization-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .demo-humanization-title { font-size: 12px; font-weight: 600; color: #1e293b; }
+    .demo-humanization-subtitle { font-size: 10px; color: #64748b; }
+
+    .demo-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .demo-status-badge.humanized { background: #dcfce7; color: #166534; }
+    .demo-status-dot { width: 5px; height: 5px; border-radius: 50%; background: #22c55e; }
+    .demo-humanization-textarea {
+      flex: 1;
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .demo-amber-line { height: 14px; border-radius: 4px; background: #fde68a; }
+    .demo-humanization-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+    .demo-complete-text {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #22c55e;
+      white-space: nowrap;
+    }
+    .demo-humanize-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border: none;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+      opacity: 0.5;
+      white-space: nowrap;
+    }
+
+    /* VOICE PROFILE STYLES */
+    .voice-profile-bg {
+      background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 40%, #6d28d9 70%, #1e1b4b 100%);
+    }
+    .voice-profile-glow {
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, rgba(99, 102, 241, 0.1) 40%, transparent 70%);
+    }
+    .dna-bg {
+      position: absolute;
+      top: 50%;
+      left: 35%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 700px;
+      opacity: 0.9;
+    }
+    .voice-profile-icon { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    .voice-profile-title {
+      background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .pill-purple-solid {
+      background: rgba(139, 92, 246, 0.25);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+    .demo-window-floating {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .demo-app-frame-floating {
+      width: 720px;
+      height: 540px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 
+        0 40px 100px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 60px rgba(139, 92, 246, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .demo-voice-content { flex: 1; display: flex; overflow: hidden; }
+    .demo-voice-sidebar {
+      width: 200px;
+      padding: 16px;
+      background: #f8fafc;
+      border-right: 1px solid #e2e8f0;
+    }
+    .demo-voice-sidebar-title { font-size: 11px; font-weight: 600; color: #1e293b; margin-bottom: 12px; }
+    .demo-profile-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .demo-profile-card.active { background: white; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+    .demo-profile-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .demo-profile-name { font-size: 12px; font-weight: 600; color: #1e293b; }
+    .demo-profile-desc { font-size: 10px; color: #64748b; }
+    .demo-voice-main { flex: 1; padding: 20px; display: flex; flex-direction: column; }
+    .demo-voice-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .demo-voice-avatar-large {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+    }
+    .demo-voice-name { font-size: 16px; font-weight: 600; color: #1e293b; }
+    .demo-voice-style { font-size: 12px; color: #8b5cf6; }
+
+    .demo-metrics-section { margin-bottom: 16px; }
+    .demo-metrics-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+    .demo-metric-bar { margin-bottom: 10px; }
+    .demo-metric-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .demo-metric-label { font-size: 10px; color: #64748b; }
+    .demo-metric-value { font-size: 10px; font-weight: 600; color: #1e293b; }
+    .demo-metric-track { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .demo-metric-fill { height: 100%; background: #8b5cf6; border-radius: 3px; }
+    .demo-traits-section { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .demo-traits-box { padding: 12px; background: #f8fafc; border-radius: 10px; }
+    .demo-traits-title {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 9px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+    .demo-traits-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .demo-trait-tag { padding: 3px 8px; border-radius: 12px; font-size: 9px; font-weight: 500; white-space: nowrap; }
+    .demo-trait-tag.purple { background: #ede9fe; color: #7c3aed; }
+    .demo-trait-tag.gray { background: white; color: #64748b; }
+
+    /* AI WORKSPACE STYLES */
+    .ai-workspace-bg {
+      background: linear-gradient(135deg, #042f2e 0%, #134e4a 40%, #0d9488 70%, #042f2e 100%);
+    }
+    .ai-workspace-glow {
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(20, 184, 166, 0.1) 40%, transparent 70%);
+      left: 70%;
+    }
+    .neural-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1000px;
+      height: 800px;
+      opacity: 0.9;
+    }
+    .ai-workspace-icon { background: linear-gradient(135deg, #06b6d4, #0d9488); }
+    .ai-workspace-title {
+      background: linear-gradient(135deg, #ffffff 0%, #a5f3fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .pill-cyan-solid {
+      background: rgba(6, 182, 212, 0.25);
+      border: 1px solid rgba(6, 182, 212, 0.4);
+    }
+    .demo-window-perspective-left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      perspective: 1200px;
+      padding-right: 20px;
+    }
+    .demo-app-frame-perspective-left {
+      width: 680px;
+      height: 520px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 
+        -30px 30px 80px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      transform: rotateY(12deg) rotateX(2deg) translateZ(0);
+      transform-style: preserve-3d;
+    }
+
+    .demo-workspace-content {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+    }
+    .demo-chat-messages { flex: 1; display: flex; flex-direction: column; gap: 16px; overflow: hidden; }
+    .demo-chat-user { display: flex; justify-content: flex-end; }
+    .demo-chat-user-bubble {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px 16px 4px 16px;
+      padding: 12px 16px;
+      max-width: 70%;
+    }
+    .demo-chat-ai { display: flex; gap: 10px; }
+    .demo-chat-ai-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #06b6d4, #0d9488);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .demo-chat-ai-bubble { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .demo-cyan-line {
+      height: 12px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #e0f2fe 0%, #cffafe 50%, #e0f2fe 100%);
+    }
+    .demo-chat-actions { display: flex; gap: 4px; margin-top: 8px; }
+    .demo-chat-action-btn { padding: 5px; border-radius: 6px; background: transparent; border: none; }
+    .demo-workspace-input {
+      margin-top: 16px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .demo-workspace-input-area { padding: 12px 16px; }
+    .demo-workspace-input-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      border-top: 1px solid #f1f5f9;
+    }
+    .demo-workspace-input-left { display: flex; align-items: center; gap: 4px; }
+    .demo-model-selector {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .demo-send-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: #0f172a;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* AI REWRITE STYLES */
+    .ai-rewrite-bg {
+      background: linear-gradient(135deg, #022c22 0%, #064e3b 40%, #059669 70%, #022c22 100%);
+    }
+    .ai-rewrite-glow {
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, rgba(52, 211, 153, 0.1) 40%, transparent 70%);
+    }
+    .transform-flow-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1000px;
+      height: 800px;
+      opacity: 0.9;
+    }
+    .ai-rewrite-icon { background: linear-gradient(135deg, #10b981, #059669); }
+    .ai-rewrite-title {
+      background: linear-gradient(135deg, #ffffff 0%, #a7f3d0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .pill-emerald-solid {
+      background: rgba(16, 185, 129, 0.25);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .demo-app-frame-floating-emerald {
+      width: 700px;
+      height: 520px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 
+        0 40px 100px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 60px rgba(16, 185, 129, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    .demo-rewrite-content { flex: 1; display: flex; overflow: hidden; }
+    .demo-rewrite-main { flex: 1; padding: 20px; display: flex; flex-direction: column; }
+    .demo-rewrite-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .demo-rewrite-info { display: flex; align-items: center; gap: 10px; }
+    .demo-rewrite-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .demo-rewrite-title { font-size: 12px; font-weight: 600; color: #1e293b; }
+    .demo-rewrite-subtitle { font-size: 10px; color: #64748b; }
+
+    .demo-rewrite-styles { display: flex; gap: 6px; }
+    .demo-style-btn {
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 500;
+      border: none;
+      white-space: nowrap;
+    }
+    .demo-style-btn.active { background: #10b981; color: white; }
+    .demo-style-btn:not(.active) { background: #f1f5f9; color: #64748b; }
+    .demo-rewrite-status { margin-bottom: 10px; }
+    .demo-status-rewritten {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .demo-rewrite-textarea {
+      flex: 1;
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border: 1px solid #6ee7b7;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .demo-emerald-line { height: 12px; border-radius: 4px; background: #a7f3d0; }
+    .demo-rewrite-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+    }
+    .demo-rewrite-complete {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #22c55e;
+      white-space: nowrap;
+    }
+    .demo-rewrite-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      opacity: 0.5;
+      white-space: nowrap;
+    }
+    .demo-rewrite-sidebar {
+      width: 180px;
+      padding: 14px;
+      background: #f8fafc;
+      border-left: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .demo-sidebar-card {
+      padding: 12px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      text-align: center;
+    }
+    .demo-sidebar-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 6px;
+    }
+    .demo-sidebar-title { font-size: 11px; font-weight: 600; color: #1e293b; }
+    .demo-sidebar-desc { font-size: 9px; color: #64748b; }
+    .demo-option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+    .demo-option-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: #475569;
+    }
+    .demo-toggle { width: 28px; height: 16px; border-radius: 8px; position: relative; }
+    .demo-toggle.on { background: #10b981; }
+    .demo-toggle.on::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: white;
+      top: 2px;
+      right: 2px;
+    }
+
+    /* Marketing Layout */
+    .marketing-layout {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      padding: 40px;
+      gap: 40px;
+    }
+    .marketing-content {
+      flex: 0 0 340px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px 0;
+    }
+    .marketing-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+    .marketing-logo-icon { width: 40px; height: 40px; border-radius: 10px; overflow: hidden; }
+    .marketing-logo-text { font-size: 18px; font-weight: 700; color: white; }
+    .marketing-feature-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    .ai-detection-icon { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .marketing-title {
+      font-size: 48px;
+      font-weight: 800;
+      margin: 0 0 16px 0;
+      line-height: 1.1;
+    }
+    .ai-detection-title {
+      background: linear-gradient(135deg, #ffffff 0%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .marketing-subtitle {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.7);
+      margin: 0 0 32px 0;
+      line-height: 1.5;
+    }
+    .marketing-pills { display: flex; flex-direction: column; gap: 10px; }
+    .marketing-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      width: fit-content;
+      white-space: nowrap;
+    }
+    .pill-blue-solid {
+      background: rgba(59, 130, 246, 0.25);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+    .marketing-url {
+      position: absolute;
+      bottom: 30px;
+      left: 50px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.4);
+      z-index: 1;
+    }
+
+    /* Demo Window Container */
+    .demo-window-container { flex: 1; display: flex; align-items: center; justify-content: center; }
+    .demo-app-frame {
+      width: 100%;
+      max-width: 780px;
+      height: 580px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    .demo-window-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .demo-window-dots { display: flex; gap: 6px; }
+    .demo-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .demo-dot.red { background: #ef4444; }
+    .demo-dot.yellow { background: #eab308; }
+    .demo-dot.green { background: #22c55e; }
+    .demo-window-title {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .demo-app-content { flex: 1; display: flex; overflow: hidden; }
+    .demo-editor-panel {
+      flex: 1.2;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #e2e8f0;
+    }
+    .demo-sample-buttons { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .demo-sample-label { font-size: 11px; color: #64748b; }
+    .demo-sample-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .demo-sample-btn.active { background: #3b82f6; color: white; }
+    .demo-sample-btn:not(.active) { background: #f1f5f9; color: #64748b; }
+
+    .demo-text-area {
+      flex: 1;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .demo-shimmer-line { height: 14px; border-radius: 4px; background: #e2e8f0; }
+    .demo-editor-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+    .demo-char-count { font-size: 11px; color: #22c55e; }
+    .demo-char-count strong { font-weight: 600; }
+    .demo-detect-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .demo-results-panel {
+      flex: 0.8;
+      padding: 20px;
+      background: white;
+      display: flex;
+      flex-direction: column;
+    }
+    .demo-results-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .demo-results-icon {
+      width: 36px;
+      height: 36px;
+      background: #dbeafe;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .demo-results-title { font-size: 13px; font-weight: 600; color: #1e293b; }
+    .demo-results-subtitle { font-size: 11px; color: #64748b; }
+    .demo-score-container { display: flex; justify-content: center; margin: 12px 0; }
+    .demo-score-circle { position: relative; width: 100px; height: 100px; }
+    .demo-score-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 28px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .demo-score-value span { font-size: 14px; color: #94a3b8; }
+
+    .demo-verdict { display: flex; justify-content: center; margin-bottom: 12px; }
+    .demo-verdict-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .demo-confidence {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .demo-confidence-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 10px;
+      color: #64748b;
+    }
+    .demo-confidence-value { font-weight: 600; color: #1e293b; }
+    .demo-confidence-track { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+    .demo-confidence-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #10b981);
+      border-radius: 3px;
+    }
+    .demo-indicators { flex: 1; }
+    .demo-indicators-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+    .demo-indicator-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .demo-indicator-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .demo-indicator-icon.warning { background: #fef3c7; }
+    .demo-indicator-shimmer { height: 10px; border-radius: 3px; background: #e2e8f0; }
+
+    /* SMALL PROMO TILE - 440x280 */
+    .small-promo {
+      width: 440px; height: 280px;
+      background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 30%, #0f172a 60%, #0a0a1a 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .small-promo-bg { position: absolute; inset: 0; z-index: 0; }
+    .small-promo-pattern {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 350px;
+      opacity: 0.8;
+    }
+    .small-promo-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 24px;
+    }
+    .small-promo .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      z-index: 2;
+    }
+    .small-promo .logo-icon { width: 36px; height: 36px; border-radius: 10px; overflow: hidden; }
+    .small-promo .logo-text { font-size: 15px; font-weight: 700; color: white; }
+    .small-promo .title {
+      font-size: 32px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #c4b5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .small-promo .subtitle { font-size: 14px; color: rgba(255,255,255,0.75); margin-bottom: 20px; }
+    .small-promo .pills { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .small-promo .pills-row { display: flex; justify-content: center; gap: 8px; }
+    .small-promo .pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      backdrop-filter: blur(10px);
+      white-space: nowrap;
+    }
+    .small-promo .pill svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2; fill: none; }
+    .small-promo .pill-blue { background: rgba(59, 130, 246, 0.35); border: 1px solid rgba(59, 130, 246, 0.5); }
+    .small-promo .pill-amber { background: rgba(245, 158, 11, 0.35); border: 1px solid rgba(245, 158, 11, 0.5); }
+    .small-promo .pill-purple { background: rgba(139, 92, 246, 0.35); border: 1px solid rgba(139, 92, 246, 0.5); }
+    .small-promo .pill-cyan { background: rgba(6, 182, 212, 0.35); border: 1px solid rgba(6, 182, 212, 0.5); }
+    .small-promo .pill-emerald { background: rgba(16, 185, 129, 0.35); border: 1px solid rgba(16, 185, 129, 0.5); }
+
+    /* MARQUEE PROMO TILE - 1400x560 */
+    .marquee-promo {
+      width: 1400px; height: 560px;
+      background: linear-gradient(135deg, #0a0a1a 0%, #0f172a 40%, #1e1b4b 70%, #0a0a1a 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .marquee-promo-bg { position: absolute; inset: 0; z-index: 0; }
+    .marquee-promo-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 900px;
+      height: 500px;
+      background: 
+        radial-gradient(ellipse at 30% 50%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .marquee-promo-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 50px;
+    }
+    .marquee-promo .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: absolute;
+      top: 40px;
+      left: 50px;
+      z-index: 2;
+    }
+    .marquee-promo .logo-icon { width: 52px; height: 52px; border-radius: 14px; overflow: hidden; }
+    .marquee-promo .logo-text { font-size: 24px; font-weight: 700; color: white; }
+    .marquee-promo .url {
+      position: absolute;
+      bottom: 40px;
+      left: 50px;
+      font-size: 16px;
+      color: rgba(255,255,255,0.5);
+      z-index: 2;
+    }
+    .marquee-promo .title {
+      font-size: 76px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 40%, #c4b5fd 70%, #fcd34d 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+    }
+    .marquee-promo .subtitle {
+      font-size: 22px;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 40px;
+      line-height: 1.5;
+      max-width: 800px;
+    }
+    .marquee-promo .pills { display: flex; gap: 14px; }
+    .marquee-promo .pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 22px;
+      border-radius: 28px;
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+      backdrop-filter: blur(10px);
+      transition: transform 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+    .marquee-promo .pill svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; }
+    .marquee-promo .pill-blue { background: rgba(59, 130, 246, 0.3); border: 1px solid rgba(59, 130, 246, 0.5); box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2); }
+    .marquee-promo .pill-amber { background: rgba(245, 158, 11, 0.3); border: 1px solid rgba(245, 158, 11, 0.5); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.2); }
+    .marquee-promo .pill-purple { background: rgba(139, 92, 246, 0.3); border: 1px solid rgba(139, 92, 246, 0.5); box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2); }
+    .marquee-promo .pill-cyan { background: rgba(6, 182, 212, 0.3); border: 1px solid rgba(6, 182, 212, 0.5); box-shadow: 0 4px 20px rgba(6, 182, 212, 0.2); }
+    .marquee-promo .pill-emerald { background: rgba(16, 185, 129, 0.3); border: 1px solid rgba(16, 185, 129, 0.5); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2); }
+  </style>
+</head>
+
+<body>
+  <h1>Chrome Web Store Images Generator - Graphos AI Studio (i18n)</h1>
+  
+  <div class="instructions">
+    🌍 Chọn ngôn ngữ để tạo ảnh cho từng quốc gia. Tên file sẽ bao gồm mã ngôn ngữ (ví dụ: screenshot-1-detection-vi.png)
+  </div>
+  
+  <!-- Language Selector -->
+  <div class="language-selector" id="langSelector">
+    <button class="lang-btn active" data-lang="en">🇺🇸 English</button>
+    <button class="lang-btn" data-lang="vi">🇻🇳 Tiếng Việt</button>
+    <button class="lang-btn" data-lang="zh_CN">🇨🇳 简体中文</button>
+    <button class="lang-btn" data-lang="ja">🇯🇵 日本語</button>
+    <button class="lang-btn" data-lang="ko">🇰🇷 한국어</button>
+    <button class="lang-btn" data-lang="es">🇪🇸 Español</button>
+    <button class="lang-btn" data-lang="fr">🇫🇷 Français</button>
+    <button class="lang-btn" data-lang="de">🇩🇪 Deutsch</button>
+    <button class="lang-btn" data-lang="pt_BR">��🇷 Português</button>
+    <button class="lang-btn" data-lang="ru">🇷🇺 Русский</button>
+    <button class="lang-btn" data-lang="ar">🇸🇦 العربية</button>
+    <button class="lang-btn" data-lang="hi">🇮🇳 हिन्दी</button>
+    <button class="lang-btn" data-lang="th">🇹🇭 ไทย</button>
+    <button class="lang-btn" data-lang="id">🇮🇩 Indonesia</button>
+    <button class="lang-btn" data-lang="it">�� Italiano<ut/button>
+    <button class="lang-btn" data-lang="zh_TW">🇹🇼 繁體中文</button>
+  </div>
+  
+  <div class="size-info">
+    <h3>📐 Kích thước yêu cầu</h3>
+    <ul>
+      <li><span class="label">Global Screenshots (5 ảnh)</span><span class="value">1280×800</span></li>
+      <li><span class="label">Small Promo Tile</span><span class="value">440×280</span></li>
+      <li><span class="label">Marquee Promo Tile</span><span class="value">1400×560</span></li>
+    </ul>
+  </div>
+  
+  <div style="text-align: center;">
+    <button class="btn-download-all" onclick="downloadAll()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+      <span id="downloadAllText">Download All (7 images)</span>
+    </button>
+    <button class="btn-download-all" style="background: linear-gradient(135deg, #f59e0b, #d97706); margin-left: 12px;" onclick="downloadAllOG()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+      <span id="downloadAllOGText">Download All OG (5 images - 1200×630)</span>
+    </button>
+  </div>
+  
+  <div class="og-container">
+    <h2 class="section-title">📸 Global Screenshots (1280×800)</h2>
+
+    <!-- Screenshot 1: AI Detection -->
+    <div class="og-wrapper">
+      <span class="og-label" id="label-screenshot-1">screenshot-1-detection-en.png (1280×800) - AI Detection</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('screenshot-1')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          1280×800
+        </button>
+        <button class="btn-download og" onclick="downloadCardOG('screenshot-1')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          OG 1200×630
+        </button>
+      </div>
+      <div class="screenshot-card screenshot-marketing" id="screenshot-1">
+        <div class="marketing-bg ai-detection-bg">
+          <svg class="radar-bg" viewBox="0 0 800 800" fill="none">
+            <circle cx="400" cy="400" r="80" stroke="rgba(59, 130, 246, 0.3)" stroke-width="1.5" fill="none" />
+            <circle cx="400" cy="400" r="140" stroke="rgba(59, 130, 246, 0.25)" stroke-width="1.5" fill="none" />
+            <circle cx="400" cy="400" r="200" stroke="rgba(59, 130, 246, 0.2)" stroke-width="1.5" fill="none" />
+            <circle cx="400" cy="400" r="260" stroke="rgba(59, 130, 246, 0.15)" stroke-width="1" fill="none" />
+            <circle cx="400" cy="400" r="320" stroke="rgba(59, 130, 246, 0.12)" stroke-width="1" fill="none" />
+            <circle cx="400" cy="400" r="380" stroke="rgba(59, 130, 246, 0.08)" stroke-width="1" fill="none" />
+            <line x1="400" y1="20" x2="400" y2="780" stroke="rgba(59, 130, 246, 0.15)" stroke-width="1" />
+            <line x1="20" y1="400" x2="780" y2="400" stroke="rgba(59, 130, 246, 0.15)" stroke-width="1" />
+            <line x1="117" y1="117" x2="683" y2="683" stroke="rgba(59, 130, 246, 0.1)" stroke-width="1" />
+            <line x1="683" y1="117" x2="117" y2="683" stroke="rgba(59, 130, 246, 0.1)" stroke-width="1" />
+            <defs>
+              <linearGradient id="radarScannerGradient" x1="400" y1="400" x2="750" y2="50" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(59, 130, 246, 0.3)" />
+                <stop offset="100%" stop-color="rgba(59, 130, 246, 0)" />
+              </linearGradient>
+              <radialGradient id="radarCenterGlow" cx="400" cy="400" r="150" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="rgba(59, 130, 246, 0.25)" />
+                <stop offset="100%" stop-color="rgba(59, 130, 246, 0)" />
+              </radialGradient>
+            </defs>
+            <path d="M400,400 L400,0 A400,400 0 0,1 683,117 Z" fill="url(#radarScannerGradient)" opacity="0.7"/>
+            <line x1="400" y1="400" x2="683" y2="117" stroke="rgba(59, 130, 246, 0.6)" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="400" cy="400" r="150" fill="url(#radarCenterGlow)" />
+            <circle cx="400" cy="400" r="6" fill="rgba(59, 130, 246, 0.8)" />
+            <circle cx="400" cy="400" r="3" fill="rgba(59, 130, 246, 1)" />
+            <circle cx="480" cy="320" r="5" fill="rgba(34, 197, 94, 0.9)" />
+            <circle cx="480" cy="320" r="10" fill="rgba(34, 197, 94, 0.3)" />
+            <circle cx="350" cy="280" r="4" fill="rgba(59, 130, 246, 0.7)" />
+            <circle cx="350" cy="280" r="8" fill="rgba(59, 130, 246, 0.25)" />
+            <circle cx="520" cy="380" r="4" fill="rgba(139, 92, 246, 0.7)" />
+            <circle cx="520" cy="380" r="8" fill="rgba(139, 92, 246, 0.25)" />
+            <circle cx="300" cy="350" r="3" fill="rgba(245, 158, 11, 0.7)" />
+            <circle cx="300" cy="350" r="6" fill="rgba(245, 158, 11, 0.25)" />
+          </svg>
+          <div class="marketing-glow ai-detection-glow"></div>
+        </div>
+
+        <div class="marketing-layout">
+          <div class="marketing-content">
+            <div class="marketing-logo">
+              <div class="marketing-logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+              </div>
+              <span class="marketing-logo-text">Graphos AI</span>
+            </div>
+            <div class="marketing-feature-icon ai-detection-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg>
+            </div>
+            <h2 class="marketing-title ai-detection-title" data-i18n="detection.title">AI Detection</h2>
+            <p class="marketing-subtitle" data-i18n="detection.subtitle">Detect AI-generated content<br>with industry-leading accuracy</p>
+            <div class="marketing-pills">
+              <div class="marketing-pill pill-blue-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span data-i18n="detection.pill1">98% Accuracy</span>
+              </div>
+              <div class="marketing-pill pill-blue-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                <span data-i18n="detection.pill2">Real-time</span>
+              </div>
+              <div class="marketing-pill pill-blue-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <span data-i18n="detection.pill3">Multi-language</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-window-container">
+            <div class="demo-app-frame">
+              <div class="demo-window-header">
+                <div class="demo-window-dots">
+                  <div class="demo-dot red"></div>
+                  <div class="demo-dot yellow"></div>
+                  <div class="demo-dot green"></div>
+                </div>
+                <div class="demo-window-title" data-i18n="detection.windowTitle">AI Detection</div>
+                <div style="width: 52px;"></div>
+              </div>
+              <div class="demo-app-content">
+                <div class="demo-editor-panel">
+                  <div class="demo-sample-buttons">
+                    <span class="demo-sample-label" data-i18n="detection.trySample">Try sample:</span>
+                    <button class="demo-sample-btn active" data-i18n="detection.aiText">AI Text</button>
+                    <button class="demo-sample-btn" data-i18n="detection.human">Human</button>
+                    <button class="demo-sample-btn" data-i18n="detection.mixed">Mixed</button>
+                  </div>
+                  <div class="demo-text-area">
+                    <div class="demo-shimmer-line" style="width: 95%;"></div>
+                    <div class="demo-shimmer-line" style="width: 88%;"></div>
+                    <div class="demo-shimmer-line" style="width: 92%;"></div>
+                    <div class="demo-shimmer-line" style="width: 78%;"></div>
+                    <div class="demo-shimmer-line" style="width: 85%;"></div>
+                    <div class="demo-shimmer-line" style="width: 90%;"></div>
+                    <div class="demo-shimmer-line" style="width: 72%;"></div>
+                    <div class="demo-shimmer-line" style="width: 60%;"></div>
+                  </div>
+                  <div class="demo-editor-footer">
+                    <span class="demo-char-count"><strong>1,247</strong> / 50+ chars</span>
+                    <button class="demo-detect-btn">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                      <span data-i18n="detection.detectBtn">Detect AI</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="demo-results-panel">
+                  <div class="demo-results-header">
+                    <div class="demo-results-icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
+                    <div>
+                      <div class="demo-results-title" data-i18n="detection.resultsTitle">AI Detection</div>
+                      <div class="demo-results-subtitle" data-i18n="detection.resultsSubtitle">Content Analysis</div>
+                    </div>
+                  </div>
+                  <div class="demo-score-container">
+                    <div class="demo-score-circle">
+                      <svg width="100" height="100" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="url(#demoBlueGrad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="22.62" transform="rotate(-90 50 50)"/>
+                        <defs>
+                          <linearGradient id="demoBlueGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#93c5fd"/>
+                            <stop offset="100%" stop-color="#2563eb"/>
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div class="demo-score-value">91<span>%</span></div>
+                    </div>
+                  </div>
+                  <div class="demo-verdict">
+                    <div class="demo-verdict-badge">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                      <span data-i18n="detection.verdict">Likely AI Generated</span>
+                    </div>
+                  </div>
+                  <div class="demo-confidence">
+                    <div class="demo-confidence-header">
+                      <span data-i18n="detection.confidence">Confidence</span>
+                      <span class="demo-confidence-value">87%</span>
+                    </div>
+                    <div class="demo-confidence-track">
+                      <div class="demo-confidence-fill" style="width: 87%;"></div>
+                    </div>
+                  </div>
+                  <div class="demo-indicators">
+                    <div class="demo-indicators-header">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                      <span data-i18n="detection.indicators">AI Indicators (4)</span>
+                    </div>
+                    <div class="demo-indicator-item">
+                      <div class="demo-indicator-icon warning">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>
+                      </div>
+                      <div class="demo-indicator-shimmer" style="width: 140px;"></div>
+                    </div>
+                    <div class="demo-indicator-item">
+                      <div class="demo-indicator-icon warning">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>
+                      </div>
+                      <div class="demo-indicator-shimmer" style="width: 120px;"></div>
+                    </div>
+                    <div class="demo-indicator-item">
+                      <div class="demo-indicator-icon warning">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>
+                      </div>
+                      <div class="demo-indicator-shimmer" style="width: 150px;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="marketing-url">graphosai.com</div>
+      </div>
+    </div>
+
+    <!-- Screenshot 2: Humanization -->
+    <div class="og-wrapper">
+      <span class="og-label" id="label-screenshot-2">screenshot-2-humanization-en.png (1280×800) - Humanization</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('screenshot-2')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          1280×800
+        </button>
+        <button class="btn-download og" onclick="downloadCardOG('screenshot-2')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          OG 1200×630
+        </button>
+      </div>
+      <div class="screenshot-card screenshot-marketing" id="screenshot-2">
+        <div class="marketing-bg humanization-bg">
+          <svg class="transformation-bg" viewBox="0 0 1000 800" fill="none">
+            <defs>
+              <linearGradient id="aiToHumanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(148, 163, 184, 0.3)" />
+                <stop offset="50%" stop-color="rgba(251, 191, 36, 0.2)" />
+                <stop offset="100%" stop-color="rgba(251, 146, 60, 0.3)" />
+              </linearGradient>
+              <radialGradient id="transformCenterGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(251, 191, 36, 0.3)" />
+                <stop offset="100%" stop-color="transparent" />
+              </radialGradient>
+            </defs>
+            <g opacity="0.5">
+              <line x1="50" y1="150" x2="350" y2="150" stroke="rgba(148, 163, 184, 0.25)" stroke-width="1"/>
+              <line x1="50" y1="220" x2="350" y2="220" stroke="rgba(148, 163, 184, 0.2)" stroke-width="1" stroke-dasharray="4 4"/>
+              <line x1="50" y1="290" x2="350" y2="290" stroke="rgba(148, 163, 184, 0.25)" stroke-width="1"/>
+              <line x1="50" y1="360" x2="350" y2="360" stroke="rgba(148, 163, 184, 0.2)" stroke-width="1" stroke-dasharray="4 4"/>
+              <line x1="50" y1="430" x2="350" y2="430" stroke="rgba(148, 163, 184, 0.25)" stroke-width="1"/>
+              <line x1="50" y1="500" x2="350" y2="500" stroke="rgba(148, 163, 184, 0.2)" stroke-width="1" stroke-dasharray="4 4"/>
+              <line x1="100" y1="120" x2="100" y2="680" stroke="rgba(148, 163, 184, 0.15)" stroke-width="1"/>
+              <line x1="175" y1="120" x2="175" y2="680" stroke="rgba(148, 163, 184, 0.15)" stroke-width="1"/>
+              <line x1="250" y1="120" x2="250" y2="680" stroke="rgba(148, 163, 184, 0.15)" stroke-width="1"/>
+              <circle cx="120" cy="180" r="3" fill="rgba(148, 163, 184, 0.4)"/>
+              <circle cx="200" cy="250" r="2" fill="rgba(148, 163, 184, 0.3)"/>
+              <circle cx="150" cy="320" r="3" fill="rgba(148, 163, 184, 0.4)"/>
+            </g>
+            <ellipse cx="500" cy="400" rx="150" ry="250" fill="url(#transformCenterGlow)" />
+            <path d="M350 200 Q450 200 500 250 Q550 300 650 280" stroke="rgba(251, 191, 36, 0.35)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M350 320 Q450 330 500 360 Q550 390 650 370" stroke="rgba(251, 191, 36, 0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M350 440 Q450 440 500 420 Q550 400 650 430" stroke="rgba(251, 191, 36, 0.4)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <g opacity="0.6">
+              <path d="M620 180 Q700 220 760 200 Q820 180 880 220" stroke="rgba(251, 146, 60, 0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <path d="M640 280 Q700 320 780 300 Q840 280 900 320" stroke="rgba(251, 146, 60, 0.25)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              <path d="M620 380 Q680 420 760 400 Q820 380 880 420" stroke="rgba(251, 146, 60, 0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+              <circle cx="700" cy="240" r="4" fill="rgba(251, 146, 60, 0.5)"/>
+              <circle cx="780" cy="340" r="3" fill="rgba(251, 146, 60, 0.4)"/>
+            </g>
+            <circle cx="480" cy="350" r="5" fill="rgba(251, 191, 36, 0.6)"/>
+            <circle cx="520" cy="400" r="4" fill="rgba(251, 191, 36, 0.5)"/>
+            <circle cx="490" cy="450" r="6" fill="rgba(251, 191, 36, 0.4)"/>
+            <g transform="translate(500, 400)">
+              <path d="M-25 0 L15 0 M5 -8 L15 0 L5 8" stroke="rgba(251, 146, 60, 0.6)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+          </svg>
+          <div class="marketing-glow humanization-glow"></div>
+        </div>
+
+        <div class="marketing-layout-reversed">
+          <div class="marketing-content-right">
+            <div class="marketing-logo">
+              <div class="marketing-logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+              </div>
+              <span class="marketing-logo-text">Graphos AI</span>
+            </div>
+            <div class="marketing-feature-icon humanization-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/>
+              </svg>
+            </div>
+            <h2 class="marketing-title humanization-title" data-i18n="humanization.title">Humanization</h2>
+            <p class="marketing-subtitle" data-i18n="humanization.subtitle">Transform AI-generated text<br>into authentic human writing</p>
+            <div class="marketing-pills">
+              <div class="marketing-pill pill-amber-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span data-i18n="humanization.pill1">Bypass AI Detection</span>
+              </div>
+              <div class="marketing-pill pill-amber-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                <span data-i18n="humanization.pill2">Natural Tone</span>
+              </div>
+              <div class="marketing-pill pill-amber-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                <span data-i18n="humanization.pill3">Multiple Styles</span>
+              </div>
+            </div>
+          </div>
+          <div class="demo-window-perspective">
+            <div class="demo-app-frame-perspective">
+              <div class="demo-window-header">
+                <div class="demo-window-dots">
+                  <div class="demo-dot red"></div>
+                  <div class="demo-dot yellow"></div>
+                  <div class="demo-dot green"></div>
+                </div>
+                <div class="demo-window-title" data-i18n="humanization.windowTitle">Content Humanization</div>
+                <div style="width: 52px;"></div>
+              </div>
+              <div class="demo-humanization-content">
+                <div class="demo-humanization-header">
+                  <div class="demo-humanization-info">
+                    <div class="demo-humanization-icon">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+                    </div>
+                    <div>
+                      <div class="demo-humanization-title" data-i18n="humanization.demoTitle">Content Humanization</div>
+                      <div class="demo-humanization-subtitle" data-i18n="humanization.demoSubtitle">Transform AI text to human-like</div>
+                    </div>
+                  </div>
+                  <div class="demo-sample-buttons">
+                    <button class="demo-sample-btn active" style="background: #8b5cf6; color: white;" data-i18n="humanization.formal">Formal</button>
+                    <button class="demo-sample-btn" data-i18n="humanization.academic">Academic</button>
+                  </div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <span class="demo-status-badge humanized">
+                    <span class="demo-status-dot"></span>
+                    <span data-i18n="humanization.status">Humanized</span>
+                  </span>
+                </div>
+                <div class="demo-humanization-textarea">
+                  <div class="demo-amber-line" style="width: 95%;"></div>
+                  <div class="demo-amber-line" style="width: 88%;"></div>
+                  <div class="demo-amber-line" style="width: 92%;"></div>
+                  <div class="demo-amber-line" style="width: 78%;"></div>
+                  <div class="demo-amber-line" style="width: 85%;"></div>
+                  <div class="demo-amber-line" style="width: 90%;"></div>
+                  <div class="demo-amber-line" style="width: 65%;"></div>
+                </div>
+                <div class="demo-humanization-footer">
+                  <span class="demo-complete-text">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <span data-i18n="humanization.complete">Transformation complete</span>
+                  </span>
+                  <button class="demo-humanize-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+                    <span data-i18n="humanization.btn">Humanize</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="marketing-url">graphosai.com</div>
+      </div>
+    </div>
+
+    <!-- Screenshot 3: Voice Profile -->
+    <div class="og-wrapper">
+      <span class="og-label" id="label-screenshot-3">screenshot-3-voice-en.png (1280×800) - Voice Profile</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('screenshot-3')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          1280×800
+        </button>
+        <button class="btn-download og" onclick="downloadCardOG('screenshot-3')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          OG 1200×630
+        </button>
+      </div>
+      <div class="screenshot-card screenshot-marketing" id="screenshot-3">
+        <div class="marketing-bg voice-profile-bg">
+          <svg class="dna-bg" viewBox="0 0 800 700" fill="none">
+            <defs>
+              <linearGradient id="dnaGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="rgba(139, 92, 246, 0.4)" />
+                <stop offset="100%" stop-color="rgba(99, 102, 241, 0.1)" />
+              </linearGradient>
+              <linearGradient id="dnaGradient2" x1="100%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="rgba(167, 139, 250, 0.3)" />
+                <stop offset="100%" stop-color="rgba(139, 92, 246, 0.1)" />
+              </linearGradient>
+              <radialGradient id="dnaCenterGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(139, 92, 246, 0.25)" />
+                <stop offset="100%" stop-color="transparent" />
+              </radialGradient>
+            </defs>
+            <path d="M100 50 Q200 150 150 250 Q100 350 200 450 Q300 550 250 650" stroke="url(#dnaGradient1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M150 50 Q250 150 200 250 Q150 350 250 450 Q350 550 300 650" stroke="url(#dnaGradient2)" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <path d="M200 50 Q100 150 150 250 Q200 350 100 450 Q0 550 50 650" stroke="url(#dnaGradient1)" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <line x1="125" y1="100" x2="175" y2="100" stroke="rgba(139, 92, 246, 0.3)" stroke-width="2"/>
+            <line x1="140" y1="200" x2="160" y2="200" stroke="rgba(139, 92, 246, 0.25)" stroke-width="2"/>
+            <line x1="175" y1="400" x2="125" y2="400" stroke="rgba(139, 92, 246, 0.25)" stroke-width="2"/>
+            <g transform="translate(550, 200)" opacity="0.5">
+              <path d="M0 150 Q50 100 100 150 Q150 200 100 250 Q50 300 0 250" stroke="rgba(167, 139, 250, 0.4)" stroke-width="2" fill="none"/>
+              <path d="M20 150 Q60 110 100 150 Q140 190 100 230 Q60 270 20 230" stroke="rgba(167, 139, 250, 0.35)" stroke-width="1.5" fill="none"/>
+              <path d="M40 150 Q70 120 100 150 Q130 180 100 210 Q70 240 40 210" stroke="rgba(167, 139, 250, 0.3)" stroke-width="1.5" fill="none"/>
+            </g>
+            <circle cx="300" cy="150" r="4" fill="rgba(139, 92, 246, 0.5)"/>
+            <circle cx="450" cy="250" r="3" fill="rgba(167, 139, 250, 0.4)"/>
+            <circle cx="350" cy="400" r="5" fill="rgba(139, 92, 246, 0.3)"/>
+            <ellipse cx="400" cy="350" rx="200" ry="250" fill="url(#dnaCenterGlow)" />
+          </svg>
+          <div class="marketing-glow voice-profile-glow"></div>
+        </div>
+
+        <div class="marketing-layout">
+          <div class="marketing-content">
+            <div class="marketing-logo">
+              <div class="marketing-logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+              </div>
+              <span class="marketing-logo-text">Graphos AI</span>
+            </div>
+            <div class="marketing-feature-icon voice-profile-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <h2 class="marketing-title voice-profile-title" data-i18n="voice.title">Voice Profile</h2>
+            <p class="marketing-subtitle" data-i18n="voice.subtitle">Capture your unique writing style<br>and apply it to any content</p>
+            <div class="marketing-pills">
+              <div class="marketing-pill pill-purple-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                <span data-i18n="voice.pill1">Style Analysis</span>
+              </div>
+              <div class="marketing-pill pill-purple-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                <span data-i18n="voice.pill2">Writing Metrics</span>
+              </div>
+              <div class="marketing-pill pill-purple-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span data-i18n="voice.pill3">Multiple Profiles</span>
+              </div>
+            </div>
+          </div>
+          <div class="demo-window-floating">
+            <div class="demo-app-frame-floating">
+              <div class="demo-window-header">
+                <div class="demo-window-dots">
+                  <div class="demo-dot red"></div>
+                  <div class="demo-dot yellow"></div>
+                  <div class="demo-dot green"></div>
+                </div>
+                <div class="demo-window-title" data-i18n="voice.windowTitle">Voice Profile</div>
+                <div style="width: 52px;"></div>
+              </div>
+              <div class="demo-voice-content">
+                <div class="demo-voice-sidebar">
+                  <div class="demo-voice-sidebar-title" data-i18n="voice.selectProfile">Select a Profile</div>
+                  <div class="demo-profile-card active">
+                    <div class="demo-profile-avatar" style="background: #8b5cf6; color: white;" data-i18n-initials="voice.profile1.initials">SC</div>
+                    <div>
+                      <div class="demo-profile-name" data-i18n="voice.profile1.name">Sarah Chen</div>
+                      <div class="demo-profile-desc" data-i18n="voice.profile1.desc">Professional & Warm</div>
+                    </div>
+                  </div>
+                  <div class="demo-profile-card">
+                    <div class="demo-profile-avatar" style="background: #e2e8f0; color: #64748b;" data-i18n-initials="voice.profile2.initials">AR</div>
+                    <div>
+                      <div class="demo-profile-name" data-i18n="voice.profile2.name">Alex Rivera</div>
+                      <div class="demo-profile-desc" data-i18n="voice.profile2.desc">Casual & Creative</div>
+                    </div>
+                  </div>
+                  <div class="demo-profile-card">
+                    <div class="demo-profile-avatar" style="background: #e2e8f0; color: #64748b;" data-i18n-initials="voice.profile3.initials">JP</div>
+                    <div>
+                      <div class="demo-profile-name" data-i18n="voice.profile3.name">Dr. James Park</div>
+                      <div class="demo-profile-desc" data-i18n="voice.profile3.desc">Academic & Precise</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="demo-voice-main">
+                  <div class="demo-voice-header">
+                    <div class="demo-voice-avatar-large" style="background: #8b5cf6;" data-i18n-initials="voice.profile1.initials">SC</div>
+                    <div>
+                      <div class="demo-voice-name" data-i18n="voice.profile1.name">Sarah Chen</div>
+                      <div class="demo-voice-style" data-i18n="voice.profile1.desc">Professional & Warm</div>
+                    </div>
+                  </div>
+                  <div class="demo-metrics-section">
+                    <div class="demo-metrics-title">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                      <span data-i18n="voice.metrics">Writing Metrics</span>
+                    </div>
+                    <div class="demo-metric-bar">
+                      <div class="demo-metric-header">
+                        <span class="demo-metric-label" data-i18n="voice.formality">Formality</span>
+                        <span class="demo-metric-value">65%</span>
+                      </div>
+                      <div class="demo-metric-track">
+                        <div class="demo-metric-fill" style="width: 65%;"></div>
+                      </div>
+                    </div>
+                    <div class="demo-metric-bar">
+                      <div class="demo-metric-header">
+                        <span class="demo-metric-label" data-i18n="voice.complexity">Complexity</span>
+                        <span class="demo-metric-value">72%</span>
+                      </div>
+                      <div class="demo-metric-track">
+                        <div class="demo-metric-fill" style="width: 72%;"></div>
+                      </div>
+                    </div>
+                    <div class="demo-metric-bar">
+                      <div class="demo-metric-header">
+                        <span class="demo-metric-label" data-i18n="voice.emotion">Emotion</span>
+                        <span class="demo-metric-value">58%</span>
+                      </div>
+                      <div class="demo-metric-track">
+                        <div class="demo-metric-fill" style="width: 58%;"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="demo-traits-section">
+                    <div class="demo-traits-box">
+                      <div class="demo-traits-title">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                        <span data-i18n="voice.styleTraits">Style Traits</span>
+                      </div>
+                      <div class="demo-traits-tags">
+                        <span class="demo-trait-tag purple" data-i18n="voice.trait1">Confident</span>
+                        <span class="demo-trait-tag purple" data-i18n="voice.trait2">Clear</span>
+                        <span class="demo-trait-tag gray" data-i18n="voice.trait3">Engaging</span>
+                      </div>
+                    </div>
+                    <div class="demo-traits-box">
+                      <div class="demo-traits-title">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                        <span data-i18n="voice.vocabulary">Vocabulary</span>
+                      </div>
+                      <div class="demo-traits-tags">
+                        <span class="demo-trait-tag purple" data-i18n="voice.vocab1">Technical</span>
+                        <span class="demo-trait-tag gray" data-i18n="voice.vocab2">Modern</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="marketing-url">graphosai.com</div>
+      </div>
+    </div>
+
+    <!-- Screenshot 4: AI Workspace -->
+    <div class="og-wrapper">
+      <span class="og-label" id="label-screenshot-4">screenshot-4-workspace-en.png (1280×800) - AI Workspace</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('screenshot-4')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          1280×800
+        </button>
+        <button class="btn-download og" onclick="downloadCardOG('screenshot-4')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          OG 1200×630
+        </button>
+      </div>
+      <div class="screenshot-card screenshot-marketing" id="screenshot-4">
+        <div class="marketing-bg ai-workspace-bg">
+          <svg class="neural-bg" viewBox="0 0 1000 800" fill="none">
+            <defs>
+              <linearGradient id="neuralGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(6, 182, 212, 0.3)" />
+                <stop offset="50%" stop-color="rgba(20, 184, 166, 0.4)" />
+                <stop offset="100%" stop-color="rgba(6, 182, 212, 0.3)" />
+              </linearGradient>
+              <radialGradient id="neuralCenterGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(6, 182, 212, 0.25)" />
+                <stop offset="100%" stop-color="transparent" />
+              </radialGradient>
+            </defs>
+            
+            <!-- Neural Network Connections -->
+            <g stroke="url(#neuralGradient)" stroke-width="1.5" opacity="0.6">
+              <!-- Input to Hidden 1 -->
+              <path d="M150 150 Q300 200 350 250" fill="none" />
+              <path d="M150 250 Q300 280 350 300" fill="none" />
+              <path d="M150 350 Q300 360 350 370" fill="none" />
+              <path d="M150 450 Q300 440 350 430" fill="none" />
+              <path d="M150 550 Q300 520 350 490" fill="none" />
+              <path d="M150 650 Q300 600 350 550" fill="none" />
+              
+              <!-- Hidden 1 to Hidden 2 -->
+              <path d="M350 250 Q450 300 500 340" fill="none" />
+              <path d="M350 300 Q450 340 500 370" fill="none" />
+              <path d="M350 370 Q450 390 500 410" fill="none" />
+              <path d="M350 430 Q450 430 500 440" fill="none" />
+              <path d="M350 490 Q450 470 500 470" fill="none" />
+              <path d="M350 550 Q450 510 500 500" fill="none" />
+              
+              <!-- Hidden 2 to Output -->
+              <path d="M500 340 Q600 370 650 390" fill="none" />
+              <path d="M500 410 Q600 410 650 420" fill="none" />
+              <path d="M500 470 Q600 450 650 450" fill="none" />
+              
+              <!-- Output to Final -->
+              <path d="M650 390 Q750 410 850 420" fill="none" />
+              <path d="M650 420 Q750 420 850 420" fill="none" />
+              <path d="M650 450 Q750 430 850 420" fill="none" />
+            </g>
+            
+            <!-- Neural Nodes - Input Layer -->
+            <g>
+              <circle cx="150" cy="150" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="150" r="5" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="150" cy="250" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="250" r="5" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="150" cy="350" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="350" r="5" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="150" cy="450" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="450" r="5" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="150" cy="550" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="550" r="5" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="150" cy="650" r="10" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="150" cy="650" r="5" fill="rgba(6, 182, 212, 0.5)" />
+            </g>
+            
+            <!-- Neural Nodes - Hidden Layer 1 -->
+            <g>
+              <circle cx="350" cy="250" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="250" r="4" fill="rgba(20, 184, 166, 0.5)" />
+              <circle cx="350" cy="300" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="300" r="4" fill="rgba(20, 184, 166, 0.5)" />
+              <circle cx="350" cy="370" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="370" r="4" fill="rgba(20, 184, 166, 0.5)" />
+              <circle cx="350" cy="430" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="430" r="4" fill="rgba(20, 184, 166, 0.5)" />
+              <circle cx="350" cy="490" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="490" r="4" fill="rgba(20, 184, 166, 0.5)" />
+              <circle cx="350" cy="550" r="8" fill="rgba(20, 184, 166, 0.15)" />
+              <circle cx="350" cy="550" r="4" fill="rgba(20, 184, 166, 0.5)" />
+            </g>
+            
+            <!-- Neural Nodes - Hidden Layer 2 -->
+            <g>
+              <circle cx="500" cy="340" r="8" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="500" cy="340" r="4" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="500" cy="410" r="8" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="500" cy="410" r="4" fill="rgba(6, 182, 212, 0.5)" />
+              <circle cx="500" cy="470" r="8" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="500" cy="470" r="4" fill="rgba(6, 182, 212, 0.5)" />
+            </g>
+            
+            <!-- Neural Nodes - Output Layer -->
+            <g>
+              <circle cx="650" cy="390" r="10" fill="rgba(20, 184, 166, 0.2)" />
+              <circle cx="650" cy="390" r="5" fill="rgba(20, 184, 166, 0.6)" />
+              <circle cx="650" cy="420" r="10" fill="rgba(20, 184, 166, 0.2)" />
+              <circle cx="650" cy="420" r="5" fill="rgba(20, 184, 166, 0.6)" />
+              <circle cx="650" cy="450" r="10" fill="rgba(20, 184, 166, 0.2)" />
+              <circle cx="650" cy="450" r="5" fill="rgba(20, 184, 166, 0.6)" />
+            </g>
+            
+            <!-- Final Output Node -->
+            <g>
+              <circle cx="850" cy="420" r="16" fill="rgba(6, 182, 212, 0.15)" />
+              <circle cx="850" cy="420" r="10" fill="rgba(6, 182, 212, 0.3)" />
+              <circle cx="850" cy="420" r="5" fill="rgba(6, 182, 212, 0.7)" />
+            </g>
+            
+            <!-- Center glow -->
+            <ellipse cx="500" cy="400" rx="200" ry="180" fill="url(#neuralCenterGlow)" />
+            
+            <!-- Chat bubble hint -->
+            <g transform="translate(500, 400)">
+              <rect x="-25" y="-15" width="50" height="30" rx="6" fill="rgba(6, 182, 212, 0.1)" stroke="rgba(6, 182, 212, 0.2)" stroke-width="1" />
+            </g>
+          </svg>
+          <div class="marketing-glow ai-workspace-glow"></div>
+        </div>
+
+        <div class="marketing-layout-reversed">
+          <div class="marketing-content-right">
+            <div class="marketing-logo">
+              <div class="marketing-logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+              </div>
+              <span class="marketing-logo-text">Graphos AI</span>
+            </div>
+            <div class="marketing-feature-icon ai-workspace-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </div>
+            <h2 class="marketing-title ai-workspace-title" data-i18n="workspace.title">AI Workspace</h2>
+            <p class="marketing-subtitle" data-i18n="workspace.subtitle">Chat with multiple AI models<br>in one unified interface</p>
+            <div class="marketing-pills">
+              <div class="marketing-pill pill-cyan-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+                <span data-i18n="workspace.pill1">Multi-Model</span>
+              </div>
+              <div class="marketing-pill pill-cyan-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span data-i18n="workspace.pill2">Smart Chat</span>
+              </div>
+              <div class="marketing-pill pill-cyan-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                <span data-i18n="workspace.pill3">Image Analysis</span>
+              </div>
+            </div>
+          </div>
+          <div class="demo-window-perspective">
+            <div class="demo-app-frame-perspective-left">
+              <div class="demo-window-header">
+                <div class="demo-window-dots">
+                  <div class="demo-dot red"></div>
+                  <div class="demo-dot yellow"></div>
+                  <div class="demo-dot green"></div>
+                </div>
+                <div class="demo-window-title" data-i18n="workspace.windowTitle">AI Workspace</div>
+                <div style="width: 52px;"></div>
+              </div>
+              <div class="demo-workspace-content">
+                <div class="demo-chat-messages">
+                  <div class="demo-chat-user">
+                    <div class="demo-chat-user-bubble">
+                      <div class="demo-shimmer-line" style="width: 180px; height: 12px;"></div>
+                    </div>
+                  </div>
+                  <div class="demo-chat-ai">
+                    <div class="demo-chat-ai-avatar">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/></svg>
+                    </div>
+                    <div class="demo-chat-ai-bubble">
+                      <div class="demo-cyan-line" style="width: 95%;"></div>
+                      <div class="demo-cyan-line" style="width: 88%;"></div>
+                      <div class="demo-cyan-line" style="width: 75%;"></div>
+                      <div class="demo-cyan-line" style="width: 82%;"></div>
+                      <div class="demo-chat-actions">
+                        <button class="demo-chat-action-btn">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        </button>
+                        <button class="demo-chat-action-btn">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="demo-workspace-input">
+                  <div class="demo-workspace-input-area">
+                    <div class="demo-shimmer-line" style="width: 200px; height: 12px; background: #f1f5f9;"></div>
+                  </div>
+                  <div class="demo-workspace-input-footer">
+                    <div class="demo-workspace-input-left">
+                      <button class="demo-model-selector">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/></svg>
+                        GPT-4o
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                      </button>
+                    </div>
+                    <button class="demo-send-btn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="marketing-url">graphosai.com</div>
+      </div>
+    </div>
+
+    <!-- Screenshot 5: AI Rewrite -->
+    <div class="og-wrapper">
+      <span class="og-label" id="label-screenshot-5">screenshot-5-rewrite-en.png (1280×800) - AI Rewrite</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('screenshot-5')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          1280×800
+        </button>
+        <button class="btn-download og" onclick="downloadCardOG('screenshot-5')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          OG 1200×630
+        </button>
+      </div>
+      <div class="screenshot-card screenshot-marketing" id="screenshot-5">
+        <div class="marketing-bg ai-rewrite-bg">
+          <svg class="transform-flow-bg" viewBox="0 0 1000 800" fill="none">
+            <defs>
+              <linearGradient id="transformFlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(16, 185, 129, 0.3)" />
+                <stop offset="50%" stop-color="rgba(52, 211, 153, 0.4)" />
+                <stop offset="100%" stop-color="rgba(16, 185, 129, 0.3)" />
+              </linearGradient>
+              <radialGradient id="transformCenterGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(16, 185, 129, 0.25)" />
+                <stop offset="100%" stop-color="transparent" />
+              </radialGradient>
+            </defs>
+            
+            <!-- Left side - Original text (rigid/gray) -->
+            <g opacity="0.5">
+              <line x1="80" y1="200" x2="220" y2="200" stroke="rgba(148, 163, 184, 0.4)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="260" x2="200" y2="260" stroke="rgba(148, 163, 184, 0.35)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="320" x2="240" y2="320" stroke="rgba(148, 163, 184, 0.4)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="380" x2="180" y2="380" stroke="rgba(148, 163, 184, 0.35)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="440" x2="210" y2="440" stroke="rgba(148, 163, 184, 0.4)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="500" x2="190" y2="500" stroke="rgba(148, 163, 184, 0.35)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="560" x2="230" y2="560" stroke="rgba(148, 163, 184, 0.4)" stroke-width="8" stroke-linecap="round"/>
+              <line x1="80" y1="620" x2="160" y2="620" stroke="rgba(148, 163, 184, 0.35)" stroke-width="8" stroke-linecap="round"/>
+              <rect x="60" y="180" width="200" height="480" rx="8" fill="none" stroke="rgba(148, 163, 184, 0.2)" stroke-width="2" stroke-dasharray="8 4"/>
+            </g>
+            
+            <!-- Center transformation zone -->
+            <ellipse cx="500" cy="400" rx="180" ry="250" fill="url(#transformCenterGlow)" />
+            
+            <!-- Transformation flow arrows -->
+            <g stroke="url(#transformFlowGrad)" stroke-width="3" fill="none" stroke-linecap="round">
+              <path d="M280 220 Q400 250 500 280 Q600 310 700 290" />
+              <path d="M280 320 Q400 340 500 360 Q600 380 700 360" />
+              <path d="M280 420 Q400 420 500 420 Q600 420 700 420" />
+              <path d="M280 520 Q400 500 500 480 Q600 460 700 480" />
+              <path d="M280 620 Q400 580 500 540 Q600 500 700 530" />
+            </g>
+            
+            <!-- Arrow heads -->
+            <polygon points="700,290 680,280 680,300" fill="rgba(16, 185, 129, 0.5)" />
+            <polygon points="700,360 680,350 680,370" fill="rgba(16, 185, 129, 0.5)" />
+            <polygon points="700,420 680,410 680,430" fill="rgba(16, 185, 129, 0.6)" />
+            <polygon points="700,480 680,470 680,490" fill="rgba(16, 185, 129, 0.5)" />
+            <polygon points="700,530 680,520 680,540" fill="rgba(16, 185, 129, 0.5)" />
+            
+            <!-- Right side - Transformed text (organic/green) -->
+            <g opacity="0.6">
+              <path d="M750 280 Q800 290 850 280 Q900 270 940 285" stroke="rgba(16, 185, 129, 0.5)" stroke-width="8" stroke-linecap="round" fill="none"/>
+              <path d="M750 350 Q800 340 850 350 Q900 360 920 345" stroke="rgba(16, 185, 129, 0.45)" stroke-width="8" stroke-linecap="round" fill="none"/>
+              <path d="M750 420 Q800 430 850 420 Q900 410 950 425" stroke="rgba(16, 185, 129, 0.5)" stroke-width="8" stroke-linecap="round" fill="none"/>
+              <path d="M750 490 Q800 480 850 490 Q900 500 930 485" stroke="rgba(16, 185, 129, 0.45)" stroke-width="8" stroke-linecap="round" fill="none"/>
+              <path d="M750 560 Q800 570 850 560 Q900 550 940 565" stroke="rgba(16, 185, 129, 0.5)" stroke-width="8" stroke-linecap="round" fill="none"/>
+              <rect x="730" y="260" width="240" height="340" rx="16" fill="none" stroke="rgba(16, 185, 129, 0.25)" stroke-width="2"/>
+            </g>
+            
+            <!-- Center transformation icon -->
+            <g transform="translate(500, 400)">
+              <circle cx="0" cy="0" r="35" fill="rgba(16, 185, 129, 0.1)" stroke="rgba(16, 185, 129, 0.3)" stroke-width="2" />
+              <path d="M-12 0 L8 0 M3 -6 L12 0 L3 6" stroke="rgba(16, 185, 129, 0.6)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            
+            <!-- Floating particles -->
+            <circle cx="350" cy="280" r="4" fill="rgba(16, 185, 129, 0.5)" />
+            <circle cx="450" cy="350" r="3" fill="rgba(52, 211, 153, 0.4)" />
+            <circle cx="550" cy="300" r="4" fill="rgba(16, 185, 129, 0.5)" />
+            <circle cx="600" cy="450" r="3" fill="rgba(52, 211, 153, 0.4)" />
+            <circle cx="400" cy="500" r="4" fill="rgba(16, 185, 129, 0.5)" />
+            <circle cx="520" cy="550" r="3" fill="rgba(52, 211, 153, 0.4)" />
+          </svg>
+          <div class="marketing-glow ai-rewrite-glow"></div>
+        </div>
+        <div class="marketing-layout">
+          <div class="marketing-content">
+            <div class="marketing-logo">
+              <div class="marketing-logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+              </div>
+              <span class="marketing-logo-text">Graphos AI</span>
+            </div>
+            <div class="marketing-feature-icon ai-rewrite-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"/>
+                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+              </svg>
+            </div>
+            <h2 class="marketing-title ai-rewrite-title" data-i18n="rewrite.title">AI Rewrite</h2>
+            <p class="marketing-subtitle" data-i18n="rewrite.subtitle">Transform your content with<br>AI-powered rewriting tools</p>
+            <div class="marketing-pills">
+              <div class="marketing-pill pill-emerald-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                <span data-i18n="rewrite.pill1">Smart Rewrite</span>
+              </div>
+              <div class="marketing-pill pill-emerald-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                <span data-i18n="rewrite.pill2">Multiple Tones</span>
+              </div>
+              <div class="marketing-pill pill-emerald-solid">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span data-i18n="rewrite.pill3">Grammar Fix</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-window-floating">
+            <div class="demo-app-frame-floating-emerald">
+              <div class="demo-window-header">
+                <div class="demo-window-dots">
+                  <div class="demo-dot red"></div>
+                  <div class="demo-dot yellow"></div>
+                  <div class="demo-dot green"></div>
+                </div>
+                <div class="demo-window-title" data-i18n="rewrite.windowTitle">AI Rewrite</div>
+                <div style="width: 52px;"></div>
+              </div>
+              <div class="demo-rewrite-content">
+                <div class="demo-rewrite-main">
+                  <div class="demo-rewrite-header">
+                    <div class="demo-rewrite-info">
+                      <div class="demo-rewrite-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                      </div>
+                      <div>
+                        <div class="demo-rewrite-title" data-i18n="rewrite.demoTitle">Content Rewrite</div>
+                        <div class="demo-rewrite-subtitle" data-i18n="rewrite.demoSubtitle">Transform your text</div>
+                      </div>
+                    </div>
+                    <div class="demo-rewrite-styles">
+                      <button class="demo-style-btn active" data-i18n="rewrite.professional">Professional</button>
+                      <button class="demo-style-btn" data-i18n="rewrite.casual">Casual</button>
+                      <button class="demo-style-btn" data-i18n="rewrite.creative">Creative</button>
+                    </div>
+                  </div>
+                  <div class="demo-rewrite-status">
+                    <span class="demo-status-rewritten">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      <span data-i18n="rewrite.status">Rewritten</span>
+                    </span>
+                  </div>
+                  <div class="demo-rewrite-textarea">
+                    <div class="demo-emerald-line" style="width: 95%;"></div>
+                    <div class="demo-emerald-line" style="width: 88%;"></div>
+                    <div class="demo-emerald-line" style="width: 92%;"></div>
+                    <div class="demo-emerald-line" style="width: 78%;"></div>
+                    <div class="demo-emerald-line" style="width: 85%;"></div>
+                    <div class="demo-emerald-line" style="width: 70%;"></div>
+                  </div>
+                  <div class="demo-rewrite-footer">
+                    <span class="demo-rewrite-complete">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      <span data-i18n="rewrite.complete">Rewrite complete</span>
+                    </span>
+                    <button class="demo-rewrite-btn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                      <span data-i18n="rewrite.btn">Rewrite</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="demo-rewrite-sidebar">
+                  <div class="demo-sidebar-card">
+                    <div class="demo-sidebar-icon" style="background: #d1fae5;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <div class="demo-sidebar-title" data-i18n="rewrite.grammarFix">Grammar Fix</div>
+                    <div class="demo-sidebar-desc" data-i18n="rewrite.grammarDesc">Auto-correct errors</div>
+                  </div>
+                  <div class="demo-sidebar-card">
+                    <div class="demo-sidebar-icon" style="background: #e0f2fe;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+                    </div>
+                    <div class="demo-sidebar-title" data-i18n="rewrite.expand">Expand</div>
+                    <div class="demo-sidebar-desc" data-i18n="rewrite.expandDesc">Add more details</div>
+                  </div>
+                  <div class="demo-option-row">
+                    <span class="demo-option-label">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                      <span data-i18n="rewrite.keepMeaning">Keep meaning</span>
+                    </span>
+                    <div class="demo-toggle on"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="marketing-url">graphosai.com</div>
+      </div>
+    </div>
+
+    <h2 class="section-title">🎨 Promo Tiles</h2>
+
+    <!-- Small Promo Tile -->
+    <div class="og-wrapper">
+      <span class="og-label" id="label-small-promo">small-promo-tile-en.png (440×280)</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('small-promo')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+      </div>
+      <div class="small-promo" id="small-promo">
+        <div class="small-promo-bg">
+          <svg class="small-promo-pattern" viewBox="0 0 500 350" fill="none">
+            <defs>
+              <radialGradient id="smallCenterGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(139, 92, 246, 0.2)" />
+                <stop offset="100%" stop-color="transparent" />
+              </radialGradient>
+            </defs>
+            
+            <!-- Multi-color glow -->
+            <ellipse cx="250" cy="175" rx="200" ry="150" fill="url(#smallCenterGlow)" />
+            
+            <!-- Radar circles (blue) -->
+            <circle cx="100" cy="120" r="40" stroke="rgba(59, 130, 246, 0.2)" stroke-width="1" fill="none" />
+            <circle cx="100" cy="120" r="25" stroke="rgba(59, 130, 246, 0.15)" stroke-width="1" fill="none" />
+            <circle cx="100" cy="120" r="3" fill="rgba(59, 130, 246, 0.5)" />
+            
+            <!-- Neural nodes (cyan) -->
+            <circle cx="400" cy="100" r="4" fill="rgba(6, 182, 212, 0.4)" />
+            <circle cx="420" cy="130" r="3" fill="rgba(6, 182, 212, 0.3)" />
+            <circle cx="380" cy="140" r="3" fill="rgba(6, 182, 212, 0.3)" />
+            <line x1="400" y1="100" x2="420" y2="130" stroke="rgba(6, 182, 212, 0.2)" stroke-width="1" />
+            <line x1="400" y1="100" x2="380" y2="140" stroke="rgba(6, 182, 212, 0.2)" stroke-width="1" />
+            
+            <!-- Transformation arrows (amber) -->
+            <path d="M80 230 Q150 220 180 230" stroke="rgba(245, 158, 11, 0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <polygon points="180,230 170,225 170,235" fill="rgba(245, 158, 11, 0.4)" />
+            
+            <!-- DNA strand hint (purple) -->
+            <path d="M350 200 Q370 220 350 240 Q330 260 350 280" stroke="rgba(139, 92, 246, 0.25)" stroke-width="2" fill="none" />
+            <path d="M370 200 Q350 220 370 240 Q390 260 370 280" stroke="rgba(139, 92, 246, 0.2)" stroke-width="2" fill="none" />
+            
+            <!-- Floating particles -->
+            <circle cx="150" cy="80" r="2" fill="rgba(59, 130, 246, 0.4)" />
+            <circle cx="300" cy="60" r="2" fill="rgba(139, 92, 246, 0.4)" />
+            <circle cx="450" cy="200" r="2" fill="rgba(6, 182, 212, 0.4)" />
+            <circle cx="50" cy="250" r="2" fill="rgba(245, 158, 11, 0.4)" />
+            <circle cx="200" cy="300" r="2" fill="rgba(16, 185, 129, 0.4)" />
+          </svg>
+        </div>
+        <div class="small-promo-content">
+          <div class="logo">
+            <div class="logo-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+            </div>
+            <span class="logo-text">Graphos AI</span>
+          </div>
+          <h2 class="title" data-i18n="promo.title">Graphos AI Studio</h2>
+          <p class="subtitle" data-i18n="promo.subtitle">Detect, Humanize & Create with AI</p>
+          <div class="pills">
+            <div class="pills-row">
+              <span class="pill pill-blue">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                <span data-i18n="promo.pill1">AI Detection</span>
+              </span>
+              <span class="pill pill-amber">
+                <svg viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+                <span data-i18n="promo.pill2">Humanize</span>
+              </span>
+            </div>
+            <div class="pills-row">
+              <span class="pill pill-purple">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span data-i18n="promo.pill3">Voice Profile</span>
+              </span>
+              <span class="pill pill-cyan">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span data-i18n="promo.pill4">AI Chat</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Marquee Promo Tile -->
+    <div class="og-wrapper">
+      <span class="og-label" id="label-marquee-promo">marquee-promo-tile-en.png (1400×560)</span>
+      <div class="og-actions">
+        <button class="btn-download primary" onclick="downloadCard('marquee-promo')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Download PNG
+        </button>
+      </div>
+      <div class="marquee-promo" id="marquee-promo">
+        <div class="marquee-promo-bg">
+          <div class="marquee-promo-glow"></div>
+        </div>
+        <div class="marquee-promo-content">
+          <div class="logo">
+            <div class="logo-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 375" style="width:100%;height:100%;"><path fill="#000" d="M130.57.24h113.85c70.5 0 130.33 59.83 130.33 130.33v113.85c0 70.5-59.83 130.33-130.33 130.33H130.57c-70.5 0-130.33-59.83-130.33-130.33V130.57C.24 60.07 60.07.24 130.57.24z"/><path fill="#fff" stroke="#fff" stroke-width="25" stroke-linecap="round" d="M62.5 162.5v37.5M112.5 112.5v137.5M162.5 75v187.5M212.5 137.5v87.5M262.5 100v162.5M312.5 162.5v37.5"/><path fill="#fff" d="M312.78 103.22c.91 9.36 8.32 16.77 17.68 17.68.23.02.23.35 0 .37-9.36.91-16.77 8.32-17.68 17.68-.02.23-.35.23-.37 0-.91-9.36-8.32-16.77-17.68-17.68-.23-.02-.23-.35 0-.37 9.36-.91 16.77-8.32 17.68-17.68.02-.23.35-.23.37 0z"/></svg>
+            </div>
+            <span class="logo-text">Graphos AI</span>
+          </div>
+          <span class="url">graphosai.com</span>
+          <h1 class="title" data-i18n="marquee.title">Graphos AI Studio</h1>
+          <p class="subtitle" data-i18n="marquee.subtitle">Detect AI content, humanize text, and create with your unique voice</p>
+          <div class="pills">
+            <span class="pill pill-blue">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              <span data-i18n="marquee.pill1">AI Detection</span>
+            </span>
+            <span class="pill pill-amber">
+              <svg viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+              <span data-i18n="marquee.pill2">Humanization</span>
+            </span>
+            <span class="pill pill-purple">
+              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span data-i18n="marquee.pill3">Voice Profile</span>
+            </span>
+            <span class="pill pill-cyan">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span data-i18n="marquee.pill4">AI Workspace</span>
+            </span>
+            <span class="pill pill-emerald">
+              <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              <span data-i18n="marquee.pill5">AI Rewrite</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript for i18n and downloading -->
+  <!-- html-to-image - best CSS support for modern browsers -->
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+  <script>
+    // Current language
+    let currentLang = 'en';
+    
+    // Translations for 15 languages with localized profile names
+    const translations = {
+      en: {
+        detection: {
+          title: 'AI Detection',
+          subtitle: 'Detect AI-generated content<br>with industry-leading accuracy',
+          pill1: '98% Accuracy',
+          pill2: 'Real-time',
+          pill3: 'Multi-language',
+          windowTitle: 'AI Detection',
+          trySample: 'Try sample:',
+          aiText: 'AI Text',
+          human: 'Human',
+          mixed: 'Mixed',
+          detectBtn: 'Detect AI',
+          resultsTitle: 'AI Detection',
+          resultsSubtitle: 'Content Analysis',
+          verdict: 'Likely AI Generated',
+          confidence: 'Confidence',
+          indicators: 'AI Indicators (4)'
+        },
+        humanization: {
+          title: 'Humanization',
+          subtitle: 'Transform AI-generated text<br>into authentic human writing',
+          pill1: 'Bypass AI Detection',
+          pill2: 'Natural Tone',
+          pill3: 'Multiple Styles',
+          windowTitle: 'Content Humanization',
+          demoTitle: 'Content Humanization',
+          demoSubtitle: 'Transform AI text to human-like',
+          formal: 'Formal',
+          academic: 'Academic',
+          status: 'Humanized',
+          complete: 'Transformation complete',
+          btn: 'Humanize'
+        },
+        voice: {
+          title: 'Voice Profile',
+          subtitle: 'Capture your unique writing style<br>and apply it to any content',
+          pill1: 'Style Analysis',
+          pill2: 'Writing Metrics',
+          pill3: 'Multiple Profiles',
+          windowTitle: 'Voice Profile',
+          selectProfile: 'Select a Profile',
+          profile1: { name: 'Sarah Chen', initials: 'SC', desc: 'Professional & Warm' },
+          profile2: { name: 'Alex Rivera', initials: 'AR', desc: 'Casual & Creative' },
+          profile3: { name: 'Dr. James Park', initials: 'JP', desc: 'Academic & Precise' },
+          metrics: 'Writing Metrics',
+          formality: 'Formality',
+          complexity: 'Complexity',
+          emotion: 'Emotion',
+          styleTraits: 'Style Traits',
+          trait1: 'Confident',
+          trait2: 'Clear',
+          trait3: 'Engaging',
+          vocabulary: 'Vocabulary',
+          vocab1: 'Technical',
+          vocab2: 'Modern'
+        },
+        workspace: {
+          title: 'AI Workspace',
+          subtitle: 'Chat with multiple AI models<br>in one unified interface',
+          pill1: 'Multi-Model',
+          pill2: 'Smart Chat',
+          pill3: 'Image Analysis',
+          windowTitle: 'AI Workspace'
+        },
+        rewrite: {
+          title: 'AI Rewrite',
+          subtitle: 'Transform your content with<br>AI-powered rewriting tools',
+          pill1: 'Smart Rewrite',
+          pill2: 'Multiple Tones',
+          pill3: 'Grammar Fix',
+          windowTitle: 'AI Rewrite',
+          demoTitle: 'Content Rewrite',
+          demoSubtitle: 'Transform your text',
+          professional: 'Professional',
+          casual: 'Casual',
+          creative: 'Creative',
+          status: 'Rewritten',
+          complete: 'Rewrite complete',
+          btn: 'Rewrite',
+          grammarFix: 'Grammar Fix',
+          grammarDesc: 'Auto-correct errors',
+          expand: 'Expand',
+          expandDesc: 'Add more details',
+          keepMeaning: 'Keep meaning'
+        },
+        promo: {
+          title: 'Graphos AI Studio',
+          subtitle: 'Detect, Humanize & Create with AI',
+          pill1: 'AI Detection',
+          pill2: 'Humanize',
+          pill3: 'Voice Profile',
+          pill4: 'AI Chat'
+        },
+        marquee: {
+          title: 'Graphos AI Studio',
+          subtitle: 'Detect AI content, humanize text, and create with your unique voice',
+          pill1: 'AI Detection',
+          pill2: 'Humanization',
+          pill3: 'Voice Profile',
+          pill4: 'AI Workspace',
+          pill5: 'AI Rewrite'
+        }
+      },
+
+      vi: {
+        detection: {
+          title: 'Phát hiện AI',
+          subtitle: 'Phát hiện nội dung do AI tạo<br>với độ chính xác hàng đầu',
+          pill1: 'Chính xác 98%',
+          pill2: 'Thời gian thực',
+          pill3: 'Đa ngôn ngữ',
+          windowTitle: 'Phát hiện AI',
+          trySample: 'Thử mẫu:',
+          aiText: 'Văn bản AI',
+          human: 'Con người',
+          mixed: 'Hỗn hợp',
+          detectBtn: 'Phát hiện AI',
+          resultsTitle: 'Phát hiện AI',
+          resultsSubtitle: 'Phân tích nội dung',
+          verdict: 'Có thể do AI tạo',
+          confidence: 'Độ tin cậy',
+          indicators: 'Chỉ số AI (4)'
+        },
+        humanization: {
+          title: 'Nhân hóa',
+          subtitle: 'Biến đổi văn bản AI<br>thành văn bản tự nhiên',
+          pill1: 'Vượt qua phát hiện AI',
+          pill2: 'Giọng điệu tự nhiên',
+          pill3: 'Nhiều phong cách',
+          windowTitle: 'Nhân hóa nội dung',
+          demoTitle: 'Nhân hóa nội dung',
+          demoSubtitle: 'Biến văn bản AI thành tự nhiên',
+          formal: 'Trang trọng',
+          academic: 'Học thuật',
+          status: 'Đã nhân hóa',
+          complete: 'Hoàn thành chuyển đổi',
+          btn: 'Nhân hóa'
+        },
+        voice: {
+          title: 'Hồ sơ giọng văn',
+          subtitle: 'Nắm bắt phong cách viết độc đáo<br>và áp dụng cho mọi nội dung',
+          pill1: 'Phân tích phong cách',
+          pill2: 'Chỉ số viết',
+          pill3: 'Nhiều hồ sơ',
+          windowTitle: 'Hồ sơ giọng văn',
+          selectProfile: 'Chọn hồ sơ',
+          profile1: { name: 'Nguyễn Minh Anh', initials: 'MA', desc: 'Chuyên nghiệp & Ấm áp' },
+          profile2: { name: 'Trần Văn Hùng', initials: 'VH', desc: 'Thoải mái & Sáng tạo' },
+          profile3: { name: 'TS. Lê Hoàng', initials: 'LH', desc: 'Học thuật & Chính xác' },
+          metrics: 'Chỉ số viết',
+          formality: 'Trang trọng',
+          complexity: 'Độ phức tạp',
+          emotion: 'Cảm xúc',
+          styleTraits: 'Đặc điểm phong cách',
+          trait1: 'Tự tin',
+          trait2: 'Rõ ràng',
+          trait3: 'Hấp dẫn',
+          vocabulary: 'Từ vựng',
+          vocab1: 'Chuyên môn',
+          vocab2: 'Hiện đại'
+        },
+        workspace: {
+          title: 'Không gian AI',
+          subtitle: 'Trò chuyện với nhiều mô hình AI<br>trong một giao diện thống nhất',
+          pill1: 'Đa mô hình',
+          pill2: 'Chat thông minh',
+          pill3: 'Phân tích hình ảnh',
+          windowTitle: 'Không gian AI'
+        },
+        rewrite: {
+          title: 'Viết lại AI',
+          subtitle: 'Biến đổi nội dung của bạn<br>với công cụ viết lại AI',
+          pill1: 'Viết lại thông minh',
+          pill2: 'Nhiều giọng điệu',
+          pill3: 'Sửa ngữ pháp',
+          windowTitle: 'Viết lại AI',
+          demoTitle: 'Viết lại nội dung',
+          demoSubtitle: 'Biến đổi văn bản của bạn',
+          professional: 'Chuyên nghiệp',
+          casual: 'Thoải mái',
+          creative: 'Sáng tạo',
+          status: 'Đã viết lại',
+          complete: 'Hoàn thành viết lại',
+          btn: 'Viết lại',
+          grammarFix: 'Sửa ngữ pháp',
+          grammarDesc: 'Tự động sửa lỗi',
+          expand: 'Mở rộng',
+          expandDesc: 'Thêm chi tiết',
+          keepMeaning: 'Giữ nguyên ý nghĩa'
+        },
+        promo: {
+          title: 'Graphos AI Studio',
+          subtitle: 'Phát hiện, Nhân hóa & Sáng tạo với AI',
+          pill1: 'Phát hiện AI',
+          pill2: 'Nhân hóa',
+          pill3: 'Hồ sơ giọng văn',
+          pill4: 'Chat AI'
+        },
+        marquee: {
+          title: 'Graphos AI Studio',
+          subtitle: 'Phát hiện nội dung AI, nhân hóa văn bản và sáng tạo với giọng văn riêng',
+          pill1: 'Phát hiện AI',
+          pill2: 'Nhân hóa',
+          pill3: 'Hồ sơ giọng văn',
+          pill4: 'Không gian AI',
+          pill5: 'Viết lại AI'
+        }
+      },
+
+      zh_CN: {
+        detection: {
+          title: 'AI检测',
+          subtitle: '以行业领先的准确度<br>检测AI生成的内容',
+          pill1: '98%准确率',
+          pill2: '实时检测',
+          pill3: '多语言支持',
+          windowTitle: 'AI检测',
+          trySample: '试试样本:',
+          aiText: 'AI文本',
+          human: '人类',
+          mixed: '混合',
+          detectBtn: '检测AI',
+          resultsTitle: 'AI检测',
+          resultsSubtitle: '内容分析',
+          verdict: '可能由AI生成',
+          confidence: '置信度',
+          indicators: 'AI指标 (4)'
+        },
+        humanization: {
+          title: '人性化',
+          subtitle: '将AI生成的文本<br>转化为真实的人类写作',
+          pill1: '绕过AI检测',
+          pill2: '自然语调',
+          pill3: '多种风格',
+          windowTitle: '内容人性化',
+          demoTitle: '内容人性化',
+          demoSubtitle: '将AI文本转化为人类风格',
+          formal: '正式',
+          academic: '学术',
+          status: '已人性化',
+          complete: '转换完成',
+          btn: '人性化'
+        },
+        voice: {
+          title: '声音档案',
+          subtitle: '捕捉您独特的写作风格<br>并应用于任何内容',
+          pill1: '风格分析',
+          pill2: '写作指标',
+          pill3: '多个档案',
+          windowTitle: '声音档案',
+          selectProfile: '选择档案',
+          profile1: { name: '陈晓明', initials: '陈', desc: '专业且温暖' },
+          profile2: { name: '王小华', initials: '王', desc: '休闲且创意' },
+          profile3: { name: '李教授', initials: '李', desc: '学术且精确' },
+          metrics: '写作指标',
+          formality: '正式度',
+          complexity: '复杂度',
+          emotion: '情感',
+          styleTraits: '风格特征',
+          trait1: '自信',
+          trait2: '清晰',
+          trait3: '引人入胜',
+          vocabulary: '词汇',
+          vocab1: '技术性',
+          vocab2: '现代'
+        },
+        workspace: {
+          title: 'AI工作区',
+          subtitle: '在统一界面中<br>与多个AI模型对话',
+          pill1: '多模型',
+          pill2: '智能聊天',
+          pill3: '图像分析',
+          windowTitle: 'AI工作区'
+        },
+        rewrite: {
+          title: 'AI重写',
+          subtitle: '使用AI驱动的重写工具<br>转换您的内容',
+          pill1: '智能重写',
+          pill2: '多种语调',
+          pill3: '语法修复',
+          windowTitle: 'AI重写',
+          demoTitle: '内容重写',
+          demoSubtitle: '转换您的文本',
+          professional: '专业',
+          casual: '休闲',
+          creative: '创意',
+          status: '已重写',
+          complete: '重写完成',
+          btn: '重写',
+          grammarFix: '语法修复',
+          grammarDesc: '自动纠错',
+          expand: '扩展',
+          expandDesc: '添加更多细节',
+          keepMeaning: '保持原意'
+        },
+        promo: {
+          title: 'AI写作工作室',
+          subtitle: '用AI检测、人性化和创作',
+          pill1: 'AI检测',
+          pill2: '人性化',
+          pill3: '声音档案',
+          pill4: 'AI聊天'
+        },
+        marquee: {
+          title: 'AI写作工作室',
+          subtitle: '检测AI内容，人性化文本，用您独特的声音创作',
+          pill1: 'AI检测',
+          pill2: '人性化',
+          pill3: '声音档案',
+          pill4: 'AI工作区',
+          pill5: 'AI重写'
+        }
+      },
+
+      ja: {
+        detection: {
+          title: 'AI検出',
+          subtitle: '業界最高の精度で<br>AI生成コンテンツを検出',
+          pill1: '98%の精度',
+          pill2: 'リアルタイム',
+          pill3: '多言語対応',
+          windowTitle: 'AI検出',
+          trySample: 'サンプル:',
+          aiText: 'AIテキスト',
+          human: '人間',
+          mixed: '混合',
+          detectBtn: 'AI検出',
+          resultsTitle: 'AI検出',
+          resultsSubtitle: 'コンテンツ分析',
+          verdict: 'AI生成の可能性',
+          confidence: '信頼度',
+          indicators: 'AI指標 (4)'
+        },
+        humanization: {
+          title: '人間化',
+          subtitle: 'AI生成テキストを<br>本物の人間の文章に変換',
+          pill1: 'AI検出を回避',
+          pill2: '自然なトーン',
+          pill3: '複数のスタイル',
+          windowTitle: 'コンテンツ人間化',
+          demoTitle: 'コンテンツ人間化',
+          demoSubtitle: 'AIテキストを人間らしく',
+          formal: 'フォーマル',
+          academic: '学術的',
+          status: '人間化済み',
+          complete: '変換完了',
+          btn: '人間化'
+        },
+        voice: {
+          title: 'ボイスプロファイル',
+          subtitle: 'あなた独自の文体を捉え<br>あらゆるコンテンツに適用',
+          pill1: 'スタイル分析',
+          pill2: '文章指標',
+          pill3: '複数プロファイル',
+          windowTitle: 'ボイスプロファイル',
+          selectProfile: 'プロファイルを選択',
+          profile1: { name: '田中美咲', initials: '田', desc: 'プロフェッショナル＆温かい' },
+          profile2: { name: '鈴木健太', initials: '鈴', desc: 'カジュアル＆クリエイティブ' },
+          profile3: { name: '山田教授', initials: '山', desc: '学術的＆正確' },
+          metrics: '文章指標',
+          formality: 'フォーマル度',
+          complexity: '複雑さ',
+          emotion: '感情',
+          styleTraits: 'スタイル特性',
+          trait1: '自信',
+          trait2: '明確',
+          trait3: '魅力的',
+          vocabulary: '語彙',
+          vocab1: '技術的',
+          vocab2: 'モダン'
+        },
+        workspace: {
+          title: 'AIワークスペース',
+          subtitle: '統一インターフェースで<br>複数のAIモデルとチャット',
+          pill1: 'マルチモデル',
+          pill2: 'スマートチャット',
+          pill3: '画像分析',
+          windowTitle: 'AIワークスペース'
+        },
+        rewrite: {
+          title: 'AIリライト',
+          subtitle: 'AI搭載のリライトツールで<br>コンテンツを変換',
+          pill1: 'スマートリライト',
+          pill2: '複数のトーン',
+          pill3: '文法修正',
+          windowTitle: 'AIリライト',
+          demoTitle: 'コンテンツリライト',
+          demoSubtitle: 'テキストを変換',
+          professional: 'プロフェッショナル',
+          casual: 'カジュアル',
+          creative: 'クリエイティブ',
+          status: 'リライト済み',
+          complete: 'リライト完了',
+          btn: 'リライト',
+          grammarFix: '文法修正',
+          grammarDesc: '自動修正',
+          expand: '拡張',
+          expandDesc: '詳細を追加',
+          keepMeaning: '意味を保持'
+        },
+        promo: {
+          title: 'AIライティングスタジオ',
+          subtitle: 'AIで検出、人間化、創作',
+          pill1: 'AI検出',
+          pill2: '人間化',
+          pill3: 'ボイスプロファイル',
+          pill4: 'AIチャット'
+        },
+        marquee: {
+          title: 'AIライティングスタジオ',
+          subtitle: 'AIコンテンツを検出し、テキストを人間化し、あなた独自の声で創作',
+          pill1: 'AI検出',
+          pill2: '人間化',
+          pill3: 'ボイスプロファイル',
+          pill4: 'AIワークスペース',
+          pill5: 'AIリライト'
+        }
+      },
+
+      ko: {
+        detection: {
+          title: 'AI 감지',
+          subtitle: '업계 최고의 정확도로<br>AI 생성 콘텐츠 감지',
+          pill1: '98% 정확도',
+          pill2: '실시간',
+          pill3: '다국어 지원',
+          windowTitle: 'AI 감지',
+          trySample: '샘플 시도:',
+          aiText: 'AI 텍스트',
+          human: '인간',
+          mixed: '혼합',
+          detectBtn: 'AI 감지',
+          resultsTitle: 'AI 감지',
+          resultsSubtitle: '콘텐츠 분석',
+          verdict: 'AI 생성 가능성',
+          confidence: '신뢰도',
+          indicators: 'AI 지표 (4)'
+        },
+        humanization: {
+          title: '인간화',
+          subtitle: 'AI 생성 텍스트를<br>진정한 인간 글쓰기로 변환',
+          pill1: 'AI 감지 우회',
+          pill2: '자연스러운 톤',
+          pill3: '다양한 스타일',
+          windowTitle: '콘텐츠 인간화',
+          demoTitle: '콘텐츠 인간화',
+          demoSubtitle: 'AI 텍스트를 인간처럼',
+          formal: '공식적',
+          academic: '학술적',
+          status: '인간화됨',
+          complete: '변환 완료',
+          btn: '인간화'
+        },
+        voice: {
+          title: '보이스 프로필',
+          subtitle: '고유한 글쓰기 스타일을 캡처하고<br>모든 콘텐츠에 적용',
+          pill1: '스타일 분석',
+          pill2: '글쓰기 지표',
+          pill3: '다중 프로필',
+          windowTitle: '보이스 프로필',
+          selectProfile: '프로필 선택',
+          profile1: { name: '김민지', initials: '김', desc: '전문적 & 따뜻함' },
+          profile2: { name: '이준호', initials: '이', desc: '캐주얼 & 창의적' },
+          profile3: { name: '박교수', initials: '박', desc: '학술적 & 정확함' },
+          metrics: '글쓰기 지표',
+          formality: '공식성',
+          complexity: '복잡성',
+          emotion: '감정',
+          styleTraits: '스타일 특성',
+          trait1: '자신감',
+          trait2: '명확함',
+          trait3: '매력적',
+          vocabulary: '어휘',
+          vocab1: '기술적',
+          vocab2: '현대적'
+        },
+        workspace: {
+          title: 'AI 워크스페이스',
+          subtitle: '통합 인터페이스에서<br>여러 AI 모델과 채팅',
+          pill1: '멀티 모델',
+          pill2: '스마트 채팅',
+          pill3: '이미지 분석',
+          windowTitle: 'AI 워크스페이스'
+        },
+        rewrite: {
+          title: 'AI 다시쓰기',
+          subtitle: 'AI 기반 다시쓰기 도구로<br>콘텐츠 변환',
+          pill1: '스마트 다시쓰기',
+          pill2: '다양한 톤',
+          pill3: '문법 수정',
+          windowTitle: 'AI 다시쓰기',
+          demoTitle: '콘텐츠 다시쓰기',
+          demoSubtitle: '텍스트 변환',
+          professional: '전문적',
+          casual: '캐주얼',
+          creative: '창의적',
+          status: '다시쓰기됨',
+          complete: '다시쓰기 완료',
+          btn: '다시쓰기',
+          grammarFix: '문법 수정',
+          grammarDesc: '자동 수정',
+          expand: '확장',
+          expandDesc: '세부 정보 추가',
+          keepMeaning: '의미 유지'
+        },
+        promo: {
+          title: 'AI 글쓰기 스튜디오',
+          subtitle: 'AI로 감지, 인간화 및 창작',
+          pill1: 'AI 감지',
+          pill2: '인간화',
+          pill3: '보이스 프로필',
+          pill4: 'AI 채팅'
+        },
+        marquee: {
+          title: 'AI 글쓰기 스튜디오',
+          subtitle: 'AI 콘텐츠 감지, 텍스트 인간화, 고유한 목소리로 창작',
+          pill1: 'AI 감지',
+          pill2: '인간화',
+          pill3: '보이스 프로필',
+          pill4: 'AI 워크스페이스',
+          pill5: 'AI 다시쓰기'
+        }
+      },
+
+      es: {
+        detection: {
+          title: 'Detección de IA',
+          subtitle: 'Detecta contenido generado por IA<br>con precisión líder en la industria',
+          pill1: '98% de precisión',
+          pill2: 'Tiempo real',
+          pill3: 'Multiidioma',
+          windowTitle: 'Detección de IA',
+          trySample: 'Probar muestra:',
+          aiText: 'Texto IA',
+          human: 'Humano',
+          mixed: 'Mixto',
+          detectBtn: 'Detectar IA',
+          resultsTitle: 'Detección de IA',
+          resultsSubtitle: 'Análisis de contenido',
+          verdict: 'Probablemente generado por IA',
+          confidence: 'Confianza',
+          indicators: 'Indicadores IA (4)'
+        },
+        humanization: {
+          title: 'Humanización',
+          subtitle: 'Transforma texto generado por IA<br>en escritura humana auténtica',
+          pill1: 'Evita detección IA',
+          pill2: 'Tono natural',
+          pill3: 'Múltiples estilos',
+          windowTitle: 'Humanización de contenido',
+          demoTitle: 'Humanización de contenido',
+          demoSubtitle: 'Transforma texto IA a humano',
+          formal: 'Formal',
+          academic: 'Académico',
+          status: 'Humanizado',
+          complete: 'Transformación completa',
+          btn: 'Humanizar'
+        },
+        voice: {
+          title: 'Perfil de voz',
+          subtitle: 'Captura tu estilo de escritura único<br>y aplícalo a cualquier contenido',
+          pill1: 'Análisis de estilo',
+          pill2: 'Métricas de escritura',
+          pill3: 'Múltiples perfiles',
+          windowTitle: 'Perfil de voz',
+          selectProfile: 'Seleccionar perfil',
+          profile1: { name: 'María García', initials: 'MG', desc: 'Profesional y cálida' },
+          profile2: { name: 'Carlos López', initials: 'CL', desc: 'Casual y creativo' },
+          profile3: { name: 'Dr. Ana Martín', initials: 'AM', desc: 'Académica y precisa' },
+          metrics: 'Métricas de escritura',
+          formality: 'Formalidad',
+          complexity: 'Complejidad',
+          emotion: 'Emoción',
+          styleTraits: 'Rasgos de estilo',
+          trait1: 'Confiado',
+          trait2: 'Claro',
+          trait3: 'Atractivo',
+          vocabulary: 'Vocabulario',
+          vocab1: 'Técnico',
+          vocab2: 'Moderno'
+        },
+        workspace: {
+          title: 'Espacio de trabajo IA',
+          subtitle: 'Chatea con múltiples modelos IA<br>en una interfaz unificada',
+          pill1: 'Multi-modelo',
+          pill2: 'Chat inteligente',
+          pill3: 'Análisis de imagen',
+          windowTitle: 'Espacio de trabajo IA'
+        },
+        rewrite: {
+          title: 'Reescritura IA',
+          subtitle: 'Transforma tu contenido con<br>herramientas de reescritura IA',
+          pill1: 'Reescritura inteligente',
+          pill2: 'Múltiples tonos',
+          pill3: 'Corrección gramatical',
+          windowTitle: 'Reescritura IA',
+          demoTitle: 'Reescritura de contenido',
+          demoSubtitle: 'Transforma tu texto',
+          professional: 'Profesional',
+          casual: 'Casual',
+          creative: 'Creativo',
+          status: 'Reescrito',
+          complete: 'Reescritura completa',
+          btn: 'Reescribir',
+          grammarFix: 'Corrección gramatical',
+          grammarDesc: 'Corrección automática',
+          expand: 'Expandir',
+          expandDesc: 'Añadir más detalles',
+          keepMeaning: 'Mantener significado'
+        },
+        promo: {
+          title: 'Estudio de escritura IA',
+          subtitle: 'Detecta, humaniza y crea con IA',
+          pill1: 'Detección IA',
+          pill2: 'Humanizar',
+          pill3: 'Perfil de voz',
+          pill4: 'Chat IA'
+        },
+        marquee: {
+          title: 'Estudio de escritura IA',
+          subtitle: 'Detecta contenido IA, humaniza texto y crea con tu voz única',
+          pill1: 'Detección IA',
+          pill2: 'Humanización',
+          pill3: 'Perfil de voz',
+          pill4: 'Espacio de trabajo IA',
+          pill5: 'Reescritura IA'
+        }
+      },
+
+      fr: {
+        detection: {
+          title: 'Détection IA',
+          subtitle: 'Détectez le contenu généré par IA<br>avec une précision de pointe',
+          pill1: '98% de précision',
+          pill2: 'Temps réel',
+          pill3: 'Multilingue',
+          windowTitle: 'Détection IA',
+          trySample: 'Essayer:',
+          aiText: 'Texte IA',
+          human: 'Humain',
+          mixed: 'Mixte',
+          detectBtn: 'Détecter IA',
+          resultsTitle: 'Détection IA',
+          resultsSubtitle: 'Analyse du contenu',
+          verdict: 'Probablement généré par IA',
+          confidence: 'Confiance',
+          indicators: 'Indicateurs IA (4)'
+        },
+        humanization: {
+          title: 'Humanisation',
+          subtitle: 'Transformez le texte IA<br>en écriture humaine authentique',
+          pill1: 'Contourne la détection IA',
+          pill2: 'Ton naturel',
+          pill3: 'Styles multiples',
+          windowTitle: 'Humanisation du contenu',
+          demoTitle: 'Humanisation du contenu',
+          demoSubtitle: 'Transformez le texte IA en humain',
+          formal: 'Formel',
+          academic: 'Académique',
+          status: 'Humanisé',
+          complete: 'Transformation terminée',
+          btn: 'Humaniser'
+        },
+        voice: {
+          title: 'Profil vocal',
+          subtitle: 'Capturez votre style d\'écriture unique<br>et appliquez-le à tout contenu',
+          pill1: 'Analyse de style',
+          pill2: 'Métriques d\'écriture',
+          pill3: 'Profils multiples',
+          windowTitle: 'Profil vocal',
+          selectProfile: 'Sélectionner un profil',
+          profile1: { name: 'Marie Dupont', initials: 'MD', desc: 'Professionnelle et chaleureuse' },
+          profile2: { name: 'Pierre Martin', initials: 'PM', desc: 'Décontracté et créatif' },
+          profile3: { name: 'Dr. Sophie Bernard', initials: 'SB', desc: 'Académique et précise' },
+          metrics: 'Métriques d\'écriture',
+          formality: 'Formalité',
+          complexity: 'Complexité',
+          emotion: 'Émotion',
+          styleTraits: 'Traits de style',
+          trait1: 'Confiant',
+          trait2: 'Clair',
+          trait3: 'Engageant',
+          vocabulary: 'Vocabulaire',
+          vocab1: 'Technique',
+          vocab2: 'Moderne'
+        },
+        workspace: {
+          title: 'Espace de travail IA',
+          subtitle: 'Discutez avec plusieurs modèles IA<br>dans une interface unifiée',
+          pill1: 'Multi-modèle',
+          pill2: 'Chat intelligent',
+          pill3: 'Analyse d\'image',
+          windowTitle: 'Espace de travail IA'
+        },
+        rewrite: {
+          title: 'Réécriture IA',
+          subtitle: 'Transformez votre contenu avec<br>des outils de réécriture IA',
+          pill1: 'Réécriture intelligente',
+          pill2: 'Tons multiples',
+          pill3: 'Correction grammaticale',
+          windowTitle: 'Réécriture IA',
+          demoTitle: 'Réécriture du contenu',
+          demoSubtitle: 'Transformez votre texte',
+          professional: 'Professionnel',
+          casual: 'Décontracté',
+          creative: 'Créatif',
+          status: 'Réécrit',
+          complete: 'Réécriture terminée',
+          btn: 'Réécrire',
+          grammarFix: 'Correction grammaticale',
+          grammarDesc: 'Correction automatique',
+          expand: 'Développer',
+          expandDesc: 'Ajouter des détails',
+          keepMeaning: 'Garder le sens'
+        },
+        promo: {
+          title: 'Studio d\'écriture IA',
+          subtitle: 'Détectez, humanisez et créez avec l\'IA',
+          pill1: 'Détection IA',
+          pill2: 'Humaniser',
+          pill3: 'Profil vocal',
+          pill4: 'Chat IA'
+        },
+        marquee: {
+          title: 'Studio d\'écriture IA',
+          subtitle: 'Détectez le contenu IA, humanisez le texte et créez avec votre voix unique',
+          pill1: 'Détection IA',
+          pill2: 'Humanisation',
+          pill3: 'Profil vocal',
+          pill4: 'Espace de travail IA',
+          pill5: 'Réécriture IA'
+        }
+      },
+
+      de: {
+        detection: {
+          title: 'KI-Erkennung',
+          subtitle: 'Erkennen Sie KI-generierte Inhalte<br>mit branchenführender Genauigkeit',
+          pill1: '98% Genauigkeit',
+          pill2: 'Echtzeit',
+          pill3: 'Mehrsprachig',
+          windowTitle: 'KI-Erkennung',
+          trySample: 'Beispiel:',
+          aiText: 'KI-Text',
+          human: 'Mensch',
+          mixed: 'Gemischt',
+          detectBtn: 'KI erkennen',
+          resultsTitle: 'KI-Erkennung',
+          resultsSubtitle: 'Inhaltsanalyse',
+          verdict: 'Wahrscheinlich KI-generiert',
+          confidence: 'Vertrauen',
+          indicators: 'KI-Indikatoren (4)'
+        },
+        humanization: {
+          title: 'Humanisierung',
+          subtitle: 'Verwandeln Sie KI-Text<br>in authentisches menschliches Schreiben',
+          pill1: 'KI-Erkennung umgehen',
+          pill2: 'Natürlicher Ton',
+          pill3: 'Mehrere Stile',
+          windowTitle: 'Inhalts-Humanisierung',
+          demoTitle: 'Inhalts-Humanisierung',
+          demoSubtitle: 'KI-Text menschlich machen',
+          formal: 'Formell',
+          academic: 'Akademisch',
+          status: 'Humanisiert',
+          complete: 'Transformation abgeschlossen',
+          btn: 'Humanisieren'
+        },
+        voice: {
+          title: 'Stimmprofil',
+          subtitle: 'Erfassen Sie Ihren einzigartigen Schreibstil<br>und wenden Sie ihn auf jeden Inhalt an',
+          pill1: 'Stilanalyse',
+          pill2: 'Schreibmetriken',
+          pill3: 'Mehrere Profile',
+          windowTitle: 'Stimmprofil',
+          selectProfile: 'Profil auswählen',
+          profile1: { name: 'Anna Müller', initials: 'AM', desc: 'Professionell & Warm' },
+          profile2: { name: 'Max Schmidt', initials: 'MS', desc: 'Lässig & Kreativ' },
+          profile3: { name: 'Dr. Hans Weber', initials: 'HW', desc: 'Akademisch & Präzise' },
+          metrics: 'Schreibmetriken',
+          formality: 'Formalität',
+          complexity: 'Komplexität',
+          emotion: 'Emotion',
+          styleTraits: 'Stilmerkmale',
+          trait1: 'Selbstbewusst',
+          trait2: 'Klar',
+          trait3: 'Ansprechend',
+          vocabulary: 'Wortschatz',
+          vocab1: 'Technisch',
+          vocab2: 'Modern'
+        },
+        workspace: {
+          title: 'KI-Arbeitsbereich',
+          subtitle: 'Chatten Sie mit mehreren KI-Modellen<br>in einer einheitlichen Oberfläche',
+          pill1: 'Multi-Modell',
+          pill2: 'Smart Chat',
+          pill3: 'Bildanalyse',
+          windowTitle: 'KI-Arbeitsbereich'
+        },
+        rewrite: {
+          title: 'KI-Umschreiben',
+          subtitle: 'Transformieren Sie Ihre Inhalte mit<br>KI-gestützten Umschreibe-Tools',
+          pill1: 'Smart Umschreiben',
+          pill2: 'Mehrere Töne',
+          pill3: 'Grammatikkorrektur',
+          windowTitle: 'KI-Umschreiben',
+          demoTitle: 'Inhalts-Umschreiben',
+          demoSubtitle: 'Text transformieren',
+          professional: 'Professionell',
+          casual: 'Lässig',
+          creative: 'Kreativ',
+          status: 'Umgeschrieben',
+          complete: 'Umschreiben abgeschlossen',
+          btn: 'Umschreiben',
+          grammarFix: 'Grammatikkorrektur',
+          grammarDesc: 'Automatische Korrektur',
+          expand: 'Erweitern',
+          expandDesc: 'Details hinzufügen',
+          keepMeaning: 'Bedeutung beibehalten'
+        },
+        promo: {
+          title: 'KI-Schreibstudio',
+          subtitle: 'Erkennen, humanisieren und erstellen mit KI',
+          pill1: 'KI-Erkennung',
+          pill2: 'Humanisieren',
+          pill3: 'Stimmprofil',
+          pill4: 'KI-Chat'
+        },
+        marquee: {
+          title: 'KI-Schreibstudio',
+          subtitle: 'KI-Inhalte erkennen, Text humanisieren und mit Ihrer einzigartigen Stimme erstellen',
+          pill1: 'KI-Erkennung',
+          pill2: 'Humanisierung',
+          pill3: 'Stimmprofil',
+          pill4: 'KI-Arbeitsbereich',
+          pill5: 'KI-Umschreiben'
+        }
+      },
+
+      pt_BR: {
+        detection: {
+          title: 'Detecção de IA',
+          subtitle: 'Detecte conteúdo gerado por IA<br>com precisão líder do setor',
+          pill1: '98% de precisão',
+          pill2: 'Tempo real',
+          pill3: 'Multi-idioma',
+          windowTitle: 'Detecção de IA',
+          trySample: 'Testar amostra:',
+          aiText: 'Texto IA',
+          human: 'Humano',
+          mixed: 'Misto',
+          detectBtn: 'Detectar IA',
+          resultsTitle: 'Detecção de IA',
+          resultsSubtitle: 'Análise de conteúdo',
+          verdict: 'Provavelmente gerado por IA',
+          confidence: 'Confiança',
+          indicators: 'Indicadores IA (4)'
+        },
+        humanization: {
+          title: 'Humanização',
+          subtitle: 'Transforme texto gerado por IA<br>em escrita humana autêntica',
+          pill1: 'Evita detecção IA',
+          pill2: 'Tom natural',
+          pill3: 'Múltiplos estilos',
+          windowTitle: 'Humanização de conteúdo',
+          demoTitle: 'Humanização de conteúdo',
+          demoSubtitle: 'Transforme texto IA em humano',
+          formal: 'Formal',
+          academic: 'Acadêmico',
+          status: 'Humanizado',
+          complete: 'Transformação completa',
+          btn: 'Humanizar'
+        },
+        voice: {
+          title: 'Perfil de voz',
+          subtitle: 'Capture seu estilo de escrita único<br>e aplique a qualquer conteúdo',
+          pill1: 'Análise de estilo',
+          pill2: 'Métricas de escrita',
+          pill3: 'Múltiplos perfis',
+          windowTitle: 'Perfil de voz',
+          selectProfile: 'Selecionar perfil',
+          profile1: { name: 'Maria Silva', initials: 'MS', desc: 'Profissional e calorosa' },
+          profile2: { name: 'João Santos', initials: 'JS', desc: 'Casual e criativo' },
+          profile3: { name: 'Dra. Ana Costa', initials: 'AC', desc: 'Acadêmica e precisa' },
+          metrics: 'Métricas de escrita',
+          formality: 'Formalidade',
+          complexity: 'Complexidade',
+          emotion: 'Emoção',
+          styleTraits: 'Traços de estilo',
+          trait1: 'Confiante',
+          trait2: 'Claro',
+          trait3: 'Envolvente',
+          vocabulary: 'Vocabulário',
+          vocab1: 'Técnico',
+          vocab2: 'Moderno'
+        },
+        workspace: {
+          title: 'Espaço de trabalho IA',
+          subtitle: 'Converse com múltiplos modelos IA<br>em uma interface unificada',
+          pill1: 'Multi-modelo',
+          pill2: 'Chat inteligente',
+          pill3: 'Análise de imagem',
+          windowTitle: 'Espaço de trabalho IA'
+        },
+        rewrite: {
+          title: 'Reescrita IA',
+          subtitle: 'Transforme seu conteúdo com<br>ferramentas de reescrita IA',
+          pill1: 'Reescrita inteligente',
+          pill2: 'Múltiplos tons',
+          pill3: 'Correção gramatical',
+          windowTitle: 'Reescrita IA',
+          demoTitle: 'Reescrita de conteúdo',
+          demoSubtitle: 'Transforme seu texto',
+          professional: 'Profissional',
+          casual: 'Casual',
+          creative: 'Criativo',
+          status: 'Reescrito',
+          complete: 'Reescrita completa',
+          btn: 'Reescrever',
+          grammarFix: 'Correção gramatical',
+          grammarDesc: 'Correção automática',
+          expand: 'Expandir',
+          expandDesc: 'Adicionar detalhes',
+          keepMeaning: 'Manter significado'
+        },
+        promo: {
+          title: 'Estúdio de escrita IA',
+          subtitle: 'Detecte, humanize e crie com IA',
+          pill1: 'Detecção IA',
+          pill2: 'Humanizar',
+          pill3: 'Perfil de voz',
+          pill4: 'Chat IA'
+        },
+        marquee: {
+          title: 'Estúdio de escrita IA',
+          subtitle: 'Detecte conteúdo IA, humanize texto e crie com sua voz única',
+          pill1: 'Detecção IA',
+          pill2: 'Humanização',
+          pill3: 'Perfil de voz',
+          pill4: 'Espaço de trabalho IA',
+          pill5: 'Reescrita IA'
+        }
+      },
+
+      ru: {
+        detection: {
+          title: 'Обнаружение ИИ',
+          subtitle: 'Обнаруживайте контент, созданный ИИ<br>с лучшей в отрасли точностью',
+          pill1: '98% точность',
+          pill2: 'В реальном времени',
+          pill3: 'Многоязычный',
+          windowTitle: 'Обнаружение ИИ',
+          trySample: 'Попробовать:',
+          aiText: 'Текст ИИ',
+          human: 'Человек',
+          mixed: 'Смешанный',
+          detectBtn: 'Обнаружить ИИ',
+          resultsTitle: 'Обнаружение ИИ',
+          resultsSubtitle: 'Анализ контента',
+          verdict: 'Вероятно создано ИИ',
+          confidence: 'Уверенность',
+          indicators: 'Индикаторы ИИ (4)'
+        },
+        humanization: {
+          title: 'Гуманизация',
+          subtitle: 'Преобразуйте текст ИИ<br>в подлинное человеческое письмо',
+          pill1: 'Обход обнаружения ИИ',
+          pill2: 'Естественный тон',
+          pill3: 'Множество стилей',
+          windowTitle: 'Гуманизация контента',
+          demoTitle: 'Гуманизация контента',
+          demoSubtitle: 'Преобразуйте текст ИИ в человеческий',
+          formal: 'Формальный',
+          academic: 'Академический',
+          status: 'Гуманизировано',
+          complete: 'Преобразование завершено',
+          btn: 'Гуманизировать'
+        },
+        voice: {
+          title: 'Голосовой профиль',
+          subtitle: 'Захватите свой уникальный стиль письма<br>и применяйте к любому контенту',
+          pill1: 'Анализ стиля',
+          pill2: 'Метрики письма',
+          pill3: 'Множество профилей',
+          windowTitle: 'Голосовой профиль',
+          selectProfile: 'Выбрать профиль',
+          profile1: { name: 'Анна Иванова', initials: 'АИ', desc: 'Профессиональный и тёплый' },
+          profile2: { name: 'Максим Петров', initials: 'МП', desc: 'Непринуждённый и творческий' },
+          profile3: { name: 'Д-р Елена Смирнова', initials: 'ЕС', desc: 'Академический и точный' },
+          metrics: 'Метрики письма',
+          formality: 'Формальность',
+          complexity: 'Сложность',
+          emotion: 'Эмоция',
+          styleTraits: 'Черты стиля',
+          trait1: 'Уверенный',
+          trait2: 'Ясный',
+          trait3: 'Увлекательный',
+          vocabulary: 'Словарь',
+          vocab1: 'Технический',
+          vocab2: 'Современный'
+        },
+        workspace: {
+          title: 'Рабочее пространство ИИ',
+          subtitle: 'Общайтесь с несколькими моделями ИИ<br>в едином интерфейсе',
+          pill1: 'Мульти-модель',
+          pill2: 'Умный чат',
+          pill3: 'Анализ изображений',
+          windowTitle: 'Рабочее пространство ИИ'
+        },
+        rewrite: {
+          title: 'Переписывание ИИ',
+          subtitle: 'Преобразуйте контент с помощью<br>инструментов переписывания ИИ',
+          pill1: 'Умное переписывание',
+          pill2: 'Множество тонов',
+          pill3: 'Исправление грамматики',
+          windowTitle: 'Переписывание ИИ',
+          demoTitle: 'Переписывание контента',
+          demoSubtitle: 'Преобразуйте текст',
+          professional: 'Профессиональный',
+          casual: 'Непринуждённый',
+          creative: 'Творческий',
+          status: 'Переписано',
+          complete: 'Переписывание завершено',
+          btn: 'Переписать',
+          grammarFix: 'Исправление грамматики',
+          grammarDesc: 'Автоисправление',
+          expand: 'Расширить',
+          expandDesc: 'Добавить детали',
+          keepMeaning: 'Сохранить смысл'
+        },
+        promo: {
+          title: 'Студия письма ИИ',
+          subtitle: 'Обнаруживайте, гуманизируйте и создавайте с ИИ',
+          pill1: 'Обнаружение ИИ',
+          pill2: 'Гуманизация',
+          pill3: 'Голосовой профиль',
+          pill4: 'Чат ИИ'
+        },
+        marquee: {
+          title: 'Студия письма ИИ',
+          subtitle: 'Обнаруживайте контент ИИ, гуманизируйте текст и создавайте своим уникальным голосом',
+          pill1: 'Обнаружение ИИ',
+          pill2: 'Гуманизация',
+          pill3: 'Голосовой профиль',
+          pill4: 'Рабочее пространство ИИ',
+          pill5: 'Переписывание ИИ'
+        }
+      },
+
+      ar: {
+        detection: {
+          title: 'كشف الذكاء الاصطناعي',
+          subtitle: 'اكتشف المحتوى المُنشأ بالذكاء الاصطناعي<br>بدقة رائدة في الصناعة',
+          pill1: 'دقة 98%',
+          pill2: 'في الوقت الفعلي',
+          pill3: 'متعدد اللغات',
+          windowTitle: 'كشف الذكاء الاصطناعي',
+          trySample: 'جرب عينة:',
+          aiText: 'نص AI',
+          human: 'بشري',
+          mixed: 'مختلط',
+          detectBtn: 'كشف AI',
+          resultsTitle: 'كشف الذكاء الاصطناعي',
+          resultsSubtitle: 'تحليل المحتوى',
+          verdict: 'من المحتمل أنه مُنشأ بالذكاء الاصطناعي',
+          confidence: 'الثقة',
+          indicators: 'مؤشرات AI (4)'
+        },
+        humanization: {
+          title: 'الأنسنة',
+          subtitle: 'حوّل النص المُنشأ بالذكاء الاصطناعي<br>إلى كتابة بشرية أصيلة',
+          pill1: 'تجاوز كشف AI',
+          pill2: 'نبرة طبيعية',
+          pill3: 'أنماط متعددة',
+          windowTitle: 'أنسنة المحتوى',
+          demoTitle: 'أنسنة المحتوى',
+          demoSubtitle: 'حوّل نص AI إلى بشري',
+          formal: 'رسمي',
+          academic: 'أكاديمي',
+          status: 'تمت الأنسنة',
+          complete: 'اكتمل التحويل',
+          btn: 'أنسنة'
+        },
+        voice: {
+          title: 'ملف الصوت',
+          subtitle: 'التقط أسلوب كتابتك الفريد<br>وطبقه على أي محتوى',
+          pill1: 'تحليل الأسلوب',
+          pill2: 'مقاييس الكتابة',
+          pill3: 'ملفات متعددة',
+          windowTitle: 'ملف الصوت',
+          selectProfile: 'اختر ملفًا',
+          profile1: { name: 'سارة أحمد', initials: 'سأ', desc: 'محترفة ودافئة' },
+          profile2: { name: 'محمد علي', initials: 'مع', desc: 'عفوي ومبدع' },
+          profile3: { name: 'د. فاطمة حسن', initials: 'فح', desc: 'أكاديمية ودقيقة' },
+          metrics: 'مقاييس الكتابة',
+          formality: 'الرسمية',
+          complexity: 'التعقيد',
+          emotion: 'العاطفة',
+          styleTraits: 'سمات الأسلوب',
+          trait1: 'واثق',
+          trait2: 'واضح',
+          trait3: 'جذاب',
+          vocabulary: 'المفردات',
+          vocab1: 'تقني',
+          vocab2: 'حديث'
+        },
+        workspace: {
+          title: 'مساحة عمل AI',
+          subtitle: 'تحدث مع نماذج AI متعددة<br>في واجهة موحدة',
+          pill1: 'متعدد النماذج',
+          pill2: 'دردشة ذكية',
+          pill3: 'تحليل الصور',
+          windowTitle: 'مساحة عمل AI'
+        },
+        rewrite: {
+          title: 'إعادة كتابة AI',
+          subtitle: 'حوّل محتواك باستخدام<br>أدوات إعادة الكتابة بالذكاء الاصطناعي',
+          pill1: 'إعادة كتابة ذكية',
+          pill2: 'نبرات متعددة',
+          pill3: 'تصحيح القواعد',
+          windowTitle: 'إعادة كتابة AI',
+          demoTitle: 'إعادة كتابة المحتوى',
+          demoSubtitle: 'حوّل نصك',
+          professional: 'محترف',
+          casual: 'عفوي',
+          creative: 'إبداعي',
+          status: 'تمت إعادة الكتابة',
+          complete: 'اكتملت إعادة الكتابة',
+          btn: 'إعادة كتابة',
+          grammarFix: 'تصحيح القواعد',
+          grammarDesc: 'تصحيح تلقائي',
+          expand: 'توسيع',
+          expandDesc: 'إضافة تفاصيل',
+          keepMeaning: 'الحفاظ على المعنى'
+        },
+        promo: {
+          title: 'استوديو الكتابة بالذكاء الاصطناعي',
+          subtitle: 'اكتشف وأنسن وأنشئ مع AI',
+          pill1: 'كشف AI',
+          pill2: 'أنسنة',
+          pill3: 'ملف الصوت',
+          pill4: 'دردشة AI'
+        },
+        marquee: {
+          title: 'استوديو الكتابة بالذكاء الاصطناعي',
+          subtitle: 'اكتشف محتوى AI، أنسن النص، وأنشئ بصوتك الفريد',
+          pill1: 'كشف AI',
+          pill2: 'الأنسنة',
+          pill3: 'ملف الصوت',
+          pill4: 'مساحة عمل AI',
+          pill5: 'إعادة كتابة AI'
+        }
+      },
+
+      hi: {
+        detection: {
+          title: 'AI पहचान',
+          subtitle: 'उद्योग-अग्रणी सटीकता के साथ<br>AI-जनित सामग्री का पता लगाएं',
+          pill1: '98% सटीकता',
+          pill2: 'रीयल-टाइम',
+          pill3: 'बहु-भाषा',
+          windowTitle: 'AI पहचान',
+          trySample: 'नमूना आज़माएं:',
+          aiText: 'AI टेक्स्ट',
+          human: 'मानव',
+          mixed: 'मिश्रित',
+          detectBtn: 'AI पहचानें',
+          resultsTitle: 'AI पहचान',
+          resultsSubtitle: 'सामग्री विश्लेषण',
+          verdict: 'संभवतः AI द्वारा जनित',
+          confidence: 'विश्वास',
+          indicators: 'AI संकेतक (4)'
+        },
+        humanization: {
+          title: 'मानवीकरण',
+          subtitle: 'AI-जनित टेक्स्ट को<br>प्रामाणिक मानव लेखन में बदलें',
+          pill1: 'AI पहचान को बायपास करें',
+          pill2: 'प्राकृतिक टोन',
+          pill3: 'कई शैलियाँ',
+          windowTitle: 'सामग्री मानवीकरण',
+          demoTitle: 'सामग्री मानवीकरण',
+          demoSubtitle: 'AI टेक्स्ट को मानव जैसा बनाएं',
+          formal: 'औपचारिक',
+          academic: 'शैक्षणिक',
+          status: 'मानवीकृत',
+          complete: 'रूपांतरण पूर्ण',
+          btn: 'मानवीकरण'
+        },
+        voice: {
+          title: 'वॉइस प्रोफाइल',
+          subtitle: 'अपनी अनूठी लेखन शैली को कैप्चर करें<br>और किसी भी सामग्री पर लागू करें',
+          pill1: 'शैली विश्लेषण',
+          pill2: 'लेखन मेट्रिक्स',
+          pill3: 'कई प्रोफाइल',
+          windowTitle: 'वॉइस प्रोफाइल',
+          selectProfile: 'प्रोफाइल चुनें',
+          profile1: { name: 'प्रिया शर्मा', initials: 'प्श', desc: 'पेशेवर और गर्मजोश' },
+          profile2: { name: 'राहुल वर्मा', initials: 'रव', desc: 'आकस्मिक और रचनात्मक' },
+          profile3: { name: 'डॉ. अनीता गुप्ता', initials: 'अग', desc: 'शैक्षणिक और सटीक' },
+          metrics: 'लेखन मेट्रिक्स',
+          formality: 'औपचारिकता',
+          complexity: 'जटिलता',
+          emotion: 'भावना',
+          styleTraits: 'शैली विशेषताएं',
+          trait1: 'आत्मविश्वासी',
+          trait2: 'स्पष्ट',
+          trait3: 'आकर्षक',
+          vocabulary: 'शब्दावली',
+          vocab1: 'तकनीकी',
+          vocab2: 'आधुनिक'
+        },
+        workspace: {
+          title: 'AI कार्यक्षेत्र',
+          subtitle: 'एक एकीकृत इंटरफेस में<br>कई AI मॉडल के साथ चैट करें',
+          pill1: 'मल्टी-मॉडल',
+          pill2: 'स्मार्ट चैट',
+          pill3: 'छवि विश्लेषण',
+          windowTitle: 'AI कार्यक्षेत्र'
+        },
+        rewrite: {
+          title: 'AI पुनर्लेखन',
+          subtitle: 'AI-संचालित पुनर्लेखन टूल के साथ<br>अपनी सामग्री को बदलें',
+          pill1: 'स्मार्ट पुनर्लेखन',
+          pill2: 'कई टोन',
+          pill3: 'व्याकरण सुधार',
+          windowTitle: 'AI पुनर्लेखन',
+          demoTitle: 'सामग्री पुनर्लेखन',
+          demoSubtitle: 'अपना टेक्स्ट बदलें',
+          professional: 'पेशेवर',
+          casual: 'आकस्मिक',
+          creative: 'रचनात्मक',
+          status: 'पुनर्लिखित',
+          complete: 'पुनर्लेखन पूर्ण',
+          btn: 'पुनर्लेखन',
+          grammarFix: 'व्याकरण सुधार',
+          grammarDesc: 'स्वतः सुधार',
+          expand: 'विस्तार',
+          expandDesc: 'विवरण जोड़ें',
+          keepMeaning: 'अर्थ बनाए रखें'
+        },
+        promo: {
+          title: 'AI लेखन स्टूडियो',
+          subtitle: 'AI के साथ पहचानें, मानवीकरण करें और बनाएं',
+          pill1: 'AI पहचान',
+          pill2: 'मानवीकरण',
+          pill3: 'वॉइस प्रोफाइल',
+          pill4: 'AI चैट'
+        },
+        marquee: {
+          title: 'AI लेखन स्टूडियो',
+          subtitle: 'AI सामग्री का पता लगाएं, टेक्स्ट को मानवीकृत करें, और अपनी अनूठी आवाज़ से बनाएं',
+          pill1: 'AI पहचान',
+          pill2: 'मानवीकरण',
+          pill3: 'वॉइस प्रोफाइल',
+          pill4: 'AI कार्यक्षेत्र',
+          pill5: 'AI पुनर्लेखन'
+        }
+      },
+
+      th: {
+        detection: {
+          title: 'ตรวจจับ AI',
+          subtitle: 'ตรวจจับเนื้อหาที่สร้างโดย AI<br>ด้วยความแม่นยำชั้นนำในอุตสาหกรรม',
+          pill1: 'แม่นยำ 98%',
+          pill2: 'เรียลไทม์',
+          pill3: 'หลายภาษา',
+          windowTitle: 'ตรวจจับ AI',
+          trySample: 'ลองตัวอย่าง:',
+          aiText: 'ข้อความ AI',
+          human: 'มนุษย์',
+          mixed: 'ผสม',
+          detectBtn: 'ตรวจจับ AI',
+          resultsTitle: 'ตรวจจับ AI',
+          resultsSubtitle: 'วิเคราะห์เนื้อหา',
+          verdict: 'น่าจะสร้างโดย AI',
+          confidence: 'ความมั่นใจ',
+          indicators: 'ตัวบ่งชี้ AI (4)'
+        },
+        humanization: {
+          title: 'ทำให้เป็นมนุษย์',
+          subtitle: 'แปลงข้อความที่สร้างโดย AI<br>เป็นการเขียนของมนุษย์แท้จริง',
+          pill1: 'หลีกเลี่ยงการตรวจจับ AI',
+          pill2: 'โทนธรรมชาติ',
+          pill3: 'หลายสไตล์',
+          windowTitle: 'ทำเนื้อหาให้เป็นมนุษย์',
+          demoTitle: 'ทำเนื้อหาให้เป็นมนุษย์',
+          demoSubtitle: 'แปลงข้อความ AI เป็นมนุษย์',
+          formal: 'ทางการ',
+          academic: 'วิชาการ',
+          status: 'ทำให้เป็นมนุษย์แล้ว',
+          complete: 'การแปลงเสร็จสมบูรณ์',
+          btn: 'ทำให้เป็นมนุษย์'
+        },
+        voice: {
+          title: 'โปรไฟล์เสียง',
+          subtitle: 'จับสไตล์การเขียนที่เป็นเอกลักษณ์ของคุณ<br>และนำไปใช้กับเนื้อหาใดก็ได้',
+          pill1: 'วิเคราะห์สไตล์',
+          pill2: 'เมตริกการเขียน',
+          pill3: 'หลายโปรไฟล์',
+          windowTitle: 'โปรไฟล์เสียง',
+          selectProfile: 'เลือกโปรไฟล์',
+          profile1: { name: 'สมหญิง ใจดี', initials: 'สญ', desc: 'มืออาชีพและอบอุ่น' },
+          profile2: { name: 'สมชาย สร้างสรรค์', initials: 'สช', desc: 'สบายๆ และสร้างสรรค์' },
+          profile3: { name: 'ดร. วิชัย ปราชญ์', initials: 'วป', desc: 'วิชาการและแม่นยำ' },
+          metrics: 'เมตริกการเขียน',
+          formality: 'ความเป็นทางการ',
+          complexity: 'ความซับซ้อน',
+          emotion: 'อารมณ์',
+          styleTraits: 'ลักษณะสไตล์',
+          trait1: 'มั่นใจ',
+          trait2: 'ชัดเจน',
+          trait3: 'น่าสนใจ',
+          vocabulary: 'คำศัพท์',
+          vocab1: 'เทคนิค',
+          vocab2: 'ทันสมัย'
+        },
+        workspace: {
+          title: 'พื้นที่ทำงาน AI',
+          subtitle: 'แชทกับโมเดล AI หลายตัว<br>ในอินเทอร์เฟซเดียว',
+          pill1: 'หลายโมเดล',
+          pill2: 'แชทอัจฉริยะ',
+          pill3: 'วิเคราะห์รูปภาพ',
+          windowTitle: 'พื้นที่ทำงาน AI'
+        },
+        rewrite: {
+          title: 'เขียนใหม่ AI',
+          subtitle: 'แปลงเนื้อหาของคุณด้วย<br>เครื่องมือเขียนใหม่ที่ขับเคลื่อนด้วย AI',
+          pill1: 'เขียนใหม่อัจฉริยะ',
+          pill2: 'หลายโทน',
+          pill3: 'แก้ไขไวยากรณ์',
+          windowTitle: 'เขียนใหม่ AI',
+          demoTitle: 'เขียนเนื้อหาใหม่',
+          demoSubtitle: 'แปลงข้อความของคุณ',
+          professional: 'มืออาชีพ',
+          casual: 'สบายๆ',
+          creative: 'สร้างสรรค์',
+          status: 'เขียนใหม่แล้ว',
+          complete: 'เขียนใหม่เสร็จสมบูรณ์',
+          btn: 'เขียนใหม่',
+          grammarFix: 'แก้ไขไวยากรณ์',
+          grammarDesc: 'แก้ไขอัตโนมัติ',
+          expand: 'ขยาย',
+          expandDesc: 'เพิ่มรายละเอียด',
+          keepMeaning: 'รักษาความหมาย'
+        },
+        promo: {
+          title: 'สตูดิโอเขียน AI',
+          subtitle: 'ตรวจจับ ทำให้เป็นมนุษย์ และสร้างด้วย AI',
+          pill1: 'ตรวจจับ AI',
+          pill2: 'ทำให้เป็นมนุษย์',
+          pill3: 'โปรไฟล์เสียง',
+          pill4: 'แชท AI'
+        },
+        marquee: {
+          title: 'สตูดิโอเขียน AI',
+          subtitle: 'ตรวจจับเนื้อหา AI ทำข้อความให้เป็นมนุษย์ และสร้างด้วยเสียงที่เป็นเอกลักษณ์ของคุณ',
+          pill1: 'ตรวจจับ AI',
+          pill2: 'ทำให้เป็นมนุษย์',
+          pill3: 'โปรไฟล์เสียง',
+          pill4: 'พื้นที่ทำงาน AI',
+          pill5: 'เขียนใหม่ AI'
+        }
+      },
+
+      id: {
+        detection: {
+          title: 'Deteksi AI',
+          subtitle: 'Deteksi konten yang dihasilkan AI<br>dengan akurasi terdepan di industri',
+          pill1: 'Akurasi 98%',
+          pill2: 'Real-time',
+          pill3: 'Multi-bahasa',
+          windowTitle: 'Deteksi AI',
+          trySample: 'Coba sampel:',
+          aiText: 'Teks AI',
+          human: 'Manusia',
+          mixed: 'Campuran',
+          detectBtn: 'Deteksi AI',
+          resultsTitle: 'Deteksi AI',
+          resultsSubtitle: 'Analisis Konten',
+          verdict: 'Kemungkinan dihasilkan AI',
+          confidence: 'Kepercayaan',
+          indicators: 'Indikator AI (4)'
+        },
+        humanization: {
+          title: 'Humanisasi',
+          subtitle: 'Ubah teks yang dihasilkan AI<br>menjadi tulisan manusia autentik',
+          pill1: 'Lewati deteksi AI',
+          pill2: 'Nada alami',
+          pill3: 'Berbagai gaya',
+          windowTitle: 'Humanisasi Konten',
+          demoTitle: 'Humanisasi Konten',
+          demoSubtitle: 'Ubah teks AI menjadi manusia',
+          formal: 'Formal',
+          academic: 'Akademis',
+          status: 'Dihumanisasi',
+          complete: 'Transformasi selesai',
+          btn: 'Humanisasi'
+        },
+        voice: {
+          title: 'Profil Suara',
+          subtitle: 'Tangkap gaya penulisan unik Anda<br>dan terapkan ke konten apa pun',
+          pill1: 'Analisis gaya',
+          pill2: 'Metrik penulisan',
+          pill3: 'Banyak profil',
+          windowTitle: 'Profil Suara',
+          selectProfile: 'Pilih Profil',
+          profile1: { name: 'Siti Rahayu', initials: 'SR', desc: 'Profesional & Hangat' },
+          profile2: { name: 'Budi Santoso', initials: 'BS', desc: 'Santai & Kreatif' },
+          profile3: { name: 'Dr. Dewi Lestari', initials: 'DL', desc: 'Akademis & Presisi' },
+          metrics: 'Metrik Penulisan',
+          formality: 'Formalitas',
+          complexity: 'Kompleksitas',
+          emotion: 'Emosi',
+          styleTraits: 'Ciri Gaya',
+          trait1: 'Percaya diri',
+          trait2: 'Jelas',
+          trait3: 'Menarik',
+          vocabulary: 'Kosakata',
+          vocab1: 'Teknis',
+          vocab2: 'Modern'
+        },
+        workspace: {
+          title: 'Ruang Kerja AI',
+          subtitle: 'Ngobrol dengan berbagai model AI<br>dalam satu antarmuka terpadu',
+          pill1: 'Multi-model',
+          pill2: 'Chat pintar',
+          pill3: 'Analisis gambar',
+          windowTitle: 'Ruang Kerja AI'
+        },
+        rewrite: {
+          title: 'Tulis Ulang AI',
+          subtitle: 'Ubah konten Anda dengan<br>alat tulis ulang bertenaga AI',
+          pill1: 'Tulis ulang pintar',
+          pill2: 'Berbagai nada',
+          pill3: 'Perbaikan tata bahasa',
+          windowTitle: 'Tulis Ulang AI',
+          demoTitle: 'Tulis Ulang Konten',
+          demoSubtitle: 'Ubah teks Anda',
+          professional: 'Profesional',
+          casual: 'Santai',
+          creative: 'Kreatif',
+          status: 'Ditulis ulang',
+          complete: 'Tulis ulang selesai',
+          btn: 'Tulis Ulang',
+          grammarFix: 'Perbaikan tata bahasa',
+          grammarDesc: 'Koreksi otomatis',
+          expand: 'Perluas',
+          expandDesc: 'Tambah detail',
+          keepMeaning: 'Pertahankan makna'
+        },
+        promo: {
+          title: 'Studio Penulisan AI',
+          subtitle: 'Deteksi, Humanisasi & Buat dengan AI',
+          pill1: 'Deteksi AI',
+          pill2: 'Humanisasi',
+          pill3: 'Profil Suara',
+          pill4: 'Chat AI'
+        },
+        marquee: {
+          title: 'Studio Penulisan AI',
+          subtitle: 'Deteksi konten AI, humanisasi teks, dan buat dengan suara unik Anda',
+          pill1: 'Deteksi AI',
+          pill2: 'Humanisasi',
+          pill3: 'Profil Suara',
+          pill4: 'Ruang Kerja AI',
+          pill5: 'Tulis Ulang AI'
+        }
+      },
+
+      it: {
+        detection: {
+          title: 'Rilevamento IA',
+          subtitle: 'Rileva contenuti generati dall\'IA<br>con precisione leader del settore',
+          pill1: 'Precisione 98%',
+          pill2: 'Tempo reale',
+          pill3: 'Multilingue',
+          windowTitle: 'Rilevamento IA',
+          trySample: 'Prova esempio:',
+          aiText: 'Testo IA',
+          human: 'Umano',
+          mixed: 'Misto',
+          detectBtn: 'Rileva IA',
+          resultsTitle: 'Rilevamento IA',
+          resultsSubtitle: 'Analisi contenuto',
+          verdict: 'Probabilmente generato da IA',
+          confidence: 'Confidenza',
+          indicators: 'Indicatori IA (4)'
+        },
+        humanization: {
+          title: 'Umanizzazione',
+          subtitle: 'Trasforma il testo generato dall\'IA<br>in scrittura umana autentica',
+          pill1: 'Bypassa rilevamento IA',
+          pill2: 'Tono naturale',
+          pill3: 'Stili multipli',
+          windowTitle: 'Umanizzazione contenuto',
+          demoTitle: 'Umanizzazione contenuto',
+          demoSubtitle: 'Trasforma testo IA in umano',
+          formal: 'Formale',
+          academic: 'Accademico',
+          status: 'Umanizzato',
+          complete: 'Trasformazione completata',
+          btn: 'Umanizza'
+        },
+        voice: {
+          title: 'Profilo vocale',
+          subtitle: 'Cattura il tuo stile di scrittura unico<br>e applicalo a qualsiasi contenuto',
+          pill1: 'Analisi stile',
+          pill2: 'Metriche scrittura',
+          pill3: 'Profili multipli',
+          windowTitle: 'Profilo vocale',
+          selectProfile: 'Seleziona profilo',
+          profile1: { name: 'Maria Rossi', initials: 'MR', desc: 'Professionale e calorosa' },
+          profile2: { name: 'Marco Bianchi', initials: 'MB', desc: 'Casual e creativo' },
+          profile3: { name: 'Dott. Laura Verdi', initials: 'LV', desc: 'Accademica e precisa' },
+          metrics: 'Metriche scrittura',
+          formality: 'Formalità',
+          complexity: 'Complessità',
+          emotion: 'Emozione',
+          styleTraits: 'Tratti di stile',
+          trait1: 'Sicuro',
+          trait2: 'Chiaro',
+          trait3: 'Coinvolgente',
+          vocabulary: 'Vocabolario',
+          vocab1: 'Tecnico',
+          vocab2: 'Moderno'
+        },
+        workspace: {
+          title: 'Spazio di lavoro IA',
+          subtitle: 'Chatta con più modelli IA<br>in un\'interfaccia unificata',
+          pill1: 'Multi-modello',
+          pill2: 'Chat intelligente',
+          pill3: 'Analisi immagini',
+          windowTitle: 'Spazio di lavoro IA'
+        },
+        rewrite: {
+          title: 'Riscrittura IA',
+          subtitle: 'Trasforma i tuoi contenuti con<br>strumenti di riscrittura IA',
+          pill1: 'Riscrittura intelligente',
+          pill2: 'Toni multipli',
+          pill3: 'Correzione grammaticale',
+          windowTitle: 'Riscrittura IA',
+          demoTitle: 'Riscrittura contenuto',
+          demoSubtitle: 'Trasforma il tuo testo',
+          professional: 'Professionale',
+          casual: 'Casual',
+          creative: 'Creativo',
+          status: 'Riscritto',
+          complete: 'Riscrittura completata',
+          btn: 'Riscrivi',
+          grammarFix: 'Correzione grammaticale',
+          grammarDesc: 'Correzione automatica',
+          expand: 'Espandi',
+          expandDesc: 'Aggiungi dettagli',
+          keepMeaning: 'Mantieni significato'
+        },
+        promo: {
+          title: 'Studio di scrittura IA',
+          subtitle: 'Rileva, umanizza e crea con l\'IA',
+          pill1: 'Rilevamento IA',
+          pill2: 'Umanizza',
+          pill3: 'Profilo vocale',
+          pill4: 'Chat IA'
+        },
+        marquee: {
+          title: 'Studio di scrittura IA',
+          subtitle: 'Rileva contenuti IA, umanizza il testo e crea con la tua voce unica',
+          pill1: 'Rilevamento IA',
+          pill2: 'Umanizzazione',
+          pill3: 'Profilo vocale',
+          pill4: 'Spazio di lavoro IA',
+          pill5: 'Riscrittura IA'
+        }
+      },
+
+      zh_TW: {
+        detection: {
+          title: 'AI偵測',
+          subtitle: '以業界領先的準確度<br>偵測AI生成的內容',
+          pill1: '98%準確率',
+          pill2: '即時偵測',
+          pill3: '多語言支援',
+          windowTitle: 'AI偵測',
+          trySample: '試試範例:',
+          aiText: 'AI文字',
+          human: '人類',
+          mixed: '混合',
+          detectBtn: '偵測AI',
+          resultsTitle: 'AI偵測',
+          resultsSubtitle: '內容分析',
+          verdict: '可能由AI生成',
+          confidence: '信心度',
+          indicators: 'AI指標 (4)'
+        },
+        humanization: {
+          title: '人性化',
+          subtitle: '將AI生成的文字<br>轉化為真實的人類寫作',
+          pill1: '繞過AI偵測',
+          pill2: '自然語調',
+          pill3: '多種風格',
+          windowTitle: '內容人性化',
+          demoTitle: '內容人性化',
+          demoSubtitle: '將AI文字轉化為人類風格',
+          formal: '正式',
+          academic: '學術',
+          status: '已人性化',
+          complete: '轉換完成',
+          btn: '人性化'
+        },
+        voice: {
+          title: '聲音檔案',
+          subtitle: '捕捉您獨特的寫作風格<br>並應用於任何內容',
+          pill1: '風格分析',
+          pill2: '寫作指標',
+          pill3: '多個檔案',
+          windowTitle: '聲音檔案',
+          selectProfile: '選擇檔案',
+          profile1: { name: '陳小明', initials: '陳', desc: '專業且溫暖' },
+          profile2: { name: '王小華', initials: '王', desc: '休閒且創意' },
+          profile3: { name: '李教授', initials: '李', desc: '學術且精確' },
+          metrics: '寫作指標',
+          formality: '正式度',
+          complexity: '複雜度',
+          emotion: '情感',
+          styleTraits: '風格特徵',
+          trait1: '自信',
+          trait2: '清晰',
+          trait3: '引人入勝',
+          vocabulary: '詞彙',
+          vocab1: '技術性',
+          vocab2: '現代'
+        },
+        workspace: {
+          title: 'AI工作區',
+          subtitle: '在統一介面中<br>與多個AI模型對話',
+          pill1: '多模型',
+          pill2: '智慧聊天',
+          pill3: '圖像分析',
+          windowTitle: 'AI工作區'
+        },
+        rewrite: {
+          title: 'AI重寫',
+          subtitle: '使用AI驅動的重寫工具<br>轉換您的內容',
+          pill1: '智慧重寫',
+          pill2: '多種語調',
+          pill3: '文法修復',
+          windowTitle: 'AI重寫',
+          demoTitle: '內容重寫',
+          demoSubtitle: '轉換您的文字',
+          professional: '專業',
+          casual: '休閒',
+          creative: '創意',
+          status: '已重寫',
+          complete: '重寫完成',
+          btn: '重寫',
+          grammarFix: '文法修復',
+          grammarDesc: '自動糾錯',
+          expand: '擴展',
+          expandDesc: '添加更多細節',
+          keepMeaning: '保持原意'
+        },
+        promo: {
+          title: 'AI寫作工作室',
+          subtitle: '用AI偵測、人性化和創作',
+          pill1: 'AI偵測',
+          pill2: '人性化',
+          pill3: '聲音檔案',
+          pill4: 'AI聊天'
+        },
+        marquee: {
+          title: 'AI寫作工作室',
+          subtitle: '偵測AI內容，人性化文字，用您獨特的聲音創作',
+          pill1: 'AI偵測',
+          pill2: '人性化',
+          pill3: '聲音檔案',
+          pill4: 'AI工作區',
+          pill5: 'AI重寫'
+        }
+      }
+    };
+
+    // Get nested translation value
+    function getTranslation(lang, key) {
+      const keys = key.split('.');
+      let value = translations[lang];
+      for (const k of keys) {
+        if (value && value[k] !== undefined) {
+          value = value[k];
+        } else {
+          return null;
+        }
+      }
+      return value;
+    }
+    
+    // Apply translations to the page
+    function applyTranslations(lang) {
+      currentLang = lang;
+      
+      // Update all elements with data-i18n attribute
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const translation = getTranslation(lang, key);
+        if (translation) {
+          el.innerHTML = translation;
+        }
+      });
+      
+      // Update elements with data-i18n-initials attribute (for profile avatars)
+      document.querySelectorAll('[data-i18n-initials]').forEach(el => {
+        const key = el.getAttribute('data-i18n-initials');
+        const translation = getTranslation(lang, key);
+        if (translation) {
+          el.textContent = translation;
+        }
+      });
+      
+      // Update labels with language code
+      updateLabels(lang);
+      
+      // Update active button
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+    }
+    
+    // Update file labels with language code
+    function updateLabels(lang) {
+      const labels = {
+        'screenshot-1': `screenshot-1-detection-${lang}.png (1280×800) - AI Detection`,
+        'screenshot-2': `screenshot-2-humanization-${lang}.png (1280×800) - Humanization`,
+        'screenshot-3': `screenshot-3-voice-${lang}.png (1280×800) - Voice Profile`,
+        'screenshot-4': `screenshot-4-workspace-${lang}.png (1280×800) - AI Workspace`,
+        'screenshot-5': `screenshot-5-rewrite-${lang}.png (1280×800) - AI Rewrite`,
+        'small-promo': `small-promo-tile-${lang}.png (440×280)`,
+        'marquee-promo': `marquee-promo-tile-${lang}.png (1400×560)`
+      };
+      
+      for (const [id, label] of Object.entries(labels)) {
+        const el = document.getElementById(`label-${id}`);
+        if (el) el.textContent = label;
+      }
+      
+      // Update download all button text
+      const downloadAllText = document.getElementById('downloadAllText');
+      if (downloadAllText) {
+        downloadAllText.textContent = `Download All - ${lang.toUpperCase()} (7 images)`;
+      }
+    }
+    
+    // Get filename with language code
+    function getFilename(elementId) {
+      const names = {
+        'screenshot-1': `screenshot-1-detection-${currentLang}.png`,
+        'screenshot-2': `screenshot-2-humanization-${currentLang}.png`,
+        'screenshot-3': `screenshot-3-voice-${currentLang}.png`,
+        'screenshot-4': `screenshot-4-workspace-${currentLang}.png`,
+        'screenshot-5': `screenshot-5-rewrite-${currentLang}.png`,
+        'small-promo': `small-promo-tile-${currentLang}.png`,
+        'marquee-promo': `marquee-promo-tile-${currentLang}.png`
+      };
+      return names[elementId] || `${elementId}-${currentLang}.png`;
+    }
+
+    // Image sizes for Chrome Web Store
+    const SIZES = {
+      'screenshot-1': { width: 1280, height: 800 },
+      'screenshot-2': { width: 1280, height: 800 },
+      'screenshot-3': { width: 1280, height: 800 },
+      'screenshot-4': { width: 1280, height: 800 },
+      'screenshot-5': { width: 1280, height: 800 },
+      'small-promo': { width: 440, height: 280 },
+      'marquee-promo': { width: 1400, height: 560 }
+    };
+    
+    // Download single card using html-to-image
+    async function downloadCard(elementId) {
+      const element = document.getElementById(elementId);
+      if (!element) {
+        alert('Element not found: ' + elementId);
+        return;
+      }
+      
+      const size = SIZES[elementId] || { width: 1280, height: 800 };
+      
+      try {
+        const dataUrl = await htmlToImage.toPng(element, {
+          width: size.width,
+          height: size.height,
+          pixelRatio: 1,
+          skipAutoScale: true,
+          cacheBust: true,
+          includeQueryParams: true
+        });
+        
+        const link = document.createElement('a');
+        link.download = getFilename(elementId);
+        link.href = dataUrl;
+        link.click();
+      } catch (error) {
+        console.error('Download error:', error);
+        alert('Error downloading. Please try again.');
+      }
+    }
+    
+    // Download screenshot as OG image (1200x630) - crops center portion
+    async function downloadCardOG(elementId) {
+      const element = document.getElementById(elementId);
+      if (!element) {
+        alert('Element not found: ' + elementId);
+        return;
+      }
+      
+      const originalSize = SIZES[elementId] || { width: 1280, height: 800 };
+      const ogWidth = 1200;
+      const ogHeight = 630;
+      
+      try {
+        // First capture at original size
+        const dataUrl = await htmlToImage.toPng(element, {
+          width: originalSize.width,
+          height: originalSize.height,
+          pixelRatio: 1,
+          skipAutoScale: true,
+          cacheBust: true,
+          includeQueryParams: true
+        });
+        
+        // Create canvas to crop/resize to OG dimensions
+        const canvas = document.createElement('canvas');
+        canvas.width = ogWidth;
+        canvas.height = ogHeight;
+        const ctx = canvas.getContext('2d');
+        
+        const img = new Image();
+        img.onload = function() {
+          // Calculate crop area to maintain aspect ratio and center
+          const sourceAspect = originalSize.width / originalSize.height;
+          const targetAspect = ogWidth / ogHeight;
+          
+          let sx, sy, sw, sh;
+          
+          if (sourceAspect > targetAspect) {
+            // Source is wider - crop sides
+            sh = originalSize.height;
+            sw = sh * targetAspect;
+            sx = (originalSize.width - sw) / 2;
+            sy = 0;
+          } else {
+            // Source is taller - crop top/bottom
+            sw = originalSize.width;
+            sh = sw / targetAspect;
+            sx = 0;
+            sy = (originalSize.height - sh) / 2;
+          }
+          
+          ctx.drawImage(img, sx, sy, sw, sh, 0, 0, ogWidth, ogHeight);
+          
+          const ogDataUrl = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.download = getFilename(elementId).replace('.png', '-og.png');
+          link.href = ogDataUrl;
+          link.click();
+        };
+        img.src = dataUrl;
+      } catch (error) {
+        console.error('Download OG error:', error);
+        alert('Error downloading OG image. Please try again.');
+      }
+    }
+    
+    // Download all images
+    async function downloadAll() {
+      const images = [
+        'screenshot-1',
+        'screenshot-2',
+        'screenshot-3',
+        'screenshot-4',
+        'screenshot-5',
+        'small-promo',
+        'marquee-promo'
+      ];
+      
+      const btn = document.querySelector('.btn-download-all');
+      const originalText = btn.innerHTML;
+      
+      for (let i = 0; i < images.length; i++) {
+        const id = images[i];
+        btn.innerHTML = `⏳ Downloading ${i + 1}/${images.length}...`;
+        
+        await downloadCard(id);
+        await new Promise(resolve => setTimeout(resolve, 800));
+      }
+      
+      btn.innerHTML = '✓ All downloaded!';
+      setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+    }
+    
+    // Download all OG images (5 screenshots at 1200x630)
+    async function downloadAllOG() {
+      const images = [
+        'screenshot-1',
+        'screenshot-2',
+        'screenshot-3',
+        'screenshot-4',
+        'screenshot-5'
+      ];
+      
+      const btn = document.querySelectorAll('.btn-download-all')[1];
+      const originalText = btn.innerHTML;
+      
+      for (let i = 0; i < images.length; i++) {
+        const id = images[i];
+        btn.innerHTML = `⏳ Downloading OG ${i + 1}/${images.length}...`;
+        
+        await downloadCardOG(id);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      btn.innerHTML = '✓ All OG downloaded!';
+      setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+    }
+    
+    // Initialize language selector
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        applyTranslations(btn.dataset.lang);
+      });
+    });
+    
+    // Apply default language on load
+    applyTranslations('en');
+  </script>
+</body>
+</html>

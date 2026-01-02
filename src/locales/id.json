@@ -153,6 +153,12 @@
     "chatDescription": "Tanyakan apa saja tentang catatan ini. Saya akan menjawab berdasarkan konteks catatan.",
     "send": "Kirim"
   },
+  "sharedNotes": {
+    "title": "Dibagikan dengan Anda",
+    "empty": "Tidak ada catatan yang dibagikan",
+    "accept": "Terima",
+    "decline": "Tolak"
+  },
   "share": {
     "title": "Bagikan catatan",
     "public": "Publik",

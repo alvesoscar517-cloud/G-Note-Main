@@ -70,14 +70,14 @@ export function NoteModal() {
   // Subscribe to the specific note by ID - memoized selector
   const note = useNotesStore(useCallback((state) => {
     if (!selectedNoteId) return undefined
-    return state.notes.find(n => n.id === selectedNoteId) || 
-           state.sharedNotes.find(n => n.id === selectedNoteId)
+    return state.notes.find(n => n.id === selectedNoteId)
   }, [selectedNoteId]))
   
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isFullscreenAnimating, setIsFullscreenAnimating] = useState(false) // Track animation state
   const [canExitFullscreen, setCanExitFullscreen] = useState(true)
   const userToggledRef = useRef(false)
+  const [isClosing, setIsClosing] = useState(false) // Track if modal is closing to re-enable layoutId
   
   // Check if modal should auto-fullscreen based on screen width
   const checkAutoFullscreen = useCallback(() => {
@@ -170,6 +170,7 @@ export function NoteModal() {
     if (isModalOpen) {
       document.body.style.overflow = 'hidden'
       document.body.classList.add('modal-open')
+      setIsClosing(false)
       // Note: Don't call onModalOpen() here because NoteModal is fullscreen
       // and doesn't need the status bar overlay effect
     } else {
@@ -186,6 +187,7 @@ export function NoteModal() {
     setIsFullscreen(false)
     setCanExitFullscreen(true)
     userToggledRef.current = false
+    setIsClosing(true) // Enable layoutId for closing animation
     
     // Get fresh note from store to check if empty
     const freshNote = useNotesStore.getState().notes.find(n => n.id === selectedNoteId)
@@ -234,7 +236,7 @@ export function NoteModal() {
 
           {/* Modal */}
           <motion.div
-            layoutId={`note-card-${displayNote.id}`}
+            layoutId={isModalOpen && !isClosing ? undefined : `note-card-${displayNote.id}`}
             transition={isFullscreenAnimating ? FULLSCREEN_TRANSITION : LAYOUT_TRANSITION}
             onLayoutAnimationStart={() => setIsFullscreenAnimating(true)}
             onLayoutAnimationComplete={() => setIsFullscreenAnimating(false)}
@@ -247,7 +249,9 @@ export function NoteModal() {
               ...backgroundStyle 
             }}
             className={cn(
-              'fixed z-50 flex flex-col overflow-hidden',
+              'fixed flex flex-col overflow-hidden',
+              // Higher z-index when closing to ensure animation is visible above other cards
+              isClosing ? 'z-[100]' : 'z-50',
               'inset-0',
               'md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2',
               'md:rounded-[12px] md:shadow-2xl md:border md:border-neutral-200 md:dark:border-neutral-700',

@@ -197,12 +197,19 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
         onCloseAutoFocus={(e) => e.preventDefault()}
         onClick={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
+        onPointerDownOutside={(e) => {
+          // Prevent the event from bubbling to the backdrop which would close the note modal
+          e.stopPropagation()
+        }}
         className="z-[100] w-[280px] max-w-[calc(100vw-32px)] bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 p-3 animate-in fade-in-0 zoom-in-95"
       >
           {/* Tabs */}
           <div className="flex gap-1 mb-3">
             <button
-              onClick={() => setTab('color')}
+              onClick={(e) => {
+                e.stopPropagation()
+                setTab('color')
+              }}
               className={cn(
                 'flex-1 py-1.5 px-3 text-sm font-medium rounded-lg transition-colors',
                 tab === 'color'
@@ -213,7 +220,10 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
               {t('stylePicker.colorTab')}
             </button>
             <button
-              onClick={() => setTab('image')}
+              onClick={(e) => {
+                e.stopPropagation()
+                setTab('image')
+              }}
               className={cn(
                 'flex-1 py-1.5 px-3 text-sm font-medium rounded-lg transition-colors',
                 tab === 'image'
@@ -231,7 +241,10 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
                 <Tooltip key={color.name}>
                   <TooltipTrigger asChild>
                     <button
-                      onClick={() => handleColorSelect(index)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleColorSelect(index)
+                      }}
                       className={cn(
                         'w-8 h-8 rounded-full border-2 transition-all hover:scale-110 flex items-center justify-center',
                         selectedIndex === index
@@ -262,7 +275,10 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
                       <Tooltip key={bg.name}>
                         <TooltipTrigger asChild>
                           <button
-                            onClick={() => handleDefaultBgSelect(bg.src)}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDefaultBgSelect(bg.src)
+                            }}
                             className="h-16 rounded-lg border border-neutral-200 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-400 transition-colors overflow-hidden"
                           >
                             <img 
@@ -309,7 +325,10 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
                       style={{ filter: IMAGE_FILTERS.find(f => f.value === style.backgroundFilter)?.css }}
                     />
                     <button
-                      onClick={handleRemoveImage}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleRemoveImage()
+                      }}
                       className="absolute top-1 right-1 p-1 bg-black/50 rounded-full text-white hover:bg-black/70"
                     >
                       <X className="w-3 h-3" />
@@ -317,7 +336,7 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
                   </div>
 
                   {/* Opacity slider */}
-                  <div className="space-y-1">
+                  <div className="space-y-1" onClick={(e) => e.stopPropagation()}>
                     <label className="text-xs text-neutral-500 dark:text-neutral-400">
                       {t('stylePicker.opacity')}: {Math.round((style.backgroundOpacity ?? 1) * 100)}%
                     </label>
@@ -340,7 +359,10 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
                         {IMAGE_FILTERS.map((filter) => (
                           <button
                             key={filter.name}
-                            onClick={() => handleFilterSelect(filter)}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleFilterSelect(filter)
+                            }}
                             className={cn(
                               'relative rounded-md overflow-hidden h-12 transition-all',
                               style.backgroundFilter === filter.value || (!style.backgroundFilter && !filter.value)

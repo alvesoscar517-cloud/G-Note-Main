@@ -157,6 +157,12 @@
     "chatDescription": "Ask me anything about this note. I'll answer based on the note's context.",
     "send": "Send"
   },
+  "sharedNotes": {
+    "title": "Shared with you",
+    "empty": "No shared notes",
+    "accept": "Accept",
+    "decline": "Decline"
+  },
   "share": {
     "title": "Share note",
     "public": "Public",

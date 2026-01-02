@@ -153,6 +153,12 @@
     "chatDescription": "Bu not hakkında bana her şeyi sorabilirsiniz. Notun bağlamına göre cevap vereceğim.",
     "send": "Gönder"
   },
+  "sharedNotes": {
+    "title": "Sizinle paylaşılan",
+    "empty": "Paylaşılan not yok",
+    "accept": "Kabul et",
+    "decline": "Reddet"
+  },
   "share": {
     "title": "Notu paylaş",
     "public": "Herkese açık",

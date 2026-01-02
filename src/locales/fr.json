@@ -150,6 +150,12 @@
     "chatDescription": "Posez-moi n'importe quelle question sur cette note. Je répondrai en fonction du contexte de la note.",
     "send": "Envoyer"
   },
+  "sharedNotes": {
+    "title": "Partagé avec vous",
+    "empty": "Aucune note partagée",
+    "accept": "Accepter",
+    "decline": "Refuser"
+  },
   "share": {
     "title": "Partager la note",
     "public": "Public",

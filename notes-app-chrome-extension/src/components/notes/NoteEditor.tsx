@@ -1380,9 +1380,21 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           
           {/* Speech to Text */}
           <SpeechButton
-            onTranscript={(text, isFinal) => {
-              if (isFinal && editor) {
-                editor.commands.insertContent(text + ' ')
+            onTranscript={(text, isFinal, replaceLength) => {
+              if (editor) {
+                // Delete previous interim text if needed
+                if (replaceLength && replaceLength > 0) {
+                  // Move cursor back and delete the interim text
+                  const { from } = editor.state.selection
+                  const deleteFrom = Math.max(0, from - replaceLength)
+                  editor.chain()
+                    .deleteRange({ from: deleteFrom, to: from })
+                    .insertContent(text + (isFinal ? ' ' : ''))
+                    .run()
+                } else {
+                  // Just insert new text
+                  editor.commands.insertContent(text + (isFinal ? ' ' : ''))
+                }
               }
             }}
             disabled={isAILoading || isStreaming}

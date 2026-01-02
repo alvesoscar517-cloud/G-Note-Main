@@ -150,6 +150,12 @@
     "chatDescription": "Hỏi tôi bất cứ điều gì về nội dung ghi chú này. Tôi sẽ trả lời dựa trên ngữ cảnh của ghi chú.",
     "send": "Gửi"
   },
+  "sharedNotes": {
+    "title": "Được chia sẻ với bạn",
+    "empty": "Không có ghi chú được chia sẻ",
+    "accept": "Chấp nhận",
+    "decline": "Từ chối"
+  },
   "share": {
     "title": "Chia sẻ ghi chú",
     "public": "Public",

@@ -150,6 +150,12 @@
     "chatDescription": "このメモについて何でも質問してください。メモの内容に基づいて回答します。",
     "send": "送信"
   },
+  "sharedNotes": {
+    "title": "共有されたメモ",
+    "empty": "共有されたメモはありません",
+    "accept": "承諾",
+    "decline": "拒否"
+  },
   "share": {
     "title": "メモを共有",
     "public": "公開",

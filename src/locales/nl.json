@@ -153,6 +153,12 @@
     "chatDescription": "Vraag me alles over deze notitie. Ik zal antwoorden op basis van de context van de notitie.",
     "send": "Verzenden"
   },
+  "sharedNotes": {
+    "title": "Met u gedeeld",
+    "empty": "Geen gedeelde notities",
+    "accept": "Accepteren",
+    "decline": "Weigeren"
+  },
   "share": {
     "title": "Notitie delen",
     "public": "Openbaar",
