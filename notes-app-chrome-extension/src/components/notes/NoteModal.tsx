@@ -189,15 +189,20 @@ export function NoteModal() {
     userToggledRef.current = false
     setIsClosing(true) // Enable layoutId for closing animation
     
-    // Get fresh note from store to check if empty
+    // Only check for empty notes that were JUST CREATED (never had content)
+    // Don't auto-delete notes that had content and were then emptied - let users decide
     const freshNote = useNotesStore.getState().notes.find(n => n.id === selectedNoteId)
     if (freshNote) {
       const plainContent = getPlainText(freshNote.content).trim()
       const hasTitle = freshNote.title.trim().length > 0
       const hasContent = plainContent.length > 0
       
-      if (!hasTitle && !hasContent) {
-        // Empty notes should be permanently deleted, not moved to trash
+      // Only auto-delete if note was never modified (brand new empty note)
+      // Check if createdAt and updatedAt are very close (within 1 second) = never edited
+      const isNewNote = Math.abs(freshNote.updatedAt - freshNote.createdAt) < 1000
+      
+      if (!hasTitle && !hasContent && isNewNote) {
+        // Only permanently delete brand new empty notes
         useNotesStore.getState().permanentlyDelete(freshNote.id)
         setModalOpen(false)
         return
