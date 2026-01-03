@@ -324,10 +324,14 @@
   "speech": {
     "start": "Entrada de voz",
     "stop": "Detener grabación",
-    "notSupported": "Entrada de voz no soportada",
+    "notSupported": "Entrada de voz no disponible",
+    "notSupportedTitle": "Entrada de voz no disponible",
+    "notSupportedMessage": "Tu navegador no admite la función de entrada de voz. Por favor, usa Google Chrome o Microsoft Edge para la mejor experiencia.",
+    "notSupportedTip": "Consejo: Asegúrate de estar usando la última versión de tu navegador.",
     "micDenied": "Acceso al micrófono denegado",
     "noSpeech": "No se detectó voz",
-    "error": "Error de entrada de voz"
+    "error": "Error de entrada de voz",
+    "gotIt": "Entendido"
   },
   "trash": {
     "title": "Papelera",

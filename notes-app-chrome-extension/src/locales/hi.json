@@ -48,6 +48,13 @@
     "modalSizeDefault": "डिफ़ॉल्ट",
     "modalSizeLarge": "बड़ा",
     "modalSizeXLarge": "बहुत बड़ा",
+    "displayMode": "प्रदर्शन मोड",
+    "displayModeDescription": "एक्सटेंशन खोलने का तरीका चुनें",
+    "fullscreen": "पूर्ण स्क्रीन",
+    "fullscreenDesc": "नए ब्राउज़र टैब में खोलें",
+    "sidePanel": "साइड पैनल",
+    "sidePanelDesc": "साइड पैनल के रूप में खोलें",
+    "displayModeHint": "परिवर्तन अगली बार एक्सटेंशन खोलने पर लागू होंगे",
     "offlineLogoutTitle": "ऑफ़लाइन होने पर लॉग आउट करें?",
     "offlineLogoutWarning": "आप वर्तमान में ऑफ़लाइन हैं। सहेजे नहीं गए परिवर्तन Google Drive के साथ सिंक नहीं हुए हो सकते हैं। यदि आप अभी लॉग आउट करते हैं, तो आप इन परिवर्तनों को खो सकते हैं।",
     "logoutAnyway": "फिर भी लॉग आउट करें"
@@ -327,10 +334,19 @@
   "speech": {
     "start": "आवाज इनपुट",
     "stop": "रिकॉर्डिंग बंद करें",
+    "startListening": "आवाज इनपुट शुरू करें",
+    "stopListening": "आवाज इनपुट बंद करें",
     "notSupported": "आवाज इनपुट समर्थित नहीं है",
     "micDenied": "माइक्रोफ़ोन एक्सेस अस्वीकृत",
     "noSpeech": "कोई आवाज नहीं मिली",
-    "error": "आवाज इनपुट त्रुटि"
+    "error": "आवाज इनपुट त्रुटि",
+    "notSupportedTitle": "सुविधा उपलब्ध नहीं है",
+    "notSupportedMessage": "आपका ब्राउज़र आवाज इनपुट का समर्थन नहीं करता। सर्वोत्तम अनुभव के लिए कृपया Chrome, Edge या Safari जैसे आधुनिक ब्राउज़र का उपयोग करें।",
+    "understood": "समझ गया",
+    "permissionRequired": "आवाज इनपुट सक्षम करें",
+    "permissionMessage": "वॉइस-टू-टेक्स्ट का उपयोग करने के लिए माइक्रोफ़ोन एक्सेस की अनुमति दें।",
+    "enableVoice": "आवाज इनपुट सक्षम करें",
+    "enable": "सक्षम"
   },
   "trash": {
     "title": "कचरा",

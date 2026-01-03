@@ -324,10 +324,14 @@
   "speech": {
     "start": "Spracheingabe",
     "stop": "Aufnahme stoppen",
-    "notSupported": "Spracheingabe nicht unterstützt",
+    "notSupported": "Spracheingabe nicht verfügbar",
+    "notSupportedTitle": "Spracheingabe nicht verfügbar",
+    "notSupportedMessage": "Ihr Browser unterstützt die Spracheingabe nicht. Bitte verwenden Sie Google Chrome oder Microsoft Edge für die beste Erfahrung.",
+    "notSupportedTip": "Tipp: Stellen Sie sicher, dass Sie die neueste Version Ihres Browsers verwenden.",
     "micDenied": "Mikrofonzugriff verweigert",
     "noSpeech": "Keine Sprache erkannt",
-    "error": "Spracheingabefehler"
+    "error": "Spracheingabefehler",
+    "gotIt": "Verstanden"
   },
   "trash": {
     "title": "Papierkorb",

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { NoteEditor } from './NoteEditor'
-import { useNotesStore } from '@/stores/notesStore'
+import { useNotesStore, flushPendingNoteUpdates, smartSyncManager } from '@/stores/notesStore'
 import { useUIStore, type ModalSize } from '@/stores/uiStore'
 import { cn } from '@/lib/utils'
 import { getPlainText } from '@/lib/utils'
@@ -80,6 +80,12 @@ export function NoteModal() {
   const userToggledRef = useRef(false)
   const [isClosing, setIsClosing] = useState(false) // Track if modal is closing to re-enable layoutId
   
+  // Track if note ever had content (to avoid auto-deleting notes that user intentionally emptied)
+  const noteEverHadContentRef = useRef(false)
+  
+  // Track if note was modified during this session (to avoid unnecessary sync)
+  const noteWasModifiedRef = useRef(false)
+  
   // Handle close function (defined early for useHistoryBack)
   const handleCloseRef = useRef<() => void>(() => {})
   
@@ -135,15 +141,36 @@ export function NoteModal() {
     }
   }, [modalSize, isModalOpen, checkAutoFullscreen])
   
-  // Local state to keep note data even if store temporarily loses it
+  // Local state to keep note data for closing animation only
+  // This prevents the modal from disappearing before animation completes
   const [localNote, setLocalNote] = useState<Note | undefined>(undefined)
   
-  // Sync local note with store note - only update on meaningful changes
+  // Store initial note state to detect changes
+  const initialNoteStateRef = useRef<{ title: string; content: string } | null>(null)
+  
+  // Only sync localNote when note ID changes or note appears/disappears
+  // Don't sync on every title/content change - store note is source of truth
   useEffect(() => {
     if (note) {
       setLocalNote(note)
+      // Store initial state to detect changes later
+      initialNoteStateRef.current = { title: note.title, content: note.content }
+      noteWasModifiedRef.current = false // Reset modification tracking
+      // Check if note has content when first opened
+      const plainContent = getPlainText(note.content).trim()
+      const hasTitle = note.title.trim().length > 0
+      const hasContent = plainContent.length > 0
+      if (hasTitle || hasContent) {
+        noteEverHadContentRef.current = true
+      }
+    } else {
+      // Reset when note changes
+      noteEverHadContentRef.current = false
+      initialNoteStateRef.current = null
     }
-  }, [note?.id, note?.isPinned, note?.title, note?.content, note?.style])
+    // Note: intentionally only depend on note?.id to avoid unnecessary updates
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [note?.id])
   
   // Clear local note when modal closes
   useEffect(() => {
@@ -151,12 +178,38 @@ export function NoteModal() {
       // Delay to allow animation
       const timer = setTimeout(() => {
         setLocalNote(undefined)
+        noteEverHadContentRef.current = false // Reset for next note
+        noteWasModifiedRef.current = false
+        initialNoteStateRef.current = null
       }, 300)
       return () => clearTimeout(timer)
     }
   }, [isModalOpen])
   
-  // The note to render - prefer store note, fallback to local
+  // Track if note ever had content and if it was modified during this session
+  useEffect(() => {
+    if (note) {
+      const plainContent = getPlainText(note.content).trim()
+      const hasTitle = note.title.trim().length > 0
+      const hasContent = plainContent.length > 0
+      
+      // Track if note ever had content
+      if (!noteEverHadContentRef.current && (hasTitle || hasContent)) {
+        noteEverHadContentRef.current = true
+      }
+      
+      // Track if note was modified from initial state
+      if (initialNoteStateRef.current && !noteWasModifiedRef.current) {
+        const titleChanged = note.title !== initialNoteStateRef.current.title
+        const contentChanged = note.content !== initialNoteStateRef.current.content
+        if (titleChanged || contentChanged) {
+          noteWasModifiedRef.current = true
+        }
+      }
+    }
+  }, [note?.title, note?.content])
+  
+  // The note to render - always prefer store note (live data), fallback to local (for animation)
   const displayNote = note || localNote
   
   // Memoize background style to prevent recalculation
@@ -198,32 +251,37 @@ export function NoteModal() {
     }
   }, [isModalOpen])
 
-  const handleClose = useCallback(() => {
+  const handleClose = useCallback(async () => {
     setIsFullscreen(false)
     setCanExitFullscreen(true)
     userToggledRef.current = false
     setIsClosing(true) // Enable layoutId for closing animation
     
-    // Only check for empty notes that were JUST CREATED (never had content)
-    // Don't auto-delete notes that had content and were then emptied - let users decide
+    // Flush pending saves before closing
+    await flushPendingNoteUpdates()
+    
+    // Auto-delete empty notes when closing modal
+    // This handles both: new notes that were never filled, and notes that were emptied
     const freshNote = useNotesStore.getState().notes.find(n => n.id === selectedNoteId)
     if (freshNote) {
       const plainContent = getPlainText(freshNote.content).trim()
       const hasTitle = freshNote.title.trim().length > 0
       const hasContent = plainContent.length > 0
       
-      // Only auto-delete if note was never modified (brand new empty note)
-      // Check if createdAt and updatedAt are very close (within 1 second) = never edited
-      const isNewNote = Math.abs(freshNote.updatedAt - freshNote.createdAt) < 1000
-      
-      if (!hasTitle && !hasContent && isNewNote) {
-        // Only permanently delete brand new empty notes
+      if (!hasTitle && !hasContent) {
+        // Delete empty notes when closing (regardless of whether they ever had content)
         useNotesStore.getState().permanentlyDelete(freshNote.id)
         setModalOpen(false)
         return
       }
     }
+    
     setModalOpen(false)
+    
+    // Only trigger sync if note was actually modified
+    if (noteWasModifiedRef.current) {
+      smartSyncManager.syncNow()
+    }
   }, [selectedNoteId, setModalOpen])
   
   // Keep handleCloseRef in sync for useHistoryBack

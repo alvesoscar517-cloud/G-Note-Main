@@ -47,7 +47,14 @@
     "modalSizeDescription": "Größe des Notizeditors anpassen",
     "modalSizeDefault": "Standard",
     "modalSizeLarge": "Groß",
-    "modalSizeXLarge": "Sehr groß"
+    "modalSizeXLarge": "Sehr groß",
+    "displayMode": "Anzeigemodus",
+    "displayModeDescription": "Wählen Sie, wie die Erweiterung geöffnet wird",
+    "fullscreen": "Vollbild",
+    "fullscreenDesc": "In neuem Browser-Tab öffnen",
+    "sidePanel": "Seitenleiste",
+    "sidePanelDesc": "Als Seitenleiste öffnen",
+    "displayModeHint": "Änderungen werden beim nächsten Öffnen der Erweiterung wirksam"
   },
   "credits": {
     "title": "AI-Credits kaufen",
@@ -324,10 +331,20 @@
   "speech": {
     "start": "Spracheingabe",
     "stop": "Aufnahme stoppen",
-    "notSupported": "Spracheingabe nicht unterstützt",
+    "startListening": "Spracheingabe starten",
+    "stopListening": "Spracheingabe stoppen",
+    "notSupported": "Spracheingabe nicht verfügbar",
+    "notSupportedTitle": "Spracheingabe nicht verfügbar",
+    "notSupportedMessage": "Ihr Browser unterstützt die Spracheingabe nicht. Bitte verwenden Sie Google Chrome oder Microsoft Edge für die beste Erfahrung.",
+    "notSupportedTip": "Tipp: Stellen Sie sicher, dass Sie die neueste Version Ihres Browsers verwenden.",
     "micDenied": "Mikrofonzugriff verweigert",
     "noSpeech": "Keine Sprache erkannt",
-    "error": "Spracheingabefehler"
+    "error": "Spracheingabefehler",
+    "gotIt": "Verstanden",
+    "permissionRequired": "Spracheingabe aktivieren",
+    "permissionMessage": "Erlauben Sie den Mikrofonzugriff für Sprache-zu-Text.",
+    "enableVoice": "Spracheingabe aktivieren",
+    "enable": "Aktivieren"
   },
   "trash": {
     "title": "Papierkorb",

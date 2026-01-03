@@ -47,7 +47,14 @@
     "modalSizeDescription": "Ajuster la taille de l'éditeur",
     "modalSizeDefault": "Par défaut",
     "modalSizeLarge": "Grande",
-    "modalSizeXLarge": "Très grande"
+    "modalSizeXLarge": "Très grande",
+    "displayMode": "Mode d'affichage",
+    "displayModeDescription": "Choisissez comment ouvrir l'extension",
+    "fullscreen": "Plein écran",
+    "fullscreenDesc": "Ouvrir dans un nouvel onglet du navigateur",
+    "sidePanel": "Panneau latéral",
+    "sidePanelDesc": "Ouvrir en tant que panneau latéral",
+    "displayModeHint": "Les modifications s'appliqueront à la prochaine ouverture de l'extension"
   },
   "credits": {
     "title": "Acheter des crédits AI",
@@ -324,10 +331,20 @@
   "speech": {
     "start": "Saisie vocale",
     "stop": "Arrêter l'enregistrement",
-    "notSupported": "Saisie vocale non prise en charge",
+    "startListening": "Démarrer la saisie vocale",
+    "stopListening": "Arrêter la saisie vocale",
+    "notSupported": "Saisie vocale non disponible",
+    "notSupportedTitle": "Saisie vocale non disponible",
+    "notSupportedMessage": "Votre navigateur ne prend pas en charge la saisie vocale. Veuillez utiliser Google Chrome ou Microsoft Edge pour une meilleure expérience.",
+    "notSupportedTip": "Conseil : Assurez-vous d'utiliser la dernière version de votre navigateur.",
     "micDenied": "Accès au microphone refusé",
     "noSpeech": "Aucune voix détectée",
-    "error": "Erreur de saisie vocale"
+    "error": "Erreur de saisie vocale",
+    "gotIt": "Compris",
+    "permissionRequired": "Activer la saisie vocale",
+    "permissionMessage": "Autorisez l'accès au microphone pour utiliser la voix en texte.",
+    "enableVoice": "Activer la saisie vocale",
+    "enable": "Activer"
   },
   "trash": {
     "title": "Corbeille",

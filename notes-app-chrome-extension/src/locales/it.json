@@ -47,7 +47,14 @@
     "modalSizeDescription": "Regola dimensione editor",
     "modalSizeDefault": "Predefinita",
     "modalSizeLarge": "Grande",
-    "modalSizeXLarge": "Molto grande"
+    "modalSizeXLarge": "Molto grande",
+    "displayMode": "Modalità di visualizzazione",
+    "displayModeDescription": "Scegli come aprire l'estensione",
+    "fullscreen": "Schermo intero",
+    "fullscreenDesc": "Apri in una nuova scheda del browser",
+    "sidePanel": "Pannello laterale",
+    "sidePanelDesc": "Apri come pannello laterale",
+    "displayModeHint": "Le modifiche verranno applicate alla prossima apertura dell'estensione"
   },
   "credits": {
     "title": "Acquista crediti AI",
@@ -324,10 +331,20 @@
   "speech": {
     "start": "Input vocale",
     "stop": "Interrompi registrazione",
-    "notSupported": "Input vocale non supportato",
+    "startListening": "Avvia input vocale",
+    "stopListening": "Interrompi input vocale",
+    "notSupported": "Input vocale non disponibile",
+    "notSupportedTitle": "Input vocale non disponibile",
+    "notSupportedMessage": "Il tuo browser non supporta l'input vocale. Utilizza Google Chrome o Microsoft Edge per la migliore esperienza.",
+    "notSupportedTip": "Suggerimento: Assicurati di utilizzare l'ultima versione del tuo browser.",
     "micDenied": "Accesso al microfono negato",
     "noSpeech": "Nessuna voce rilevata",
-    "error": "Errore input vocale"
+    "error": "Errore input vocale",
+    "gotIt": "Capito",
+    "permissionRequired": "Abilita input vocale",
+    "permissionMessage": "Consenti l'accesso al microfono per usare la voce in testo.",
+    "enableVoice": "Abilita input vocale",
+    "enable": "Abilita"
   },
   "trash": {
     "title": "Cestino",

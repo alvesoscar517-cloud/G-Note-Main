@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pin, Loader2, AlertCircle, Users, CloudCheck, Copy, Trash2, PinOff } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -16,17 +16,25 @@ import {
 import type { Note } from '@/types'
 import { cn } from '@/lib/utils'
 
-// Smooth transition config - optimized for 120Hz displays
-// Uses critically damped spring for smooth, bounce-free animation
-const LAYOUT_TRANSITION = { 
-  layout: { 
-    type: 'spring' as const,
-    stiffness: 500,      // Higher stiffness = faster response
-    damping: 40,         // Critical damping = no bounce
-    mass: 0.8,           // Lower mass = snappier feel
-    restDelta: 0.001,    // Smaller = smoother finish
-    restSpeed: 0.001,
-  }
+// Optimized spring config - fast and smooth without bounce
+const LAYOUT_SPRING = {
+  type: 'spring' as const,
+  stiffness: 400,
+  damping: 30,
+  mass: 0.8,
+}
+
+// Exit animation for deleted notes - quick fade + scale
+const EXIT_ANIMATION = {
+  opacity: 0,
+  scale: 0.8,
+  transition: { duration: 0.15, ease: 'easeOut' as const }
+}
+
+// Enter animation for new notes
+const ENTER_ANIMATION = {
+  opacity: 0,
+  scale: 0.9,
 }
 
 // Hook to detect resize and temporarily disable layoutId to prevent ghost elements
@@ -109,7 +117,8 @@ interface NoteCardProps {
   searchQuery?: string
 }
 
-export function NoteCard({ note, searchQuery }: NoteCardProps) {
+// Memoized NoteCard to prevent unnecessary re-renders during list updates
+export const NoteCard = memo(function NoteCard({ note, searchQuery }: NoteCardProps) {
   const { t } = useTranslation()
   const { setSelectedNote, setModalOpen, isSyncing, togglePin, deleteNote, duplicateNote } = useNotesStore()
   
@@ -159,82 +168,81 @@ export function NoteCard({ note, searchQuery }: NoteCardProps) {
   const hasCustomBg = note.style?.backgroundColor || note.style?.backgroundImage
 
   // Disable layoutId during resize to prevent ghost elements
-  const layoutId = isResizing ? undefined : `note-card-${note.id}`
+  // Also disable when modal is open to prevent layout shifts
+  const layoutId = (isResizing || isModalOpen) ? undefined : `note-card-${note.id}`
 
   return (
-    <>
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
-          <motion.div
-            layoutId={layoutId}
-            transition={LAYOUT_TRANSITION}
-            style={{ 
-              willChange: 'transform',
-              contain: 'layout style paint',
-              backfaceVisibility: 'hidden',
-              transform: 'translateZ(0)', // Force GPU layer
-              ...backgroundStyle,
-              // High z-index during morph animation
-              zIndex: isAnimating ? 40 : 'auto',
-              position: isAnimating ? 'relative' : undefined
-            }}
-            onClick={handleClick}
-            className={cn(
-              "cursor-pointer rounded-[16px] border border-neutral-200 p-4 transition-shadow hover:shadow-md hover:border-neutral-300 dark:border-neutral-700 dark:hover:border-neutral-600 relative overflow-hidden",
-              // Always have solid bg when using background image
-              note.style?.backgroundImage ? "bg-white dark:bg-neutral-900" : (!hasCustomBg && "bg-white dark:bg-neutral-900")
-            )}
-          >
-            <NoteBackground style={note.style} />
-            <div className="flex items-start justify-between gap-2 relative z-10">
-              <div className="flex items-center gap-2 min-w-0">
-                <h3 className="font-semibold text-base text-neutral-900 dark:text-white line-clamp-1">
-                  <Highlight text={title} query={searchQuery} />
-                </h3>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                {note.isPinned && (
-                  <Pin className="w-4 h-4 text-neutral-400" />
-                )}
-                {note.isShared && (
-                  <Users className="w-4 h-4 text-neutral-400" />
-                )}
-                <SyncIcon status={note.syncStatus} isSyncing={isSyncing} />
-              </div>
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        <motion.div
+          layout
+          layoutId={layoutId}
+          initial={ENTER_ANIMATION}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={EXIT_ANIMATION}
+          transition={{ layout: LAYOUT_SPRING, opacity: { duration: 0.15 } }}
+          style={{ 
+            ...backgroundStyle,
+            // High z-index during morph animation
+            zIndex: isAnimating ? 40 : 'auto',
+            position: isAnimating ? 'relative' : undefined
+          }}
+          onClick={handleClick}
+          className={cn(
+            "cursor-pointer rounded-[16px] border border-neutral-200 p-4 transition-shadow hover:shadow-md hover:border-neutral-300 dark:border-neutral-700 dark:hover:border-neutral-600 relative overflow-hidden",
+            // Always have solid bg when using background image
+            note.style?.backgroundImage ? "bg-white dark:bg-neutral-900" : (!hasCustomBg && "bg-white dark:bg-neutral-900")
+          )}
+        >
+          <NoteBackground style={note.style} />
+          <div className="flex items-start justify-between gap-2 relative z-10">
+            <div className="flex items-center gap-2 min-w-0">
+              <h3 className="font-semibold text-base text-neutral-900 dark:text-white line-clamp-1">
+                <Highlight text={title} query={searchQuery} />
+              </h3>
             </div>
-            
-            {/* Content preview - fixed 2 line height for consistent card size */}
-            <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 min-h-[2.5rem] relative z-10">
-              {preview ? (
-                searchQuery ? <Highlight text={preview} query={searchQuery} /> : preview
-              ) : (
-                <span className="text-neutral-300 dark:text-neutral-600">&nbsp;</span>
+            <div className="flex items-center gap-1 shrink-0">
+              {note.isPinned && (
+                <Pin className="w-4 h-4 text-neutral-400" />
               )}
-            </p>
-            
-            <p className="mt-3 text-xs text-neutral-400 dark:text-neutral-500 relative z-10">
-              {formatDate(note.updatedAt)}
-            </p>
-          </motion.div>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem onClick={handleTogglePin}>
-            {note.isPinned ? <PinOff className="w-4 h-4 mr-2" /> : <Pin className="w-4 h-4 mr-2" />}
-            {note.isPinned ? t('contextMenu.unpin') : t('contextMenu.pin')}
-          </ContextMenuItem>
-          <ContextMenuItem onClick={handleDuplicate}>
-            <Copy className="w-4 h-4 mr-2" />
-            {t('contextMenu.duplicate')}
-          </ContextMenuItem>
-          <ContextMenuItem onClick={handleMoveToTrash}>
-            <Trash2 className="w-4 h-4 mr-2" />
-            {t('trash.moveToTrash')}
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
-    </>
+              {note.isShared && (
+                <Users className="w-4 h-4 text-neutral-400" />
+              )}
+              <SyncIcon status={note.syncStatus} isSyncing={isSyncing} />
+            </div>
+          </div>
+          
+          {/* Content preview - fixed 2 line height for consistent card size */}
+          <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 line-clamp-2 min-h-[2.5rem] relative z-10">
+            {preview ? (
+              searchQuery ? <Highlight text={preview} query={searchQuery} /> : preview
+            ) : (
+              <span className="text-neutral-300 dark:text-neutral-600">&nbsp;</span>
+            )}
+          </p>
+          
+          <p className="mt-3 text-xs text-neutral-400 dark:text-neutral-500 relative z-10">
+            {formatDate(note.updatedAt)}
+          </p>
+        </motion.div>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem onClick={handleTogglePin}>
+          {note.isPinned ? <PinOff className="w-4 h-4 mr-2" /> : <Pin className="w-4 h-4 mr-2" />}
+          {note.isPinned ? t('contextMenu.unpin') : t('contextMenu.pin')}
+        </ContextMenuItem>
+        <ContextMenuItem onClick={handleDuplicate}>
+          <Copy className="w-4 h-4 mr-2" />
+          {t('contextMenu.duplicate')}
+        </ContextMenuItem>
+        <ContextMenuItem onClick={handleMoveToTrash}>
+          <Trash2 className="w-4 h-4 mr-2" />
+          {t('trash.moveToTrash')}
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   )
-}
+})
 
 // Draggable version of NoteCard
 export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
@@ -310,8 +318,8 @@ export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
   // Card is hidden when modal is open (morph effect shows modal instead)
   const isThisNoteOpen = isModalOpen && isThisNoteSelected
   
-  // Disable layoutId during resize to prevent ghost elements
-  const layoutId = isResizing ? undefined : `note-card-${note.id}`
+  // Disable layoutId during resize or when modal is open to prevent layout shifts
+  const layoutId = (isResizing || isModalOpen) ? undefined : `note-card-${note.id}`
 
   return (
     <>
@@ -326,15 +334,14 @@ export function DraggableNoteCard({ note, searchQuery }: NoteCardProps) {
             {...attributes}
           >
             <motion.div
+              layout
               layoutId={layoutId}
+              initial={ENTER_ANIMATION}
+              animate={{ opacity: isThisNoteOpen ? 0 : 1, scale: 1 }}
+              exit={EXIT_ANIMATION}
               onClick={handleClick}
-              transition={LAYOUT_TRANSITION}
+              transition={{ layout: LAYOUT_SPRING, opacity: { duration: 0.15 } }}
               style={{ 
-                willChange: 'transform',
-                contain: 'layout style paint',
-                backfaceVisibility: 'hidden',
-                transform: 'translateZ(0)', // Force GPU layer
-                opacity: isThisNoteOpen ? 0 : 1,
                 // High z-index during morph animation
                 zIndex: isAnimating ? 40 : 'auto',
                 position: isAnimating ? 'relative' : undefined,

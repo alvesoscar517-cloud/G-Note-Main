@@ -324,10 +324,14 @@
   "speech": {
     "start": "Saisie vocale",
     "stop": "Arrêter l'enregistrement",
-    "notSupported": "Saisie vocale non prise en charge",
+    "notSupported": "Saisie vocale non disponible",
+    "notSupportedTitle": "Saisie vocale non disponible",
+    "notSupportedMessage": "Votre navigateur ne prend pas en charge la saisie vocale. Veuillez utiliser Google Chrome ou Microsoft Edge pour une meilleure expérience.",
+    "notSupportedTip": "Conseil : Assurez-vous d'utiliser la dernière version de votre navigateur.",
     "micDenied": "Accès au microphone refusé",
     "noSpeech": "Aucune voix détectée",
-    "error": "Erreur de saisie vocale"
+    "error": "Erreur de saisie vocale",
+    "gotIt": "Compris"
   },
   "trash": {
     "title": "Corbeille",

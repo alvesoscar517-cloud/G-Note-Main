@@ -108,7 +108,7 @@ export function TermsOfService() {
                 <section id="acceptance" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">1. Acceptance of Terms</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px]">
-                    By accessing or using G-Note ("the Service"), available at gnote.graphoasai.com and as a Chrome extension, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
+                    By accessing or using G-Note ("the Service"), available at gnote.graphosai.com and as a Chrome extension, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
                   </p>
                 </section>
 

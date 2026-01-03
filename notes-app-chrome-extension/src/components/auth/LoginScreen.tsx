@@ -131,7 +131,7 @@ export function LoginScreen() {
           <p className="text-xs text-neutral-400 dark:text-white/50 !mt-3">
             {t('auth.agreeToTerms.prefix')}{' '}
             <a 
-              href="https://gnote.graphoasai.com/terms" 
+              href="https://gnote.graphosai.com/terms" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline"
@@ -140,7 +140,7 @@ export function LoginScreen() {
             </a>{' '}
             {t('auth.agreeToTerms.and')}{' '}
             <a 
-              href="https://gnote.graphoasai.com/privacy" 
+              href="https://gnote.graphosai.com/privacy" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 underline"
@@ -154,7 +154,7 @@ export function LoginScreen() {
       {/* Get App Pill & Chrome Extension Info */}
       <div className="relative z-10 mt-6 flex flex-col items-center gap-3">
         <a
-          href="https://gnote.graphoasai.com"
+          href="https://gnote.graphosai.com"
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center gap-2.5 px-4 py-2.5 bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/50 dark:border-white/10 rounded-full hover:bg-white/50 dark:hover:bg-black/50 transition-all shadow-lg"
@@ -185,7 +185,7 @@ export function LoginScreen() {
         </a>
 
         <p className="text-xs text-neutral-400 dark:text-white/50">
-          Chrome Extension v1.0.1
+          Chrome Extension v1.1.6
         </p>
       </div>
       

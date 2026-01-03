@@ -324,10 +324,14 @@
   "speech": {
     "start": "語音輸入",
     "stop": "停止錄音",
-    "notSupported": "不支援語音輸入",
+    "notSupported": "無法使用語音輸入",
+    "notSupportedTitle": "無法使用語音輸入",
+    "notSupportedMessage": "您的瀏覽器不支援語音輸入功能。請使用 Google Chrome 或 Microsoft Edge 以獲得最佳體驗。",
+    "notSupportedTip": "提示：請確保您使用的是最新版本的瀏覽器。",
     "micDenied": "麥克風存取被拒絕",
     "noSpeech": "未偵測到語音",
-    "error": "語音輸入錯誤"
+    "error": "語音輸入錯誤",
+    "gotIt": "知道了"
   },
   "trash": {
     "title": "垃圾桶",

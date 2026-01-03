@@ -48,7 +48,9 @@ const COLLECTION_COLORS = [
 ]
 
 // Debounce configuration
-const UPDATE_DEBOUNCE_MS = 500
+const UPDATE_DEBOUNCE_MS = 500 // Local save debounce
+const SYNC_IDLE_DELAY_MS = 30000 // Sync after 30s of inactivity
+const SYNC_PERIODIC_MS = 5 * 60 * 1000 // Periodic sync every 5 minutes
 
 /**
  * Debounce Manager for per-note updates
@@ -149,6 +151,103 @@ const noteDebounceManager = new NoteDebounceManager(async (note: Note) => {
 export async function flushPendingNoteUpdates(): Promise<void> {
   await noteDebounceManager.flush()
 }
+
+/**
+ * Smart Sync Manager
+ * Handles intelligent sync timing: on idle, on close, periodic
+ */
+class SmartSyncManager {
+  private idleTimer: ReturnType<typeof setTimeout> | null = null
+  private periodicTimer: ReturnType<typeof setInterval> | null = null
+  private lastActivity: number = Date.now()
+  private isSyncScheduled: boolean = false
+
+  /**
+   * Record user activity - resets idle timer
+   */
+  recordActivity(): void {
+    this.lastActivity = Date.now()
+    this.scheduleIdleSync()
+  }
+
+  /**
+   * Schedule sync after user becomes idle
+   */
+  private scheduleIdleSync(): void {
+    if (this.idleTimer) {
+      clearTimeout(this.idleTimer)
+    }
+
+    this.idleTimer = setTimeout(() => {
+      this.triggerSync('idle')
+    }, SYNC_IDLE_DELAY_MS)
+  }
+
+  /**
+   * Start periodic sync timer
+   */
+  startPeriodicSync(): void {
+    if (this.periodicTimer) return
+
+    this.periodicTimer = setInterval(() => {
+      // Only sync if there was activity since last sync
+      if (noteDebounceManager.hasPending() || this.lastActivity > Date.now() - SYNC_PERIODIC_MS) {
+        this.triggerSync('periodic')
+      }
+    }, SYNC_PERIODIC_MS)
+  }
+
+  /**
+   * Stop all timers
+   */
+  stop(): void {
+    if (this.idleTimer) {
+      clearTimeout(this.idleTimer)
+      this.idleTimer = null
+    }
+    if (this.periodicTimer) {
+      clearInterval(this.periodicTimer)
+      this.periodicTimer = null
+    }
+  }
+
+  /**
+   * Trigger sync with Drive
+   */
+  private async triggerSync(reason: 'idle' | 'periodic' | 'close'): Promise<void> {
+    if (this.isSyncScheduled) return
+
+    const authStore = useAuthStore.getState()
+    const notesStore = useNotesStore.getState()
+    
+    // Only sync if logged in and not already syncing
+    if (!authStore.user?.accessToken || notesStore.isSyncing) return
+
+    this.isSyncScheduled = true
+    console.log(`[SmartSync] Triggering sync (reason: ${reason})`)
+
+    try {
+      // Flush pending local saves first
+      await noteDebounceManager.flush()
+      // Then sync with Drive
+      await notesStore.syncWithDrive(authStore.user.accessToken)
+    } catch (error) {
+      console.error('[SmartSync] Sync failed:', error)
+    } finally {
+      this.isSyncScheduled = false
+    }
+  }
+
+  /**
+   * Force immediate sync (e.g., when closing note or app)
+   */
+  async syncNow(): Promise<void> {
+    await this.triggerSync('close')
+  }
+}
+
+// Create smart sync manager instance
+export const smartSyncManager = new SmartSyncManager()
 
 interface NotesState {
   notes: Note[]
@@ -396,6 +495,8 @@ export const useNotesStore = create<NotesState>()(
         // Use debounced save for better performance during rapid typing
         if (updatedNote) {
           noteDebounceManager.schedule(updatedNote)
+          // Record activity for smart sync
+          smartSyncManager.recordActivity()
         }
       },
       

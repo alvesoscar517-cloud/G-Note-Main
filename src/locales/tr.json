@@ -330,7 +330,10 @@
     "notSupported": "Sesli giriş desteklenmiyor",
     "micDenied": "Mikrofon erişimi reddedildi",
     "noSpeech": "Ses algılanmadı",
-    "error": "Sesli giriş hatası"
+    "error": "Sesli giriş hatası",
+    "notSupportedTitle": "Özellik mevcut değil",
+    "notSupportedMessage": "Tarayıcınız sesli girişi desteklemiyor. En iyi deneyim için Chrome, Edge veya Safari gibi modern bir tarayıcı kullanın.",
+    "understood": "Anladım"
   },
   "trash": {
     "title": "Çöp Kutusu",

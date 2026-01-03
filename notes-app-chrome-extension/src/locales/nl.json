@@ -48,6 +48,13 @@
     "modalSizeDefault": "Standaard",
     "modalSizeLarge": "Groot",
     "modalSizeXLarge": "Extra groot",
+    "displayMode": "Weergavemodus",
+    "displayModeDescription": "Kies hoe de extensie wordt geopend",
+    "fullscreen": "Volledig scherm",
+    "fullscreenDesc": "Openen in een nieuw browsertabblad",
+    "sidePanel": "Zijpaneel",
+    "sidePanelDesc": "Openen als zijpaneel",
+    "displayModeHint": "Wijzigingen worden toegepast de volgende keer dat u de extensie opent",
     "offlineLogoutTitle": "Uitloggen terwijl offline?",
     "offlineLogoutWarning": "Je bent momenteel offline. Niet-opgeslagen wijzigingen zijn mogelijk niet gesynchroniseerd met Google Drive. Als je nu uitlogt, kun je deze wijzigingen verliezen.",
     "logoutAnyway": "Toch uitloggen"
@@ -327,10 +334,19 @@
   "speech": {
     "start": "Spraakinvoer",
     "stop": "Opname stoppen",
+    "startListening": "Spraakinvoer starten",
+    "stopListening": "Spraakinvoer stoppen",
     "notSupported": "Spraakinvoer niet ondersteund",
     "micDenied": "Microfoontoegang geweigerd",
     "noSpeech": "Geen spraak gedetecteerd",
-    "error": "Spraakinvoerfout"
+    "error": "Spraakinvoerfout",
+    "notSupportedTitle": "Functie niet beschikbaar",
+    "notSupportedMessage": "Uw browser ondersteunt geen spraakinvoer. Gebruik een moderne browser zoals Chrome, Edge of Safari voor de beste ervaring.",
+    "understood": "Begrepen",
+    "permissionRequired": "Spraakinvoer inschakelen",
+    "permissionMessage": "Sta microfoontoegang toe om spraak-naar-tekst te gebruiken.",
+    "enableVoice": "Spraakinvoer inschakelen",
+    "enable": "Inschakelen"
   },
   "trash": {
     "title": "Prullenbak",

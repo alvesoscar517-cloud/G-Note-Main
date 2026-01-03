@@ -324,10 +324,14 @@
   "speech": {
     "start": "Voice input",
     "stop": "Stop recording",
-    "notSupported": "Voice input not supported",
+    "notSupported": "Voice input not available",
+    "notSupportedTitle": "Voice input not available",
+    "notSupportedMessage": "Your browser doesn't support voice input. Please try using Google Chrome or Microsoft Edge for the best experience.",
+    "notSupportedTip": "Tip: Make sure you're using the latest version of your browser.",
     "micDenied": "Microphone access denied",
     "noSpeech": "No speech detected",
-    "error": "Voice input error"
+    "error": "Voice input error",
+    "gotIt": "Got it"
   },
   "trash": {
     "title": "Trash",

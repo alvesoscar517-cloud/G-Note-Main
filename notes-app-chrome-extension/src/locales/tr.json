@@ -48,6 +48,13 @@
     "modalSizeDefault": "Varsayılan",
     "modalSizeLarge": "Büyük",
     "modalSizeXLarge": "Çok büyük",
+    "displayMode": "Görüntüleme Modu",
+    "displayModeDescription": "Uzantının nasıl açılacağını seçin",
+    "fullscreen": "Tam Ekran",
+    "fullscreenDesc": "Yeni tarayıcı sekmesinde aç",
+    "sidePanel": "Yan Panel",
+    "sidePanelDesc": "Yan panel olarak aç",
+    "displayModeHint": "Değişiklikler uzantıyı bir sonraki açışınızda uygulanacak",
     "offlineLogoutTitle": "Çevrimdışıyken çıkış yap?",
     "offlineLogoutWarning": "Şu anda çevrimdışısınız. Kaydedilmemiş değişiklikler Google Drive ile senkronize edilmemiş olabilir. Şimdi çıkış yaparsanız bu değişiklikleri kaybedebilirsiniz.",
     "logoutAnyway": "Yine de çıkış yap"
@@ -327,10 +334,19 @@
   "speech": {
     "start": "Sesli giriş",
     "stop": "Kaydı durdur",
+    "startListening": "Sesli girişi başlat",
+    "stopListening": "Sesli girişi durdur",
     "notSupported": "Sesli giriş desteklenmiyor",
     "micDenied": "Mikrofon erişimi reddedildi",
     "noSpeech": "Ses algılanmadı",
-    "error": "Sesli giriş hatası"
+    "error": "Sesli giriş hatası",
+    "notSupportedTitle": "Özellik mevcut değil",
+    "notSupportedMessage": "Tarayıcınız sesli girişi desteklemiyor. En iyi deneyim için Chrome, Edge veya Safari gibi modern bir tarayıcı kullanın.",
+    "understood": "Anladım",
+    "permissionRequired": "Sesli girişi etkinleştir",
+    "permissionMessage": "Sesten metne özelliğini kullanmak için mikrofon erişimine izin verin.",
+    "enableVoice": "Sesli girişi etkinleştir",
+    "enable": "Etkinleştir"
   },
   "trash": {
     "title": "Çöp Kutusu",

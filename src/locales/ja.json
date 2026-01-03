@@ -324,10 +324,14 @@
   "speech": {
     "start": "音声入力",
     "stop": "録音を停止",
-    "notSupported": "音声入力はサポートされていません",
+    "notSupported": "音声入力を利用できません",
+    "notSupportedTitle": "音声入力を利用できません",
+    "notSupportedMessage": "お使いのブラウザは音声入力機能に対応していません。最高の体験のために Google Chrome または Microsoft Edge をご利用ください。",
+    "notSupportedTip": "ヒント：ブラウザが最新バージョンであることをご確認ください。",
     "micDenied": "マイクへのアクセスが拒否されました",
     "noSpeech": "音声が検出されませんでした",
-    "error": "音声入力エラー"
+    "error": "音声入力エラー",
+    "gotIt": "了解"
   },
   "trash": {
     "title": "ゴミ箱",

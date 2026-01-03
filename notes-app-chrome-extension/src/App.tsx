@@ -2,7 +2,7 @@ import { useEffect, useCallback, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { LayoutGroup } from 'framer-motion'
 import { useAuthStore } from '@/stores/authStore'
-import { useNotesStore } from '@/stores/notesStore'
+import { useNotesStore, smartSyncManager, flushPendingNoteUpdates } from '@/stores/notesStore'
 import { useThemeStore } from '@/stores/themeStore'
 import { useNetworkStore } from '@/stores/networkStore'
 import { LoginScreen } from '@/components/auth/LoginScreen'
@@ -48,11 +48,35 @@ function AppContent() {
     // Initialize offline storage (IndexedDB)
     initOfflineStorage()
     
+    // Start periodic sync when logged in
+    if (user?.accessToken) {
+      smartSyncManager.startPeriodicSync()
+    }
+    
+    // Sync and flush on page unload/visibility change
+    const handleBeforeUnload = async () => {
+      await flushPendingNoteUpdates()
+    }
+    
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'hidden') {
+        await flushPendingNoteUpdates()
+        // Trigger sync when app goes to background
+        smartSyncManager.syncNow()
+      }
+    }
+    
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
     return () => {
       cleanupNetwork()
       cleanupOfflineSync()
+      smartSyncManager.stop()
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [initNetwork, initOfflineStorage])
+  }, [initNetwork, initOfflineStorage, user?.accessToken])
 
   // Debounced sync - wait 2s after last change before syncing
   const debouncedSync = useDebouncedCallback(async () => {

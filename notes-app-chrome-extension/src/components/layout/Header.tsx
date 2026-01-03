@@ -672,12 +672,7 @@ export function Header() {
                       : "hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
                   )}
                 >
-                  <div className={cn(
-                    "p-2 rounded-lg",
-                    displayMode === option.value
-                      ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
-                      : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400"
-                  )}>
+                  <div className="p-2 rounded-lg bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
                     {option.icon === 'monitor' ? (
                       <Monitor className="w-5 h-5" />
                     ) : (

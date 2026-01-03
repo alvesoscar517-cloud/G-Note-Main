@@ -324,10 +324,14 @@
   "speech": {
     "start": "Input vocale",
     "stop": "Interrompi registrazione",
-    "notSupported": "Input vocale non supportato",
+    "notSupported": "Input vocale non disponibile",
+    "notSupportedTitle": "Input vocale non disponibile",
+    "notSupportedMessage": "Il tuo browser non supporta l'input vocale. Utilizza Google Chrome o Microsoft Edge per la migliore esperienza.",
+    "notSupportedTip": "Suggerimento: Assicurati di utilizzare l'ultima versione del tuo browser.",
     "micDenied": "Accesso al microfono negato",
     "noSpeech": "Nessuna voce rilevata",
-    "error": "Errore input vocale"
+    "error": "Errore input vocale",
+    "gotIt": "Capito"
   },
   "trash": {
     "title": "Cestino",

@@ -310,12 +310,14 @@ export function VirtualizedNotesList() {
                 }}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-1 px-1">
-                  {row.map(item => {
-                    if (item.type === 'note') {
-                      return <NoteCard key={item.note.id} note={item.note} searchQuery={currentQuery} />
-                    }
-                    return null
-                  })}
+                  <AnimatePresence mode="popLayout">
+                    {row.map(item => {
+                      if (item.type === 'note') {
+                        return <NoteCard key={item.note.id} note={item.note} searchQuery={currentQuery} />
+                      }
+                      return null
+                    })}
+                  </AnimatePresence>
                 </div>
               </div>
             )

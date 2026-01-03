@@ -324,10 +324,14 @@
   "speech": {
     "start": "Entrada de voz",
     "stop": "Parar gravação",
-    "notSupported": "Entrada de voz não suportada",
+    "notSupported": "Entrada de voz não disponível",
+    "notSupportedTitle": "Entrada de voz não disponível",
+    "notSupportedMessage": "Seu navegador não suporta entrada de voz. Por favor, use o Google Chrome ou Microsoft Edge para a melhor experiência.",
+    "notSupportedTip": "Dica: Certifique-se de estar usando a versão mais recente do seu navegador.",
     "micDenied": "Acesso ao microfone negado",
     "noSpeech": "Nenhuma voz detectada",
-    "error": "Erro de entrada de voz"
+    "error": "Erro de entrada de voz",
+    "gotIt": "Entendi"
   },
   "trash": {
     "title": "Lixeira",

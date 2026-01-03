@@ -47,7 +47,14 @@
     "modalSizeDescription": "Điều chỉnh kích thước ghi chú",
     "modalSizeDefault": "Mặc định",
     "modalSizeLarge": "Lớn",
-    "modalSizeXLarge": "Rất lớn"
+    "modalSizeXLarge": "Rất lớn",
+    "displayMode": "Chế độ hiển thị",
+    "displayModeDescription": "Chọn cách mở tiện ích",
+    "fullscreen": "Toàn màn hình",
+    "fullscreenDesc": "Mở trong tab trình duyệt mới",
+    "sidePanel": "Bảng bên",
+    "sidePanelDesc": "Mở dưới dạng bảng bên",
+    "displayModeHint": "Thay đổi sẽ áp dụng khi bạn mở tiện ích lần sau"
   },
   "credits": {
     "title": "Mua AI Credits",
@@ -324,10 +331,20 @@
   "speech": {
     "start": "Nhập giọng nói",
     "stop": "Dừng ghi âm",
-    "notSupported": "Trình duyệt không hỗ trợ nhập giọng nói",
+    "startListening": "Bắt đầu nhập giọng nói",
+    "stopListening": "Dừng nhập giọng nói",
+    "notSupported": "Không thể nhập giọng nói",
+    "notSupportedTitle": "Không thể nhập giọng nói",
+    "notSupportedMessage": "Trình duyệt của bạn không hỗ trợ tính năng nhập giọng nói. Vui lòng sử dụng Google Chrome hoặc Microsoft Edge để có trải nghiệm tốt nhất.",
+    "notSupportedTip": "Mẹo: Hãy đảm bảo bạn đang sử dụng phiên bản mới nhất của trình duyệt.",
     "micDenied": "Không có quyền truy cập microphone",
     "noSpeech": "Không phát hiện giọng nói",
-    "error": "Lỗi nhập giọng nói"
+    "error": "Lỗi nhập giọng nói",
+    "gotIt": "Đã hiểu",
+    "permissionRequired": "Bật nhập giọng nói",
+    "permissionMessage": "Cho phép truy cập microphone để sử dụng chuyển giọng nói thành văn bản.",
+    "enableVoice": "Bật nhập giọng nói",
+    "enable": "Bật"
   },
   "trash": {
     "title": "Thùng rác",

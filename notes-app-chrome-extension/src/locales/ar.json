@@ -48,6 +48,13 @@
     "modalSizeDefault": "افتراضي",
     "modalSizeLarge": "كبير",
     "modalSizeXLarge": "كبير جداً",
+    "displayMode": "وضع العرض",
+    "displayModeDescription": "اختر كيفية فتح الإضافة",
+    "fullscreen": "ملء الشاشة",
+    "fullscreenDesc": "فتح في علامة تبويب جديدة",
+    "sidePanel": "اللوحة الجانبية",
+    "sidePanelDesc": "فتح كلوحة جانبية",
+    "displayModeHint": "ستُطبق التغييرات في المرة القادمة التي تفتح فيها الإضافة",
     "offlineLogoutTitle": "تسجيل الخروج وأنت غير متصل؟",
     "offlineLogoutWarning": "أنت غير متصل بالإنترنت حالياً. قد لا تكون التغييرات غير المحفوظة قد تمت مزامنتها مع Google Drive. إذا قمت بتسجيل الخروج الآن، فقد تفقد هذه التغييرات.",
     "logoutAnyway": "تسجيل الخروج على أي حال"
@@ -327,10 +334,19 @@
   "speech": {
     "start": "إدخال صوتي",
     "stop": "إيقاف التسجيل",
+    "startListening": "بدء الإدخال الصوتي",
+    "stopListening": "إيقاف الإدخال الصوتي",
     "notSupported": "الإدخال الصوتي غير مدعوم",
     "micDenied": "تم رفض الوصول إلى الميكروفون",
     "noSpeech": "لم يتم اكتشاف كلام",
-    "error": "خطأ في الإدخال الصوتي"
+    "error": "خطأ في الإدخال الصوتي",
+    "notSupportedTitle": "الميزة غير متوفرة",
+    "notSupportedMessage": "متصفحك لا يدعم الإدخال الصوتي. يرجى استخدام متصفح حديث مثل Chrome أو Edge أو Safari للحصول على أفضل تجربة.",
+    "understood": "فهمت",
+    "permissionRequired": "تفعيل الإدخال الصوتي",
+    "permissionMessage": "اسمح بالوصول إلى الميكروفون لاستخدام تحويل الصوت إلى نص.",
+    "enableVoice": "تفعيل الإدخال الصوتي",
+    "enable": "تفعيل"
   },
   "trash": {
     "title": "سلة المهملات",

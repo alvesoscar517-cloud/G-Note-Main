@@ -330,7 +330,10 @@
     "notSupported": "Input suara tidak didukung",
     "micDenied": "Akses mikrofon ditolak",
     "noSpeech": "Tidak ada suara terdeteksi",
-    "error": "Kesalahan input suara"
+    "error": "Kesalahan input suara",
+    "notSupportedTitle": "Fitur tidak tersedia",
+    "notSupportedMessage": "Browser Anda tidak mendukung input suara. Silakan gunakan browser modern seperti Chrome, Edge, atau Safari untuk pengalaman terbaik.",
+    "understood": "Mengerti"
   },
   "trash": {
     "title": "Sampah",

@@ -192,7 +192,36 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .catch(error => sendResponse({ error: error.message }))
     return true
   }
+  
+  // Handle reset offscreen document request (after permission granted)
+  if (request.type === 'reset-offscreen') {
+    closeOffscreenDocument()
+      .then(() => sendResponse({ success: true }))
+      .catch(error => sendResponse({ error: error.message }))
+    return true
+  }
 })
+
+// Close offscreen document to force recreation with new permissions
+async function closeOffscreenDocument() {
+  try {
+    const offscreenUrl = chrome.runtime.getURL('offscreen.html')
+    
+    if ('getContexts' in chrome.runtime) {
+      const contexts = await chrome.runtime.getContexts({
+        contextTypes: ['OFFSCREEN_DOCUMENT'],
+        documentUrls: [offscreenUrl]
+      })
+      
+      if (contexts.length > 0) {
+        await chrome.offscreen.closeDocument()
+        console.log('[Background] Offscreen document closed for permission refresh')
+      }
+    }
+  } catch (err) {
+    console.error('[Background] Error closing offscreen document:', err)
+  }
+}
 
 async function handleGoogleAuth() {
   try {

@@ -102,7 +102,7 @@ export function PrivacyPolicy() {
                 <section id="introduction" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">1. Introduction</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px]">
-                    G-Note ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our note-taking application available at gnote.graphoasai.com and our Chrome extension.
+                    G-Note ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our note-taking application available at gnote.graphosai.com and our Chrome extension.
                   </p>
                 </section>
 

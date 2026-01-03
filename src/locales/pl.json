@@ -330,7 +330,10 @@
     "notSupported": "Wprowadzanie głosowe nie jest obsługiwane",
     "micDenied": "Odmowa dostępu do mikrofonu",
     "noSpeech": "Nie wykryto mowy",
-    "error": "Błąd wprowadzania głosowego"
+    "error": "Błąd wprowadzania głosowego",
+    "notSupportedTitle": "Funkcja niedostępna",
+    "notSupportedMessage": "Twoja przeglądarka nie obsługuje wprowadzania głosowego. Użyj nowoczesnej przeglądarki, takiej jak Chrome, Edge lub Safari, aby uzyskać najlepsze wrażenia.",
+    "understood": "Rozumiem"
   },
   "trash": {
     "title": "Kosz",

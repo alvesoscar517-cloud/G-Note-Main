@@ -47,7 +47,14 @@
     "modalSizeDescription": "調整編輯器大小",
     "modalSizeDefault": "預設",
     "modalSizeLarge": "大",
-    "modalSizeXLarge": "超大"
+    "modalSizeXLarge": "超大",
+    "displayMode": "顯示模式",
+    "displayModeDescription": "選擇開啟擴充功能的方式",
+    "fullscreen": "全螢幕",
+    "fullscreenDesc": "在新瀏覽器分頁中開啟",
+    "sidePanel": "側邊欄",
+    "sidePanelDesc": "作為側邊欄開啟",
+    "displayModeHint": "變更將在下次開啟擴充功能時生效"
   },
   "credits": {
     "title": "購買 AI 點數",
@@ -324,10 +331,20 @@
   "speech": {
     "start": "語音輸入",
     "stop": "停止錄音",
-    "notSupported": "不支援語音輸入",
+    "startListening": "開始語音輸入",
+    "stopListening": "停止語音輸入",
+    "notSupported": "無法使用語音輸入",
+    "notSupportedTitle": "無法使用語音輸入",
+    "notSupportedMessage": "您的瀏覽器不支援語音輸入功能。請使用 Google Chrome 或 Microsoft Edge 以獲得最佳體驗。",
+    "notSupportedTip": "提示：請確保您使用的是最新版本的瀏覽器。",
     "micDenied": "麥克風存取被拒絕",
     "noSpeech": "未偵測到語音",
-    "error": "語音輸入錯誤"
+    "error": "語音輸入錯誤",
+    "gotIt": "知道了",
+    "permissionRequired": "啟用語音輸入",
+    "permissionMessage": "允許麥克風存取以使用語音轉文字。",
+    "enableVoice": "啟用語音輸入",
+    "enable": "啟用"
   },
   "trash": {
     "title": "垃圾桶",

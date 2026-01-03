@@ -47,7 +47,14 @@
     "modalSizeDescription": "エディターのサイズを調整",
     "modalSizeDefault": "デフォルト",
     "modalSizeLarge": "大",
-    "modalSizeXLarge": "特大"
+    "modalSizeXLarge": "特大",
+    "displayMode": "表示モード",
+    "displayModeDescription": "拡張機能の開き方を選択",
+    "fullscreen": "全画面",
+    "fullscreenDesc": "新しいブラウザタブで開く",
+    "sidePanel": "サイドパネル",
+    "sidePanelDesc": "サイドパネルとして開く",
+    "displayModeHint": "変更は次回拡張機能を開いたときに適用されます"
   },
   "credits": {
     "title": "AIクレジットを購入",
@@ -324,10 +331,20 @@
   "speech": {
     "start": "音声入力",
     "stop": "録音を停止",
-    "notSupported": "音声入力はサポートされていません",
+    "startListening": "音声入力を開始",
+    "stopListening": "音声入力を停止",
+    "notSupported": "音声入力を利用できません",
+    "notSupportedTitle": "音声入力を利用できません",
+    "notSupportedMessage": "お使いのブラウザは音声入力機能に対応していません。最高の体験のために Google Chrome または Microsoft Edge をご利用ください。",
+    "notSupportedTip": "ヒント：ブラウザが最新バージョンであることをご確認ください。",
     "micDenied": "マイクへのアクセスが拒否されました",
     "noSpeech": "音声が検出されませんでした",
-    "error": "音声入力エラー"
+    "error": "音声入力エラー",
+    "gotIt": "了解",
+    "permissionRequired": "音声入力を有効にする",
+    "permissionMessage": "音声テキスト変換を使用するにはマイクへのアクセスを許可してください。",
+    "enableVoice": "音声入力を有効にする",
+    "enable": "有効"
   },
   "trash": {
     "title": "ゴミ箱",

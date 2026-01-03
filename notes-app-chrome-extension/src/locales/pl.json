@@ -48,6 +48,13 @@
     "modalSizeDefault": "Domyślny",
     "modalSizeLarge": "Duży",
     "modalSizeXLarge": "Bardzo duży",
+    "displayMode": "Tryb wyświetlania",
+    "displayModeDescription": "Wybierz sposób otwierania rozszerzenia",
+    "fullscreen": "Pełny ekran",
+    "fullscreenDesc": "Otwórz w nowej karcie przeglądarki",
+    "sidePanel": "Panel boczny",
+    "sidePanelDesc": "Otwórz jako panel boczny",
+    "displayModeHint": "Zmiany zostaną zastosowane przy następnym otwarciu rozszerzenia",
     "offlineLogoutTitle": "Wylogować się offline?",
     "offlineLogoutWarning": "Jesteś obecnie offline. Niezapisane zmiany mogły nie zostać zsynchronizowane z Google Drive. Jeśli teraz się wylogujesz, możesz stracić te zmiany.",
     "logoutAnyway": "Wyloguj mimo to"
@@ -327,10 +334,19 @@
   "speech": {
     "start": "Wprowadzanie głosowe",
     "stop": "Zatrzymaj nagrywanie",
+    "startListening": "Rozpocznij wprowadzanie głosowe",
+    "stopListening": "Zatrzymaj wprowadzanie głosowe",
     "notSupported": "Wprowadzanie głosowe nie jest obsługiwane",
     "micDenied": "Odmowa dostępu do mikrofonu",
     "noSpeech": "Nie wykryto mowy",
-    "error": "Błąd wprowadzania głosowego"
+    "error": "Błąd wprowadzania głosowego",
+    "notSupportedTitle": "Funkcja niedostępna",
+    "notSupportedMessage": "Twoja przeglądarka nie obsługuje wprowadzania głosowego. Użyj nowoczesnej przeglądarki, takiej jak Chrome, Edge lub Safari, aby uzyskać najlepsze wrażenia.",
+    "understood": "Rozumiem",
+    "permissionRequired": "Włącz wprowadzanie głosowe",
+    "permissionMessage": "Zezwól na dostęp do mikrofonu, aby używać mowy na tekst.",
+    "enableVoice": "Włącz wprowadzanie głosowe",
+    "enable": "Włącz"
   },
   "trash": {
     "title": "Kosz",

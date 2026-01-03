@@ -86,7 +86,7 @@ import { NoteActionsMenu } from './NoteActionsMenu'
 import { generateUserColor } from '@/lib/collaboration'
 import { AIMenu, SummaryModal, InsufficientCreditsModal } from './AIMenu'
 import { AIChatView } from './AIChatView'
-import { SpeechButton } from './SpeechButton'
+// import { SpeechButton } from './SpeechButton' // Hidden due to Chrome extension permission limitations
 import { EditorSkeleton } from '@/components/ui/Skeleton'
 import { useNetworkRequiredOverlay } from '@/components/ui/OfflineIndicator'
 import * as AI from '@/lib/ai'
@@ -1378,8 +1378,8 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             disabled={!isOnline || isAILoading || isStreaming}
           />
           
-          {/* Speech to Text */}
-          <SpeechButton
+          {/* Speech to Text - Hidden due to Chrome extension permission limitations */}
+          {/* <SpeechButton
             onTranscript={(text, isFinal, replaceLength) => {
               if (editor) {
                 // Delete previous interim text if needed
@@ -1398,7 +1398,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               }
             }}
             disabled={isAILoading || isStreaming}
-          />
+          /> */}
           
           {/* Primary formatting tools - always visible */}
           <ToolbarButton

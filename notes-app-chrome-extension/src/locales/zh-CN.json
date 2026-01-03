@@ -47,7 +47,14 @@
     "modalSizeDescription": "调整编辑器大小",
     "modalSizeDefault": "默认",
     "modalSizeLarge": "大",
-    "modalSizeXLarge": "超大"
+    "modalSizeXLarge": "超大",
+    "displayMode": "显示模式",
+    "displayModeDescription": "选择打开扩展的方式",
+    "fullscreen": "全屏",
+    "fullscreenDesc": "在新浏览器标签页中打开",
+    "sidePanel": "侧边栏",
+    "sidePanelDesc": "作为侧边栏打开",
+    "displayModeHint": "更改将在下次打开扩展时生效"
   },
   "credits": {
     "title": "购买 AI 积分",
@@ -324,10 +331,20 @@
   "speech": {
     "start": "语音输入",
     "stop": "停止录音",
-    "notSupported": "不支持语音输入",
+    "startListening": "开始语音输入",
+    "stopListening": "停止语音输入",
+    "notSupported": "无法使用语音输入",
+    "notSupportedTitle": "无法使用语音输入",
+    "notSupportedMessage": "您的浏览器不支持语音输入功能。请使用 Google Chrome 或 Microsoft Edge 以获得最佳体验。",
+    "notSupportedTip": "提示：请确保您使用的是最新版本的浏览器。",
     "micDenied": "麦克风访问被拒绝",
     "noSpeech": "未检测到语音",
-    "error": "语音输入错误"
+    "error": "语音输入错误",
+    "gotIt": "知道了",
+    "permissionRequired": "启用语音输入",
+    "permissionMessage": "允许麦克风访问以使用语音转文字。",
+    "enableVoice": "启用语音输入",
+    "enable": "启用"
   },
   "trash": {
     "title": "回收站",

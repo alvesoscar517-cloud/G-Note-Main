@@ -48,6 +48,13 @@
     "modalSizeDefault": "Default",
     "modalSizeLarge": "Besar",
     "modalSizeXLarge": "Sangat besar",
+    "displayMode": "Mode Tampilan",
+    "displayModeDescription": "Pilih cara membuka ekstensi",
+    "fullscreen": "Layar Penuh",
+    "fullscreenDesc": "Buka di tab browser baru",
+    "sidePanel": "Panel Samping",
+    "sidePanelDesc": "Buka sebagai panel samping",
+    "displayModeHint": "Perubahan akan diterapkan saat Anda membuka ekstensi berikutnya",
     "offlineLogoutTitle": "Keluar saat offline?",
     "offlineLogoutWarning": "Anda sedang offline. Perubahan yang belum disimpan mungkin belum disinkronkan ke Google Drive. Jika Anda keluar sekarang, Anda mungkin kehilangan perubahan tersebut.",
     "logoutAnyway": "Tetap keluar"
@@ -327,10 +334,19 @@
   "speech": {
     "start": "Input suara",
     "stop": "Hentikan rekaman",
+    "startListening": "Mulai input suara",
+    "stopListening": "Hentikan input suara",
     "notSupported": "Input suara tidak didukung",
     "micDenied": "Akses mikrofon ditolak",
     "noSpeech": "Tidak ada suara terdeteksi",
-    "error": "Kesalahan input suara"
+    "error": "Kesalahan input suara",
+    "notSupportedTitle": "Fitur tidak tersedia",
+    "notSupportedMessage": "Browser Anda tidak mendukung input suara. Silakan gunakan browser modern seperti Chrome, Edge, atau Safari untuk pengalaman terbaik.",
+    "understood": "Mengerti",
+    "permissionRequired": "Aktifkan input suara",
+    "permissionMessage": "Izinkan akses mikrofon untuk menggunakan suara ke teks.",
+    "enableVoice": "Aktifkan input suara",
+    "enable": "Aktifkan"
   },
   "trash": {
     "title": "Sampah",

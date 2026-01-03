@@ -330,7 +330,10 @@
     "notSupported": "Spraakinvoer niet ondersteund",
     "micDenied": "Microfoontoegang geweigerd",
     "noSpeech": "Geen spraak gedetecteerd",
-    "error": "Spraakinvoerfout"
+    "error": "Spraakinvoerfout",
+    "notSupportedTitle": "Functie niet beschikbaar",
+    "notSupportedMessage": "Uw browser ondersteunt geen spraakinvoer. Gebruik een moderne browser zoals Chrome, Edge of Safari voor de beste ervaring.",
+    "understood": "Begrepen"
   },
   "trash": {
     "title": "Prullenbak",

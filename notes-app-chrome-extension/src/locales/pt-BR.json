@@ -47,7 +47,14 @@
     "modalSizeDescription": "Ajustar tamanho do editor",
     "modalSizeDefault": "Padrão",
     "modalSizeLarge": "Grande",
-    "modalSizeXLarge": "Extra grande"
+    "modalSizeXLarge": "Extra grande",
+    "displayMode": "Modo de exibição",
+    "displayModeDescription": "Escolha como abrir a extensão",
+    "fullscreen": "Tela cheia",
+    "fullscreenDesc": "Abrir em uma nova aba do navegador",
+    "sidePanel": "Painel lateral",
+    "sidePanelDesc": "Abrir como painel lateral",
+    "displayModeHint": "As alterações serão aplicadas na próxima vez que você abrir a extensão"
   },
   "credits": {
     "title": "Comprar créditos AI",
@@ -324,10 +331,20 @@
   "speech": {
     "start": "Entrada de voz",
     "stop": "Parar gravação",
-    "notSupported": "Entrada de voz não suportada",
+    "startListening": "Iniciar entrada de voz",
+    "stopListening": "Parar entrada de voz",
+    "notSupported": "Entrada de voz não disponível",
+    "notSupportedTitle": "Entrada de voz não disponível",
+    "notSupportedMessage": "Seu navegador não suporta entrada de voz. Por favor, use o Google Chrome ou Microsoft Edge para a melhor experiência.",
+    "notSupportedTip": "Dica: Certifique-se de estar usando a versão mais recente do seu navegador.",
     "micDenied": "Acesso ao microfone negado",
     "noSpeech": "Nenhuma voz detectada",
-    "error": "Erro de entrada de voz"
+    "error": "Erro de entrada de voz",
+    "gotIt": "Entendi",
+    "permissionRequired": "Ativar entrada de voz",
+    "permissionMessage": "Permita o acesso ao microfone para usar voz para texto.",
+    "enableVoice": "Ativar entrada de voz",
+    "enable": "Ativar"
   },
   "trash": {
     "title": "Lixeira",

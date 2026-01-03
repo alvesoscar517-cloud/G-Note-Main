@@ -87,6 +87,26 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
     resetTranscript,
   } = useLibSpeechRecognition()
 
+  // Debug logging for production issues
+  useEffect(() => {
+    const hasSpeechRecognition = typeof window !== 'undefined' && 
+      ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
+    
+    console.log('[SpeechToText] Debug info:', {
+      browserSupportsSpeechRecognition,
+      hasSpeechRecognition,
+      protocol: window.location.protocol,
+      hostname: window.location.hostname,
+      isSecureContext: window.isSecureContext,
+      userAgent: navigator.userAgent,
+    })
+    
+    // Web Speech API requires secure context (HTTPS or localhost)
+    if (!window.isSecureContext) {
+      console.warn('[SpeechToText] Not in secure context - Speech API may not work')
+    }
+  }, [browserSupportsSpeechRecognition])
+
   // Determine status based on library's listening state only
   const status: SpeechStatus = error ? 'error' : listening ? 'listening' : 'idle'
 
@@ -145,14 +165,18 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
   }, [listening])
 
   const startListening = useCallback(async () => {
+    console.log('[SpeechToText] startListening called, support:', browserSupportsSpeechRecognition, 'listening:', listening)
+    
     if (!browserSupportsSpeechRecognition) {
       const errorMsg = 'Speech recognition is not supported in this browser'
+      console.error('[SpeechToText]', errorMsg)
       setError(errorMsg)
       onError?.(errorMsg)
       return
     }
 
     if (isStartingRef.current || listening) {
+      console.log('[SpeechToText] Already starting or listening, skipping')
       return
     }
 
@@ -165,13 +189,18 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
     resetTranscript()
 
     try {
+      const lang = LOCALE_TO_SPEECH_LANG[locale] || 'en-US'
+      console.log('[SpeechToText] Starting with language:', lang)
+      
       await SpeechRecognition.startListening({
         continuous,
         interimResults,
-        language: LOCALE_TO_SPEECH_LANG[locale] || 'en-US',
+        language: lang,
       })
+      console.log('[SpeechToText] Started successfully')
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to start speech recognition'
+      console.error('[SpeechToText] Error:', errorMsg, err)
       setError(errorMsg)
       onError?.(errorMsg)
     } finally {

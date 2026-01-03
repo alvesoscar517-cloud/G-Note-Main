@@ -49,12 +49,12 @@
     "modalSizeLarge": "Large",
     "modalSizeXLarge": "Extra large",
     "displayMode": "Display Mode",
-    "displayModeDescription": "How the app opens",
-    "fullscreen": "Fullscreen",
-    "fullscreenDesc": "Open in new tab",
+    "displayModeDescription": "Choose how to open the extension",
+    "fullscreen": "Full Screen",
+    "fullscreenDesc": "Open in a new browser tab",
     "sidePanel": "Side Panel",
-    "sidePanelDesc": "Open in side panel",
-    "displayModeHint": "Changes will apply the next time you click the extension icon."
+    "sidePanelDesc": "Open as a side panel",
+    "displayModeHint": "Changes will apply the next time you open the extension"
   },
   "credits": {
     "title": "Buy AI Credits",
@@ -331,10 +331,20 @@
   "speech": {
     "start": "Voice input",
     "stop": "Stop recording",
-    "notSupported": "Voice input not supported",
+    "startListening": "Start voice input",
+    "stopListening": "Stop voice input",
+    "notSupported": "Voice input not available",
+    "notSupportedTitle": "Voice input not available",
+    "notSupportedMessage": "Your browser doesn't support voice input. Please try using Google Chrome or Microsoft Edge for the best experience.",
+    "notSupportedTip": "Tip: Make sure you're using the latest version of your browser.",
     "micDenied": "Microphone access denied",
     "noSpeech": "No speech detected",
-    "error": "Voice input error"
+    "error": "Voice input error",
+    "gotIt": "Got it",
+    "permissionRequired": "Enable Voice Input",
+    "permissionMessage": "Allow microphone access to use voice-to-text.",
+    "enableVoice": "Enable Voice Input",
+    "enable": "Enable"
   },
   "trash": {
     "title": "Trash",

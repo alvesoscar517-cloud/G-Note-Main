@@ -324,10 +324,14 @@
   "speech": {
     "start": "음성 입력",
     "stop": "녹음 중지",
-    "notSupported": "음성 입력이 지원되지 않습니다",
+    "notSupported": "음성 입력을 사용할 수 없습니다",
+    "notSupportedTitle": "음성 입력을 사용할 수 없습니다",
+    "notSupportedMessage": "브라우저가 음성 입력 기능을 지원하지 않습니다. 최상의 경험을 위해 Google Chrome 또는 Microsoft Edge를 사용해 주세요.",
+    "notSupportedTip": "팁: 브라우저가 최신 버전인지 확인하세요.",
     "micDenied": "마이크 접근이 거부되었습니다",
     "noSpeech": "음성이 감지되지 않았습니다",
-    "error": "음성 입력 오류"
+    "error": "음성 입력 오류",
+    "gotIt": "알겠습니다"
   },
   "trash": {
     "title": "휴지통",
