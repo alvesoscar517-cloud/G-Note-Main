@@ -4,10 +4,13 @@ import { RefreshCw, FileText, List, Pencil, LayoutGrid, AlertCircle } from 'luci
 import { cn } from '@/lib/utils'
 
 // Error logging utility
-function logError(error: Error, errorInfo: { componentStack?: string | null }, context: string) {
+function logError(error: unknown, errorInfo: { componentStack?: string | null }, context: string) {
+  const errorMessage = error instanceof Error ? error.message : String(error)
+  const errorStack = error instanceof Error ? error.stack : undefined
+  
   console.error(`[ErrorBoundary] ${context}:`, {
-    error: error.message,
-    stack: error.stack,
+    error: errorMessage,
+    stack: errorStack,
     componentStack: errorInfo.componentStack,
     timestamp: new Date().toISOString()
   })
