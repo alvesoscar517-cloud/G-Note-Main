@@ -89,6 +89,7 @@ import { AIChatView } from './AIChatView'
 // import { SpeechButton } from './SpeechButton' // Hidden due to Chrome extension permission limitations
 import { EditorSkeleton } from '@/components/ui/Skeleton'
 import { useNetworkRequiredOverlay } from '@/components/ui/OfflineIndicator'
+import { useScrollableDrag } from '@/hooks/useScrollableDrag'
 import * as AI from '@/lib/ai'
 import { InsufficientCreditsError } from '@/lib/ai'
 import type { Note, NoteStyle, AIChatMessage } from '@/types'
@@ -229,6 +230,9 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   const [showDrawingModal, setShowDrawingModal] = useState(false)
   const [showLinkDialog, setShowLinkDialog] = useState(false)
   const editorContainerRef = useRef<HTMLDivElement>(null)
+  
+  // Scrollable drag for toolbar
+  const toolbarScrollRef = useScrollableDrag<HTMLDivElement>()
 
   // Clear AI error after 5 seconds
   useEffect(() => {
@@ -1371,7 +1375,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           </div>
         )}
 
-        <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-none">
+        <div ref={toolbarScrollRef} className="flex items-center gap-0.5 overflow-x-auto scrollbar-none">
           {/* AI Menu - First position */}
           <AIMenu 
             onAction={handleAIAction} 

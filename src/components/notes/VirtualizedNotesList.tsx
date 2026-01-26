@@ -24,7 +24,6 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/ContextMenu'
-import { ConfirmDialog } from '@/components/ui/Dialog'
 
 import { useNotesStore } from '@/stores/notesStore'
 import { useIsTouchDevice } from '@/hooks/useIsTouchDevice'
@@ -580,19 +579,8 @@ function CollectionHeader({
   onAddNote,
   t
 }: CollectionHeaderProps) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-
   return (
     <>
-      <ConfirmDialog
-        open={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
-        onConfirm={() => { onDelete(); setShowDeleteDialog(false) }}
-        title={t('notes.delete')}
-        description={t('notes.deleteConfirm')}
-        confirmText={t('notes.delete')}
-        cancelText={t('notes.cancel')}
-      />
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div className="flex items-center gap-2">
@@ -658,7 +646,7 @@ function CollectionHeader({
                   </button>
                   <button
                     className="relative flex w-full cursor-default select-none items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                    onClick={() => setShowDeleteDialog(true)}
+                    onClick={onDelete}
                   >
                     <Trash2 className="w-4 h-4" />
                     {t('contextMenu.delete')}
@@ -677,7 +665,7 @@ function CollectionHeader({
             <Pencil className="w-4 h-4 mr-2" />
             {t('contextMenu.rename')}
           </ContextMenuItem>
-          <ContextMenuItem onClick={() => setShowDeleteDialog(true)}>
+          <ContextMenuItem onClick={onDelete}>
             <Trash2 className="w-4 h-4 mr-2" />
             {t('contextMenu.delete')}
           </ContextMenuItem>
@@ -713,22 +701,12 @@ function CollapsedCollection({
   onAddNote,
   t,
 }: CollectionProps) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const topNote = notes[0]
   const plainContent = topNote ? getPlainText(topNote.content) : ''
   const preview = plainContent.slice(0, 80) + (plainContent.length > 80 ? '...' : '')
 
   return (
     <>
-      <ConfirmDialog
-        open={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
-        onConfirm={() => { onDelete(); setShowDeleteDialog(false) }}
-        title={t('notes.delete')}
-        description={t('notes.deleteConfirm')}
-        confirmText={t('notes.delete')}
-        cancelText={t('notes.cancel')}
-      />
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <motion.div 
@@ -782,7 +760,7 @@ function CollapsedCollection({
             <Pencil className="w-4 h-4 mr-2" />
             {t('contextMenu.rename')}
           </ContextMenuItem>
-          <ContextMenuItem onClick={() => setShowDeleteDialog(true)}>
+          <ContextMenuItem onClick={onDelete}>
             <Trash2 className="w-4 h-4 mr-2" />
             {t('contextMenu.delete')}
           </ContextMenuItem>

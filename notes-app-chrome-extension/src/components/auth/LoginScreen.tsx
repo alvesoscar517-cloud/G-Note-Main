@@ -185,7 +185,7 @@ export function LoginScreen() {
         </a>
 
         <p className="text-xs text-neutral-400 dark:text-white/50">
-          Chrome Extension v1.1.6
+          Chrome Extension v1.1.7
         </p>
       </div>
       

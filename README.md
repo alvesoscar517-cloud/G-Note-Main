@@ -1,6 +1,6 @@
 # G-Note - Modern Note-Taking App with Google Drive Sync
 
-[![Version](https://img.shields.io/badge/version-1.1.6-blue.svg)](https://github.com/alvesoscar517-cloud/G-Note-Main)
+[![Version](https://img.shields.io/badge/version-1.1.7-blue.svg)](https://github.com/alvesoscar517-cloud/G-Note-Main)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-19.2.0-61dafb.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178c6.svg)](https://www.typescriptlang.org/)

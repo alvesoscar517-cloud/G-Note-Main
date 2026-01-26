@@ -90,6 +90,7 @@ import { SpeechButton } from './SpeechButton'
 import { EditorSkeleton } from '@/components/ui/Skeleton'
 import { useNetworkRequiredOverlay } from '@/components/ui/OfflineIndicator'
 import { useResponsiveToolbar } from '@/hooks/useResponsiveToolbar'
+import { useScrollableDrag } from '@/hooks/useScrollableDrag'
 import * as AI from '@/lib/ai'
 import { InsufficientCreditsError } from '@/lib/ai'
 import type { Note, NoteStyle, AIChatMessage } from '@/types'
@@ -235,6 +236,9 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   
   // Responsive toolbar visibility
   const toolbarVisibility = useResponsiveToolbar(toolbarRef)
+  
+  // Scrollable drag for toolbar
+  const toolbarScrollRef = useScrollableDrag<HTMLDivElement>()
 
   // Clear AI error after 5 seconds
   useEffect(() => {
@@ -1372,7 +1376,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           </div>
         )}
 
-        <div className="flex items-center gap-0.5 overflow-x-auto scrollbar-none" style={{ touchAction: 'pan-x' }}>
+        <div ref={toolbarScrollRef} className="flex items-center gap-0.5 overflow-x-auto scrollbar-none" style={{ touchAction: 'pan-x' }}>
           {/* AI Menu - Priority 1 (always visible) */}
           {toolbarVisibility.ai && (
             <AIMenu 

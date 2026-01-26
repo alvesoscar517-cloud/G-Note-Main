@@ -228,7 +228,7 @@ export function Header() {
   return (
     <>
       {/* Logout Loading Overlay */}
-      <LoadingOverlay isVisible={isLoggingOut} text={t('settings.loggingOut')} />
+      <LoadingOverlay isVisible={isLoggingOut} />
 
       {/* Logout Confirmation Dialog */}
       <LogoutConfirmDialog
