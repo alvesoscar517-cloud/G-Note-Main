@@ -26,24 +26,11 @@ export interface Note {
   sharedBy?: string
   sharedByName?: string        // Name of the person who shared
   shareId?: string             // Firestore document ID for shared notes
-  collectionId?: string
   style?: NoteStyle
   isDeleted?: boolean
   deletedAt?: number
   publicFileId?: string  // ID of the public shared file on Drive
   aiChatHistory?: AIChatMessage[]  // AI chat history for this note
-}
-
-export interface Collection {
-  id: string
-  name: string
-  color: string
-  noteIds: string[]
-  isExpanded: boolean
-  createdAt: number
-  updatedAt: number
-  version: number              // Optimistic locking
-  syncStatus: 'synced' | 'pending' | 'error'
 }
 
 export interface User {

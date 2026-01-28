@@ -1,17 +1,15 @@
 /**
  * Drive Index
- * Manages index files (notes-index, collections-index, deleted-ids)
+ * Manages index files (notes-index, deleted-ids)
  */
 import { driveClient } from './driveClient'
 import {
   setNoteFileId,
-  setCollectionFileId,
   clearFileIdCaches
 } from './driveFiles'
 import {
   DEFAULT_DRIVE_CONFIG,
   type NotesIndex,
-  type CollectionsIndex,
   type DeletedIdsIndex,
   type TombstoneEntry
 } from './types'
@@ -19,7 +17,6 @@ import {
 // Cached file IDs for index files
 let folderId: string | null = null
 let notesIndexFileId: string | null = null
-let collectionsIndexFileId: string | null = null
 let deletedIdsFileId: string | null = null
 
 // Remote tombstone cache
@@ -32,7 +29,6 @@ const remoteDeletedIds = new Set<string>()
 export function resetDriveState(): void {
   folderId = null
   notesIndexFileId = null
-  collectionsIndexFileId = null
   deletedIdsFileId = null
   remoteTombstones.clear()
   remoteDeletedIds.clear()
@@ -119,60 +115,7 @@ export async function updateNotesIndex(
 }
 
 // ============ Collections Index ============
-
-/**
- * Get or create collections index file
- */
-export async function getOrCreateCollectionsIndex(): Promise<CollectionsIndex> {
-  const folder = await getOrCreateFolder()
-  const { collectionsIndexFile } = DEFAULT_DRIVE_CONFIG
-
-  if (!collectionsIndexFileId) {
-    const query = `name='${collectionsIndexFile}' and '${folder}' in parents and trashed=false`
-    const result = await driveClient.searchFiles(query)
-
-    if (result.files?.length > 0) {
-      collectionsIndexFileId = result.files[0].id
-    }
-  }
-
-  if (collectionsIndexFileId) {
-    try {
-      const data = await driveClient.downloadFile<CollectionsIndex>(collectionsIndexFileId)
-      // Cache file IDs
-      data.collections?.forEach(c => setCollectionFileId(c.id, c.fileId))
-      return data
-    } catch {
-      console.warn('[DriveIndex] Failed to download collections index, creating new')
-    }
-  }
-
-  // Create empty index
-  const emptyIndex: CollectionsIndex = { collections: [], lastSync: Date.now() }
-  collectionsIndexFileId = await driveClient.createFile(collectionsIndexFile, emptyIndex, folder)
-  return emptyIndex
-}
-
-/**
- * Update collections index file
- */
-export async function updateCollectionsIndex(
-  collections: Array<{ id: string; fileId: string; updatedAt: number; version: number }>
-): Promise<void> {
-  const folder = await getOrCreateFolder()
-  const { collectionsIndexFile } = DEFAULT_DRIVE_CONFIG
-
-  const index: CollectionsIndex = {
-    collections,
-    lastSync: Date.now()
-  }
-
-  if (collectionsIndexFileId) {
-    await driveClient.updateFile(collectionsIndexFileId, index)
-  } else {
-    collectionsIndexFileId = await driveClient.createFile(collectionsIndexFile, index, folder)
-  }
-}
+// Note: Collection index operations have been removed as part of the collection feature removal.
 
 // ============ Deleted IDs Index ============
 

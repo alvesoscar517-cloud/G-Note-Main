@@ -52,11 +52,10 @@ export async function safeDbWrite<T>(
  */
 export async function clearAllData(): Promise<void> {
   await db.transaction('rw', 
-    [db.notes, db.collections, db.syncQueue, db.tombstones, db.metadata],
+    [db.notes, db.syncQueue, db.tombstones, db.metadata],
     async () => {
       await Promise.all([
         db.notes.clear(),
-        db.collections.clear(),
         db.syncQueue.clear(),
         db.tombstones.clear(),
         db.metadata.clear()
@@ -70,18 +69,16 @@ export async function clearAllData(): Promise<void> {
  */
 export async function getDatabaseStats(): Promise<{
   notes: number
-  collections: number
   syncQueue: number
   tombstones: number
 }> {
-  const [notes, collections, syncQueue, tombstones] = await Promise.all([
+  const [notes, syncQueue, tombstones] = await Promise.all([
     db.notes.count(),
-    db.collections.count(),
     db.syncQueue.count(),
     db.tombstones.count()
   ])
   
-  return { notes, collections, syncQueue, tombstones }
+  return { notes, syncQueue, tombstones }
 }
 
 /**
@@ -89,16 +86,14 @@ export async function getDatabaseStats(): Promise<{
  */
 export async function exportAllData(): Promise<{
   notes: unknown[]
-  collections: unknown[]
   metadata: unknown[]
 }> {
-  const [notes, collections, metadata] = await Promise.all([
+  const [notes, metadata] = await Promise.all([
     db.notes.toArray(),
-    db.collections.toArray(),
     db.metadata.toArray()
   ])
   
-  return { notes, collections, metadata }
+  return { notes, metadata }
 }
 
 /**

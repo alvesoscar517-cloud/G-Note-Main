@@ -2,7 +2,7 @@
  * Sync Types
  * Type definitions for sync operations
  */
-import type { Note, Collection } from '@/types'
+import type { Note } from '@/types'
 
 // ============ Sync Status ============
 
@@ -25,7 +25,7 @@ export interface SyncOperation {
   type: SyncOperationType
   entityType: SyncEntityType
   entityId: string
-  data?: Note | Collection
+  data?: Note
   priority: number
   timestamp: number
   retries: number
@@ -36,9 +36,7 @@ export interface SyncOperation {
 export interface SyncResult {
   success: boolean
   notesChanged: boolean
-  collectionsChanged: boolean
   syncedNotes: Note[]
-  syncedCollections: Collection[]
   errors?: SyncError[]
   staleLocalIds?: string[]
   conflicts?: ConflictInfo[]

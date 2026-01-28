@@ -13,15 +13,13 @@ interface LogoutConfirmDialogProps {
 export function LogoutConfirmDialog({ open, onClose, onConfirm }: LogoutConfirmDialogProps) {
   const { t } = useTranslation()
   const notes = useNotesStore(state => state.notes)
-  const collections = useNotesStore(state => state.collections)
   const lastSyncTime = useNotesStore(state => state.lastSyncTime)
   const isSyncing = useNotesStore(state => state.isSyncing)
   const isOnline = useNetworkStore(state => state.isOnline)
   
   // Calculate sync status
   const pendingNotes = notes.filter(n => n.syncStatus === 'pending' && !n.isDeleted)
-  const pendingCollections = collections.filter(c => c.syncStatus === 'pending')
-  const totalPending = pendingNotes.length + pendingCollections.length
+  const totalPending = pendingNotes.length
   const hasUnsyncedData = totalPending > 0
   const hasAnyData = notes.filter(n => !n.isDeleted).length > 0
   

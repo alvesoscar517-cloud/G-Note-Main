@@ -2,7 +2,7 @@
  * Conflict Resolver
  * Handles version conflicts between local and remote data
  */
-import type { Note, Collection } from '@/types'
+import type { Note } from '@/types'
 import type { ConflictInfo, ConflictResolution, TombstoneData } from './types'
 
 // Time threshold for considering timestamps "close" (5 seconds)
@@ -59,67 +59,7 @@ export function resolveNoteConflict(
   }
 }
 
-/**
- * Resolve conflict between local and remote collection
- * Merges noteIds from both versions to preserve all associations
- */
-export function resolveCollectionConflict(
-  localCollection: Collection,
-  remoteCollection: Collection
-): { winner: Collection; conflict: ConflictInfo } {
-  const localVersion = localCollection.version || 1
-  const remoteVersion = remoteCollection.version || 1
 
-  let resolution: ConflictResolution
-  let winner: Collection
-
-  if (localVersion > remoteVersion) {
-    resolution = 'local'
-    winner = localCollection
-  } else if (localVersion < remoteVersion) {
-    resolution = 'remote'
-    winner = remoteCollection
-  } else {
-    const timeDiff = Math.abs(localCollection.updatedAt - remoteCollection.updatedAt)
-    
-    if (timeDiff < TIMESTAMP_THRESHOLD_MS || localCollection.updatedAt >= remoteCollection.updatedAt) {
-      resolution = 'local'
-      winner = localCollection
-    } else {
-      resolution = 'remote'
-      winner = remoteCollection
-    }
-  }
-
-  // Merge noteIds from both versions to preserve all associations
-  const mergedNoteIds = mergeNoteIds(localCollection.noteIds, remoteCollection.noteIds)
-  winner = { ...winner, noteIds: mergedNoteIds }
-
-  return {
-    winner,
-    conflict: {
-      entityId: localCollection.id,
-      entityType: 'collection',
-      localVersion,
-      remoteVersion,
-      localUpdatedAt: localCollection.updatedAt,
-      remoteUpdatedAt: remoteCollection.updatedAt,
-      resolution
-    }
-  }
-}
-
-/**
- * Merge noteIds from two collections
- * Returns union of both arrays, preserving order from winner
- */
-export function mergeNoteIds(localNoteIds: string[], remoteNoteIds: string[]): string[] {
-  const merged = new Set<string>(localNoteIds)
-  for (const id of remoteNoteIds) {
-    merged.add(id)
-  }
-  return Array.from(merged)
-}
 
 /**
  * Check if an entity should be deleted based on tombstone
@@ -187,18 +127,4 @@ export function filterSyncableNotes(
   })
 }
 
-/**
- * Filter collections that should be synced
- */
-export function filterSyncableCollections(
-  collections: Collection[],
-  tombstones: Map<string, number>
-): Collection[] {
-  return collections.filter(collection => {
-    const tombstoneTime = tombstones.get(collection.id)
-    if (tombstoneTime && shouldDeleteEntity(collection.updatedAt, tombstoneTime)) {
-      return false
-    }
-    return true
-  })
-}
+

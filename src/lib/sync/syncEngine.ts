@@ -4,14 +4,15 @@
  * Coordinates between local database and Google Drive
  * 
  * This is the NEW sync engine that replaces driveSync.ts
+ * 
+ * Note: Collection support has been removed. Any collection files
+ * encountered during sync are skipped with a warning (see Task 7.2).
  */
 import { driveClient, resetDriveState } from '../drive'
 import {
   getOrCreateNotesIndex,
-  getOrCreateCollectionsIndex,
   getOrCreateDeletedIdsIndex,
   updateNotesIndex,
-  updateCollectionsIndex,
   updateDeletedIdsIndex,
   getOrCreateFolder,
   checkHasData as driveCheckHasData,
@@ -19,27 +20,21 @@ import {
 } from '../drive/driveIndex'
 import {
   uploadNote,
-  uploadCollection,
   downloadNote,
-  downloadCollection,
   deleteNoteFile,
-  deleteCollectionFile,
   getNoteFileId,
-  getCollectionFileId,
   initFileIdCache,
   batchSetFileIds
 } from '../drive/driveFiles'
 import {
   resolveNoteConflict,
-  resolveCollectionConflict,
   mergeTombstones,
   filterSyncableNotes,
-  filterSyncableCollections,
   isNoteEmpty,
   shouldDeleteEntity
 } from './conflictResolver'
 import { setLastSyncTimestamp } from '../db/metadataRepository'
-import type { Note, Collection } from '@/types'
+import type { Note } from '@/types'
 import type { TombstoneEntry } from '../drive/types'
 import type { SyncResult, TombstoneData, ConflictInfo } from './types'
 import { STALE_DEVICE_THRESHOLD_MS } from './types'
@@ -101,6 +96,17 @@ function getStaleLocalNoteIds(
 }
 
 /**
+ * Check if an entry ID looks like a collection ID
+ * Collection IDs typically don't follow the same pattern as note IDs
+ * This is a defensive check to skip any collection entries that might remain in the index
+ */
+function isLikelyCollectionEntry(id: string): boolean {
+  // Collection IDs in the old system often had specific prefixes or patterns
+  // This is a defensive check - in practice, collection entries should already be removed
+  return id.startsWith('collection-') || id.startsWith('col-')
+}
+
+/**
  * Batch download notes with concurrency limit
  */
 async function batchDownloadNotes(
@@ -112,6 +118,12 @@ async function batchDownloadNotes(
 
   // Filter entries that should be downloaded
   const toDownload = entries.filter(entry => {
+    // Skip collection entries if any remain in the index
+    if (isLikelyCollectionEntry(entry.id)) {
+      console.warn(`[SyncEngine] Skipping collection entry ${entry.id} during sync`)
+      return false
+    }
+    
     const tombstoneTime = allNoteTombstones.get(entry.id)
     return !tombstoneTime || !shouldDeleteEntity(entry.updatedAt, tombstoneTime)
   })
@@ -158,61 +170,6 @@ async function batchDownloadNotes(
 }
 
 /**
- * Batch download collections with concurrency limit
- */
-async function batchDownloadCollections(
-  entries: Array<{ id: string; fileId: string; updatedAt: number }>,
-  allCollectionTombstones: Map<string, number>
-): Promise<{ collections: Collection[]; fileIdMappings: Array<{ entityId: string; fileId: string; entityType: 'collection' }> }> {
-  const collections: Collection[] = []
-  const fileIdMappings: Array<{ entityId: string; fileId: string; entityType: 'collection' }> = []
-
-  const toDownload = entries.filter(entry => {
-    const tombstoneTime = allCollectionTombstones.get(entry.id)
-    return !tombstoneTime || !shouldDeleteEntity(entry.updatedAt, tombstoneTime)
-  })
-
-  const chunks: Array<typeof toDownload[0]>[] = []
-  for (let i = 0; i < toDownload.length; i += DOWNLOAD_CONCURRENCY) {
-    chunks.push(toDownload.slice(i, i + DOWNLOAD_CONCURRENCY))
-  }
-
-  for (const chunk of chunks) {
-    const results = await Promise.all(
-      chunk.map(async entry => {
-        if (!entry.fileId) return null
-        
-        try {
-          const collection = await downloadCollection(entry.fileId)
-          if (collection) {
-            const collectionTombstone = allCollectionTombstones.get(collection.id)
-            if (!collectionTombstone || !shouldDeleteEntity(collection.updatedAt, collectionTombstone)) {
-              return { collection, entry }
-            }
-          }
-        } catch (error) {
-          console.error(`[SyncEngine] Failed to download collection ${entry.id}:`, error)
-        }
-        return null
-      })
-    )
-
-    for (const result of results) {
-      if (result) {
-        collections.push(result.collection)
-        fileIdMappings.push({
-          entityId: result.collection.id,
-          fileId: result.entry.fileId,
-          entityType: 'collection'
-        })
-      }
-    }
-  }
-
-  return { collections, fileIdMappings }
-}
-
-/**
  * Batch upload notes with concurrency limit
  */
 async function batchUploadNotes(
@@ -246,48 +203,13 @@ async function batchUploadNotes(
 }
 
 /**
- * Batch upload collections with concurrency limit
- */
-async function batchUploadCollections(
-  collections: Collection[],
-  collectionsIndex: { collections: Array<{ id: string; version?: number; updatedAt: number }> },
-  folderId: string
-): Promise<void> {
-  const toUpload = collections.filter(collection => {
-    const remoteEntry = collectionsIndex.collections.find(c => c.id === collection.id)
-    const collectionVersion = collection.version || 1
-    const remoteVersion = remoteEntry?.version || 0
-    return !remoteEntry || collectionVersion > remoteVersion || collection.updatedAt > remoteEntry.updatedAt
-  })
-
-  if (toUpload.length === 0) return
-
-  console.log(`[SyncEngine] Uploading ${toUpload.length} collections...`)
-
-  const chunks: Collection[][] = []
-  for (let i = 0; i < toUpload.length; i += UPLOAD_CONCURRENCY) {
-    chunks.push(toUpload.slice(i, i + UPLOAD_CONCURRENCY))
-  }
-
-  for (const chunk of chunks) {
-    await Promise.all(
-      chunk.map(collection => uploadCollection(collection, folderId).catch(error => {
-        console.error(`[SyncEngine] Failed to upload collection ${collection.id}:`, error)
-      }))
-    )
-  }
-}
-
-/**
  * Main sync function
- * Syncs local notes and collections with Google Drive
+ * Syncs local notes with Google Drive
  */
 export async function syncWithDrive(
   accessToken: string,
   localNotes: Note[],
-  localCollections: Collection[],
   localDeletedNoteIds: TombstoneData[],
-  localDeletedCollectionIds: TombstoneData[],
   syncQueueIds?: Set<string>
 ): Promise<SyncResult> {
   // Set access token
@@ -312,16 +234,12 @@ export async function syncWithDrive(
   // Build tombstone maps
   const remoteNoteTombstones: TombstoneData[] = (remoteDeletedIndex.noteTombstones || [])
     .map(t => ({ id: t.id, deletedAt: t.deletedAt }))
-  const remoteCollectionTombstones: TombstoneData[] = (remoteDeletedIndex.collectionTombstones || [])
-    .map(t => ({ id: t.id, deletedAt: t.deletedAt }))
 
   // Merge tombstones
   const allNoteTombstones = mergeTombstones(localDeletedNoteIds, remoteNoteTombstones)
-  const allCollectionTombstones = mergeTombstones(localDeletedCollectionIds, remoteCollectionTombstones)
 
   // Filter local data
   const validLocalNotes = filterSyncableNotes(localNotes, allNoteTombstones)
-  const validLocalCollections = filterSyncableCollections(localCollections, allCollectionTombstones)
 
   // ============ Sync Notes ============
   const notesIndex = await getOrCreateNotesIndex()
@@ -397,79 +315,16 @@ export async function syncWithDrive(
     }))
   )
 
-  // ============ Sync Collections ============
-  const collectionsIndex = await getOrCreateCollectionsIndex()
-
-  // Download remote collections in parallel
-  const { collections: remoteCollections, fileIdMappings: collectionFileIdMappings } = await batchDownloadCollections(
-    collectionsIndex.collections,
-    allCollectionTombstones
-  )
-
-  // Batch set file IDs
-  if (collectionFileIdMappings.length > 0) {
-    await batchSetFileIds(collectionFileIdMappings)
-  }
-
-  // Merge collections
-  const mergedCollectionsMap = new Map<string, Collection>()
-
-  for (const collection of remoteCollections) {
-    const tombstoneTime = allCollectionTombstones.get(collection.id)
-    if (!tombstoneTime || !shouldDeleteEntity(collection.updatedAt, tombstoneTime)) {
-      mergedCollectionsMap.set(collection.id, collection)
-    }
-  }
-
-  for (const localCollection of validLocalCollections) {
-    const remoteCollection = mergedCollectionsMap.get(localCollection.id)
-    if (!remoteCollection) {
-      mergedCollectionsMap.set(localCollection.id, localCollection)
-    } else {
-      const { winner, conflict } = resolveCollectionConflict(localCollection, remoteCollection)
-      mergedCollectionsMap.set(localCollection.id, winner)
-      conflicts.push(conflict)
-    }
-  }
-
-  const mergedCollections = Array.from(mergedCollectionsMap.values())
-
-  // Upload changed collections in parallel
-  await batchUploadCollections(mergedCollections, collectionsIndex, folderId)
-
-  // Delete collections that should be deleted
-  const collectionsToDelete = collectionsIndex.collections.filter(entry => {
-    const tombstoneTime = allCollectionTombstones.get(entry.id)
-    return tombstoneTime && shouldDeleteEntity(entry.updatedAt, tombstoneTime)
-  })
-  
-  await Promise.all(collectionsToDelete.map(entry => deleteCollectionFile(entry.id).catch(console.error)))
-
-  // Update collections index
-  await updateCollectionsIndex(
-    mergedCollections.map(c => ({
-      id: c.id,
-      fileId: getCollectionFileId(c.id) || '',
-      updatedAt: c.updatedAt,
-      version: c.version || 1
-    }))
-  )
-
   // ============ Update Deleted IDs Index ============
   const finalNoteTombstones: TombstoneEntry[] = Array.from(allNoteTombstones.entries())
     .map(([id, deletedAt]) => ({ id, deletedAt }))
-  const finalCollectionTombstones: TombstoneEntry[] = Array.from(allCollectionTombstones.entries())
-    .map(([id, deletedAt]) => ({ id, deletedAt }))
 
-  await updateDeletedIdsIndex(finalNoteTombstones, finalCollectionTombstones)
+  await updateDeletedIdsIndex(finalNoteTombstones, [])
 
   // ============ Check for Changes ============
   const notesChanged =
     JSON.stringify(mergedNotes.map(n => n.id).sort()) !==
     JSON.stringify(localNotes.map(n => n.id).sort())
-  const collectionsChanged =
-    JSON.stringify(mergedCollections.map(c => c.id).sort()) !==
-    JSON.stringify(localCollections.map(c => c.id).sort())
 
   // Mark as synced
   const syncedNotes = mergedNotes.map(note => ({
@@ -478,20 +333,13 @@ export async function syncWithDrive(
     driveFileId: getNoteFileId(note.id)
   }))
 
-  const syncedCollections = mergedCollections.map(collection => ({
-    ...collection,
-    syncStatus: 'synced' as const
-  }))
-
   // Save last sync timestamp
   await saveLastSyncTimestamp(now)
 
   return {
     success: true,
     notesChanged,
-    collectionsChanged,
     syncedNotes,
-    syncedCollections,
     conflicts: conflicts.length > 0 ? conflicts : undefined,
     staleLocalIds: staleLocalIds.length > 0 ? staleLocalIds : undefined
   }
@@ -520,26 +368,11 @@ export async function deleteNoteDriveFile(noteId: string): Promise<void> {
 }
 
 /**
- * Delete a collection file from Drive
- */
-export async function deleteCollectionDriveFile(collectionId: string): Promise<void> {
-  await deleteCollectionFile(collectionId)
-}
-
-/**
  * Upload a single note to Drive
  */
 export async function uploadSingleNote(note: Note): Promise<string> {
   const folderId = await getOrCreateFolder()
   return uploadNote(note, folderId)
-}
-
-/**
- * Upload a single collection to Drive
- */
-export async function uploadSingleCollection(collection: Collection): Promise<string> {
-  const folderId = await getOrCreateFolder()
-  return uploadCollection(collection, folderId)
 }
 
 /**
@@ -561,11 +394,4 @@ export function setSyncAccessToken(token: string): void {
  */
 export function getSyncNoteFileId(noteId: string): string | undefined {
   return getNoteFileId(noteId)
-}
-
-/**
- * Get collection file ID from cache
- */
-export function getSyncCollectionFileId(collectionId: string): string | undefined {
-  return getCollectionFileId(collectionId)
 }

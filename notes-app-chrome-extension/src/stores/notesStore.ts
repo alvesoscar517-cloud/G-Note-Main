@@ -1,30 +1,23 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Note, Collection } from '@/types'
+import type { Note } from '@/types'
 import { generateId } from '@/lib/utils'
 import { shareService, type SharedNote } from '@/lib/shareService'
 import { searchNotes, type SearchResult } from '@/lib/search'
 import { useNetworkStore } from '@/stores/networkStore'
 import { useAuthStore } from '@/stores/authStore'
+import { useMigrationStore } from '@/stores/migrationStore'
 
 // Direct imports from new db layer
 import {
-  saveNote,
   saveNotes,
   getAllNotes,
   deleteNote as deleteNoteFromDb
 } from '@/lib/db/noteRepository'
 import {
-  saveCollections,
-  getAllCollections,
-  deleteCollection as deleteCollectionFromDb
-} from '@/lib/db/collectionRepository'
-import {
   addToSyncQueue,
   getSyncQueue,
-  removeFromSyncQueue,
-  saveNoteWithQueue,
-  saveCollectionWithQueue
+  saveNoteWithQueue
 } from '@/lib/db/syncQueueRepository'
 import {
   addTombstone,
@@ -37,15 +30,9 @@ import {
   syncWithDrive as engineSyncWithDrive,
   checkHasData as engineCheckHasData,
   deleteNoteDriveFile,
-  deleteCollectionDriveFile,
   setSyncAccessToken,
   getRemoteTombstones
 } from '@/lib/sync/syncEngine'
-
-const COLLECTION_COLORS = [
-  '#ef4444', '#f97316', '#eab308', '#22c55e', 
-  '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'
-]
 
 // Debounce configuration
 const UPDATE_DEBOUNCE_MS = 500 // Local save debounce
@@ -252,9 +239,7 @@ export const smartSyncManager = new SmartSyncManager()
 interface NotesState {
   notes: Note[]
   sharedNotes: SharedNote[]
-  collections: Collection[]
   deletedNoteIds: string[]
-  deletedCollectionIds: string[]
   searchQuery: string
   selectedNoteId: string | null
   isModalOpen: boolean
@@ -268,7 +253,7 @@ interface NotesState {
   isOfflineReady: boolean
   
   // Note actions
-  addNote: (collectionId?: string) => Note
+  addNote: () => Note
   updateNote: (id: string, updates: Partial<Note>) => void
   deleteNote: (id: string) => void
   duplicateNote: (id: string) => Note | undefined
@@ -299,34 +284,10 @@ interface NotesState {
   permanentlyDeleteMultiple: (ids: string[]) => void
   getTrashNotes: () => Note[]
   
-  // Collection actions
-  createCollection: (name: string, noteIds: string[]) => Collection
-  updateCollection: (id: string, updates: Partial<Collection>) => void
-  deleteCollection: (id: string) => void
-  addNoteToCollection: (noteId: string, collectionId: string) => void
-  removeNoteFromCollection: (noteId: string) => void
-  toggleCollectionExpanded: (id: string) => void
-  mergeNotesIntoCollection: (sourceNoteId: string, targetNoteId: string) => void
-  
   // Getters
   getFilteredNotes: () => Note[]
   getSearchResults: () => SearchResult[]
   getSelectedNote: () => Note | undefined
-  getNotesInCollection: (collectionId: string) => Note[]
-  getUncollectedNotes: () => Note[]
-}
-
-// Helper to queue offline operations
-async function queueOfflineOperation(
-  entityType: 'note' | 'collection',
-  type: 'create' | 'update' | 'delete',
-  entityId: string,
-  data?: Note | Collection
-) {
-  const isOnline = useNetworkStore.getState().isOnline
-  if (!isOnline) {
-    await addToSyncQueue({ type, entityType, entityId, data })
-  }
 }
 
 export const useNotesStore = create<NotesState>()(
@@ -334,9 +295,7 @@ export const useNotesStore = create<NotesState>()(
     (set, get) => ({
       notes: [],
       sharedNotes: [],
-      collections: [],
       deletedNoteIds: [],
-      deletedCollectionIds: [],
       searchQuery: '',
       selectedNoteId: null,
       isModalOpen: false,
@@ -364,9 +323,7 @@ export const useNotesStore = create<NotesState>()(
         set({
           notes: [],
           sharedNotes: [],
-          collections: [],
           deletedNoteIds: [],
-          deletedCollectionIds: [],
           searchQuery: '',
           selectedNoteId: null,
           isModalOpen: false,
@@ -391,19 +348,17 @@ export const useNotesStore = create<NotesState>()(
             return
           }
 
-          const [offlineNotes, offlineCollections] = await Promise.all([
-            getAllNotes(),
-            getAllCollections()
+          const [offlineNotes] = await Promise.all([
+            getAllNotes()
           ])
           
           // Simply load from IndexedDB - no merge needed since logout clears everything
           set({ 
-            notes: offlineNotes, 
-            collections: offlineCollections,
+            notes: offlineNotes,
             isOfflineReady: true 
           })
           
-          console.log(`[NotesStore] Loaded ${offlineNotes.length} notes, ${offlineCollections.length} collections from IndexedDB`)
+          console.log(`[NotesStore] Loaded ${offlineNotes.length} notes from IndexedDB`)
         } catch (error) {
           console.error('[NotesStore] Failed to init offline storage:', error)
           set({ isOfflineReady: true })
@@ -413,17 +368,20 @@ export const useNotesStore = create<NotesState>()(
       saveToOfflineStorage: async () => {
         try {
           if (!isIndexedDBAvailable()) return
-          const { notes, collections } = get()
-          await Promise.all([
-            saveNotes(notes),
-            saveCollections(collections)
-          ])
+          const { notes } = get()
+          await saveNotes(notes)
         } catch (error) {
           console.error('[NotesStore] Failed to save to offline storage:', error)
         }
       },
 
-      addNote: (collectionId?: string) => {
+      addNote: () => {
+        // Check if migration is in progress (read-only mode)
+        if (useMigrationStore.getState().isReadOnly()) {
+          console.warn('[NotesStore] Cannot add note during migration (read-only mode)')
+          return { id: '', title: '', content: '', createdAt: 0, updatedAt: 0, isPinned: false, syncStatus: 'pending' as const, version: 1 }
+        }
+        
         const newNote: Note = {
           id: generateId(),
           title: '',
@@ -432,27 +390,14 @@ export const useNotesStore = create<NotesState>()(
           updatedAt: Date.now(),
           isPinned: false,
           syncStatus: 'pending',
-          version: 1,
-          collectionId
+          version: 1
         }
         
-        set((state) => {
-          const newState: Partial<NotesState> = { 
-            notes: [newNote, ...state.notes],
-            selectedNoteId: newNote.id,
-            isModalOpen: true
-          }
-          
-          if (collectionId) {
-            newState.collections = state.collections.map(c =>
-              c.id === collectionId 
-                ? { ...c, noteIds: [...c.noteIds, newNote.id], updatedAt: Date.now(), version: (c.version || 1) + 1, syncStatus: 'pending' as const }
-                : c
-            )
-          }
-          
-          return newState
-        })
+        set((state) => ({ 
+          notes: [newNote, ...state.notes],
+          selectedNoteId: newNote.id,
+          isModalOpen: true
+        }))
         
         // Save to IndexedDB atomically with queue
         saveNoteWithQueue(newNote, { 
@@ -462,18 +407,16 @@ export const useNotesStore = create<NotesState>()(
           data: newNote 
         }).catch(console.error)
         
-        // Queue collection update if needed
-        if (collectionId) {
-          const collection = get().collections.find(c => c.id === collectionId)
-          if (collection) {
-            queueOfflineOperation('collection', 'update', collectionId, collection)
-          }
-        }
-        
         return newNote
       },
 
       updateNote: (id, updates) => {
+        // Check if migration is in progress (read-only mode)
+        if (useMigrationStore.getState().isReadOnly()) {
+          console.warn('[NotesStore] Cannot update note during migration (read-only mode)')
+          return
+        }
+        
         let updatedNote: Note | undefined
         
         set((state) => {
@@ -506,49 +449,30 @@ export const useNotesStore = create<NotesState>()(
       },
 
       moveToTrash: (id) => {
+        // Check if migration is in progress (read-only mode)
+        if (useMigrationStore.getState().isReadOnly()) {
+          console.warn('[NotesStore] Cannot move note to trash during migration (read-only mode)')
+          return
+        }
+        
         const now = Date.now()
         let trashedNote: Note | undefined
-        let updatedCollection: Collection | undefined
         
         set((state) => {
           const note = state.notes.find(n => n.id === id)
           if (!note) return state
           
-          let newCollections = state.collections
-          
-          if (note.collectionId) {
-            newCollections = state.collections.map(c => {
-              if (c.id === note.collectionId) {
-                const newNoteIds = c.noteIds.filter(nId => nId !== id)
-                if (newNoteIds.length <= 1) {
-                  return null
-                }
-                updatedCollection = { 
-                  ...c, 
-                  noteIds: newNoteIds, 
-                  updatedAt: now,
-                  version: (c.version || 1) + 1,
-                  syncStatus: 'pending' as const
-                }
-                return updatedCollection
-              }
-              return c
-            }).filter(Boolean) as Collection[]
-          }
-          
           trashedNote = { 
             ...note, 
             isDeleted: true, 
             deletedAt: now, 
-            updatedAt: now, 
-            collectionId: undefined, 
+            updatedAt: now,
             version: (note.version || 1) + 1,
             syncStatus: 'pending' as const 
           }
           
           return {
             notes: state.notes.map(n => n.id === id ? trashedNote! : n),
-            collections: newCollections,
             selectedNoteId: state.selectedNoteId === id ? null : state.selectedNoteId,
             isModalOpen: state.selectedNoteId === id ? false : state.isModalOpen
           }
@@ -562,18 +486,15 @@ export const useNotesStore = create<NotesState>()(
             data: trashedNote
           }).catch(console.error)
         }
-        
-        if (updatedCollection) {
-          saveCollectionWithQueue(updatedCollection, {
-            type: 'update',
-            entityType: 'collection',
-            entityId: updatedCollection.id,
-            data: updatedCollection
-          }).catch(console.error)
-        }
       },
 
       restoreFromTrash: (id) => {
+        // Check if migration is in progress (read-only mode)
+        if (useMigrationStore.getState().isReadOnly()) {
+          console.warn('[NotesStore] Cannot restore note during migration (read-only mode)')
+          return
+        }
+        
         let restoredNote: Note | undefined
         
         set((state) => ({
@@ -604,6 +525,12 @@ export const useNotesStore = create<NotesState>()(
       },
 
       permanentlyDelete: (id) => {
+        // Check if migration is in progress (read-only mode)
+        if (useMigrationStore.getState().isReadOnly()) {
+          console.warn('[NotesStore] Cannot permanently delete note during migration (read-only mode)')
+          return
+        }
+        
         const { notes } = get()
         const note = notes.find(n => n.id === id)
         const isOnline = useNetworkStore.getState().isOnline
@@ -627,6 +554,12 @@ export const useNotesStore = create<NotesState>()(
       },
 
       emptyTrash: () => {
+        // Check if migration is in progress (read-only mode)
+        if (useMigrationStore.getState().isReadOnly()) {
+          console.warn('[NotesStore] Cannot empty trash during migration (read-only mode)')
+          return
+        }
+        
         const { notes } = get()
         const trashNotes = notes.filter(n => n.isDeleted)
         const isOnline = useNetworkStore.getState().isOnline
@@ -651,6 +584,12 @@ export const useNotesStore = create<NotesState>()(
       },
 
       restoreMultiple: (ids) => {
+        // Check if migration is in progress (read-only mode)
+        if (useMigrationStore.getState().isReadOnly()) {
+          console.warn('[NotesStore] Cannot restore multiple notes during migration (read-only mode)')
+          return
+        }
+        
         const now = Date.now()
         const restoredNotes: Note[] = []
         
@@ -683,6 +622,12 @@ export const useNotesStore = create<NotesState>()(
       },
 
       permanentlyDeleteMultiple: (ids) => {
+        // Check if migration is in progress (read-only mode)
+        if (useMigrationStore.getState().isReadOnly()) {
+          console.warn('[NotesStore] Cannot permanently delete multiple notes during migration (read-only mode)')
+          return
+        }
+        
         const { notes } = get()
         const isOnline = useNetworkStore.getState().isOnline
         
@@ -713,6 +658,12 @@ export const useNotesStore = create<NotesState>()(
       },
 
       duplicateNote: (id) => {
+        // Check if migration is in progress (read-only mode)
+        if (useMigrationStore.getState().isReadOnly()) {
+          console.warn('[NotesStore] Cannot duplicate note during migration (read-only mode)')
+          return undefined
+        }
+        
         const { notes } = get()
         const note = notes.find(n => n.id === id)
         if (!note) return undefined
@@ -726,31 +677,12 @@ export const useNotesStore = create<NotesState>()(
           isPinned: false,
           syncStatus: 'pending',
           version: 1,
-          driveFileId: undefined,
-          collectionId: note.collectionId
+          driveFileId: undefined
         }
 
-        set((state) => {
-          const newState: Partial<NotesState> = {
-            notes: [duplicatedNote, ...state.notes]
-          }
-
-          if (note.collectionId) {
-            newState.collections = state.collections.map(c =>
-              c.id === note.collectionId
-                ? { 
-                    ...c, 
-                    noteIds: [...c.noteIds, duplicatedNote.id], 
-                    updatedAt: Date.now(),
-                    version: (c.version || 1) + 1,
-                    syncStatus: 'pending' as const
-                  }
-                : c
-            )
-          }
-
-          return newState
-        })
+        set((state) => ({
+          notes: [duplicatedNote, ...state.notes]
+        }))
         
         saveNoteWithQueue(duplicatedNote, {
           type: 'create',
@@ -763,6 +695,12 @@ export const useNotesStore = create<NotesState>()(
       },
       
       togglePin: (id) => {
+        // Check if migration is in progress (read-only mode)
+        if (useMigrationStore.getState().isReadOnly()) {
+          console.warn('[NotesStore] Cannot toggle pin during migration (read-only mode)')
+          return
+        }
+        
         let updatedNote: Note | undefined
         
         set((state) => ({
@@ -833,7 +771,7 @@ export const useNotesStore = create<NotesState>()(
       },
 
       syncWithDrive: async (accessToken: string) => {
-        const { notes, collections, isSyncing } = get()
+        const { notes, isSyncing } = get()
         if (isSyncing) return
         
         const isOnline = useNetworkStore.getState().isOnline
@@ -855,9 +793,6 @@ export const useNotesStore = create<NotesState>()(
           const localDeletedNotes = tombstones
             .filter(d => d.entityType === 'note')
             .map(d => ({ id: d.id, deletedAt: d.deletedAt }))
-          const localDeletedCollections = tombstones
-            .filter(d => d.entityType === 'collection')
-            .map(d => ({ id: d.id, deletedAt: d.deletedAt }))
           
           // Get sync queue IDs for stale device check (X.2 fix)
           const syncQueue = await getSyncQueue()
@@ -867,13 +802,11 @@ export const useNotesStore = create<NotesState>()(
           const result = await engineSyncWithDrive(
             accessToken,
             notes,
-            collections,
             localDeletedNotes,
-            localDeletedCollections,
             syncQueueIds
           )
           
-          const { syncedNotes, syncedCollections, staleLocalIds } = result
+          const { syncedNotes, staleLocalIds } = result
           
           // Handle stale local notes (X.2 fix) - remove them from IndexedDB
           if (staleLocalIds && staleLocalIds.length > 0) {
@@ -898,12 +831,10 @@ export const useNotesStore = create<NotesState>()(
           
           // Collect IDs to delete from IndexedDB (outside of set())
           const noteIdsToDelete: string[] = []
-          const collectionIdsToDelete: string[] = []
           
           // Merge synced data with current state (handle edits during sync)
           set((state) => {
             const syncedNotesMap = new Map(syncedNotes.map(n => [n.id, n]))
-            const syncedCollectionsMap = new Map(syncedCollections.map(c => [c.id, c]))
             
             // Merge notes - preserve local pending changes, but respect tombstones and stale data
             const mergedNotes = state.notes
@@ -945,42 +876,8 @@ export const useNotesStore = create<NotesState>()(
               }
             })
             
-            // Merge collections similarly
-            const mergedCollections = state.collections
-              .filter(currentCollection => {
-                // Remove collections that have been deleted on remote
-                const deletedAt = remoteTombstones.get(currentCollection.id)
-                if (deletedAt && deletedAt > currentCollection.updatedAt) {
-                  console.log(`[NotesStore] Removing local collection ${currentCollection.id} - deleted on remote`)
-                  collectionIdsToDelete.push(currentCollection.id)
-                  return false
-                }
-                return true
-              })
-              .map(currentCollection => {
-                const syncedCollection = syncedCollectionsMap.get(currentCollection.id)
-                
-                if (!syncedCollection) return currentCollection
-                
-                if (currentCollection.syncStatus === 'pending' &&
-                    (currentCollection.version || 1) > (syncedCollection.version || 1)) {
-                  return currentCollection
-                }
-                
-                return syncedCollection
-              })
-            
-            syncedCollections.forEach(syncedCollection => {
-              const existsLocally = state.collections.find(c => c.id === syncedCollection.id)
-              const localDeletedCollectionIdSet = new Set(localDeletedCollections.map(d => d.id))
-              if (!existsLocally && !localDeletedCollectionIdSet.has(syncedCollection.id)) {
-                mergedCollections.push(syncedCollection)
-              }
-            })
-            
             return {
               notes: mergedNotes,
-              collections: mergedCollections,
               lastSyncTime: Date.now(),
               isSyncing: false,
               isInitialSync: false, // First sync completed
@@ -992,16 +889,10 @@ export const useNotesStore = create<NotesState>()(
           if (noteIdsToDelete.length > 0) {
             await Promise.all(noteIdsToDelete.map(id => deleteNoteFromDb(id).catch(console.error)))
           }
-          if (collectionIdsToDelete.length > 0) {
-            await Promise.all(collectionIdsToDelete.map(id => deleteCollectionFromDb(id).catch(console.error)))
-          }
           
           // Save synced data to IndexedDB
-          const { notes: finalNotes, collections: finalCollections } = get()
-          await Promise.all([
-            saveNotes(finalNotes),
-            saveCollections(finalCollections)
-          ])
+          const { notes: finalNotes } = get()
+          await saveNotes(finalNotes)
           
         } catch (error) {
           console.error('Sync failed:', error)
@@ -1187,314 +1078,8 @@ export const useNotesStore = create<NotesState>()(
 
       markAllSynced: () => {
         set((state) => ({
-          notes: state.notes.map(note => ({ ...note, syncStatus: 'synced' as const })),
-          collections: state.collections.map(c => ({ ...c, syncStatus: 'synced' as const }))
+          notes: state.notes.map(note => ({ ...note, syncStatus: 'synced' as const }))
         }))
-      },
-
-      // Collection actions
-      createCollection: (name: string, noteIds: string[]) => {
-        const { collections } = get()
-        const colorIndex = collections.length % COLLECTION_COLORS.length
-        
-        const newCollection: Collection = {
-          id: generateId(),
-          name,
-          color: COLLECTION_COLORS[colorIndex],
-          noteIds,
-          isExpanded: true,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          version: 1,
-          syncStatus: 'pending'
-        }
-        
-        set((state) => ({
-          collections: [...state.collections, newCollection],
-          notes: state.notes.map(n => 
-            noteIds.includes(n.id) 
-              ? { ...n, collectionId: newCollection.id, version: (n.version || 1) + 1, syncStatus: 'pending' as const } 
-              : n
-          )
-        }))
-        
-        // Save collection and queue for sync
-        saveCollectionWithQueue(newCollection, {
-          type: 'create',
-          entityType: 'collection',
-          entityId: newCollection.id,
-          data: newCollection
-        }).catch(console.error)
-        
-        // Update notes in IndexedDB
-        const { notes } = get()
-        noteIds.forEach(noteId => {
-          const note = notes.find(n => n.id === noteId)
-          if (note) {
-            saveNote(note).catch(console.error)
-          }
-        })
-        
-        return newCollection
-      },
-
-      updateCollection: (id, updates) => {
-        let updatedCollection: Collection | undefined
-        
-        set((state) => ({
-          collections: state.collections.map(c => {
-            if (c.id === id) {
-              updatedCollection = { 
-                ...c, 
-                ...updates, 
-                updatedAt: Date.now(),
-                version: (c.version || 1) + 1,
-                syncStatus: 'pending' as const
-              }
-              return updatedCollection
-            }
-            return c
-          })
-        }))
-        
-        if (updatedCollection) {
-          saveCollectionWithQueue(updatedCollection, {
-            type: 'update',
-            entityType: 'collection',
-            entityId: id,
-            data: updatedCollection
-          }).catch(console.error)
-        }
-      },
-
-      deleteCollection: (id) => {
-        const isOnline = useNetworkStore.getState().isOnline
-        const { notes } = get()
-        
-        // Get notes that belong to this collection before deletion
-        const notesInCollection = notes.filter(n => n.collectionId === id)
-        
-        // Track deletion in tombstones
-        addTombstone(id, 'collection').catch(console.error)
-        
-        // Delete from IndexedDB
-        deleteCollectionFromDb(id).catch(console.error)
-        
-        // Remove any pending sync queue items for this collection
-        getSyncQueue().then(queue => {
-          const collectionQueueItems = queue.filter(
-            item => item.entityType === 'collection' && item.entityId === id
-          )
-          collectionQueueItems.forEach(item => {
-            removeFromSyncQueue(item.id).catch(console.error)
-          })
-        }).catch(console.error)
-        
-        // Delete from Drive if online
-        if (isOnline) {
-          deleteCollectionDriveFile(id).catch(console.error)
-        } else {
-          // Queue deletion for when back online
-          addToSyncQueue({ 
-            type: 'delete', 
-            entityType: 'collection', 
-            entityId: id 
-          }).catch(console.error)
-        }
-        
-        // Update state
-        set((state) => ({
-          collections: state.collections.filter(c => c.id !== id),
-          deletedCollectionIds: [...state.deletedCollectionIds, id],
-          notes: state.notes.map(n => 
-            n.collectionId === id 
-              ? { ...n, collectionId: undefined, version: (n.version || 1) + 1, syncStatus: 'pending' as const } 
-              : n
-          )
-        }))
-        
-        // Update notes in IndexedDB that were in this collection
-        notesInCollection.forEach(note => {
-          const updatedNote = { 
-            ...note, 
-            collectionId: undefined, 
-            version: (note.version || 1) + 1, 
-            syncStatus: 'pending' as const 
-          }
-          saveNoteWithQueue(updatedNote, {
-            type: 'update',
-            entityType: 'note',
-            entityId: note.id,
-            data: updatedNote
-          }).catch(console.error)
-        })
-      },
-
-      addNoteToCollection: (noteId: string, collectionId: string) => {
-        let updatedNote: Note | undefined
-        let updatedCollection: Collection | undefined
-        
-        set((state) => ({
-          collections: state.collections.map(c => {
-            if (c.id === collectionId) {
-              updatedCollection = { 
-                ...c, 
-                noteIds: [...c.noteIds, noteId], 
-                updatedAt: Date.now(),
-                version: (c.version || 1) + 1,
-                syncStatus: 'pending' as const
-              }
-              return updatedCollection
-            }
-            return c
-          }),
-          notes: state.notes.map(n => {
-            if (n.id === noteId) {
-              updatedNote = { 
-                ...n, 
-                collectionId,
-                version: (n.version || 1) + 1,
-                syncStatus: 'pending' as const
-              }
-              return updatedNote
-            }
-            return n
-          })
-        }))
-        
-        if (updatedNote) {
-          saveNoteWithQueue(updatedNote, {
-            type: 'update',
-            entityType: 'note',
-            entityId: noteId,
-            data: updatedNote
-          }).catch(console.error)
-        }
-        
-        if (updatedCollection) {
-          saveCollectionWithQueue(updatedCollection, {
-            type: 'update',
-            entityType: 'collection',
-            entityId: collectionId,
-            data: updatedCollection
-          }).catch(console.error)
-        }
-      },
-
-      removeNoteFromCollection: (noteId: string) => {
-        let updatedNote: Note | undefined
-        let updatedCollection: Collection | undefined
-        let deletedCollectionId: string | undefined
-        
-        set((state) => {
-          const note = state.notes.find(n => n.id === noteId)
-          if (!note?.collectionId) return state
-          
-          const collection = state.collections.find(c => c.id === note.collectionId)
-          if (!collection) return state
-          
-          const newNoteIds = collection.noteIds.filter(id => id !== noteId)
-          
-          // Delete collection if less than 2 notes
-          if (newNoteIds.length < 2) {
-            deletedCollectionId = collection.id
-            return {
-              collections: state.collections.filter(c => c.id !== collection.id),
-              notes: state.notes.map(n => {
-                if (n.collectionId === collection.id) {
-                  const updated = { 
-                    ...n, 
-                    collectionId: undefined,
-                    version: (n.version || 1) + 1,
-                    syncStatus: 'pending' as const
-                  }
-                  if (n.id === noteId) updatedNote = updated
-                  return updated
-                }
-                return n
-              })
-            }
-          }
-          
-          updatedCollection = { 
-            ...collection, 
-            noteIds: newNoteIds, 
-            updatedAt: Date.now(),
-            version: (collection.version || 1) + 1,
-            syncStatus: 'pending' as const
-          }
-          
-          return {
-            collections: state.collections.map(c =>
-              c.id === collection.id ? updatedCollection! : c
-            ),
-            notes: state.notes.map(n => {
-              if (n.id === noteId) {
-                updatedNote = { 
-                  ...n, 
-                  collectionId: undefined,
-                  version: (n.version || 1) + 1,
-                  syncStatus: 'pending' as const
-                }
-                return updatedNote
-              }
-              return n
-            })
-          }
-        })
-        
-        if (updatedNote) {
-          saveNoteWithQueue(updatedNote, {
-            type: 'update',
-            entityType: 'note',
-            entityId: noteId,
-            data: updatedNote
-          }).catch(console.error)
-        }
-        
-        if (updatedCollection) {
-          saveCollectionWithQueue(updatedCollection, {
-            type: 'update',
-            entityType: 'collection',
-            entityId: updatedCollection.id,
-            data: updatedCollection
-          }).catch(console.error)
-        }
-        
-        if (deletedCollectionId) {
-          addTombstone(deletedCollectionId, 'collection').catch(console.error)
-          deleteCollectionFromDb(deletedCollectionId).catch(console.error)
-          queueOfflineOperation('collection', 'delete', deletedCollectionId)
-        }
-      },
-
-      toggleCollectionExpanded: (id: string) => {
-        set((state) => ({
-          collections: state.collections.map(c =>
-            c.id === id ? { ...c, isExpanded: !c.isExpanded } : c
-          )
-        }))
-        // Note: isExpanded is UI-only state, no need to sync
-      },
-
-      mergeNotesIntoCollection: (sourceNoteId: string, targetNoteId: string) => {
-        const { notes, createCollection, addNoteToCollection } = get()
-        
-        const sourceNote = notes.find(n => n.id === sourceNoteId)
-        const targetNote = notes.find(n => n.id === targetNoteId)
-        
-        if (!sourceNote || !targetNote) return
-        
-        if (targetNote.collectionId) {
-          if (sourceNote.collectionId) {
-            get().removeNoteFromCollection(sourceNoteId)
-          }
-          addNoteToCollection(sourceNoteId, targetNote.collectionId)
-        } else if (sourceNote.collectionId) {
-          addNoteToCollection(targetNoteId, sourceNote.collectionId)
-        } else {
-          createCollection('Collection', [sourceNoteId, targetNoteId])
-        }
       },
       
       getFilteredNotes: () => {
@@ -1531,16 +1116,6 @@ export const useNotesStore = create<NotesState>()(
       getSelectedNote: () => {
         const { notes, selectedNoteId } = get()
         return notes.find((note) => note.id === selectedNoteId)
-      },
-
-      getNotesInCollection: (collectionId: string) => {
-        const { notes } = get()
-        return notes.filter(n => n.collectionId === collectionId && !n.isDeleted)
-      },
-
-      getUncollectedNotes: () => {
-        const { notes } = get()
-        return notes.filter(n => !n.collectionId && !n.isDeleted)
       }
     }),
     {
@@ -1548,9 +1123,7 @@ export const useNotesStore = create<NotesState>()(
       partialize: (state) => ({ 
         // Only persist essential UI state - IndexedDB is source of truth for data
         notes: state.notes,
-        collections: state.collections,
         deletedNoteIds: state.deletedNoteIds,
-        deletedCollectionIds: state.deletedCollectionIds,
         lastSyncTime: state.lastSyncTime 
       })
     }

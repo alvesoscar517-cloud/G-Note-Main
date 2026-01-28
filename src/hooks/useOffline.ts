@@ -10,7 +10,7 @@ import {
   getSyncQueue, 
   type SyncQueueItem 
 } from '@/lib/db/syncQueueRepository'
-import type { Note, Collection } from '@/types'
+import type { Note } from '@/types'
 
 /**
  * Hook to check network status and handle offline scenarios
@@ -61,7 +61,7 @@ export function useOffline() {
       type: 'create' | 'update' | 'delete'
       entityType: 'note' | 'collection'
       entityId: string
-      data?: Note | Collection
+      data?: Note
     },
     options?: {
       retryOnReconnect?: boolean

@@ -183,10 +183,6 @@ export function LoginScreen() {
           {/* Arrow */}
           <ChevronRight className="w-4 h-4 text-neutral-500 dark:text-white/70 group-hover:translate-x-0.5 transition-transform" />
         </a>
-
-        <p className="text-xs text-neutral-400 dark:text-white/50">
-          Chrome Extension v1.1.7
-        </p>
       </div>
       
       {/* Drive Permission Error Dialog */}

@@ -5,9 +5,12 @@ import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore, smartSyncManager, flushPendingNoteUpdates } from '@/stores/notesStore'
 import { useThemeStore } from '@/stores/themeStore'
 import { useNetworkStore } from '@/stores/networkStore'
+import { useMigrationStore } from '@/stores/migrationStore'
+// import { migrationEngine } from '@/lib/migration/removeCollectionMigration' // Disabled - migration complete
 import { LoginScreen } from '@/components/auth/LoginScreen'
 import { DrivePermissionError } from '@/components/auth/DrivePermissionError'
 import { Header } from '@/components/layout/Header'
+import { MigrationProgress } from '@/components/layout/MigrationProgress'
 import { VirtualizedNotesList } from '@/components/notes/VirtualizedNotesList'
 import { NoteModal } from '@/components/notes/NoteModal'
 import { PublicNoteView } from '@/components/notes/PublicNoteView'
@@ -35,10 +38,63 @@ function AppContent() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showPermissionError, setShowPermissionError] = useState(false)
   
+  // Migration state
+  const { migrationResult, /* setMigrating, setMigrationResult, */ reset: resetMigration } = useMigrationStore()
+  const [showMigrationDialog, setShowMigrationDialog] = useState(false)
+  
   // Block default context menu globally
   useBlockContextMenu()
   
   const viewFileId = getViewFileId()
+  
+  // Check for migration on app initialization
+  // MIGRATION DISABLED - Collection feature has been removed
+  // Uncomment this block if you need to run migration again
+  /*
+  useEffect(() => {
+    const checkAndRunMigration = async () => {
+      try {
+        console.log('[Extension] Checking if migration is needed...')
+        const needsMigration = await migrationEngine.needsMigration()
+        
+        if (needsMigration) {
+          console.log('[Extension] Migration needed, starting migration...')
+          setMigrating(true)
+          setShowMigrationDialog(true)
+          
+          // Run migration
+          const result = await migrationEngine.migrate()
+          
+          console.log('[Extension] Migration completed:', result)
+          setMigrationResult(result)
+          
+          // Keep dialog open to show result
+          // User will close it by clicking "Continue" or "Close"
+        } else {
+          console.log('[Extension] No migration needed')
+        }
+      } catch (error) {
+        console.error('[Extension] Migration check failed:', error)
+        // Don't block app if migration check fails
+        // The app can still function normally
+      }
+    }
+    
+    // Run migration check after IndexedDB is initialized
+    // Wait a bit to ensure DB is ready
+    const timer = setTimeout(() => {
+      checkAndRunMigration()
+    }, 500)
+    
+    return () => clearTimeout(timer)
+  }, [setMigrating, setMigrationResult])
+  */
+  
+  // Handle migration dialog close
+  const handleMigrationComplete = () => {
+    setShowMigrationDialog(false)
+    resetMigration()
+  }
   
   // Initialize network status monitoring and offline storage
   useEffect(() => {
@@ -206,8 +262,7 @@ function AppContent() {
       if (!isOnline) return
       
       const hasPending = useNotesStore.getState().notes.some(n => n.syncStatus === 'pending')
-      const hasPendingCollections = useNotesStore.getState().collections.some(c => c.syncStatus === 'pending')
-      if (hasPending || hasPendingCollections) doSync()
+      if (hasPending) doSync()
     }, 30000)
 
     return () => clearInterval(interval)
@@ -225,8 +280,7 @@ function AppContent() {
     const checkPending = () => {
       const state = useNotesStore.getState()
       const hasPending = state.notes.some(n => n.syncStatus === 'pending')
-      const hasPendingCollections = state.collections.some(c => c.syncStatus === 'pending')
-      if ((hasPending || hasPendingCollections) && !state.isSyncing) {
+      if (hasPending && !state.isSyncing) {
         debouncedSync()
       }
     }
@@ -246,7 +300,7 @@ function AppContent() {
 
   return (
     <LayoutGroup>
-      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+      <div className="h-screen bg-neutral-50 dark:bg-neutral-950 overflow-y-auto">
         <div className="pt-3 px-4">
           <Header />
         </div>
@@ -260,6 +314,13 @@ function AppContent() {
         </ModalErrorBoundary>
         <WebContentDialog />
       </div>
+      
+      {/* Migration Progress Dialog */}
+      <MigrationProgress
+        isOpen={showMigrationDialog}
+        migrationResult={migrationResult}
+        onComplete={handleMigrationComplete}
+      />
       
       {/* Drive Permission Error Dialog */}
       {showPermissionError && (

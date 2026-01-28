@@ -1,9 +1,13 @@
 /**
  * Sync Queue Repository
  * Manages pending sync operations with deduplication and priority
+ * 
+ * NOTE: This repository primarily handles notes. Collection support is kept
+ * only for migration cleanup purposes (to handle any pending collection sync
+ * operations during the collection removal migration).
  */
-import { db, type SyncQueueItem } from './schema'
-import type { Note, Collection } from '@/types'
+import { db, type SyncQueueItem, type Collection } from './schema'
+import type { Note } from '@/types'
 import { v4 as uuidv4 } from 'uuid'
 
 // Re-export SyncQueueItem type for convenience
@@ -18,6 +22,8 @@ export const PRIORITY = {
 } as const
 
 // Type for adding items to queue (priority is optional with default)
+// NOTE: entityType should be 'note' for normal operations.
+// Collection support is kept for migration cleanup only.
 export type AddToQueueItem = Omit<SyncQueueItem, 'id' | 'timestamp' | 'retries' | 'priority'> & {
   priority?: number
 }
@@ -89,6 +95,9 @@ export async function getSyncQueue(): Promise<SyncQueueItem[]> {
 
 /**
  * Get sync queue items by entity type
+ * 
+ * NOTE: Collection support is kept for migration cleanup only.
+ * New code should only use 'note' as entityType.
  */
 export async function getSyncQueueByType(
   entityType: 'note' | 'collection'
@@ -97,7 +106,18 @@ export async function getSyncQueueByType(
 }
 
 /**
+ * Get all note sync queue items (primary use case)
+ * This is the recommended function for normal sync operations.
+ */
+export async function getNoteSyncQueue(): Promise<SyncQueueItem[]> {
+  return getSyncQueueByType('note')
+}
+
+/**
  * Get sync queue item by entity
+ * 
+ * NOTE: Collection support is kept for migration cleanup only.
+ * New code should only use 'note' as entityType.
  */
 export async function getSyncQueueItem(
   entityType: 'note' | 'collection',
@@ -118,6 +138,9 @@ export async function removeFromSyncQueue(id: string): Promise<void> {
 
 /**
  * Remove item by entity
+ * 
+ * NOTE: Collection support is kept for migration cleanup only.
+ * New code should only use 'note' as entityType.
  */
 export async function removeFromSyncQueueByEntity(
   entityType: 'note' | 'collection',
@@ -154,6 +177,9 @@ export async function incrementRetry(id: string, error?: string): Promise<void> 
 
 /**
  * Update priority for an entity (e.g., when user opens a note)
+ * 
+ * NOTE: Collection support is kept for migration cleanup only.
+ * New code should only use 'note' as entityType.
  */
 export async function updatePriority(
   entityType: 'note' | 'collection',
@@ -203,13 +229,23 @@ export async function saveNoteWithQueue(
 
 /**
  * Atomic: Save collection and add to sync queue in one transaction
+ * 
+ * @deprecated This function is kept for migration cleanup only.
+ * Collections are being removed from the application.
+ * New code should not use this function.
  */
 export async function saveCollectionWithQueue(
   collection: Collection,
   queueItem: AddToQueueItem
 ): Promise<void> {
+  // Check if collections table still exists (for backward compatibility)
+  if (!db.collections) {
+    console.warn('[SyncQueue] Attempted to save collection but collections table has been removed')
+    return
+  }
+  
   await db.transaction('rw', [db.collections, db.syncQueue], async () => {
-    await db.collections.put(collection)
+    await db.collections!.put(collection)
     await addToSyncQueue(queueItem)
   })
 }

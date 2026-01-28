@@ -6,10 +6,10 @@ export { db, GNoteDatabase } from './schema'
 export type { SyncQueueItem, Tombstone, MetadataItem, FileIdCacheItem } from './schema'
 
 export * from './noteRepository'
-export * from './collectionRepository'
 export * from './syncQueueRepository'
 export * from './tombstoneRepository'
 export * from './metadataRepository'
+export * from './migrationRepository'
 export * from './fileIdCacheRepository'
 export * from './utils'
 

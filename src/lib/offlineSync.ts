@@ -1,7 +1,7 @@
 /**
  * Offline sync manager
  * Handles syncing queued operations when coming back online
- * Supports both notes and collections sync
+ * Supports notes sync only (collections removed)
  */
 import { 
   getSyncQueue, 
@@ -17,15 +17,13 @@ import {
 } from './db/tombstoneRepository'
 import {
   uploadSingleNote,
-  uploadSingleCollection,
   deleteNoteDriveFile,
-  deleteCollectionDriveFile,
   setSyncAccessToken
 } from './sync/syncEngine'
 import { useNetworkStore } from '@/stores/networkStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
-import type { Note, Collection } from '@/types'
+import type { Note } from '@/types'
 
 const MAX_RETRIES = 3
 const RETRY_DELAY_BASE = 1000 // 1 second base delay
@@ -72,9 +70,8 @@ export async function processSyncQueue(): Promise<{ success: number; failed: num
     console.log(`[OfflineSync] Processing ${queue.length} queued items...`)
     setSyncAccessToken(user.accessToken)
 
-    // Process notes first, then collections
+    // Process note items only
     const noteItems = queue.filter(item => item.entityType === 'note')
-    const collectionItems = queue.filter(item => item.entityType === 'collection')
 
     // Process note items
     for (const item of noteItems) {
@@ -85,20 +82,6 @@ export async function processSyncQueue(): Promise<{ success: number; failed: num
         console.log(`[OfflineSync] Processed note: ${item.type} ${item.entityId}`)
       } catch (error) {
         console.error(`[OfflineSync] Failed to process note item:`, error)
-        await handleQueueItemError(item, error)
-        failed++
-      }
-    }
-
-    // Process collection items
-    for (const item of collectionItems) {
-      try {
-        await processCollectionQueueItem(item)
-        await removeFromSyncQueue(item.id)
-        success++
-        console.log(`[OfflineSync] Processed collection: ${item.type} ${item.entityId}`)
-      } catch (error) {
-        console.error(`[OfflineSync] Failed to process collection item:`, error)
         await handleQueueItemError(item, error)
         failed++
       }
@@ -143,27 +126,6 @@ async function processNoteQueueItem(item: SyncQueueItem): Promise<void> {
 }
 
 /**
- * Process a collection queue item
- */
-async function processCollectionQueueItem(item: SyncQueueItem): Promise<void> {
-  switch (item.type) {
-    case 'create':
-    case 'update':
-      if (item.data) {
-        await uploadSingleCollection(item.data as Collection)
-      }
-      break
-    
-    case 'delete':
-      await deleteCollectionDriveFile(item.entityId)
-      break
-    
-    default:
-      console.warn(`[OfflineSync] Unknown queue item type: ${item.type}`)
-  }
-}
-
-/**
  * Handle queue item error with retry logic
  */
 async function handleQueueItemError(item: SyncQueueItem, error: unknown): Promise<void> {
@@ -196,9 +158,8 @@ async function syncDeletedIds(accessToken: string): Promise<void> {
       try {
         if (item.entityType === 'note') {
           await deleteNoteDriveFile(item.id)
-        } else {
-          await deleteCollectionDriveFile(item.id)
         }
+        // Skip collection tombstones - collections are removed
         await removeTombstone(item.id)
         console.log(`[OfflineSync] Synced deletion: ${item.entityType} ${item.id}`)
       } catch (error) {
@@ -277,14 +238,12 @@ export async function getSyncQueueStatus(): Promise<{
   count: number
   items: SyncQueueItem[]
   noteCount: number
-  collectionCount: number
 }> {
   const items = await getSyncQueue()
   return {
     count: items.length,
     items,
-    noteCount: items.filter(i => i.entityType === 'note').length,
-    collectionCount: items.filter(i => i.entityType === 'collection').length
+    noteCount: items.filter(i => i.entityType === 'note').length
   }
 }
 

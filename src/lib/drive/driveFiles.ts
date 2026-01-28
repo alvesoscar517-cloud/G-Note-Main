@@ -1,10 +1,10 @@
 /**
  * Drive Files
- * File operations for notes and collections
+ * File operations for notes
  */
 import { driveClient } from './driveClient'
 import { DriveError } from './types'
-import type { Note, Collection } from '@/types'
+import type { Note } from '@/types'
 import {
   saveFileId,
   saveFileIds,
@@ -68,12 +68,7 @@ export function setCollectionFileId(collectionId: string, fileId: string): void 
   saveFileId(collectionId, fileId, 'collection').catch(console.error)
 }
 
-/**
- * Get collection file ID from cache
- */
-export function getCollectionFileId(collectionId: string): string | undefined {
-  return collectionFileIds.get(collectionId)
-}
+
 
 /**
  * Batch set file IDs (for sync optimization)
@@ -120,7 +115,16 @@ export async function downloadNote(fileId: string): Promise<Note | null> {
     const text = await driveClient.downloadFileAsText(fileId)
     
     try {
-      return JSON.parse(text)
+      const data = JSON.parse(text)
+      
+      // Skip collection files if encountered during sync
+      // Collection files have a 'noteIds' array property that notes don't have
+      if (data && typeof data === 'object' && 'noteIds' in data && Array.isArray(data.noteIds)) {
+        console.warn(`[DriveFiles] Skipping collection file ${fileId} during note download`)
+        return null
+      }
+      
+      return data
     } catch (parseError) {
       console.error(`[DriveFiles] Corrupted note file ${fileId}:`, parseError)
       return null
@@ -157,50 +161,12 @@ export async function deleteNoteFile(noteId: string): Promise<void> {
 }
 
 // ============ Collection Operations ============
-
-/**
- * Upload a collection to Drive
- */
-export async function uploadCollection(
-  collection: Collection,
-  folderId: string
-): Promise<string> {
-  const existingFileId = collectionFileIds.get(collection.id)
-
-  if (existingFileId) {
-    await driveClient.updateFile(existingFileId, collection)
-    return existingFileId
-  }
-
-  const fileName = `collection-${collection.id}.json`
-  const fileId = await driveClient.createFile(fileName, collection, folderId)
-  collectionFileIds.set(collection.id, fileId)
-  return fileId
-}
-
-/**
- * Download a collection from Drive
- */
-export async function downloadCollection(fileId: string): Promise<Collection | null> {
-  try {
-    const text = await driveClient.downloadFileAsText(fileId)
-    
-    try {
-      return JSON.parse(text)
-    } catch (parseError) {
-      console.error(`[DriveFiles] Corrupted collection file ${fileId}:`, parseError)
-      return null
-    }
-  } catch (error) {
-    if (error instanceof DriveError && error.code === 'DRIVE_NOT_FOUND') {
-      return null
-    }
-    throw error
-  }
-}
+// Note: Collection operations have been removed as part of the collection feature removal.
+// Only deleteCollectionFile() is kept for migration cleanup purposes.
 
 /**
  * Delete a collection file from Drive
+ * Note: This function is kept only for migration cleanup purposes.
  */
 export async function deleteCollectionFile(collectionId: string): Promise<void> {
   const fileId = collectionFileIds.get(collectionId)

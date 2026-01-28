@@ -2,7 +2,6 @@
  * Drive Types
  * Type definitions for Google Drive sync operations
  */
-import type { Note, Collection } from '@/types'
 
 // ============ Index File Types ============
 
@@ -15,18 +14,6 @@ export interface NoteIndexEntry {
 
 export interface NotesIndex {
   notes: NoteIndexEntry[]
-  lastSync: number
-}
-
-export interface CollectionIndexEntry {
-  id: string
-  fileId: string
-  updatedAt: number
-  version: number
-}
-
-export interface CollectionsIndex {
-  collections: CollectionIndexEntry[]
   lastSync: number
 }
 
@@ -45,23 +32,6 @@ export interface DeletedIdsIndex {
   noteTombstones?: TombstoneEntry[]
   collectionTombstones?: TombstoneEntry[]
   lastSync: number
-}
-
-// ============ Sync Result Types ============
-
-export interface ConflictInfo {
-  noteId: string
-  localVersion: number
-  remoteVersion: number
-  resolution: 'local' | 'remote' | 'copy'
-}
-
-export interface SyncResult {
-  notes: Note[]
-  collections: Collection[]
-  hasChanges: boolean
-  conflicts?: ConflictInfo[]
-  staleLocalIds?: string[]
 }
 
 // ============ Drive API Types ============
