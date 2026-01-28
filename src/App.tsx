@@ -8,7 +8,7 @@ import { useNotesStore, smartSyncManager, flushPendingNoteUpdates } from '@/stor
 import { useThemeStore } from '@/stores/themeStore'
 import { useNetworkStore } from '@/stores/networkStore'
 import { useMigrationStore } from '@/stores/migrationStore'
-import { migrationEngine } from '@/lib/migration/removeCollectionMigration'
+// import { migrationEngine } from '@/lib/migration/removeCollectionMigration' // Disabled - migration complete
 import { LoginScreen } from '@/components/auth/LoginScreen'
 import { DrivePermissionError } from '@/components/auth/DrivePermissionError'
 import { Header } from '@/components/layout/Header'
@@ -56,7 +56,7 @@ function AppContent() {
   const [showPermissionError, setShowPermissionError] = useState(false)
   
   // Migration state
-  const { migrationResult, setMigrating, setMigrationResult, reset: resetMigration } = useMigrationStore()
+  const { migrationResult, /* setMigrating, setMigrationResult, */ reset: resetMigration } = useMigrationStore()
   const [showMigrationDialog, setShowMigrationDialog] = useState(false)
   
   // Block default context menu globally
