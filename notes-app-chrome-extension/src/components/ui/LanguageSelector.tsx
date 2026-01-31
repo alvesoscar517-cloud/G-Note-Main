@@ -132,7 +132,7 @@ export function LanguageButton({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       className="w-full flex items-center gap-2 px-2 py-2.5 rounded-xl text-left text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
     >
-      <div className="p-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+      <div className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">
         <Globe className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">

@@ -48,6 +48,7 @@
     "modalSizeDefault": "डिफ़ॉल्ट",
     "modalSizeLarge": "बड़ा",
     "modalSizeXLarge": "बहुत बड़ा",
+    "modalSizeFullscreen": "पूर्ण स्क्रीन",
     "displayMode": "प्रदर्शन मोड",
     "displayModeDescription": "एक्सटेंशन खोलने का तरीका चुनें",
     "fullscreen": "पूर्ण स्क्रीन",
@@ -135,7 +136,48 @@
     "versionHistory": "संस्करण इतिहास",
     "fullscreen": "पूर्ण स्क्रीन",
     "exitFullscreen": "पूर्ण स्क्रीन से बाहर निकलें",
-    "more": "और"
+    "more": "और",
+    "insertTable": "तालिका डालें",
+    "tableProperties": "तालिका गुण",
+    "addColumnBefore": "पहले कॉलम जोड़ें",
+    "addColumnAfter": "बाद में कॉलम जोड़ें",
+    "addRowBefore": "पहले पंक्ति जोड़ें",
+    "addRowAfter": "बाद में पंक्ति जोड़ें",
+    "deleteColumn": "कॉलम हटाएं",
+    "deleteRow": "पंक्ति हटाएं",
+    "deleteTable": "तालिका हटाएं",
+    "mergeCells": "सेल मर्ज करें",
+    "splitCell": "सेल विभाजित करें",
+    "toggleHeaderRow": "शीर्षक पंक्ति टॉगल करें",
+    "toggleHeaderColumn": "शीर्षक कॉलम टॉगल करें",
+    "exportTableCSV": "CSV के रूप में निर्यात करें",
+    "exportTableMarkdown": "Markdown के रूप में निर्यात करें",
+    "tableRows": "पंक्तियाँ",
+    "tableColumns": "कॉलम",
+    "includeHeaderRow": "शीर्षक पंक्ति शामिल करें",
+    "tablePreview": "पूर्वावलोकन",
+    "createTable": "तालिका बनाएं",
+    "tableDimensions": "आयाम",
+    "tableHeaders": "शीर्षक",
+    "tableWidth": "चौड़ाई",
+    "tableOptions": "विकल्प",
+    "resizableColumns": "आकार बदलने योग्य कॉलम",
+    "fixedLayout": "निश्चित लेआउट",
+    "headerRow": "शीर्षक पंक्ति",
+    "headerColumn": "शीर्षक कॉलम",
+    "autoWidth": "स्वचालित",
+    "fullWidth": "100%",
+    "customWidth": "कस्टम",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -158,7 +200,16 @@
     "chatWithAI": "AI के साथ चैट",
     "chatWelcome": "नमस्ते",
     "chatDescription": "इस नोट के बारे में मुझसे कुछ भी पूछें। मैं नोट के संदर्भ के आधार पर उत्तर दूंगा।",
-    "send": "भेजें"
+    "send": "भेजें",
+    "tone": {
+      "label": "लहजा बदलें",
+      "professional": "पेशेवर",
+      "formalEmail": "औपचारिक ईमेल",
+      "socialMedia": "सोशल मीडिया",
+      "casual": "अनौपचारिक",
+      "friendly": "मित्रवत",
+      "confident": "आत्मविश्वासी"
+    }
   },
   "sharedNotes": {
     "title": "आपके साथ साझा किया गया",
@@ -265,7 +316,8 @@
     "cancel": "रद्द करें",
     "language": "भाषा",
     "searchLanguage": "भाषा खोजें...",
-    "noLanguageFound": "कोई भाषा नहीं मिली"
+    "noLanguageFound": "कोई भाषा नहीं मिली",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "अभी",
@@ -346,7 +398,9 @@
     "permissionRequired": "आवाज इनपुट सक्षम करें",
     "permissionMessage": "वॉइस-टू-टेक्स्ट का उपयोग करने के लिए माइक्रोफ़ोन एक्सेस की अनुमति दें।",
     "enableVoice": "आवाज इनपुट सक्षम करें",
-    "enable": "सक्षम"
+    "enable": "सक्षम",
+    "notSupportedTip": "Tip: Make sure you're using the latest version of your browser.",
+    "gotIt": "Got it"
   },
   "trash": {
     "title": "कचरा",
@@ -426,5 +480,6 @@
     "genericErrorDescription": "एक अप्रत्याशित त्रुटि हुई। कृपया पुनः प्रयास करें।",
     "appError": "ऐप क्रैश हो गया",
     "appErrorDescription": "कुछ गलत हो गया और ऐप को रीलोड करने की आवश्यकता है। असुविधा के लिए हम क्षमा चाहते हैं।"
-  }
+  },
+  "webContent": {}
 }

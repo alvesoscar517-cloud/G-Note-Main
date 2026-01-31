@@ -47,7 +47,8 @@
     "modalSizeDescription": "Ajustar tamanho do editor",
     "modalSizeDefault": "Padrão",
     "modalSizeLarge": "Grande",
-    "modalSizeXLarge": "Extra grande"
+    "modalSizeXLarge": "Extra grande",
+    "modalSizeFullscreen": "Tela cheia"
   },
   "credits": {
     "title": "Comprar créditos AI",
@@ -125,7 +126,48 @@
     "versionHistory": "Histórico de versões",
     "fullscreen": "Tela cheia",
     "exitFullscreen": "Sair da tela cheia",
-    "more": "Mais"
+    "more": "Mais",
+    "insertTable": "Inserir tabela",
+    "addColumnBefore": "Adicionar coluna antes",
+    "addColumnAfter": "Adicionar coluna depois",
+    "addRowBefore": "Adicionar linha antes",
+    "addRowAfter": "Adicionar linha depois",
+    "deleteColumn": "Excluir coluna",
+    "deleteRow": "Excluir linha",
+    "deleteTable": "Excluir tabela",
+    "mergeCells": "Mesclar células",
+    "splitCell": "Dividir célula",
+    "toggleHeaderRow": "Alternar linha de cabeçalho",
+    "toggleHeaderColumn": "Alternar coluna de cabeçalho",
+    "exportTableCSV": "Exportar como CSV",
+    "exportTableMarkdown": "Exportar como Markdown",
+    "tableRows": "Linhas",
+    "tableColumns": "Colunas",
+    "includeHeaderRow": "Incluir linha de cabeçalho",
+    "tablePreview": "Visualização",
+    "createTable": "Criar tabela",
+    "tableProperties": "Propriedades da tabela",
+    "tableDimensions": "Dimensões",
+    "tableHeaders": "Cabeçalhos",
+    "tableWidth": "Largura",
+    "tableOptions": "Opções",
+    "resizableColumns": "Colunas redimensionáveis",
+    "fixedLayout": "Layout fixo",
+    "headerRow": "Linha de cabeçalho",
+    "headerColumn": "Coluna de cabeçalho",
+    "autoWidth": "Automático",
+    "fullWidth": "100%",
+    "customWidth": "Personalizado",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -148,7 +190,30 @@
     "chatWithAI": "Chat com AI",
     "chatWelcome": "Olá",
     "chatDescription": "Pergunte-me qualquer coisa sobre esta nota. Responderei com base no contexto da nota.",
-    "send": "Enviar"
+    "send": "Enviar",
+    "tone": {
+      "label": "Mudar tom",
+      "professional": "Profissional",
+      "formalEmail": "Email Formal",
+      "socialMedia": "Redes Sociais",
+      "casual": "Casual",
+      "friendly": "Amigável",
+      "confident": "Confiante"
+    },
+    "regenerate": "Regenerar",
+    "analysis": {
+      "menu_label": "Analisar",
+      "title": "Analisar",
+      "description": "Carregue uma imagem para extrair texto, analisar dados ou gerar uma descrição.",
+      "upload_instruction": "Clique ou arraste a imagem para carregar",
+      "select_type": "Selecionar tipo de análise",
+      "type": {
+        "general": "General",
+        "whiteboard": "Whiteboard",
+        "receipt": "Receipt"
+      },
+      "submit": "Analisar"
+    }
   },
   "sharedNotes": {
     "title": "Compartilhado com você",
@@ -248,14 +313,20 @@
     "rotate": "Girar",
     "flipH": "Inverter H",
     "flipV": "Inverter V",
-    "auto": "Auto"
+    "auto": "Auto",
+    "width": "Width",
+    "height": "Height",
+    "resize": "Resize"
   },
   "common": {
     "confirm": "Confirmar",
     "cancel": "Cancelar",
     "language": "Idioma",
     "searchLanguage": "Pesquisar idioma...",
-    "noLanguageFound": "Idioma nao encontrado"
+    "noLanguageFound": "Idioma nao encontrado",
+    "delete": "Delete",
+    "copy": "Copiar",
+    "copied": "Copiado"
   },
   "time": {
     "justNow": "Agora mesmo",
@@ -411,5 +482,6 @@
     "genericErrorDescription": "Ocorreu um erro inesperado. Por favor, tente novamente.",
     "appError": "App travou",
     "appErrorDescription": "Algo deu errado e o app precisa ser recarregado. Pedimos desculpas pelo inconveniente."
-  }
+  },
+  "webContent": {}
 }

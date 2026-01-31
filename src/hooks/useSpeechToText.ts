@@ -70,11 +70,11 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
   const [error, setError] = useState<string | null>(null)
   const [accumulatedTranscript, setAccumulatedTranscript] = useState('')
   const isStartingRef = useRef(false)
-  
+
   // Track what we've inserted
   const lastFinalTranscriptRef = useRef('')
   const lastInterimLengthRef = useRef(0)
-  
+
   const onResultRef = useRef(onResult)
   onResultRef.current = onResult
 
@@ -89,9 +89,9 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
 
   // Debug logging for production issues
   useEffect(() => {
-    const hasSpeechRecognition = typeof window !== 'undefined' && 
+    const hasSpeechRecognition = typeof window !== 'undefined' &&
       ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
-    
+
     console.log('[SpeechToText] Debug info:', {
       browserSupportsSpeechRecognition,
       hasSpeechRecognition,
@@ -100,7 +100,7 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
       isSecureContext: window.isSecureContext,
       userAgent: navigator.userAgent,
     })
-    
+
     // Web Speech API requires secure context (HTTPS or localhost)
     if (!window.isSecureContext) {
       console.warn('[SpeechToText] Not in secure context - Speech API may not work')
@@ -113,16 +113,16 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
   // Handle final transcript - this is confirmed text
   useEffect(() => {
     if (!libFinalTranscript) return
-    
+
     // Get only the new part of final transcript
     const newFinalText = libFinalTranscript.slice(lastFinalTranscriptRef.current.length)
-    
+
     if (newFinalText) {
       // Replace any interim text with the final confirmed text
       const replaceLength = lastInterimLengthRef.current
-      
+
       onResultRef.current?.(newFinalText, true, replaceLength)
-      
+
       // Update tracking
       lastFinalTranscriptRef.current = libFinalTranscript
       lastInterimLengthRef.current = 0
@@ -140,16 +140,16 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
       }
       return
     }
-    
+
     // Calculate what to show
     const interimText = libInterimTranscript.trim()
-    
+
     if (interimText) {
       // Tell the editor to replace previous interim with new interim
       const replaceLength = lastInterimLengthRef.current
-      
+
       onResultRef.current?.(interimText, false, replaceLength)
-      
+
       // Track the length of interim text we inserted
       lastInterimLengthRef.current = interimText.length
     }
@@ -166,7 +166,7 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
 
   const startListening = useCallback(async () => {
     console.log('[SpeechToText] startListening called, support:', browserSupportsSpeechRecognition, 'listening:', listening)
-    
+
     if (!browserSupportsSpeechRecognition) {
       const errorMsg = 'Speech recognition is not supported in this browser'
       console.error('[SpeechToText]', errorMsg)
@@ -185,13 +185,13 @@ export function useSpeechToText(options: UseSpeechToTextOptions = {}): UseSpeech
     setAccumulatedTranscript('')
     lastFinalTranscriptRef.current = ''
     lastInterimLengthRef.current = 0
-    
+
     resetTranscript()
 
     try {
       const lang = LOCALE_TO_SPEECH_LANG[locale] || 'en-US'
       console.log('[SpeechToText] Starting with language:', lang)
-      
+
       await SpeechRecognition.startListening({
         continuous,
         interimResults,

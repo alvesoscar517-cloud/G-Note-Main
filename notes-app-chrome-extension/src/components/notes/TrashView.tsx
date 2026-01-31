@@ -8,7 +8,7 @@ import { Dialog, DialogHeader, DialogContent, DialogFooter } from '@/components/
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { useNotesStore } from '@/stores/notesStore'
 import { useAuthStore } from '@/stores/authStore'
-import { useThemeStore } from '@/stores/themeStore'
+import { useAppStore } from '@/stores/appStore'
 import { cn, getPlainText, formatDate } from '@/lib/utils'
 import { NoteBackground, getNoteBackgroundStyle } from './NoteStylePicker'
 import { Highlight } from '@/components/ui/Highlight'
@@ -26,27 +26,27 @@ const OVERSCAN = 5
  */
 function getSmartPreview(plainContent: string, searchQuery?: string): string {
   const maxLength = 120
-  
+
   if (!searchQuery?.trim()) {
     return plainContent.slice(0, maxLength) + (plainContent.length > maxLength ? '...' : '')
   }
-  
+
   const query = searchQuery.toLowerCase()
   const contentLower = plainContent.toLowerCase()
   const matchIndex = contentLower.indexOf(query)
-  
+
   if (matchIndex === -1 || matchIndex < maxLength - 20) {
     return plainContent.slice(0, maxLength) + (plainContent.length > maxLength ? '...' : '')
   }
-  
+
   const contextBefore = 40
   const contextAfter = 80
-  
+
   const start = Math.max(0, matchIndex - contextBefore)
   const end = Math.min(plainContent.length, matchIndex + query.length + contextAfter)
-  
+
   let snippet = plainContent.slice(start, end)
-  
+
   if (start > 0) {
     const firstSpace = snippet.indexOf(' ')
     if (firstSpace > 0 && firstSpace < 15) {
@@ -54,7 +54,7 @@ function getSmartPreview(plainContent: string, searchQuery?: string): string {
     }
     snippet = '...' + snippet
   }
-  
+
   if (end < plainContent.length) {
     const lastSpace = snippet.lastIndexOf(' ')
     if (lastSpace > snippet.length - 15 && lastSpace > 0) {
@@ -62,7 +62,7 @@ function getSmartPreview(plainContent: string, searchQuery?: string): string {
     }
     snippet = snippet + '...'
   }
-  
+
   return snippet
 }
 
@@ -82,8 +82,8 @@ export function TrashView({ open, onClose }: TrashViewProps) {
   const restoreMultiple = useNotesStore(state => state.restoreMultiple)
   const permanentlyDeleteMultiple = useNotesStore(state => state.permanentlyDeleteMultiple)
   const user = useAuthStore(state => state.user)
-  const theme = useThemeStore(state => state.theme)
-  
+  const theme = useAppStore(state => state.theme)
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [showEmptyConfirm, setShowEmptyConfirm] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -92,9 +92,9 @@ export function TrashView({ open, onClose }: TrashViewProps) {
   const [driveResults, setDriveResults] = useState<DriveSearchResult[]>([])
   const [isDriveSearching, setIsDriveSearching] = useState(false)
   const [columnCount, setColumnCount] = useState(3)
-  
+
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-  
+
   // Detect column count based on container width
   useEffect(() => {
     const updateColumnCount = () => {
@@ -104,7 +104,7 @@ export function TrashView({ open, onClose }: TrashViewProps) {
       else if (width < 1024) setColumnCount(2)
       else setColumnCount(3)
     }
-    
+
     if (open) {
       setTimeout(updateColumnCount, 50)
       const observer = new ResizeObserver(updateColumnCount)
@@ -112,20 +112,20 @@ export function TrashView({ open, onClose }: TrashViewProps) {
       return () => observer.disconnect()
     }
   }, [open])
-  
+
   // Edge swipe back gesture
-  const { 
-    handlers: edgeSwipeHandlers, 
+  const {
+    handlers: edgeSwipeHandlers,
     swipeStyle: edgeSwipeStyle,
     swipeState: edgeSwipeState,
-    progress: edgeSwipeProgress 
+    progress: edgeSwipeProgress
   } = useEdgeSwipeBack({
     onSwipeBack: onClose,
     edgeWidth: 25,
     threshold: 100,
     enabled: open
   })
-  
+
   const trashNotes = useMemo(() => {
     return notes
       .filter(n => n.isDeleted)
@@ -281,25 +281,25 @@ export function TrashView({ open, onClose }: TrashViewProps) {
     <>
       {/* Backdrop to cover home page content */}
       <div className="fixed inset-0 z-[89] bg-neutral-50 dark:bg-neutral-950" />
-      
-      <div 
+
+      <div
         ref={scrollContainerRef}
         className="fixed inset-0 z-[90] overflow-y-auto bg-neutral-50 dark:bg-neutral-950"
         style={edgeSwipeState.isDragging ? edgeSwipeStyle : undefined}
         {...edgeSwipeHandlers}
       >
         {/* Edge swipe indicator */}
-        <EdgeSwipeIndicator 
-          progress={edgeSwipeProgress} 
-          isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
+        <EdgeSwipeIndicator
+          progress={edgeSwipeProgress}
+          isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge}
         />
-        
+
         {/* Header */}
         <div className="px-3 sm:px-4 pt-3">
           <div className="max-w-6xl mx-auto bg-white/80 dark:bg-neutral-900/80 backdrop-blur-lg border border-neutral-200 dark:border-neutral-800 rounded-[16px] px-3 sm:px-4 py-2.5 sm:py-3">
             <div className="flex items-center justify-between gap-2 sm:gap-4">
               <div className="flex items-center gap-2 sm:gap-3">
-                <Button variant="ghost" size="icon" onClick={handleClose} className="rounded-full flex-shrink-0">
+                <Button variant="ghost" size="icon" onClick={handleClose} className="rounded-full border border-neutral-200 dark:border-neutral-700 flex-shrink-0">
                   <X className="w-5 h-5" />
                 </Button>
                 <div className="flex items-center gap-2">
@@ -310,10 +310,10 @@ export function TrashView({ open, onClose }: TrashViewProps) {
                   )}
                 </div>
               </div>
-              
+
               {trashNotes.length > 0 && (
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => setShowEmptyConfirm(true)}
                   className="flex-shrink-0 text-xs sm:text-sm"
@@ -371,9 +371,9 @@ export function TrashView({ open, onClose }: TrashViewProps) {
                       {driveSearchEnabled ? (
                         <img src="/drive-color-svgrepo-com.svg" alt="Drive" className="w-4 h-4" />
                       ) : (
-                        <img 
-                          src="/drive-google-svgrepo-com.svg" 
-                          alt="Drive" 
+                        <img
+                          src="/drive-google-svgrepo-com.svg"
+                          alt="Drive"
                           className="w-4 h-4 opacity-50"
                           style={{ filter: isDark ? 'invert(1)' : 'none' }}
                         />
@@ -387,9 +387,9 @@ export function TrashView({ open, onClose }: TrashViewProps) {
         )}
 
         {/* Content */}
-        <div 
+        <div
           ref={listRef}
-          className="px-3 sm:px-4 py-3 sm:py-4"
+          className="px-3 sm:px-4 pt-3 pb-32"
         >
           <div className="max-w-6xl mx-auto">
             {trashNotes.length === 0 ? (
@@ -433,7 +433,7 @@ export function TrashView({ open, onClose }: TrashViewProps) {
                           transform: `translateY(${virtualRow.start - driveVirtualizer.options.scrollMargin}px)`,
                         }}
                       >
-                        <div 
+                        <div
                           className="grid gap-4"
                           style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}
                         >
@@ -483,7 +483,7 @@ export function TrashView({ open, onClose }: TrashViewProps) {
                         transform: `translateY(${virtualRow.start - virtualizer.options.scrollMargin}px)`,
                       }}
                     >
-                      <div 
+                      <div
                         className="grid gap-4"
                         style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}
                       >
@@ -555,11 +555,11 @@ interface TrashNoteCardProps {
 function TrashNoteCard({ note, isSelected, hasSelection, onToggleSelect, onRestore, onDelete, searchQuery }: TrashNoteCardProps) {
   const { t } = useTranslation()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  
+
   const plainContent = getPlainText(note.content)
   const preview = getSmartPreview(plainContent, searchQuery)
   const title = note.title || t('notes.newNote')
-  
+
   const deletedTimeAgo = useMemo(() => {
     if (!note.deletedAt) return ''
     return formatDate(note.deletedAt)
@@ -575,8 +575,8 @@ function TrashNoteCard({ note, isSelected, hasSelection, onToggleSelect, onResto
         className={cn(
           'relative group rounded-[16px] border p-4 cursor-pointer transition-shadow overflow-hidden',
           note.style?.backgroundImage ? 'bg-white dark:bg-neutral-900' : (!hasCustomBg && 'bg-white dark:bg-neutral-900'),
-          isSelected 
-            ? 'border-neutral-900 dark:border-white ring-2 ring-neutral-900/20 dark:ring-white/20' 
+          isSelected
+            ? 'border-neutral-400 dark:border-neutral-600'
             : 'border-neutral-200 dark:border-neutral-800 hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-700'
         )}
         onClick={onToggleSelect}
@@ -588,7 +588,7 @@ function TrashNoteCard({ note, isSelected, hasSelection, onToggleSelect, onResto
           <h3 className="font-semibold text-neutral-900 dark:text-white line-clamp-1 min-w-0 flex-1">
             <Highlight text={title} query={searchQuery} />
           </h3>
-          
+
           {/* Right side: checkbox or action buttons */}
           <div className="flex items-center gap-1 shrink-0">
             {/* Checkbox - show on hover or when in selection mode */}

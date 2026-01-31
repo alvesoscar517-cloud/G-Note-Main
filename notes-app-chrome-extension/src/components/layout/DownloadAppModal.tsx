@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Share, Plus, MoreVertical, Download, ChevronRight, Smartphone, Monitor, Tablet, Info } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { useThemeStore } from '@/stores/themeStore'
+import { useAppStore } from '@/stores/appStore'
 
 interface DownloadAppModalProps {
   isOpen: boolean
@@ -69,7 +69,7 @@ function BrowserCard({ browser, name, isRecommended, children }: BrowserCardProp
   return (
     <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl space-y-3">
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-lg border border-neutral-300 dark:border-neutral-600 flex items-center justify-center">
           <BrowserIcon browser={browser} className="w-5 h-5" />
         </div>
         <span className="font-medium text-neutral-900 dark:text-white">{name}</span>
@@ -86,7 +86,7 @@ function BrowserCard({ browser, name, isRecommended, children }: BrowserCardProp
 
 export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
   const { t } = useTranslation()
-  const { theme } = useThemeStore()
+  const { theme } = useAppStore()
   const [selectedPlatform, setSelectedPlatform] = useState<Platform>('ios')
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   
@@ -238,7 +238,7 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
             {/* Firefox notice - neutral background */}
             <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-lg bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg border border-neutral-300 dark:border-neutral-600 flex items-center justify-center">
                   <BrowserIcon browser="firefox" className="w-5 h-5" />
                 </div>
                 <span className="font-medium text-neutral-900 dark:text-white">Firefox</span>

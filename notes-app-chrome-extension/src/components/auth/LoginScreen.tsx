@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronRight, WifiOff } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
-import { useThemeStore } from '@/stores/themeStore'
+import { useAppStore } from '@/stores/appStore'
 import { VantaWaves } from '@/components/ui/VantaWaves'
-import { useNetworkStore } from '@/stores/networkStore'
 import { chromeGoogleLogin, isChromeExtension } from '@/lib/chromeAuth'
 import { DrivePermissionError } from './DrivePermissionError'
 
@@ -32,8 +31,8 @@ const WindowsIcon = ({ className }: { className?: string }) => (
 export function LoginScreen() {
   const { t } = useTranslation()
   const { setUser, setLoading, setLoginTransition } = useAuthStore()
-  const { theme } = useThemeStore()
-  const { isOnline } = useNetworkStore()
+  const { theme } = useAppStore()
+  const { isOnline } = useAppStore()
   const [showPermissionError, setShowPermissionError] = useState(false)
   
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)

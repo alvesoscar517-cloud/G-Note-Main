@@ -31,6 +31,7 @@ export interface Note {
   deletedAt?: number
   publicFileId?: string  // ID of the public shared file on Drive
   aiChatHistory?: AIChatMessage[]  // AI chat history for this note
+  userId?: string // ID of the user who owns this note (for multi-user support)
 }
 
 export interface User {

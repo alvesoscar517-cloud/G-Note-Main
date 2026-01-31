@@ -80,27 +80,27 @@ export class GNoteDatabase extends Dexie {
 
   constructor() {
     super('gnote-offline')
-    
+
     // Version 7: New schema with Dexie
     // Maintains backward compatibility with existing data
     this.version(7).stores({
       // Notes: indexed by id, collectionId, updatedAt, syncStatus, isDeleted
       notes: 'id, collectionId, updatedAt, syncStatus, isDeleted',
-      
+
       // Collections: indexed by id, updatedAt, syncStatus
       collections: 'id, updatedAt, syncStatus',
-      
+
       // Sync Queue: indexed by id, entityType, priority, timestamp
       // Compound index [entityType+entityId] for deduplication
       syncQueue: 'id, entityType, entityId, priority, timestamp, [entityType+entityId]',
-      
+
       // Tombstones: indexed by id, entityType, deletedAt
       tombstones: 'id, entityType, deletedAt',
-      
+
       // Metadata: simple key-value store
       metadata: 'key'
     })
-    
+
     // Version 8: Add file ID cache for persistence
     this.version(8).stores({
       notes: 'id, collectionId, updatedAt, syncStatus, isDeleted',
@@ -126,10 +126,10 @@ export class GNoteDatabase extends Dexie {
     this.version(10).stores({
       // Remove collectionId index from notes
       notes: 'id, updatedAt, syncStatus, isDeleted',
-      
+
       // Remove collections table by setting it to null
       collections: null,
-      
+
       syncQueue: 'id, entityType, entityId, priority, timestamp, [entityType+entityId]',
       tombstones: 'id, entityType, deletedAt',
       metadata: 'key',
@@ -139,6 +139,18 @@ export class GNoteDatabase extends Dexie {
       // Migration logic is handled by RemoveCollectionMigration
       // This upgrade hook just logs the schema change
       console.log('[Schema] Upgraded to version 10 - collections table removed, collectionId index removed from notes')
+    })
+
+    // Version 11: Add userId to notes for multi-user support
+    this.version(11).stores({
+      notes: 'id, userId, updatedAt, syncStatus, isDeleted',
+      syncQueue: 'id, entityType, entityId, priority, timestamp, [entityType+entityId]',
+      tombstones: 'id, entityType, deletedAt',
+      metadata: 'key',
+      fileIdCache: 'entityId, entityType',
+      migrationBackup: 'timestamp'
+    }).upgrade(async () => {
+      console.log('[Schema] Upgraded to version 11 - added userId index to notes')
     })
   }
 }

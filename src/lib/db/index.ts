@@ -9,7 +9,6 @@ export * from './noteRepository'
 export * from './syncQueueRepository'
 export * from './tombstoneRepository'
 export * from './metadataRepository'
-export * from './migrationRepository'
 export * from './fileIdCacheRepository'
 export * from './utils'
 

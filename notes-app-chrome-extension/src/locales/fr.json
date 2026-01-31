@@ -48,6 +48,7 @@
     "modalSizeDefault": "Par défaut",
     "modalSizeLarge": "Grande",
     "modalSizeXLarge": "Très grande",
+    "modalSizeFullscreen": "Plein écran",
     "displayMode": "Mode d'affichage",
     "displayModeDescription": "Choisissez comment ouvrir l'extension",
     "fullscreen": "Plein écran",
@@ -132,7 +133,48 @@
     "versionHistory": "Historique des versions",
     "fullscreen": "Plein écran",
     "exitFullscreen": "Quitter le plein écran",
-    "more": "Plus"
+    "more": "Plus",
+    "insertTable": "Insérer un tableau",
+    "tableProperties": "Propriétés du tableau",
+    "addColumnBefore": "Ajouter une colonne avant",
+    "addColumnAfter": "Ajouter une colonne après",
+    "addRowBefore": "Ajouter une ligne avant",
+    "addRowAfter": "Ajouter une ligne après",
+    "deleteColumn": "Supprimer la colonne",
+    "deleteRow": "Supprimer la ligne",
+    "deleteTable": "Supprimer le tableau",
+    "mergeCells": "Fusionner les cellules",
+    "splitCell": "Diviser la cellule",
+    "toggleHeaderRow": "Basculer la ligne d'en-tête",
+    "toggleHeaderColumn": "Basculer la colonne d'en-tête",
+    "exportTableCSV": "Exporter en CSV",
+    "exportTableMarkdown": "Exporter en Markdown",
+    "tableRows": "Lignes",
+    "tableColumns": "Colonnes",
+    "includeHeaderRow": "Inclure la ligne d'en-tête",
+    "tablePreview": "Aperçu",
+    "createTable": "Créer un tableau",
+    "tableDimensions": "Dimensions",
+    "tableHeaders": "En-têtes",
+    "tableWidth": "Largeur",
+    "tableOptions": "Options",
+    "resizableColumns": "Colonnes redimensionnables",
+    "fixedLayout": "Disposition fixe",
+    "headerRow": "Ligne d'en-tête",
+    "headerColumn": "Colonne d'en-tête",
+    "autoWidth": "Automatique",
+    "fullWidth": "100%",
+    "customWidth": "Personnalisé",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -155,7 +197,16 @@
     "chatWithAI": "Chat avec AI",
     "chatWelcome": "Bonjour",
     "chatDescription": "Posez-moi n'importe quelle question sur cette note. Je répondrai en fonction du contexte de la note.",
-    "send": "Envoyer"
+    "send": "Envoyer",
+    "tone": {
+      "label": "Changer de ton",
+      "professional": "Professionnel",
+      "formalEmail": "Email formel",
+      "socialMedia": "Réseaux sociaux",
+      "casual": "Décontracté",
+      "friendly": "Amical",
+      "confident": "Confiant"
+    }
   },
   "sharedNotes": {
     "title": "Partagé avec vous",
@@ -262,7 +313,8 @@
     "cancel": "Annuler",
     "language": "Langue",
     "searchLanguage": "Rechercher une langue...",
-    "noLanguageFound": "Aucune langue trouvée"
+    "noLanguageFound": "Aucune langue trouvée",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "À l'instant",
@@ -424,5 +476,6 @@
     "genericErrorDescription": "Une erreur inattendue s'est produite. Veuillez réessayer.",
     "appError": "L'app a planté",
     "appErrorDescription": "Une erreur s'est produite et l'app doit être rechargée. Nous nous excusons pour la gêne occasionnée."
-  }
+  },
+  "webContent": {}
 }

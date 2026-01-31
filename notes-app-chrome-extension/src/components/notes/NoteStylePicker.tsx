@@ -5,7 +5,7 @@ import imageCompression from 'browser-image-compression'
 import { Palette, X, Check, Upload } from 'lucide-react'
 import * as Popover from '@radix-ui/react-popover'
 import { cn } from '@/lib/utils'
-import { useThemeStore } from '@/stores/themeStore'
+import { useAppStore } from '@/stores/appStore'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import type { NoteStyle } from '@/types'
 
@@ -77,7 +77,7 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<'color' | 'image'>('color')
-  const { theme } = useThemeStore()
+  const { theme } = useAppStore()
   
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
   // Always show light colors in picker for better visibility, but apply dark colors when in dark mode
@@ -189,10 +189,12 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
 
       <Popover.Content
         side="top"
-        align="center"
+        align="end"
+        alignOffset={-8}
         sideOffset={8}
-        collisionPadding={16}
+        collisionPadding={24}
         avoidCollisions={true}
+        sticky="always"
         onOpenAutoFocus={(e) => e.preventDefault()}
         onCloseAutoFocus={(e) => e.preventDefault()}
         onClick={(e) => e.stopPropagation()}
@@ -201,7 +203,7 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
           // Prevent the event from bubbling to the backdrop which would close the note modal
           e.stopPropagation()
         }}
-        className="z-[100] w-[280px] max-w-[calc(100vw-32px)] bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 p-3 animate-in fade-in-0 zoom-in-95"
+        className="z-[100] w-[280px] max-w-[calc(100vw-48px)] bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 p-3 max-h-[calc(100vh-80px)] overflow-y-auto"
       >
           {/* Tabs */}
           <div className="flex gap-1 mb-3">

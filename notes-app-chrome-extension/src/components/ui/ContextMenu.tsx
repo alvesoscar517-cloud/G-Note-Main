@@ -4,23 +4,18 @@ import { Check, ChevronRight, Circle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useIsTouchDevice } from '@/hooks/useIsTouchDevice'
 
-// On touch devices inside NoteEditor, we disable custom context menu
+// On touch devices, we completely disable custom context menu
 // to allow native text selection and browser context menu to work properly
-// Other areas can still use context menu via the disableOnTouch prop
 
-interface ContextMenuProps extends ContextMenuPrimitive.ContextMenuProps {
-  // When true, disables context menu on touch devices (for NoteEditor)
-  disableOnTouch?: boolean
-}
-
-const ContextMenu = ({ children, disableOnTouch = false, ...props }: ContextMenuProps) => {
+const ContextMenu = ({ children, ...props }: ContextMenuPrimitive.ContextMenuProps) => {
   const isTouchDevice = useIsTouchDevice()
-  
-  // On touch devices with disableOnTouch, just render children without any context menu wrapper
-  if (disableOnTouch && isTouchDevice) {
+
+  // On touch devices, just render children without any context menu wrapper
+  // This completely disables the custom context menu behavior
+  if (isTouchDevice) {
     return <>{children}</>
   }
-  
+
   return (
     <ContextMenuPrimitive.Root {...props}>
       {children}
@@ -28,18 +23,15 @@ const ContextMenu = ({ children, disableOnTouch = false, ...props }: ContextMenu
   )
 }
 
-interface ContextMenuTriggerProps extends React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Trigger> {
-  disableOnTouch?: boolean
-}
-
 const ContextMenuTrigger = React.forwardRef<
   React.ComponentRef<typeof ContextMenuPrimitive.Trigger>,
-  ContextMenuTriggerProps
->(({ children, disableOnTouch = false, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Trigger>
+>(({ children, ...props }, ref) => {
   const isTouchDevice = useIsTouchDevice()
-  
-  // On touch devices with disableOnTouch, render children directly
-  if (disableOnTouch && isTouchDevice) {
+
+  // On touch devices, render children directly without context menu trigger
+  // This allows native text selection and browser context menu to work
+  if (isTouchDevice) {
     return <>{children}</>
   }
 
@@ -69,7 +61,7 @@ const ContextMenuSubTrigger = React.forwardRef<
   <ContextMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      'flex cursor-default select-none items-center rounded-md px-2 py-1.5 text-sm outline-none',
+      'flex cursor-default select-none items-center gap-3 rounded-md px-2 py-1.5 text-sm outline-none transition-colors',
       'focus:bg-neutral-100 dark:focus:bg-neutral-800',
       'data-[state=open]:bg-neutral-100 dark:data-[state=open]:bg-neutral-800',
       inset && 'pl-8',
@@ -83,40 +75,43 @@ const ContextMenuSubTrigger = React.forwardRef<
 ))
 ContextMenuSubTrigger.displayName = ContextMenuPrimitive.SubTrigger.displayName
 
+
 const ContextMenuSubContent = React.forwardRef<
   React.ComponentRef<typeof ContextMenuPrimitive.SubContent>,
   React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.SubContent>
 >(({ className, ...props }, ref) => (
   <ContextMenuPrimitive.SubContent
     ref={ref}
+    sideOffset={4}
+    alignOffset={-5}
     className={cn(
       'z-50 min-w-[8rem] overflow-hidden rounded-xl border p-1 shadow-lg',
       'border-neutral-200 bg-white text-neutral-900',
       'dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100',
-      'data-[state=open]:animate-in data-[state=closed]:animate-out',
-      'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-      'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-      'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2',
-      'data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+      '',
+      '',
+      '',
+      '',
+      '',
       className
     )}
+    // Enable collision detection for submenus
+    avoidCollisions={true}
+    // Add padding from viewport edges
+    collisionPadding={8}
     {...props}
   />
 ))
 ContextMenuSubContent.displayName = ContextMenuPrimitive.SubContent.displayName
 
-interface ContextMenuContentProps extends React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Content> {
-  disableOnTouch?: boolean
-}
-
 const ContextMenuContent = React.forwardRef<
   React.ComponentRef<typeof ContextMenuPrimitive.Content>,
-  ContextMenuContentProps
->(({ className, children, disableOnTouch = false, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Content>
+>(({ className, children, ...props }, ref) => {
   const isTouchDevice = useIsTouchDevice()
-  
-  // On touch devices with disableOnTouch, don't render context menu
-  if (disableOnTouch && isTouchDevice) {
+
+  // On touch devices, don't render context menu - let native behavior work
+  if (isTouchDevice) {
     return null
   }
 
@@ -128,11 +123,17 @@ const ContextMenuContent = React.forwardRef<
           'z-50 min-w-[8rem] overflow-hidden rounded-xl border p-1 shadow-lg',
           'border-neutral-200 bg-white text-neutral-900',
           'dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100',
-          'animate-in fade-in-0 zoom-in-95',
-          'data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2',
-          'data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+          '',
+          '',
+          '',
           className
         )}
+        // Enable collision detection to keep menu within viewport
+        avoidCollisions={true}
+        // Add padding from viewport edges to prevent menu from touching screen boundaries
+        collisionPadding={8}
+        // Hide menu if it becomes detached (e.g., when scrolling)
+        hideWhenDetached={false}
         {...props}
       >
         {children}
@@ -151,7 +152,7 @@ const ContextMenuItem = React.forwardRef<
   <ContextMenuPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none transition-colors',
+      'relative flex cursor-default select-none items-center gap-3 rounded-md px-2 py-1.5 text-sm outline-none transition-colors',
       'focus:bg-neutral-100 dark:focus:bg-neutral-800',
       'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       inset && 'pl-8',
@@ -161,6 +162,7 @@ const ContextMenuItem = React.forwardRef<
   />
 ))
 ContextMenuItem.displayName = ContextMenuPrimitive.Item.displayName
+
 
 const ContextMenuCheckboxItem = React.forwardRef<
   React.ComponentRef<typeof ContextMenuPrimitive.CheckboxItem>,
@@ -269,3 +271,4 @@ export {
   ContextMenuSubTrigger,
   ContextMenuRadioGroup,
 }
+

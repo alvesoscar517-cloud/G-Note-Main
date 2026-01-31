@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
-import { AnimatePresence } from 'framer-motion'
 import { useWindowVirtualizer } from '@tanstack/react-virtual'
 import { EmptyState } from './EmptyState'
 import { NotesListSkeleton } from '@/components/ui/Skeleton'
@@ -161,14 +160,12 @@ export function VirtualizedNotesList() {
               }}
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-1 px-1">
-                <AnimatePresence mode="popLayout">
-                  {row.map(item => {
-                    if (item.type === 'note') {
-                      return <NoteCard key={item.note.id} note={item.note} searchQuery={currentQuery} />
-                    }
-                    return null
-                  })}
-                </AnimatePresence>
+                {row.map(item => {
+                  if (item.type === 'note') {
+                    return <NoteCard key={item.note.id} note={item.note} searchQuery={currentQuery} />
+                  }
+                  return null
+                })}
               </div>
             </div>
           )

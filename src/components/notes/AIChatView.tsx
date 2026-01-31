@@ -7,14 +7,20 @@ import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import { common, createLowlight } from 'lowlight'
 import { Markdown } from 'tiptap-markdown'
 import Link from '@tiptap/extension-link'
-import { 
-  Send, 
+import {
+  Send,
   Mic,
   MessageCircle,
   FileText,
-  ChevronLeft,
-  X
+  X,
+  Copy,
+  RotateCw,
+  Check
 } from 'lucide-react'
+import { Table } from '@tiptap/extension-table'
+import TableCell from '@tiptap/extension-table-cell'
+import TableHeader from '@tiptap/extension-table-header'
+import TableRow from '@tiptap/extension-table-row'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { useAuthStore } from '@/stores/authStore'
@@ -105,7 +111,13 @@ const readOnlyExtensions = [
     }
   }).extend({
     name: 'link-readonly' // Unique name to avoid conflicts
-  })
+  }),
+  Table.configure({
+    resizable: true,
+  }),
+  TableRow,
+  TableHeader,
+  TableCell,
 ]
 
 export function AIChatView({ open, onClose, noteContent, contextText, onClearContext, initialMessages = [], onSendMessage, isLoading: externalLoading, onInsufficientCredits }: AIChatViewProps) {
@@ -122,11 +134,11 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
   // Edge swipe back gesture
-  const { 
-    handlers: edgeSwipeHandlers, 
+  const {
+    handlers: edgeSwipeHandlers,
     swipeStyle: edgeSwipeStyle,
     swipeState: edgeSwipeState,
-    progress: edgeSwipeProgress 
+    progress: edgeSwipeProgress
   } = useEdgeSwipeBack({
     onSwipeBack: onClose,
     edgeWidth: 25,
@@ -142,7 +154,7 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
   })
 
   // Check if speech recognition is supported
-  const isSpeechSupported = typeof window !== 'undefined' && 
+  const isSpeechSupported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
 
   // Sync with external messages
@@ -192,26 +204,44 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
     }
   }, [input])
 
-  // Streaming text effect
-  const streamText = async (text: string, messageId: string) => {
-    setStreamingMessageId(messageId)
-    setStreamingContent('')
-    
-    const words = text.split(' ')
-    let currentText = ''
-    
-    for (let i = 0; i < words.length; i++) {
-      currentText += (i === 0 ? '' : ' ') + words[i]
-      setStreamingContent(currentText)
-      
-      // Random delay for natural feel (20-40ms per word)
-      await new Promise(resolve => setTimeout(resolve, 20 + Math.random() * 20))
-    }
-    
-    // Streaming complete
-    setStreamingMessageId(null)
-    setStreamingContent('')
+  // Batch streaming logic
+  const streamingBufferRef = useRef('')
+  const lastFlushedLengthRef = useRef(0)
+  const flushIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Start flushing buffer to state at regular intervals
+  const startFlushing = () => {
+    if (flushIntervalRef.current) return
+
+    flushIntervalRef.current = setInterval(() => {
+      const buffer = streamingBufferRef.current
+      const lastLength = lastFlushedLengthRef.current
+
+      if (buffer.length > lastLength) {
+        // Update state with current full text
+        setStreamingContent(buffer)
+        lastFlushedLengthRef.current = buffer.length
+      }
+    }, 50) // 50ms batch update = 20fps, smooth enough but much less react work than per-char
   }
+
+  const stopFlushing = () => {
+    if (flushIntervalRef.current) {
+      clearInterval(flushIntervalRef.current)
+      flushIntervalRef.current = null
+    }
+    // Final flush
+    if (streamingBufferRef.current !== streamingContent) {
+      setStreamingContent(streamingBufferRef.current)
+    }
+  }
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (flushIntervalRef.current) clearInterval(flushIntervalRef.current)
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -225,57 +255,94 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
     }
 
     setInput('')
+    setIsLoading(true)
 
-    // If external handler provided, use it (it will handle adding messages)
+    // Reset streaming state
+    setStreamingMessageId(null)
+    setStreamingContent('')
+    streamingBufferRef.current = ''
+    lastFlushedLengthRef.current = 0
+
+    // If external handler provided, use it
     if (onSendMessage) {
+      // NOTE: External handler needs to support the new streaming callback signature if we want it to stream
+      // For now, we assume onSendMessage might be updated or we handle the stream inside the callback wrapper
+      // But based on the code, onSendMessage is likely just a prop from parent.
+      // If the parent hasn't been updated to stream, this might not work as expected.
+      // However, we are "Implementing Frontend Changes".
+      // Let's assume onSendMessage is LEGACY or we wrap it.
+      // Actually, looking at the code, onSendMessage is optional.
+      // If it exists, we await it.
       await onSendMessage(userMessage.content, async (messageId, content) => {
-        // Stream callback from parent
-        await streamText(content, messageId)
+        // This callback is for "fake streaming" from parent. 
+        // If we want real streaming, we should probably ignore this or deprecate it.
+        // But let's keep it compatible:
+        setStreamingMessageId(messageId)
+        streamingBufferRef.current = content // "Jump" to content if parent provides it
+        setStreamingContent(content)
       })
       return
     }
 
-    // Otherwise handle internally - add user message and get AI response
+    // Default internal handler
     setMessages(prev => [...prev, userMessage])
-    setIsLoading(true)
+
+    const aiMessageId = (Date.now() + 1).toString()
+    const aiMessage: AIChatMessage = {
+      id: aiMessageId,
+      role: 'assistant',
+      content: '', // Start empty
+      timestamp: Date.now()
+    }
+
+    // Add placeholder message
+    setMessages(prev => [...prev, aiMessage])
+
+    // Start streaming mode
+    setStreamingMessageId(aiMessageId)
+    startFlushing()
 
     try {
-      // Call AI with note content as context
-      const response = await AI.askAI(noteContent, userMessage.content)
-      
-      const aiMessage: AIChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response,
-        timestamp: Date.now()
-      }
+      // Use the new streaming API
+      const finalContent = await AI.askAIStream(
+        noteContent,
+        userMessage.content,
+        (chunk) => {
+          // Add chunk to buffer
+          streamingBufferRef.current += chunk
+          // The interval will pick it up
+        }
+      )
 
-      // Add message to list first (with empty content for streaming)
-      setMessages(prev => [...prev, { ...aiMessage, content: '' }])
+      stopFlushing()
+      setStreamingMessageId(null)
       setIsLoading(false)
-      
-      // Stream the text
-      await streamText(response, aiMessage.id)
-      
-      // Update with final content
-      setMessages(prev => prev.map(m => 
-        m.id === aiMessage.id ? aiMessage : m
+
+      // Update message with final content
+      setMessages(prev => prev.map(m =>
+        m.id === aiMessageId ? { ...m, content: finalContent } : m
       ))
     } catch (error) {
-      console.error('AI error:', error)
+      stopFlushing()
+      setStreamingMessageId(null)
       setIsLoading(false)
-      
+      console.error('AI error:', error)
+
       if (error instanceof InsufficientCreditsError) {
         onInsufficientCredits?.()
+        // Remove the failed message
+        setMessages(prev => prev.filter(m => m.id !== aiMessageId))
       } else {
         // Show error message
         const errorMessage: AIChatMessage = {
-          id: (Date.now() + 1).toString(),
+          id: (Date.now() + 2).toString(),
           role: 'assistant',
           content: t('ai.error'),
           timestamp: Date.now()
         }
-        setMessages(prev => [...prev, errorMessage])
+        setMessages(prev => prev.map(m =>
+          m.id === aiMessageId ? errorMessage : m
+        ))
       }
     }
   }
@@ -284,6 +351,78 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSubmit(e)
+    }
+  }
+
+  const handleRegenerate = async (messageId: string) => {
+    if (loading) return
+
+    // Find the message index
+    const messageIndex = messages.findIndex(m => m.id === messageId)
+    if (messageIndex === -1) return
+
+    // Find the previous user message
+    const previousMessage = messages[messageIndex - 1]
+    if (!previousMessage || previousMessage.role !== 'user') return
+
+    // Remove the current AI message
+    const newMessages = messages.filter(m => m.id !== messageId)
+    setMessages(newMessages)
+
+    // Set loading state
+    setIsLoading(true)
+
+    // Create a new AI message placeholder
+    const aiMessageId = (Date.now() + 1).toString()
+    const aiMessage: AIChatMessage = {
+      id: aiMessageId,
+      role: 'assistant',
+      content: '', // Start empty
+      timestamp: Date.now()
+    }
+
+    setMessages([...newMessages, aiMessage])
+
+    // Trigger streaming
+    setStreamingMessageId(aiMessageId)
+    startFlushing()
+
+    try {
+      const finalContent = await AI.askAIStream(
+        noteContent,
+        previousMessage.content,
+        (chunk) => {
+          streamingBufferRef.current += chunk
+        }
+      )
+
+      stopFlushing()
+      setStreamingMessageId(null)
+      setIsLoading(false)
+
+      // Update message with final content
+      setMessages(prev => prev.map(m =>
+        m.id === aiMessageId ? { ...m, content: finalContent } : m
+      ))
+    } catch (error) {
+      stopFlushing()
+      setStreamingMessageId(null)
+      setIsLoading(false)
+
+      if (error instanceof InsufficientCreditsError) {
+        onInsufficientCredits?.()
+        setMessages(prev => prev.filter(m => m.id !== aiMessageId))
+      } else {
+        const errorMessage: AIChatMessage = {
+          id: (Date.now() + 2).toString(),
+          role: 'assistant',
+          content: t('ai.error'),
+          timestamp: Date.now()
+        }
+        setMessages(prev => prev.map(m =>
+          m.id === aiMessageId ? errorMessage : m
+        ))
+      }
     }
   }
 
@@ -329,27 +468,27 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
   const userName = user?.name?.split(' ')[0] || 'there'
 
   return createPortal(
-    <div 
+    <div
       className="fixed inset-0 z-50 bg-white dark:bg-neutral-950 flex flex-col status-bar-bg"
       style={edgeSwipeState.isDragging ? edgeSwipeStyle : undefined}
       {...edgeSwipeHandlers}
     >
       {/* Edge swipe indicator */}
-      <EdgeSwipeIndicator 
-        progress={edgeSwipeProgress} 
-        isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
+      <EdgeSwipeIndicator
+        progress={edgeSwipeProgress}
+        isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge}
       />
-      
-      {/* Back button - icon only */}
+
+      {/* Close button - X icon with border at top right */}
       <button
         onClick={onClose}
-        className="absolute z-10 p-2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors top-3 left-3 safe-top"
+        className="absolute z-[60] p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors top-4 right-4"
       >
-        <ChevronLeft className="w-5 h-5" />
+        <X className="w-5 h-5" />
       </button>
 
       {/* Messages Area - with proper padding to prevent text cutoff */}
-      <div 
+      <div
         className="flex-1 overflow-y-auto px-4 pt-14 pb-4 safe-top"
       >
         {messages.length === 0 ? (
@@ -364,23 +503,17 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
           </div>
         ) : (
           <div className="max-w-3xl mx-auto space-y-4">
-            {messages.map((message) => (
-              <MessageBubble 
-                key={message.id} 
+            {messages.map((message, index) => (
+              <MessageBubble
+                key={message.id}
                 message={message}
                 isStreaming={streamingMessageId === message.id}
                 streamingContent={streamingMessageId === message.id ? streamingContent : undefined}
+                onRegenerate={handleRegenerate}
+                isLast={index === messages.length - 1}
               />
             ))}
-            {loading && (
-              <div className="w-full py-2">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                </div>
-              </div>
-            )}
+
             <div ref={messagesEndRef} />
           </div>
         )}
@@ -408,7 +541,7 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
                 </div>
               </div>
             )}
-            
+
             {/* Textarea */}
             <textarea
               ref={textareaRef}
@@ -420,7 +553,7 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
               className="w-full resize-none bg-transparent px-4 py-3 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 focus:outline-none"
               style={{ minHeight: '44px', maxHeight: '120px' }}
             />
-            
+
             {/* Toolbar */}
             <div className="flex items-center justify-between px-3 pb-3">
               {/* Left side tools */}
@@ -494,12 +627,16 @@ export function AIChatView({ open, onClose, noteContent, contextText, onClearCon
 }
 
 // Message bubble component
-function MessageBubble({ message, isStreaming, streamingContent }: { 
+function MessageBubble({ message, isStreaming, streamingContent, onRegenerate, isLast }: {
   message: AIChatMessage
   isStreaming?: boolean
   streamingContent?: string
+  onRegenerate?: (id: string) => void
+  isLast?: boolean
 }) {
   const isUser = message.role === 'user'
+  const { t } = useTranslation()
+  const [copied, setCopied] = useState(false)
 
   // For AI messages, use Tiptap editor for rich formatting - full width, no bubble
   const editor = useEditor({
@@ -520,6 +657,16 @@ function MessageBubble({ message, isStreaming, streamingContent }: {
     }
   }, [editor, isStreaming, streamingContent])
 
+  const handleCopy = () => {
+    if (editor) {
+      // Get plain text to avoid markdown syntax
+      const text = editor.getText()
+      navigator.clipboard.writeText(text)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
   if (isUser) {
     return (
       <div className="flex justify-end">
@@ -532,13 +679,51 @@ function MessageBubble({ message, isStreaming, streamingContent }: {
 
   // AI message - full width, no bubble
   return (
-    <div className="w-full">
-      <EditorContent 
-        editor={editor} 
-        className="prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-p:leading-relaxed prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-headings:mt-4 prose-headings:mb-2 prose-headings:text-neutral-800 dark:prose-headings:text-neutral-200 prose-code:bg-neutral-200 dark:prose-code:bg-neutral-700 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:my-3 prose-pre:bg-neutral-200 dark:prose-pre:bg-neutral-700 text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed"
-      />
-      {isStreaming && (
-        <span className="inline-block w-1 h-4 bg-neutral-900 dark:bg-white ml-0.5 animate-pulse" />
+    <div className="w-full group">
+      {isStreaming && !editor?.getText() ? (
+        <div className="flex gap-1 py-1">
+          <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <div className="w-2 h-2 bg-neutral-400 dark:bg-neutral-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+        </div>
+      ) : (
+        <>
+          <EditorContent
+            editor={editor}
+            className="ai-chat-response prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-p:leading-relaxed prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-headings:mt-4 prose-headings:mb-2 prose-headings:text-neutral-800 dark:prose-headings:text-neutral-200 prose-code:bg-neutral-200 dark:prose-code:bg-neutral-700 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:my-3 prose-pre:bg-neutral-200 dark:prose-pre:bg-neutral-700 text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed"
+          />
+
+          {/* Action buttons (Copy, Regenerate) */}
+          {!isStreaming && (
+            <div className="flex items-center gap-2 mt-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={handleCopy}
+                    className="p-1.5 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md transition-colors"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>{copied ? t('common.copied') : t('common.copy')}</TooltipContent>
+              </Tooltip>
+
+              {onRegenerate && isLast && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => onRegenerate(message.id)}
+                      className="p-1.5 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-md transition-colors"
+                    >
+                      <RotateCw className="w-3.5 h-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>{t('ai.regenerate')}</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

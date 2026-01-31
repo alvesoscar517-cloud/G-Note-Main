@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import Lottie from 'lottie-react'
-import { useThemeStore } from '@/stores/themeStore'
+import { useAppStore } from '@/stores/appStore'
 import { useEffect, useState } from 'react'
 
 interface EmptyStateProps {
@@ -10,7 +10,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ type, searchQuery }: EmptyStateProps) {
   const { t } = useTranslation()
-  const { theme } = useThemeStore()
+  const { theme } = useAppStore()
   const [animationData, setAnimationData] = useState<object | null>(null)
   
   // Determine filter color based on theme

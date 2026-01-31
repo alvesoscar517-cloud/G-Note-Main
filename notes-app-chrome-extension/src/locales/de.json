@@ -48,6 +48,7 @@
     "modalSizeDefault": "Standard",
     "modalSizeLarge": "Groß",
     "modalSizeXLarge": "Sehr groß",
+    "modalSizeFullscreen": "Vollbild",
     "displayMode": "Anzeigemodus",
     "displayModeDescription": "Wählen Sie, wie die Erweiterung geöffnet wird",
     "fullscreen": "Vollbild",
@@ -132,7 +133,48 @@
     "versionHistory": "Versionsverlauf",
     "fullscreen": "Vollbild",
     "exitFullscreen": "Vollbild beenden",
-    "more": "Mehr"
+    "more": "Mehr",
+    "insertTable": "Tabelle einfügen",
+    "tableProperties": "Tabelleneigenschaften",
+    "addColumnBefore": "Spalte davor einfügen",
+    "addColumnAfter": "Spalte danach einfügen",
+    "addRowBefore": "Zeile davor einfügen",
+    "addRowAfter": "Zeile danach einfügen",
+    "deleteColumn": "Spalte löschen",
+    "deleteRow": "Zeile löschen",
+    "deleteTable": "Tabelle löschen",
+    "mergeCells": "Zellen verbinden",
+    "splitCell": "Zelle teilen",
+    "toggleHeaderRow": "Kopfzeile umschalten",
+    "toggleHeaderColumn": "Kopfspalte umschalten",
+    "exportTableCSV": "Als CSV exportieren",
+    "exportTableMarkdown": "Als Markdown exportieren",
+    "tableRows": "Zeilen",
+    "tableColumns": "Spalten",
+    "includeHeaderRow": "Kopfzeile einschließen",
+    "tablePreview": "Vorschau",
+    "createTable": "Tabelle erstellen",
+    "tableDimensions": "Abmessungen",
+    "tableHeaders": "Kopfzeilen",
+    "tableWidth": "Breite",
+    "tableOptions": "Optionen",
+    "resizableColumns": "Größenänderbare Spalten",
+    "fixedLayout": "Festes Layout",
+    "headerRow": "Kopfzeile",
+    "headerColumn": "Kopfspalte",
+    "autoWidth": "Automatisch",
+    "fullWidth": "100%",
+    "customWidth": "Benutzerdefiniert",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -155,7 +197,16 @@
     "chatWithAI": "Chat mit AI",
     "chatWelcome": "Hallo",
     "chatDescription": "Fragen Sie mich alles über diese Notiz. Ich antworte basierend auf dem Kontext der Notiz.",
-    "send": "Senden"
+    "send": "Senden",
+    "tone": {
+      "label": "Tonfall ändern",
+      "professional": "Professionell",
+      "formalEmail": "Formelle E-Mail",
+      "socialMedia": "Soziale Medien",
+      "casual": "Locker",
+      "friendly": "Freundlich",
+      "confident": "Selbstbewusst"
+    }
   },
   "sharedNotes": {
     "title": "Mit Ihnen geteilt",
@@ -262,7 +313,8 @@
     "cancel": "Abbrechen",
     "language": "Sprache",
     "searchLanguage": "Sprache suchen...",
-    "noLanguageFound": "Keine Sprache gefunden"
+    "noLanguageFound": "Keine Sprache gefunden",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "Gerade eben",
@@ -424,5 +476,6 @@
     "genericErrorDescription": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "appError": "App abgestürzt",
     "appErrorDescription": "Ein Fehler ist aufgetreten und die App muss neu geladen werden. Wir entschuldigen uns für die Unannehmlichkeiten."
-  }
+  },
+  "webContent": {}
 }

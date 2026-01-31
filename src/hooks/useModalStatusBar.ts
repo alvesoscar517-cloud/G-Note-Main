@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { onModalOpen, onModalClose } from '@/stores/themeStore'
+import { onModalOpen, onModalClose } from '@/stores/appStore'
 
 /**
  * Hook to update status bar color when modal is open

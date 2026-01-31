@@ -48,6 +48,7 @@
     "modalSizeDefault": "ค่าเริ่มต้น",
     "modalSizeLarge": "ใหญ่",
     "modalSizeXLarge": "ใหญ่มาก",
+    "modalSizeFullscreen": "เต็มหน้าจอ",
     "displayMode": "โหมดแสดงผล",
     "displayModeDescription": "เลือกวิธีเปิดส่วนขยาย",
     "fullscreen": "เต็มหน้าจอ",
@@ -135,7 +136,48 @@
     "versionHistory": "ประวัติเวอร์ชัน",
     "fullscreen": "เต็มหน้าจอ",
     "exitFullscreen": "ออกจากเต็มหน้าจอ",
-    "more": "เพิ่มเติม"
+    "more": "เพิ่มเติม",
+    "insertTable": "แทรกตาราง",
+    "tableProperties": "คุณสมบัติตาราง",
+    "addColumnBefore": "เพิ่มคอลัมน์ก่อนหน้า",
+    "addColumnAfter": "เพิ่มคอลัมน์หลัง",
+    "addRowBefore": "เพิ่มแถวก่อนหน้า",
+    "addRowAfter": "เพิ่มแถวหลัง",
+    "deleteColumn": "ลบคอลัมน์",
+    "deleteRow": "ลบแถว",
+    "deleteTable": "ลบตาราง",
+    "mergeCells": "รวมเซลล์",
+    "splitCell": "แยกเซลล์",
+    "toggleHeaderRow": "สลับแถวหัวตาราง",
+    "toggleHeaderColumn": "สลับคอลัมน์หัวตาราง",
+    "exportTableCSV": "ส่งออกเป็น CSV",
+    "exportTableMarkdown": "ส่งออกเป็น Markdown",
+    "tableRows": "แถว",
+    "tableColumns": "คอลัมน์",
+    "includeHeaderRow": "รวมแถวหัวตาราง",
+    "tablePreview": "ดูตัวอย่าง",
+    "createTable": "สร้างตาราง",
+    "tableDimensions": "ขนาด",
+    "tableHeaders": "หัวตาราง",
+    "tableWidth": "ความกว้าง",
+    "tableOptions": "ตัวเลือก",
+    "resizableColumns": "คอลัมน์ปรับขนาดได้",
+    "fixedLayout": "เค้าโครงคงที่",
+    "headerRow": "แถวหัวตาราง",
+    "headerColumn": "คอลัมน์หัวตาราง",
+    "autoWidth": "อัตโนมัติ",
+    "fullWidth": "100%",
+    "customWidth": "กำหนดเอง",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -158,7 +200,16 @@
     "chatWithAI": "แชทกับ AI",
     "chatWelcome": "สวัสดี",
     "chatDescription": "ถามฉันอะไรก็ได้เกี่ยวกับโน้ตนี้ ฉันจะตอบตามบริบทของโน้ต",
-    "send": "ส่ง"
+    "send": "ส่ง",
+    "tone": {
+      "label": "เปลี่ยนน้ำเสียง",
+      "professional": "มืออาชีพ",
+      "formalEmail": "อีเมลทางการ",
+      "socialMedia": "โซเชียลมีเดีย",
+      "casual": "เป็นกันเอง",
+      "friendly": "เป็นมิตร",
+      "confident": "มั่นใจ"
+    }
   },
   "sharedNotes": {
     "title": "แชร์กับคุณ",
@@ -265,7 +316,8 @@
     "cancel": "ยกเลิก",
     "language": "ภาษา",
     "searchLanguage": "ค้นหาภาษา...",
-    "noLanguageFound": "ไม่พบภาษา"
+    "noLanguageFound": "ไม่พบภาษา",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "เมื่อกี้",
@@ -346,7 +398,9 @@
     "permissionRequired": "เปิดใช้งานการป้อนเสียง",
     "permissionMessage": "อนุญาตการเข้าถึงไมโครโฟนเพื่อใช้เสียงเป็นข้อความ",
     "enableVoice": "เปิดใช้งานการป้อนเสียง",
-    "enable": "เปิดใช้"
+    "enable": "เปิดใช้",
+    "notSupportedTip": "Tip: Make sure you're using the latest version of your browser.",
+    "gotIt": "Got it"
   },
   "trash": {
     "title": "ถังขยะ",
@@ -426,5 +480,6 @@
     "genericErrorDescription": "เกิดข้อผิดพลาดที่ไม่คาดคิด กรุณาลองอีกครั้ง",
     "appError": "แอปขัดข้อง",
     "appErrorDescription": "เกิดข้อผิดพลาดและแอปต้องโหลดใหม่ ขออภัยในความไม่สะดวก"
-  }
+  },
+  "webContent": {}
 }

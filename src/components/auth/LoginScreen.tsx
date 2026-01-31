@@ -4,14 +4,14 @@ import { Link } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import { VantaWaves } from '@/components/ui/VantaWaves'
 import { hasAuthBackend, getGoogleAuthUrl } from '@/lib/tokenRefresh'
-import { useNetworkStore } from '@/stores/networkStore'
+import { useAppStore } from '@/stores/appStore'
 import { WifiOff } from 'lucide-react'
 import { DownloadAppPill } from '@/components/layout/DownloadAppPill'
 
 export function LoginScreen() {
   const { t } = useTranslation()
   const { setUser, setLoading, setLoginTransition } = useAuthStore()
-  const { isOnline } = useNetworkStore()
+  const { isOnline } = useAppStore()
 
   // Implicit flow (fallback when no backend)
   const implicitLogin = useGoogleLogin({

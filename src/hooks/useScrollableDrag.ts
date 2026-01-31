@@ -37,7 +37,7 @@ export function useScrollableDrag<T extends HTMLElement>() {
       isDraggingRef.current = true
       startXRef.current = e.pageX - element.offsetLeft
       scrollLeftRef.current = element.scrollLeft
-      element.style.cursor = 'grabbing'
+      element.style.cursor = 'move'
       element.style.userSelect = 'none'
     }
 
@@ -55,7 +55,7 @@ export function useScrollableDrag<T extends HTMLElement>() {
     const handleMouseUp = () => {
       if (isDraggingRef.current) {
         isDraggingRef.current = false
-        element.style.cursor = 'grab'
+        element.style.cursor = 'pointer'
         element.style.userSelect = ''
       }
     }
@@ -64,13 +64,13 @@ export function useScrollableDrag<T extends HTMLElement>() {
     const handleMouseLeave = () => {
       if (isDraggingRef.current) {
         isDraggingRef.current = false
-        element.style.cursor = 'grab'
+        element.style.cursor = 'pointer'
         element.style.userSelect = ''
       }
     }
 
     // Set initial cursor
-    element.style.cursor = 'grab'
+    element.style.cursor = 'pointer'
 
     // Add event listeners
     element.addEventListener('wheel', handleWheel, { passive: false })

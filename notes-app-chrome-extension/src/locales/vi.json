@@ -48,6 +48,7 @@
     "modalSizeDefault": "Mặc định",
     "modalSizeLarge": "Lớn",
     "modalSizeXLarge": "Rất lớn",
+    "modalSizeFullscreen": "Toàn màn hình",
     "displayMode": "Chế độ hiển thị",
     "displayModeDescription": "Chọn cách mở tiện ích",
     "fullscreen": "Toàn màn hình",
@@ -132,7 +133,48 @@
     "versionHistory": "Lịch sử phiên bản",
     "fullscreen": "Phóng to",
     "exitFullscreen": "Thu nhỏ",
-    "more": "Thêm"
+    "more": "Thêm",
+    "insertTable": "Chèn bảng",
+    "tableProperties": "Thuộc tính bảng",
+    "addColumnBefore": "Thêm cột trước",
+    "addColumnAfter": "Thêm cột sau",
+    "addRowBefore": "Thêm hàng trước",
+    "addRowAfter": "Thêm hàng sau",
+    "deleteColumn": "Xóa cột",
+    "deleteRow": "Xóa hàng",
+    "deleteTable": "Xóa bảng",
+    "mergeCells": "Gộp ô",
+    "splitCell": "Tách ô",
+    "toggleHeaderRow": "Bật/tắt hàng tiêu đề",
+    "toggleHeaderColumn": "Bật/tắt cột tiêu đề",
+    "exportTableCSV": "Xuất dạng CSV",
+    "exportTableMarkdown": "Xuất dạng Markdown",
+    "tableRows": "Hàng",
+    "tableColumns": "Cột",
+    "includeHeaderRow": "Bao gồm hàng tiêu đề",
+    "tablePreview": "Xem trước",
+    "createTable": "Tạo bảng",
+    "tableDimensions": "Kích thước",
+    "tableHeaders": "Tiêu đề",
+    "tableWidth": "Độ rộng",
+    "tableOptions": "Tùy chọn",
+    "resizableColumns": "Cột có thể thay đổi kích thước",
+    "fixedLayout": "Bố cục cố định",
+    "headerRow": "Hàng tiêu đề",
+    "headerColumn": "Cột tiêu đề",
+    "autoWidth": "Tự động",
+    "fullWidth": "100%",
+    "customWidth": "Tùy chỉnh",
+    "tableOperations": "Bảng",
+    "columnOperations": "Cột",
+    "rowOperations": "Hàng",
+    "cellOperations": "Ô",
+    "column": "Cột",
+    "row": "Hàng",
+    "table": "Bảng",
+    "deleteTableConfirmTitle": "Xóa bảng?",
+    "deleteTableConfirmDescription": "Bạn có chắc chắn muốn xóa bảng này không? Hành động này không thể hoàn tác.",
+    "stylePreviewOnly": "Chỉ xem trước kiểu dáng"
   },
   "ai": {
     "title": "AI",
@@ -155,7 +197,29 @@
     "chatWithAI": "Chat với AI",
     "chatWelcome": "Xin chào",
     "chatDescription": "Hỏi tôi bất cứ điều gì về nội dung ghi chú này. Tôi sẽ trả lời dựa trên ngữ cảnh của ghi chú.",
-    "send": "Gửi"
+    "send": "Gửi",
+    "tone": {
+      "label": "Đổi ngữ điệu",
+      "professional": "Chuyên nghiệp",
+      "formalEmail": "Email trang trọng",
+      "socialMedia": "Mạng xã hội",
+      "casual": "Thân mật",
+      "friendly": "Thân thiện",
+      "confident": "Tự tin"
+    },
+    "analysis": {
+      "menu_label": "Phân tích hình ảnh",
+      "title": "Phân tích hình ảnh",
+      "description": "Tải lên hình ảnh để trích xuất văn bản, phân tích dữ liệu hoặc tạo mô tả.",
+      "upload_instruction": "Nhấp hoặc kéo hình ảnh để tải lên",
+      "select_type": "Chọn loại phân tích",
+      "type": {
+        "general": "Chung",
+        "whiteboard": "Bảng trắng",
+        "receipt": "Hóa đơn"
+      },
+      "submit": "Phân tích"
+    }
   },
   "sharedNotes": {
     "title": "Được chia sẻ với bạn",
@@ -262,7 +326,8 @@
     "cancel": "Hủy",
     "language": "Ngôn ngữ",
     "searchLanguage": "Tìm ngôn ngữ...",
-    "noLanguageFound": "Không tìm thấy ngôn ngữ"
+    "noLanguageFound": "Không tìm thấy ngôn ngữ",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "Vừa xong",
@@ -424,5 +489,6 @@
     "genericErrorDescription": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
     "appError": "Ứng dụng gặp sự cố",
     "appErrorDescription": "Đã xảy ra lỗi và ứng dụng cần tải lại. Chúng tôi xin lỗi vì sự bất tiện này."
-  }
+  },
+  "webContent": {}
 }

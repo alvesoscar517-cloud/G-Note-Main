@@ -7,12 +7,6 @@
   --radius-sm: 8px;
   --radius-lg: 16px;
   color-scheme: light;
-  
-  /* Safe area insets for notch/dynamic island devices */
-  --safe-area-top: env(safe-area-inset-top, 0px);
-  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-area-left: env(safe-area-inset-left, 0px);
-  --safe-area-right: env(safe-area-inset-right, 0px);
 }
 
 html {
@@ -30,6 +24,10 @@ body {
   background-color: #fafafa;
   margin: 0;
   padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.15s ease-out;
   /* Disable pull-to-refresh on mobile */
   overscroll-behavior-y: contain;
@@ -47,6 +45,10 @@ html.dark body {
   transition: background-color 0.15s ease-out;
 }
 
+.min-h-dvh {
+  min-height: 100dvh;
+}
+
 .dark {
   color-scheme: dark;
 }
@@ -55,8 +57,7 @@ html.dark body {
   box-sizing: border-box;
 }
 
-/* Text Selection Colors - Monochrome/Gray Theme */
-/* Light mode: Subtle gray with good contrast */
+/* Text Selection Colors */
 ::selection {
   background-color: #E2E2E2;
   color: #171717;
@@ -67,7 +68,6 @@ html.dark body {
   color: #171717;
 }
 
-/* Dark mode: Darker gray, maintains readability */
 .dark ::selection {
   background-color: #3F3F3F;
   color: #F5F5F5;
@@ -86,66 +86,69 @@ html.dark body {
       /* Respect user's device orientation lock setting */
     }
   }
-  
+
   /* Only allow landscape when device orientation is unlocked */
   /* This is handled by the browser respecting screen.orientation.lock */
 }
 
-/* Safe area padding utilities - CONSISTENT across all modes */
-/* Portrait mode: use safe area values with minimum padding for visual spacing */
+/* Safe area padding utilities - respects device notches and status bars */
 .safe-top {
-  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+  padding-top: max(0.75rem, env(safe-area-inset-top));
 }
 
 .safe-bottom {
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 .safe-left {
-  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+  padding-left: max(0.75rem, env(safe-area-inset-left));
 }
 
 .safe-right {
-  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
 }
 
 .safe-x {
-  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
-  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+  padding-left: max(0.75rem, env(safe-area-inset-left));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
 }
 
 .safe-y {
-  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 .safe-all {
-  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
-  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
-  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+  padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
 }
 
-/* Landscape mode: ignore safe-area, use fixed padding for both sides */
-/* This ensures symmetric layout regardless of notch position */
+/* Landscape mode: use symmetric padding for both sides to avoid uneven layout */
+/* When device is in landscape, notch/status bar is on one side only */
+/* We use fixed padding to ensure consistent appearance */
 @media (orientation: landscape) {
   .safe-left {
     padding-left: 0.75rem !important;
   }
-  
+
   .safe-right {
     padding-right: 0.75rem !important;
   }
-  
+
   .safe-x {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
   }
-  
+
   .safe-all {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
   }
+}
+
+/* Status bar background - extends content under status bar with matching background */
+.status-bar-bg {
+  padding-top: env(safe-area-inset-top);
+  background-color: inherit;
 }
 
 /* Disable text selection globally except for specific elements */
@@ -183,7 +186,6 @@ code * {
 *:focus-visible {
   outline: none !important;
   box-shadow: none !important;
-  ring: none !important;
 }
 
 input:focus,
@@ -195,12 +197,6 @@ select:focus,
   box-shadow: none !important;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
 
 /* Tiptap Editor Styles */
 .tiptap {
@@ -234,7 +230,8 @@ body {
   margin: 0.5em 0;
 }
 
-.tiptap ul, .tiptap ol {
+.tiptap ul,
+.tiptap ol {
   padding-left: 1.5rem;
   margin: 0.5em 0;
 }
@@ -278,7 +275,7 @@ body {
   margin: 0.25rem 0;
 }
 
-.tiptap ul[data-type="taskList"] li > label {
+.tiptap ul[data-type="taskList"] li>label {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -287,7 +284,7 @@ body {
   user-select: none;
 }
 
-.tiptap ul[data-type="taskList"] li > label input[type="checkbox"] {
+.tiptap ul[data-type="taskList"] li>label input[type="checkbox"] {
   width: 1.1rem;
   height: 1.1rem;
   border: 2px solid #d1d5db;
@@ -296,16 +293,16 @@ body {
   accent-color: #171717;
 }
 
-.tiptap ul[data-type="taskList"] li > div {
+.tiptap ul[data-type="taskList"] li>div {
   flex: 1;
   min-width: 0;
 }
 
-.tiptap ul[data-type="taskList"] li > div p {
+.tiptap ul[data-type="taskList"] li>div p {
   margin: 0;
 }
 
-.tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
+.tiptap ul[data-type="taskList"] li[data-checked="true"]>div {
   text-decoration: line-through;
   color: #9ca3af;
 }
@@ -327,7 +324,7 @@ body {
   background: #1a1a1a;
 }
 
-/* Syntax highlighting - Gemini style */
+/* Syntax highlighting */
 .tiptap pre code.hljs,
 .tiptap pre code {
   background: transparent !important;
@@ -339,14 +336,12 @@ body {
   background: transparent !important;
 }
 
-/* Comments - gray */
 .tiptap .hljs-comment,
 .tiptap .hljs-quote {
   color: #6b7280;
   font-style: italic;
 }
 
-/* Keywords - purple/magenta */
 .tiptap .hljs-keyword,
 .tiptap .hljs-selector-tag,
 .tiptap .hljs-built_in,
@@ -355,7 +350,6 @@ body {
   color: #c792ea;
 }
 
-/* Strings - orange */
 .tiptap .hljs-string,
 .tiptap .hljs-attr,
 .tiptap .hljs-selector-id,
@@ -366,14 +360,12 @@ body {
   color: #f9a875;
 }
 
-/* Functions - yellow */
 .tiptap .hljs-title,
 .tiptap .hljs-section,
 .tiptap .hljs-title.function_ {
   color: #ffcb6b;
 }
 
-/* Numbers - green */
 .tiptap .hljs-number,
 .tiptap .hljs-literal,
 .tiptap .hljs-variable,
@@ -382,14 +374,12 @@ body {
   color: #c3e88d;
 }
 
-/* Types - cyan */
 .tiptap .hljs-type,
 .tiptap .hljs-class .hljs-title,
 .tiptap .hljs-attribute {
   color: #89ddff;
 }
 
-/* Operators, punctuation */
 .tiptap .hljs-symbol,
 .tiptap .hljs-bullet,
 .tiptap .hljs-subst,
@@ -398,7 +388,7 @@ body {
   color: #89ddff;
 }
 
-/* Inline code - Gemini style: neutral, subtle */
+/* Inline code */
 .tiptap code {
   background: #e5e7eb;
   color: #374151;
@@ -460,6 +450,190 @@ body {
   opacity: 0.95;
 }
 
+/* Table wrapper for mobile scrolling */
+.tiptap-table-wrapper {
+  width: 100%;
+  margin: 1rem 0;
+  position: relative;
+}
+
+/* Scroll indicators (shadows) for mobile */
+@media (max-width: 768px) {
+
+  .tiptap-table-wrapper::before,
+  .tiptap-table-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 1;
+  }
+
+  /* Left shadow */
+  .tiptap-table-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.1), transparent);
+  }
+
+  /* Right shadow */
+  .tiptap-table-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.1), transparent);
+  }
+
+  /* Show shadows when scrollable */
+  .tiptap-table-wrapper.scroll-left::before {
+    opacity: 1;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.15), transparent);
+  }
+
+  .tiptap-table-wrapper.scroll-right::after {
+    opacity: 1;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.15), transparent);
+  }
+
+  /* Dark mode shadows */
+  .dark .tiptap-table-wrapper.scroll-left::before {
+    opacity: 1;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.4), transparent);
+  }
+
+  .dark .tiptap-table-wrapper.scroll-right::after {
+    opacity: 1;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.4), transparent);
+  }
+}
+
+/* Tables */
+.tiptap table {
+  border-collapse: collapse;
+  table-layout: auto;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Mobile: Enable horizontal scrolling */
+@media (max-width: 768px) {
+  .tiptap-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    /* Add negative margin to allow table to extend to edges */
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    /* Ensure horizontal scrollbar is visible if the browser wants to show it */
+    scrollbar-width: auto;
+  }
+
+  .tiptap-table-wrapper::-webkit-scrollbar:horizontal {
+    display: block !important;
+    height: 4px !important;
+  }
+
+  .tiptap-table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+  }
+
+  .dark .tiptap-table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Reduce font size and padding on mobile for better fit */
+  .tiptap table {
+    font-size: 0.8125rem;
+    min-width: 400px;
+    /* Prevent table from being crushed too much */
+    table-layout: auto !important;
+    /* Allow columns to fit content */
+  }
+
+  .tiptap table td,
+  .tiptap table th {
+    padding: 6px 8px !important;
+  }
+}
+
+.tiptap table td,
+.tiptap table th {
+  min-width: 1em;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+  transition: background-color 0.15s ease;
+}
+
+/* Hover effect for better UX */
+.tiptap table td:hover,
+.tiptap table th:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.dark .tiptap table td,
+.dark .tiptap table th {
+  border-color: #4b5563;
+}
+
+.dark .tiptap table td:hover,
+.dark .tiptap table th:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.tiptap table th {
+  font-weight: 600;
+  text-align: left;
+  background-color: #f3f4f6;
+}
+
+.dark .tiptap table th {
+  background-color: #374151;
+}
+
+.tiptap table .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(59, 130, 246, 0.1);
+  pointer-events: none;
+}
+
+.tiptap table .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background-color: #3b82f6;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.tiptap .resize-cursor,
+.ProseMirror.resize-cursor {
+  cursor: col-resize !important;
+}
+
+.tiptap table td,
+.tiptap table th {
+  position: relative;
+}
+
+.tiptap table p {
+  margin: 0;
+}
+
 .tiptap img.ProseMirror-selectednode {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
@@ -477,14 +651,13 @@ body {
 }
 
 .collaboration-cursor__label {
-  border-radius: 3px 3px 3px 0;
+  border-radius: 6px;
   color: #fff;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 500;
   left: -1px;
-  line-height: normal;
-  padding: 0.1rem 0.3rem;
+  line-height: 1;
+  padding: 2px 6px;
   position: absolute;
   top: -1.4em;
   user-select: none;
@@ -518,191 +691,83 @@ body {
   white-space: nowrap;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 
-@keyframes zoomIn95 {
-  from { 
-    opacity: 0;
-    transform: scale(0.95) translateZ(0);
-  }
-  to { 
-    opacity: 1;
-    transform: scale(1) translateZ(0);
-  }
-}
+/* Animations - Keep only loading and swipe animations */
 
-@keyframes slideInFromBottom {
-  from {
-    opacity: 0;
-    transform: translateY(8px) translateZ(0);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) translateZ(0);
-  }
-}
-
-@keyframes slideInFromTop {
-  from {
-    opacity: 0;
-    transform: translateY(-4px) translateZ(0);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) translateZ(0);
-  }
-}
-
-@keyframes slideInFromLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-4px) translateZ(0);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0) translateZ(0);
-  }
-}
-
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(4px) translateZ(0);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0) translateZ(0);
-  }
-}
-
+/* Shimmer animations for loading states */
 @keyframes shimmer {
-  0% { transform: translateX(-100%) translateZ(0); }
-  100% { transform: translateX(100%) translateZ(0); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
-/* Facebook-style shimmer for skeleton loading */
 @keyframes shimmerLine {
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
 }
 
 .shimmer-line {
-  background: linear-gradient(
-    90deg,
-    #e5e7eb 0%,
-    #f3f4f6 50%,
-    #e5e7eb 100%
-  );
+  background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
   background-size: 200% 100%;
   animation: shimmerLine 1.5s ease-in-out infinite;
 }
 
 .dark .shimmer-line {
-  background: linear-gradient(
-    90deg,
-    #374151 0%,
-    #4b5563 50%,
-    #374151 100%
-  );
+  background: linear-gradient(90deg, #374151 0%, #4b5563 50%, #374151 100%);
   background-size: 200% 100%;
-}
-
-.animate-in {
-  animation-fill-mode: both;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-}
-
-.fade-in {
-  animation-name: fadeIn;
-}
-
-.zoom-in-95 {
-  animation-name: zoomIn95;
-}
-
-.slide-in-from-bottom-2,
-[data-side="bottom"].slide-in-from-top-2 {
-  animation-name: slideInFromTop;
-}
-
-[data-side="top"].slide-in-from-bottom-2 {
-  animation-name: slideInFromBottom;
-}
-
-[data-side="left"].slide-in-from-right-2 {
-  animation-name: slideInFromRight;
-}
-
-[data-side="right"].slide-in-from-left-2 {
-  animation-name: slideInFromLeft;
-}
-
-.duration-200 {
-  animation-duration: 200ms;
-  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-/* Tooltip animations */
-.fade-in-0 {
-  animation: fadeIn 150ms cubic-bezier(0.32, 0.72, 0, 1);
-  will-change: opacity;
-}
-
-.zoom-in-95 {
-  animation: zoomIn95 150ms cubic-bezier(0.32, 0.72, 0, 1);
-  will-change: transform, opacity;
-}
-
-[data-state="closed"].fade-out-0 {
-  animation: fadeIn 100ms cubic-bezier(0.32, 0.72, 0, 1) reverse;
-}
-
-[data-state="closed"].zoom-out-95 {
-  animation: zoomIn95 100ms cubic-bezier(0.32, 0.72, 0, 1) reverse;
 }
 
 .animate-shimmer {
   animation: shimmer 1.5s infinite;
 }
 
-/* Collaboration Cursors */
-.collaboration-cursor__caret {
-  border-left: 1px solid;
-  border-right: 1px solid;
-  margin-left: -1px;
-  margin-right: -1px;
-  pointer-events: none;
-  position: relative;
-  word-break: normal;
+/* Swipe indicator animation */
+@keyframes pulseSwipe {
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
-.collaboration-cursor__label {
-  border-radius: 6px;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 500;
-  left: -1px;
-  line-height: 1;
-  padding: 2px 6px;
-  position: absolute;
-  top: -1.4em;
-  user-select: none;
-  white-space: nowrap;
+.swipe-indicator {
+  animation: pulseSwipe 2s ease-in-out infinite;
 }
 
-/* Custom Scrollbar - Only show on desktop (large screens with hover devices) */
+/* Loading dots animation */
+@keyframes loadingDot {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-loading-dot {
+  animation: loadingDot 1.4s infinite ease-in-out both;
+}
+
+/* Scrollbar - Only show on desktop */
 @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
   ::-webkit-scrollbar {
     width: 6px;
@@ -731,8 +796,10 @@ body {
   }
 }
 
-/* Hide scrollbar on mobile/tablet (small screens or touch devices) */
-@media (max-width: 1023px), (hover: none), (pointer: coarse) {
+/* Hide scrollbar on mobile/tablet */
+@media (max-width: 1023px),
+(hover: none),
+(pointer: coarse) {
   * {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -743,7 +810,6 @@ body {
   }
 }
 
-/* Hide scrollbar */
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -754,7 +820,8 @@ body {
 }
 
 /* Hide horizontal scrollbar globally */
-html, body {
+html,
+body {
   overflow-x: hidden;
 }
 
@@ -769,22 +836,7 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Touch optimization - ONLY for true mobile/tablet devices (not touch laptops) */
-/* pointer: coarse = finger/stylus, hover: none = no mouse hover capability */
-@media (hover: none) and (pointer: coarse) {
-  /* Disable hover effects on true touch devices */
-  .hover\:bg-neutral-100:hover,
-  .hover\:bg-neutral-200:hover {
-    background-color: inherit;
-  }
-  
-  .dark .dark\:hover\:bg-neutral-700:hover,
-  .dark .dark\:hover\:bg-neutral-800:hover {
-    background-color: inherit;
-  }
-}
-
-/* Prevent text selection on interactive elements */
+/* Touch optimization */
 .touch-manipulation {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -797,153 +849,55 @@ html, body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Landscape mode utilities for mobile */
-@media (orientation: landscape) and (max-height: 500px) {
-  .landscape\:flex {
-    display: flex !important;
-  }
-  .landscape\:items-center {
-    align-items: center !important;
-  }
-  .landscape\:gap-3 {
-    gap: 0.75rem !important;
-  }
-  .landscape\:text-left {
-    text-align: left !important;
-  }
-  .landscape\:pt-3 {
-    padding-top: 0.75rem !important;
-  }
-  .landscape\:pb-2 {
-    padding-bottom: 0.5rem !important;
-  }
-  .landscape\:mx-0 {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-  .landscape\:mt-0 {
-    margin-top: 0 !important;
-  }
-  .landscape\:w-10 {
-    width: 2.5rem !important;
-  }
-  .landscape\:h-10 {
-    height: 2.5rem !important;
-  }
-  .landscape\:flex-1 {
-    flex: 1 1 0% !important;
-  }
-  .landscape\:min-w-0 {
-    min-width: 0 !important;
-  }
-  .landscape\:py-1 {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-  }
-  .landscape\:max-h-screen {
-    max-height: 100vh !important;
-  }
-}
-
-
-/* Prevent browser back/forward gesture on modal content */
-.overscroll-none {
-  overscroll-behavior: none;
-}
-
 /* Swipe indicator animation */
 @keyframes pulseSwipe {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 .swipe-indicator {
   animation: pulseSwipe 2s ease-in-out infinite;
 }
 
-/* Disable pull-to-refresh on mobile when modal is open */
-body.modal-open {
-  overscroll-behavior-y: contain;
-}
+/* Loading dots animation */
+@keyframes loadingDot {
 
-/* Block pull-to-refresh globally on touch devices (mobile/tablet) */
-/* This prevents the browser's native pull-to-refresh gesture */
-@media (hover: none) and (pointer: coarse) {
-  html, body {
-    overscroll-behavior-y: contain;
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
-/* Also block for standalone PWA mode */
-@media screen and (display-mode: standalone) {
-  html, body {
-    overscroll-behavior-y: contain;
-  }
-}
-
-/* GPU acceleration for modals and animated elements */
-.modal-content,
-.animate-in,
-[class*="zoom-in"],
-[class*="fade-in"],
-[class*="slide-in"] {
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  perspective: 1000px;
-  -webkit-perspective: 1000px;
-}
-
-/* Optimized transitions for interactive elements */
-.transition-colors {
-  transition-property: background-color, border-color, color;
-  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
-  transition-duration: 150ms;
-}
-
-.transition-transform {
-  transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
-  will-change: transform;
-}
-
-/* Safe area support for curved edge devices (iPhone, modern Android) */
-@supports (padding: max(0px)) {
-  .modal-safe-area {
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-    border-radius: max(16px, calc(env(safe-area-inset-left) + 8px));
-  }
-  
-  /* Ensure content doesn't get cut off on curved corners */
-  .rounded-2xl {
-    border-radius: max(16px, calc(env(safe-area-inset-left) / 2 + 12px));
-  }
-  
-  /* Modal container adjustments for curved screens */
-  .fixed.inset-0 {
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
-}
-
-/* Curved screen corner protection */
-@media screen and (display-mode: standalone) {
-  .modal-content,
-  .rounded-2xl {
-    /* Extra padding for PWA mode on curved devices */
-    margin: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
-  }
+.animate-loading-dot {
+  animation: loadingDot 1.4s infinite ease-in-out both;
 }
 
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
-  .animate-in,
-  .fade-in,
-  .zoom-in-95,
-  [class*="slide-in"] {
+
+  .animate-loading-dot,
+  .swipe-indicator {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Simple modal styling */
+.modal-safe-area {
+  padding: 1rem;
+  border-radius: 16px;
 }

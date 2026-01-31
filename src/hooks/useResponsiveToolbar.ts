@@ -51,6 +51,10 @@ export interface ToolbarVisibility {
   orderedList: boolean
   taskList: boolean
   alignLeft: boolean
+  table: boolean
+  addColumnBefore: boolean
+  addRowBefore: boolean
+  deleteTable: boolean
   
   // Priority 4 - lg+
   alignCenter: boolean
@@ -60,6 +64,9 @@ export interface ToolbarVisibility {
   codeBlock: boolean
   blockquote: boolean
   link: boolean
+  deleteColumn: boolean
+  deleteRow: boolean
+  tableProperties: boolean
   
   // Priority 5 - xl+
   subscript: boolean
@@ -117,6 +124,10 @@ function getVisibilityForWidth(width: number): ToolbarVisibility {
     orderedList: p3,
     taskList: p3,
     alignLeft: p3,
+    table: p3,
+    addColumnBefore: p3,
+    addRowBefore: p3,
+    deleteTable: p3,
     
     // Priority 4 - lg+
     alignCenter: p4,
@@ -126,6 +137,9 @@ function getVisibilityForWidth(width: number): ToolbarVisibility {
     codeBlock: p4,
     blockquote: p4,
     link: p4,
+    deleteColumn: p4,
+    deleteRow: p4,
+    tableProperties: p4,
     
     // Priority 5 - xl+
     subscript: p5,

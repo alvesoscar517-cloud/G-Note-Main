@@ -75,7 +75,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
   const svgRef = useRef<SVGSVGElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const toolbarRef = useRef<HTMLDivElement>(null)
-  
+
   const [currentColor, setCurrentColor] = useState('#000000')
   const [currentSize, setCurrentSize] = useState(6)
   const [isEraser, setIsEraser] = useState(false)
@@ -84,23 +84,23 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
   const [undoStack, setUndoStack] = useState<Stroke[][]>([])
   const [redoStack, setRedoStack] = useState<Stroke[][]>([])
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 })
-  
+
   // Responsive toolbar visibility
   const toolbarVisibility = useResponsiveDrawingToolbar(toolbarRef)
-  
+
   // Edge swipe back gesture
-  const { 
-    handlers: edgeSwipeHandlers, 
+  const {
+    handlers: edgeSwipeHandlers,
     swipeStyle: edgeSwipeStyle,
     swipeState: edgeSwipeState,
-    progress: edgeSwipeProgress 
+    progress: edgeSwipeProgress
   } = useEdgeSwipeBack({
     onSwipeBack: onClose,
     edgeWidth: 25,
     threshold: 100,
     enabled: open
   })
-  
+
   // History back support
   useHistoryBack({
     isOpen: open,
@@ -111,7 +111,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
   // Setup canvas size
   useEffect(() => {
     if (!open) return
-    
+
     const container = containerRef.current
     if (!container) return
 
@@ -141,7 +141,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
   const getPoint = useCallback((e: React.PointerEvent): Point => {
     const svg = svgRef.current
     if (!svg) return { x: 0, y: 0 }
-    
+
     const rect = svg.getBoundingClientRect()
     return {
       x: e.clientX - rect.left,
@@ -166,11 +166,11 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
     e.currentTarget.releasePointerCapture(e.pointerId)
-    
+
     if (currentStroke.length > 1) {
       setUndoStack(prev => [...prev, strokes])
       setRedoStack([])
-      
+
       const newStroke: Stroke = {
         points: currentStroke,
         color: isEraser ? '#ffffff' : currentColor,
@@ -219,7 +219,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
     const dpr = window.devicePixelRatio || 1
     canvas.width = canvasSize.width * dpr
     canvas.height = canvasSize.height * dpr
-    
+
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
@@ -233,7 +233,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
         stroke.points.map(p => [p.x, p.y, p.pressure || 0.5]),
         getStrokeOptions(stroke.size, stroke.isEraser)
       )
-      
+
       const pathData = getSvgPathFromStroke(outlinePoints)
       const path = new Path2D(pathData)
       ctx.fillStyle = stroke.color
@@ -279,7 +279,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
       stroke.points.map(p => [p.x, p.y, p.pressure || 0.5]),
       getStrokeOptions(stroke.size, stroke.isEraser)
     )
-    
+
     return (
       <path
         key={index}
@@ -292,12 +292,12 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
   // Render current stroke being drawn
   const renderCurrentStroke = () => {
     if (currentStroke.length < 2) return null
-    
+
     const outlinePoints = getStroke(
       currentStroke.map(p => [p.x, p.y, p.pressure || 0.5]),
       getStrokeOptions(currentSize, isEraser)
     )
-    
+
     return (
       <path
         d={getSvgPathFromStroke(outlinePoints)}
@@ -307,28 +307,28 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
   }
 
   return createPortal(
-    <div 
-      className="fixed inset-0 z-50 bg-white dark:bg-neutral-900 flex flex-col status-bar-bg"
+    <div
+      className="fixed inset-0 z-50 bg-white dark:bg-neutral-950 flex flex-col status-bar-bg"
       style={edgeSwipeState.isDragging ? edgeSwipeStyle : undefined}
       {...edgeSwipeHandlers}
     >
       {/* Edge swipe indicator */}
-      <EdgeSwipeIndicator 
-        progress={edgeSwipeProgress} 
-        isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge} 
+      <EdgeSwipeIndicator
+        progress={edgeSwipeProgress}
+        isActive={edgeSwipeState.isDragging && edgeSwipeState.startedFromEdge}
       />
 
       {/* Header */}
       <div className="flex items-center justify-between pb-1.5 sm:py-2 border-b border-neutral-200 dark:border-neutral-700 px-2 sm:px-3 safe-top">
         <button
           onClick={onClose}
-          className="p-1.5 -ml-1 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
+          className="p-1.5 -ml-1 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
         >
           <X className="w-5 h-5" />
         </button>
-        
+
         <span className="text-sm font-medium">{t('drawing.title')}</span>
-        
+
         <button
           onClick={handleSave}
           className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors touch-manipulation"
@@ -338,7 +338,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
       </div>
 
       {/* Canvas Area */}
-      <div 
+      <div
         ref={containerRef}
         className="flex-1 overflow-hidden bg-white touch-none"
       >
@@ -358,17 +358,17 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
         >
           {/* White background */}
           <rect width="100%" height="100%" fill="#ffffff" />
-          
+
           {/* Completed strokes */}
           {strokes.map(renderStroke)}
-          
+
           {/* Current stroke being drawn */}
           {renderCurrentStroke()}
         </svg>
       </div>
 
       {/* Bottom Toolbar - Responsive */}
-      <div 
+      <div
         ref={toolbarRef}
         className="border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 px-2 py-1.5 sm:py-2 safe-bottom"
       >
@@ -379,8 +379,8 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
               onClick={() => setIsEraser(false)}
               className={cn(
                 "p-1.5 rounded-md transition-colors touch-manipulation",
-                !isEraser 
-                  ? "bg-white dark:bg-neutral-600 shadow-sm" 
+                !isEraser
+                  ? "bg-white dark:bg-neutral-600 shadow-sm"
                   : "hover:bg-neutral-300 dark:hover:bg-neutral-600"
               )}
             >
@@ -390,8 +390,8 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
               onClick={() => setIsEraser(true)}
               className={cn(
                 "p-1.5 rounded-md transition-colors touch-manipulation",
-                isEraser 
-                  ? "bg-white dark:bg-neutral-600 shadow-sm" 
+                isEraser
+                  ? "bg-white dark:bg-neutral-600 shadow-sm"
                   : "hover:bg-neutral-300 dark:hover:bg-neutral-600"
               )}
             >
@@ -412,18 +412,18 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
                   colorSize,
                   "rounded-full transition-all touch-manipulation flex-shrink-0",
                   color === '#ffffff' ? "border border-neutral-300 dark:border-neutral-600" : "",
-                  currentColor === color && !isEraser 
-                    ? "ring-2 ring-blue-500 ring-offset-1 dark:ring-offset-neutral-800" 
+                  currentColor === color && !isEraser
+                    ? "ring-2 ring-blue-500 ring-offset-1 dark:ring-offset-neutral-800"
                     : ""
                 )}
                 style={{ backgroundColor: color }}
               />
             ))}
           </div>
-          
+
           {/* Separator */}
           <div className="w-px h-6 bg-neutral-300 dark:bg-neutral-600 mx-1" />
-          
+
           {/* Stroke Sizes */}
           <div className={cn("flex items-center flex-shrink-0", gap)}>
             {visibleSizes.map(size => (
@@ -433,16 +433,16 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
                 className={cn(
                   buttonSize,
                   "rounded-lg flex items-center justify-center transition-colors touch-manipulation",
-                  currentSize === size && !isEraser 
-                    ? "bg-blue-100 dark:bg-blue-900/40" 
+                  currentSize === size && !isEraser
+                    ? "bg-blue-100 dark:bg-blue-900/40"
                     : "hover:bg-neutral-200 dark:hover:bg-neutral-700"
                 )}
               >
-                <div 
-                  className="rounded-full bg-neutral-800 dark:bg-neutral-200" 
-                  style={{ 
-                    width: Math.min(size + 2, 14), 
-                    height: Math.min(size + 2, 14) 
+                <div
+                  className="rounded-full bg-neutral-800 dark:bg-neutral-200"
+                  style={{
+                    width: Math.min(size + 2, 14),
+                    height: Math.min(size + 2, 14)
                   }}
                 />
               </button>
@@ -469,7 +469,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
               </TooltipTrigger>
               <TooltipContent>{t('editor.undo')}</TooltipContent>
             </Tooltip>
-            
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -485,7 +485,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
               </TooltipTrigger>
               <TooltipContent>{t('editor.redo')}</TooltipContent>
             </Tooltip>
-            
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <button

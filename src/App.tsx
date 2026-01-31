@@ -1,20 +1,18 @@
 import { useEffect, useCallback, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
+// useDebouncedCallback was removed as debouncedSync is no longer used
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { LayoutGroup } from 'framer-motion'
 import { useAuthStore } from '@/stores/authStore'
-import { useNotesStore, smartSyncManager, flushPendingNoteUpdates } from '@/stores/notesStore'
-import { useThemeStore } from '@/stores/themeStore'
-import { useNetworkStore } from '@/stores/networkStore'
-import { useMigrationStore } from '@/stores/migrationStore'
-// import { migrationEngine } from '@/lib/migration/removeCollectionMigration' // Disabled - migration complete
+import { useNotesStore } from '@/stores/notesStore'
+import { useAppStore } from '@/stores/appStore'
+import { syncManager } from '@/lib/sync/simpleSyncManager'
 import { LoginScreen } from '@/components/auth/LoginScreen'
 import { DrivePermissionError } from '@/components/auth/DrivePermissionError'
 import { Header } from '@/components/layout/Header'
 import { InstallPrompt } from '@/components/layout/InstallPrompt'
-import { MigrationProgress } from '@/components/layout/MigrationProgress'
 import { VirtualizedNotesList } from '@/components/notes/VirtualizedNotesList'
+import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 import { NoteModal } from '@/components/notes/NoteModal'
 import { PublicNoteView } from '@/components/notes/PublicNoteView'
 import { FreeNoteView } from '@/components/notes/FreeNoteView'
@@ -25,18 +23,15 @@ import { AppErrorBoundary, ListErrorBoundary, ModalErrorBoundary } from '@/compo
 import { SEOHead } from '@/components/SEOHead'
 import { initOfflineSync } from '@/lib/offlineSync'
 import { hideSplashScreen } from '@/lib/splashScreen'
-import { getValidAccessToken } from '@/lib/tokenManager'
-import { 
-  isTokenExpired, 
-  hasAuthBackend, 
-  silentRefreshWithBackend,
+import { tokenManager, isTokenExpired } from '@/lib/tokenManager'
+import {
   parseAuthCode,
-  exchangeCodeForTokens
+  exchangeCodeForTokens,
+  hasAuthBackend
 } from '@/lib/tokenRefresh'
 
 // Key for pending note from free-note page
 const PENDING_NOTE_KEY = 'g-note-pending-from-free'
-const FROM_FREE_NOTE_FLAG = 'g-note-from-free-note'
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID'
 
@@ -49,167 +44,114 @@ function getViewFileId(): string | null {
 function AppContent() {
   const { user, setUser } = useAuthStore()
   const { syncWithDrive, checkDriveHasData, loadSharedNotes, initOfflineStorage, addNote, setSelectedNote, setModalOpen, syncError, setIsNewUser } = useNotesStore()
-  const { initTheme } = useThemeStore()
-  const initNetwork = useNetworkStore(state => state.initialize)
-  const isOnline = useNetworkStore(state => state.isOnline)
+  const { initTheme, initialize: initNetwork, isOnline } = useAppStore()
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showPermissionError, setShowPermissionError] = useState(false)
-  
-  // Migration state
-  const { migrationResult, /* setMigrating, setMigrationResult, */ reset: resetMigration } = useMigrationStore()
-  const [showMigrationDialog, setShowMigrationDialog] = useState(false)
-  
+
   // Block default context menu globally
   useBlockContextMenu()
-  
+
   const viewFileId = getViewFileId()
-  
-  // Check for migration on app initialization
-  // MIGRATION DISABLED - Collection feature has been removed
-  // Uncomment this block if you need to run migration again
-  /*
-  useEffect(() => {
-    const checkAndRunMigration = async () => {
+
+  // Helper function to process pending note from free-note page
+  // Called after user is confirmed logged in
+  const processPendingFreeNote = useCallback(() => {
+    try {
+      const pendingData = localStorage.getItem(PENDING_NOTE_KEY)
+      if (!pendingData) return
+
+      const pending = JSON.parse(pendingData)
+
+      // Clear pending data first to prevent duplicate processing
+      localStorage.removeItem(PENDING_NOTE_KEY)
+
+      // Clear the free-note localStorage as well
       try {
-        console.log('[App] Checking if migration is needed...')
-        const needsMigration = await migrationEngine.needsMigration()
-        
-        if (needsMigration) {
-          console.log('[App] Migration needed, starting migration...')
-          setMigrating(true)
-          setShowMigrationDialog(true)
-          
-          // Run migration
-          const result = await migrationEngine.migrate()
-          
-          console.log('[App] Migration completed:', result)
-          setMigrationResult(result)
-          
-          // Keep dialog open to show result
-          // User will close it by clicking "Continue" or "Close"
-        } else {
-          console.log('[App] No migration needed')
-        }
-      } catch (error) {
-        console.error('[App] Migration check failed:', error)
-        // Don't block app if migration check fails
-        // The app can still function normally
+        localStorage.removeItem('g-note-free-note')
+      } catch (e) {
+        // Ignore
       }
+
+      // Create new note from pending data
+      const newNote = addNote()
+      if (newNote) {
+        // Update note with pending content
+        useNotesStore.getState().updateNote(newNote.id, {
+          title: pending.title || '',
+          content: pending.content || '',
+          style: pending.style
+        })
+
+        // Open the note modal
+        setSelectedNote(newNote.id)
+        setModalOpen(true)
+
+        console.log('✅ Pending note from free-note processed:', newNote.id)
+      }
+    } catch (e) {
+      console.error('Failed to process pending note:', e)
     }
-    
-    // Run migration check after IndexedDB is initialized
-    // Wait a bit to ensure DB is ready
-    const timer = setTimeout(() => {
-      checkAndRunMigration()
-    }, 500)
-    
-    return () => clearTimeout(timer)
-  }, [setMigrating, setMigrationResult])
-  */
-  
-  // Handle migration dialog close
-  const handleMigrationComplete = () => {
-    setShowMigrationDialog(false)
-    resetMigration()
-  }
-  
-  // Save flag when coming from free-note page (before OAuth redirect clears URL)
+  }, [addNote, setSelectedNote, setModalOpen])
+
+  // Check and process pending note when user is logged in
+  // This runs when user is already logged in and navigates from free-note
   useEffect(() => {
+    // Check if we're coming from free-note via URL param
     const params = new URLSearchParams(window.location.search)
     const fromFreeNote = params.get('from') === 'free-note'
-    
+
     if (fromFreeNote) {
-      // Save flag to localStorage so it persists through OAuth redirect
-      localStorage.setItem(FROM_FREE_NOTE_FLAG, 'true')
       // Clean URL immediately
       window.history.replaceState({}, '', '/')
-    }
-  }, [])
-  
-  // Check for pending note from free-note page after login
-  useEffect(() => {
-    if (!user?.accessToken) return
-    
-    // Check if coming from free-note page (flag saved before OAuth)
-    const fromFreeNote = localStorage.getItem(FROM_FREE_NOTE_FLAG) === 'true'
-    
-    if (fromFreeNote) {
-      // Clear flag immediately
-      localStorage.removeItem(FROM_FREE_NOTE_FLAG)
-      
-      try {
-        const pendingData = localStorage.getItem(PENDING_NOTE_KEY)
-        if (pendingData) {
-          const pending = JSON.parse(pendingData)
-          
-          // Create new note from pending data
-          const newNote = addNote()
-          if (newNote) {
-            // Update note with pending content
-            useNotesStore.getState().updateNote(newNote.id, {
-              title: pending.title || '',
-              content: pending.content || '',
-              style: pending.style
-            })
-            
-            // Open the note modal
-            setSelectedNote(newNote.id)
-            setModalOpen(true)
-            
-            // Clear pending data
-            localStorage.removeItem(PENDING_NOTE_KEY)
-          }
-        }
-      } catch (e) {
-        console.error('Failed to process pending note:', e)
+
+      // Only process if user is already logged in
+      if (user?.accessToken) {
+        // Small delay to ensure store is ready
+        setTimeout(() => processPendingFreeNote(), 100)
       }
     }
-  }, [user?.accessToken, addNote, setSelectedNote, setModalOpen])
-  
+  }, []) // Only run on mount - auth callback will handle OAuth redirect case
+
   // Initialize network status monitoring and offline storage
   useEffect(() => {
     const cleanupNetwork = initNetwork()
     const cleanupOfflineSync = initOfflineSync()
-    
+
     // Initialize offline storage (IndexedDB)
     initOfflineStorage()
-    
-    // Start periodic sync when logged in
-    if (user?.accessToken) {
-      smartSyncManager.startPeriodicSync()
-    }
-    
+
     // Sync and flush on page unload/visibility change
     const handleBeforeUnload = async () => {
-      await flushPendingNoteUpdates()
+      await syncManager.flush()
     }
-    
+
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'hidden') {
-        await flushPendingNoteUpdates()
-        // Trigger sync when app goes to background
-        smartSyncManager.syncNow()
+        // Only flush to IndexedDB when going to background
+        // Sync will happen when app comes back online (handled by offlineSync)
+        await syncManager.flush()
       }
     }
-    
+
     window.addEventListener('beforeunload', handleBeforeUnload)
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    
+
     return () => {
       cleanupNetwork()
       cleanupOfflineSync()
-      smartSyncManager.stop()
+      syncManager.stop()
       window.removeEventListener('beforeunload', handleBeforeUnload)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [initNetwork, initOfflineStorage, user?.accessToken])
+  }, [initNetwork, initOfflineStorage])
 
-  // Debounced sync - wait 2s after last change before syncing
-  const debouncedSync = useDebouncedCallback(async () => {
-    if (!user?.accessToken || isTokenExpired(user.tokenExpiry)) return
-    if (!isOnline) return // Don't sync when offline
-    await syncWithDrive(user.accessToken)
-  }, 2000)
+  // NOTE: debouncedSync is currently unused as sync is handled by SimpleSyncManager
+  // Keeping as reference for potential future use
+  // const debouncedSync = useDebouncedCallback(async () => {
+  //   if (!user?.accessToken || isTokenExpired(user.tokenExpiry)) return
+  //   if (!isOnline) return // Don't sync when offline
+  //   await syncWithDrive(user.accessToken)
+  // }, 2000)
 
   // Handle OAuth callback (authorization code flow)
   useEffect(() => {
@@ -224,7 +166,7 @@ function AppContent() {
             if (result.isNewUser) {
               setIsNewUser(true)
             }
-            
+
             setUser({
               id: result.user.id,
               email: result.user.email,
@@ -234,6 +176,10 @@ function AppContent() {
               tokenExpiry: Date.now() + (result.expiresIn * 1000)
             })
             console.log('Login successful via auth code flow', result.isNewUser ? '(new user)' : '(existing user)')
+
+            // Process pending note from free-note page AFTER user is set
+            // Small delay to ensure zustand store is updated
+            setTimeout(() => processPendingFreeNote(), 200)
           }
         } catch (error) {
           // Handle permission error during login
@@ -249,7 +195,7 @@ function AppContent() {
       }
     }
     handleAuthCallback()
-  }, [setUser])
+  }, [setUser, processPendingFreeNote])
 
   // Show permission error dialog when sync fails due to permission
   useEffect(() => {
@@ -262,47 +208,38 @@ function AppContent() {
   // Graceful degradation: if offline + token expired, allow local editing
   const checkAndRefreshToken = useCallback(async () => {
     if (!user || isRefreshing) return false
-    
+
     if (isTokenExpired(user.tokenExpiry)) {
       // If offline, don't try to refresh - allow local editing
-      // Sync will happen when back online with valid token
       if (!isOnline) {
-        console.log('Token expired but offline - allowing local editing')
-        return false // Return false but don't logout
+        console.log('[App] Token expired but offline - allowing local editing')
+        return false
       }
-      
-      console.log('Token expired or expiring soon, attempting silent refresh...')
-      
-      // Try backend refresh first (silent, no popup)
-      if (hasAuthBackend()) {
-        setIsRefreshing(true)
-        try {
-          const result = await silentRefreshWithBackend(user.id)
-          if (result) {
-            setUser({
-              ...user,
-              accessToken: result.access_token,
-              tokenExpiry: Date.now() + (result.expires_in * 1000)
-            })
-            console.log('Token refreshed silently via backend')
-            return true
-          }
-        } catch (error) {
-          console.error('Silent refresh failed:', error)
-        } finally {
-          setIsRefreshing(false)
+
+      console.log('[App] Token expired, attempting refresh...')
+      setIsRefreshing(true)
+
+      try {
+        const newToken = await tokenManager.getValidToken()
+        if (newToken) {
+          console.log('[App] Token refreshed successfully')
+          return true
         }
+
+        // If refresh fails and we're online, user needs to re-login
+        if (isOnline) {
+          console.log('[App] Token refresh failed, user needs to re-login')
+        }
+        return false
+      } catch (error) {
+        console.error('[App] Token refresh error:', error)
+        return false
+      } finally {
+        setIsRefreshing(false)
       }
-      
-      // If backend refresh fails but we're online, user needs to re-login
-      // But if offline, allow continued local editing
-      if (isOnline) {
-        console.log('Silent refresh failed, user needs to re-login')
-      }
-      return false
     }
     return true
-  }, [user, isRefreshing, setUser, isOnline])
+  }, [user, isRefreshing, isOnline])
 
   // Initialize theme on mount
   useEffect(() => {
@@ -341,13 +278,13 @@ function AppContent() {
   // Graceful: skip sync if offline or token expired, but don't block local editing
   useEffect(() => {
     if (!user?.accessToken) return
-    
+
     // Don't sync if offline - local changes will be queued
     if (!isOnline) {
       console.log('[App] Offline, skipping auto-sync')
       return
     }
-    
+
     // Don't sync if token is expired - will retry after refresh
     if (isTokenExpired(user.tokenExpiry)) {
       console.log('[App] Token expired, skipping auto-sync')
@@ -358,21 +295,21 @@ function AppContent() {
     const doSync = async () => {
       if (!isOnline) return
       if (isTokenExpired(user.tokenExpiry)) return
-      
+
       const now = Date.now()
       if (now - lastSync < 5000) return
       lastSync = now
-      
+
       // Get valid token (auto-refresh if expired)
-      const accessToken = await getValidAccessToken()
+      const accessToken = await tokenManager.getValidToken()
       if (!accessToken) return
-      
+
       // Check if Drive has data first (only on initial sync when no local notes)
       const currentNotes = useNotesStore.getState().notes
       if (currentNotes.length === 0) {
         await checkDriveHasData(accessToken)
       }
-      
+
       await syncWithDrive(accessToken)
       await loadSharedNotes()
     }
@@ -383,7 +320,7 @@ function AppContent() {
       // Check token and online status before syncing
       if (isTokenExpired(user.tokenExpiry)) return
       if (!isOnline) return
-      
+
       const hasPending = useNotesStore.getState().notes.some(n => n.syncStatus === 'pending')
       if (hasPending) doSync()
     }, 30000)
@@ -391,26 +328,9 @@ function AppContent() {
     return () => clearInterval(interval)
   }, [user?.accessToken, user?.tokenExpiry, isOnline])
 
-  // Sync when notes change (debounced)
-  // Skip if offline or token expired - changes are queued in IndexedDB
-  // Use interval-based check instead of effect dependency to avoid re-renders
-  useEffect(() => {
-    if (!user?.accessToken) return
-    if (!isOnline) return
-    if (isTokenExpired(user.tokenExpiry)) return
-
-    // Check for pending changes every 500ms instead of on every notes change
-    const checkPending = () => {
-      const state = useNotesStore.getState()
-      const hasPending = state.notes.some(n => n.syncStatus === 'pending')
-      if (hasPending && !state.isSyncing) {
-        debouncedSync()
-      }
-    }
-
-    const interval = setInterval(checkPending, 500)
-    return () => clearInterval(interval)
-  }, [user?.accessToken, user?.tokenExpiry, isOnline, debouncedSync])
+  // REMOVED: Polling-based sync check (replaced by event-driven sync in SimpleSyncManager)
+  // SimpleSyncManager now handles sync scheduling via scheduleSync() called from note actions
+  // This eliminates the 500ms polling overhead and improves performance
 
   // If viewing a public note, show the view page
   if (viewFileId) {
@@ -428,7 +348,7 @@ function AppContent() {
         <div className="pt-3 px-4 safe-top safe-x">
           <Header />
         </div>
-        <main className="max-w-6xl w-full mx-auto px-4 py-6 safe-x safe-bottom">
+        <main className="max-w-6xl w-full mx-auto px-4 pt-6 pb-32 safe-x safe-bottom">
           <ListErrorBoundary>
             <VirtualizedNotesList />
           </ListErrorBoundary>
@@ -438,14 +358,7 @@ function AppContent() {
         </ModalErrorBoundary>
         <InstallPrompt />
       </div>
-      
-      {/* Migration Progress Dialog */}
-      <MigrationProgress
-        isOpen={showMigrationDialog}
-        migrationResult={migrationResult}
-        onComplete={handleMigrationComplete}
-      />
-      
+
       {/* Drive Permission Error Dialog */}
       {showPermissionError && (
         <DrivePermissionError onClose={() => setShowPermissionError(false)} />
@@ -459,6 +372,8 @@ function App() {
     <AppErrorBoundary>
       <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
         <TooltipProvider delayDuration={300}>
+          <GlobalEffects />
+          <GlobalLoading />
           <BrowserRouter>
             <Routes>
               <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -471,6 +386,22 @@ function App() {
       </GoogleOAuthProvider>
     </AppErrorBoundary>
   )
+}
+
+function GlobalEffects() {
+  const { initTheme } = useAppStore()
+
+  useEffect(() => {
+    // Initialize theme globally for all routes
+    initTheme()
+  }, [initTheme])
+
+  return null
+}
+
+function GlobalLoading() {
+  const isLoggingOut = useAuthStore(state => state.isLoggingOut)
+  return <LoadingOverlay isVisible={isLoggingOut} />
 }
 
 export default App

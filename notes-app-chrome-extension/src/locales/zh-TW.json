@@ -48,6 +48,7 @@
     "modalSizeDefault": "預設",
     "modalSizeLarge": "大",
     "modalSizeXLarge": "超大",
+    "modalSizeFullscreen": "全螢幕",
     "displayMode": "顯示模式",
     "displayModeDescription": "選擇開啟擴充功能的方式",
     "fullscreen": "全螢幕",
@@ -132,7 +133,48 @@
     "versionHistory": "版本紀錄",
     "fullscreen": "全螢幕",
     "exitFullscreen": "結束全螢幕",
-    "more": "更多"
+    "more": "更多",
+    "insertTable": "插入表格",
+    "tableProperties": "表格屬性",
+    "addColumnBefore": "在前面新增欄",
+    "addColumnAfter": "在後面新增欄",
+    "addRowBefore": "在上面新增列",
+    "addRowAfter": "在下面新增列",
+    "deleteColumn": "刪除欄",
+    "deleteRow": "刪除列",
+    "deleteTable": "刪除表格",
+    "mergeCells": "合併儲存格",
+    "splitCell": "分割儲存格",
+    "toggleHeaderRow": "切換標題列",
+    "toggleHeaderColumn": "切換標題欄",
+    "exportTableCSV": "匯出為 CSV",
+    "exportTableMarkdown": "匯出為 Markdown",
+    "tableRows": "列",
+    "tableColumns": "欄",
+    "includeHeaderRow": "包含標題列",
+    "tablePreview": "預覽",
+    "createTable": "建立表格",
+    "tableDimensions": "尺寸",
+    "tableHeaders": "標題",
+    "tableWidth": "寬度",
+    "tableOptions": "選項",
+    "resizableColumns": "可調整大小的欄",
+    "fixedLayout": "固定版面",
+    "headerRow": "標題列",
+    "headerColumn": "標題欄",
+    "autoWidth": "自動",
+    "fullWidth": "100%",
+    "customWidth": "自訂",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -155,7 +197,16 @@
     "chatWithAI": "與 AI 聊天",
     "chatWelcome": "你好",
     "chatDescription": "問我關於這個筆記的任何問題。我會根據筆記的內容回答。",
-    "send": "傳送"
+    "send": "傳送",
+    "tone": {
+      "label": "更改語氣",
+      "professional": "專業",
+      "formalEmail": "正式郵件",
+      "socialMedia": "社群媒體",
+      "casual": "休閒",
+      "friendly": "友好",
+      "confident": "自信"
+    }
   },
   "sharedNotes": {
     "title": "與您分享",
@@ -262,7 +313,8 @@
     "cancel": "取消",
     "language": "語言",
     "searchLanguage": "搜尋語言...",
-    "noLanguageFound": "找不到語言"
+    "noLanguageFound": "找不到語言",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "剛剛",
@@ -424,5 +476,6 @@
     "genericErrorDescription": "發生意外錯誤。請重試。",
     "appError": "應用程式當機",
     "appErrorDescription": "出現問題，應用程式需要重新載入。造成不便，深感抱歉。"
-  }
+  },
+  "webContent": {}
 }

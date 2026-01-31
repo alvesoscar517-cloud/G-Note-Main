@@ -9,6 +9,7 @@ import {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
+  ContextMenuShortcut,
 } from '@/components/ui/ContextMenu'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { ImageEditor } from './ImageEditor'
@@ -31,12 +32,12 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
   const containerRef = useRef<HTMLDivElement>(null)
   const touchStartPosRef = useRef<{ x: number; y: number } | null>(null)
 
-  const { src, alt, width, height } = node.attrs as { 
+  const { src, alt, width, height } = node.attrs as {
     src: string
     alt?: string
     title?: string
     width?: number
-    height?: number 
+    height?: number
   }
 
   // Handle image edit save
@@ -73,12 +74,12 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
   const handleImageClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     e.preventDefault()
-    
+
     // Blur editor to prevent keyboard from opening
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur()
     }
-    
+
     // Activate immediately on click (both mobile and desktop)
     setIsActive(true)
   }, [])
@@ -87,7 +88,7 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     // Prevent default to stop editor from focusing
     e.stopPropagation()
-    
+
     // Store touch position to detect if it's a tap or scroll
     const touch = e.touches[0]
     touchStartPosRef.current = { x: touch.clientX, y: touch.clientY }
@@ -95,12 +96,12 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!touchStartPosRef.current) return
-    
+
     // Cancel tap if finger moved too much (user is scrolling)
     const touch = e.touches[0]
     const deltaX = Math.abs(touch.clientX - touchStartPosRef.current.x)
     const deltaY = Math.abs(touch.clientY - touchStartPosRef.current.y)
-    
+
     if (deltaX > 10 || deltaY > 10) {
       touchStartPosRef.current = null
     }
@@ -138,7 +139,7 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
       document.addEventListener('mousedown', handleClickOutside)
       document.addEventListener('touchstart', handleClickOutside)
     }, 0)
-    
+
     return () => {
       clearTimeout(timeoutId)
       document.removeEventListener('mousedown', handleClickOutside)
@@ -150,6 +151,10 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
   useEffect(() => {
     if (selected) setIsActive(true)
   }, [selected])
+
+  const isMac = typeof navigator !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0
+  const cmdKey = isMac ? '⌘' : 'Ctrl+'
+  const delKey = isMac ? '⌫' : 'Del'
 
   return (
     <NodeViewWrapper className="relative inline-block my-2">
@@ -184,7 +189,7 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
 
             {/* Controls overlay - only show when active */}
             {isActive && (
-              <div 
+              <div
                 data-image-toolbar
                 contentEditable={false}
                 className="absolute -top-10 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-neutral-800 rounded-lg p-1 shadow-lg z-20"
@@ -196,14 +201,14 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
                   <TooltipTrigger asChild>
                     <button
                       type="button"
-                      onClick={(e) => { 
+                      onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
                         // Blur any focused element to prevent keyboard from opening
                         if (document.activeElement instanceof HTMLElement) {
                           document.activeElement.blur()
                         }
-                        setShowEditor(true) 
+                        setShowEditor(true)
                       }}
                       onMouseDown={(e) => {
                         e.preventDefault()
@@ -223,7 +228,7 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
                   <TooltipTrigger asChild>
                     <button
                       type="button"
-                      onClick={(e) => { 
+                      onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
                         handleDownloadImage()
@@ -246,10 +251,10 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
                   <TooltipTrigger asChild>
                     <button
                       type="button"
-                      onClick={(e) => { 
+                      onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
-                        deleteNode() 
+                        deleteNode()
                       }}
                       onMouseDown={(e) => {
                         e.preventDefault()
@@ -273,18 +278,22 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
           <ContextMenuItem onClick={() => setShowEditor(true)}>
             <Pencil className="w-4 h-4 mr-2" />
             {t('contextMenu.edit')}
+            <ContextMenuShortcut>{cmdKey}E</ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuItem onClick={handleCopyImage}>
             <Copy className="w-4 h-4 mr-2" />
             {t('contextMenu.copy')}
+            <ContextMenuShortcut>{cmdKey}C</ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuItem onClick={handleDownloadImage}>
             <Download className="w-4 h-4 mr-2" />
             {t('contextMenu.download')}
+            <ContextMenuShortcut>{cmdKey}S</ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuItem onClick={() => deleteNode()}>
             <Trash2 className="w-4 h-4 mr-2" />
             {t('contextMenu.delete')}
+            <ContextMenuShortcut>{cmdKey}{delKey}</ContextMenuShortcut>
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
@@ -305,11 +314,11 @@ function ResizableImageComponent({ node, updateAttributes, deleteNode, selected 
 // Custom Image Extension with resize and edit capabilities
 export const ResizableImage = Node.create({
   name: 'image',
-  
+
   group: 'block',
-  
+
   draggable: true,
-  
+
   addAttributes() {
     return {
       src: {
@@ -362,12 +371,12 @@ export const ResizableImage = Node.create({
 // Read-only image component for public view
 function ReadOnlyImageComponent({ node }: NodeViewProps) {
   const { t } = useTranslation()
-  const { src, alt, width, height } = node.attrs as { 
+  const { src, alt, width, height } = node.attrs as {
     src: string
     alt?: string
     title?: string
     width?: number
-    height?: number 
+    height?: number
   }
 
   // Handle copy image
@@ -393,6 +402,9 @@ function ReadOnlyImageComponent({ node }: NodeViewProps) {
     document.body.removeChild(link)
   }, [src, alt])
 
+  const isMac = typeof navigator !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0
+  const cmdKey = isMac ? '⌘' : 'Ctrl+'
+
   return (
     <NodeViewWrapper className="relative inline-block my-2">
       <ContextMenu>
@@ -412,10 +424,12 @@ function ReadOnlyImageComponent({ node }: NodeViewProps) {
           <ContextMenuItem onClick={handleCopyImage}>
             <Copy className="w-4 h-4 mr-2" />
             {t('contextMenu.copy')}
+            <ContextMenuShortcut>{cmdKey}C</ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuItem onClick={handleDownloadImage}>
             <Download className="w-4 h-4 mr-2" />
             {t('contextMenu.download')}
+            <ContextMenuShortcut>{cmdKey}S</ContextMenuShortcut>
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
@@ -426,11 +440,11 @@ function ReadOnlyImageComponent({ node }: NodeViewProps) {
 // Read-only Image Extension for public view (no resize, no edit)
 export const ReadOnlyImage = Node.create({
   name: 'image',
-  
+
   group: 'block',
-  
+
   draggable: false,
-  
+
   addAttributes() {
     return {
       src: {

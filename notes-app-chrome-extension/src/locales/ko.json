@@ -48,6 +48,7 @@
     "modalSizeDefault": "기본",
     "modalSizeLarge": "크게",
     "modalSizeXLarge": "매우 크게",
+    "modalSizeFullscreen": "전체 화면",
     "displayMode": "표시 모드",
     "displayModeDescription": "확장 프로그램 열기 방식 선택",
     "fullscreen": "전체 화면",
@@ -132,7 +133,48 @@
     "versionHistory": "버전 기록",
     "fullscreen": "전체 화면",
     "exitFullscreen": "전체 화면 종료",
-    "more": "더보기"
+    "more": "더보기",
+    "insertTable": "표 삽입",
+    "tableProperties": "표 속성",
+    "addColumnBefore": "앞에 열 추가",
+    "addColumnAfter": "뒤에 열 추가",
+    "addRowBefore": "위에 행 추가",
+    "addRowAfter": "아래에 행 추가",
+    "deleteColumn": "열 삭제",
+    "deleteRow": "행 삭제",
+    "deleteTable": "표 삭제",
+    "mergeCells": "셀 병합",
+    "splitCell": "셀 분할",
+    "toggleHeaderRow": "머리글 행 전환",
+    "toggleHeaderColumn": "머리글 열 전환",
+    "exportTableCSV": "CSV로 내보내기",
+    "exportTableMarkdown": "Markdown으로 내보내기",
+    "tableRows": "행",
+    "tableColumns": "열",
+    "includeHeaderRow": "머리글 행 포함",
+    "tablePreview": "미리보기",
+    "createTable": "표 만들기",
+    "tableDimensions": "크기",
+    "tableHeaders": "머리글",
+    "tableWidth": "너비",
+    "tableOptions": "옵션",
+    "resizableColumns": "크기 조정 가능한 열",
+    "fixedLayout": "고정 레이아웃",
+    "headerRow": "머리글 행",
+    "headerColumn": "머리글 열",
+    "autoWidth": "자동",
+    "fullWidth": "100%",
+    "customWidth": "사용자 지정",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -155,7 +197,16 @@
     "chatWithAI": "AI와 채팅",
     "chatWelcome": "안녕하세요",
     "chatDescription": "이 메모에 대해 무엇이든 물어보세요. 메모의 맥락을 바탕으로 답변하겠습니다.",
-    "send": "보내기"
+    "send": "보내기",
+    "tone": {
+      "label": "어조 변경",
+      "professional": "전문적인",
+      "formalEmail": "공식 이메일",
+      "socialMedia": "소셜 미디어",
+      "casual": "캐주얼",
+      "friendly": "친근한",
+      "confident": "자신감 있는"
+    }
   },
   "sharedNotes": {
     "title": "공유된 메모",
@@ -262,7 +313,8 @@
     "cancel": "취소",
     "language": "언어",
     "searchLanguage": "언어 검색...",
-    "noLanguageFound": "언어를 찾을 수 없습니다"
+    "noLanguageFound": "언어를 찾을 수 없습니다",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "방금",
@@ -424,5 +476,6 @@
     "genericErrorDescription": "예기치 않은 오류가 발생했습니다. 다시 시도해 주세요.",
     "appError": "앱이 충돌했습니다",
     "appErrorDescription": "문제가 발생하여 앱을 새로고침해야 합니다. 불편을 드려 죄송합니다."
-  }
+  },
+  "webContent": {}
 }

@@ -3,7 +3,7 @@
  * Low-level Google Drive API wrapper with Mutex for thread safety
  */
 import { Mutex } from 'async-mutex'
-import { useNetworkStore } from '@/stores/networkStore'
+import { useAppStore } from '@/stores/appStore'
 import { DriveError, type DriveErrorCode } from './types'
 
 const DRIVE_API = 'https://www.googleapis.com/drive/v3'
@@ -41,7 +41,7 @@ export class DriveClient {
    * Check if online
    */
   private checkOnline(): boolean {
-    return useNetworkStore.getState().isOnline
+    return useAppStore.getState().isOnline
   }
 
   /**

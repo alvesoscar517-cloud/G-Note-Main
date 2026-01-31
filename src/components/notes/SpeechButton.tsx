@@ -14,16 +14,16 @@ interface SpeechButtonProps {
 // Modal component for not supported message
 function NotSupportedModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { t } = useTranslation()
-  
+
   if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-xl max-w-sm w-full p-6">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+          className="absolute top-4 right-4 p-1 rounded-full border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
         >
           <X className="w-5 h-5 text-neutral-500" />
         </button>
@@ -109,10 +109,14 @@ export function SpeechButton({ onTranscript, disabled, className }: SpeechButton
       <Tooltip>
         <TooltipTrigger asChild>
           <button
+            onPointerDown={(e) => {
+              e.preventDefault()
+            }}
             onClick={handleClick}
             disabled={disabled}
             className={cn(
-              'relative p-1.5 rounded-full transition-all duration-200 touch-manipulation',
+              'relative flex items-center justify-center w-[44px] h-[44px] sm:w-auto sm:h-auto rounded-full transition-all duration-200 touch-manipulation',
+              'sm:p-1.5',
               isListening
                 ? 'text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900/30'
                 : !isSupported
@@ -129,7 +133,7 @@ export function SpeechButton({ onTranscript, disabled, className }: SpeechButton
                 <span className="absolute inset-[-2px] rounded-full border-2 border-red-400/50 dark:border-red-500/40 animate-pulse" />
               </>
             )}
-            
+
             {/* Icon */}
             <span className="relative z-10">
               {isListening ? (
@@ -145,9 +149,9 @@ export function SpeechButton({ onTranscript, disabled, className }: SpeechButton
         </TooltipContent>
       </Tooltip>
 
-      <NotSupportedModal 
-        isOpen={showNotSupportedModal} 
-        onClose={() => setShowNotSupportedModal(false)} 
+      <NotSupportedModal
+        isOpen={showNotSupportedModal}
+        onClose={() => setShowNotSupportedModal(false)}
       />
     </>
   )

@@ -34,6 +34,23 @@ export async function getAllNotes(): Promise<Note[]> {
 }
 
 /**
+ * Get notes by user ID
+ */
+export async function getNotesByUserId(userId: string): Promise<Note[]> {
+  return db.notes.where('userId').equals(userId).toArray()
+}
+
+/**
+ * Assign user ID to notes that don't have one
+ * Used for migration when enabling multi-user support
+ */
+export async function assignUserIdToOrphanedNotes(userId: string): Promise<number> {
+  return db.notes
+    .filter(note => !note.userId)
+    .modify({ userId })
+}
+
+/**
  * Get notes by collection ID
  */
 export async function getNotesByCollection(collectionId: string): Promise<Note[]> {

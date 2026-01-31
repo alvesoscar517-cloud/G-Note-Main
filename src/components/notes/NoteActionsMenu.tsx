@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import * as Popover from '@radix-ui/react-popover'
-import { 
+import {
   MoreVertical,
   Download,
   Upload,
@@ -15,14 +15,14 @@ import {
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { useAuthStore } from '@/stores/authStore'
-import { useNetworkStore } from '@/stores/networkStore'
-import { 
-  exportNote, 
-  importDocument, 
-  downloadBlob, 
+import { useAppStore } from '@/stores/appStore'
+import {
+  exportNote,
+  importDocument,
+  downloadBlob,
   getSafeFilename,
   isImageFile,
-  type ExportFormat 
+  type ExportFormat
 } from '@/lib/driveExport'
 
 // Map i18n language codes to Google OCR language codes
@@ -54,11 +54,11 @@ interface NoteActionsMenuProps {
   disabled?: boolean
 }
 
-export function NoteActionsMenu({ 
-  noteTitle, 
-  noteContent, 
+export function NoteActionsMenu({
+  noteTitle,
+  noteContent,
   onImport,
-  disabled 
+  disabled
 }: NoteActionsMenuProps) {
   const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
@@ -68,11 +68,11 @@ export function NoteActionsMenu({
   const [ocrWarning, setOcrWarning] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const user = useAuthStore(state => state.user)
-  const isOnline = useNetworkStore(state => state.isOnline)
+  const isOnline = useAppStore(state => state.isOnline)
 
   const handleExport = useCallback(async (format: ExportFormat) => {
     if (!user?.accessToken) return
-    
+
     setIsExporting(true)
     try {
       const blob = await exportNote(
@@ -98,13 +98,13 @@ export function NoteActionsMenu({
   const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !user?.accessToken) return
-    
+
     // Check if it's an image file and show warning
     const isImage = isImageFile(file)
     if (isImage) {
       setOcrWarning(t('noteActions.ocrWarning'))
     }
-    
+
     setIsImporting(true)
     try {
       // Get OCR language from current app language
@@ -143,7 +143,7 @@ export function NoteActionsMenu({
         onChange={handleFileChange}
         className="hidden"
       />
-      
+
       <Popover.Root open={open} onOpenChange={handleOpenChange}>
         <Popover.Trigger asChild>
           <span>
@@ -151,8 +151,13 @@ export function NoteActionsMenu({
               <TooltipTrigger asChild>
                 <button
                   disabled={disabled || isLoading}
+                  onPointerDown={(e) => {
+                    e.preventDefault()
+                  }}
                   className={cn(
-                    'p-1.5 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors touch-manipulation',
+                    'flex items-center justify-center w-[44px] h-[44px] sm:w-auto sm:h-auto rounded-full transition-colors touch-manipulation',
+                    'sm:p-1.5',
+                    'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700',
                     open && 'bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-white',
                     (disabled || isLoading) && 'opacity-40 cursor-not-allowed'
                   )}
@@ -178,8 +183,7 @@ export function NoteActionsMenu({
             avoidCollisions={true}
             className={cn(
               'z-50 w-[220px] max-w-[calc(100vw-32px)] rounded-xl border border-neutral-200 dark:border-neutral-700',
-              'bg-white dark:bg-neutral-800 shadow-lg',
-              'animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95'
+              'bg-white dark:bg-neutral-800 shadow-lg'
             )}
           >
             {showExportOptions ? (
@@ -192,7 +196,7 @@ export function NoteActionsMenu({
                   <span>‹</span>
                   {t('noteActions.selectFormat')}
                 </button>
-                
+
                 <MenuItem
                   icon={<FileText className="w-4 h-4" />}
                   label="PDF"
@@ -200,7 +204,7 @@ export function NoteActionsMenu({
                   onClick={() => handleExport('pdf')}
                   disabled={isExporting}
                 />
-                
+
                 <MenuItem
                   icon={<FileType className="w-4 h-4" />}
                   label="Word (.docx)"
@@ -208,7 +212,7 @@ export function NoteActionsMenu({
                   onClick={() => handleExport('docx')}
                   disabled={isExporting}
                 />
-                
+
                 <MenuItem
                   icon={<FileCode className="w-4 h-4" />}
                   label="HTML"
@@ -216,7 +220,7 @@ export function NoteActionsMenu({
                   onClick={() => handleExport('html')}
                   disabled={isExporting}
                 />
-                
+
                 <MenuItem
                   icon={<FileCode className="w-4 h-4" />}
                   label="Markdown (.md)"
@@ -238,7 +242,7 @@ export function NoteActionsMenu({
                     </div>
                   </div>
                 )}
-                
+
                 {/* OCR Warning */}
                 {ocrWarning && (
                   <div className="mx-2 mb-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
@@ -250,7 +254,7 @@ export function NoteActionsMenu({
                     </div>
                   </div>
                 )}
-                
+
                 <MenuItem
                   icon={<Download className="w-4 h-4" />}
                   label={t('noteActions.export')}
@@ -259,7 +263,7 @@ export function NoteActionsMenu({
                   hasSubmenu
                   disabled={!isOnline}
                 />
-                
+
                 <MenuItem
                   icon={<Upload className="w-4 h-4" />}
                   label={t('noteActions.import')}

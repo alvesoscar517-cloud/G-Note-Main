@@ -48,6 +48,7 @@
     "modalSizeDefault": "Default",
     "modalSizeLarge": "Large",
     "modalSizeXLarge": "Extra large",
+    "modalSizeFullscreen": "Fullscreen",
     "displayMode": "Display Mode",
     "displayModeDescription": "Choose how to open the extension",
     "fullscreen": "Full Screen",
@@ -132,7 +133,48 @@
     "versionHistory": "Version history",
     "fullscreen": "Fullscreen",
     "exitFullscreen": "Exit fullscreen",
-    "more": "More"
+    "more": "More",
+    "insertTable": "Insert table",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "tableProperties": "Table properties",
+    "addColumnBefore": "Add column before",
+    "addColumnAfter": "Add column after",
+    "addRowBefore": "Add row before",
+    "addRowAfter": "Add row after",
+    "deleteColumn": "Delete column",
+    "deleteRow": "Delete row",
+    "deleteTable": "Delete table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "mergeCells": "Merge cells",
+    "splitCell": "Split cell",
+    "toggleHeaderRow": "Toggle header row",
+    "toggleHeaderColumn": "Toggle header column",
+    "exportTableCSV": "Export as CSV",
+    "exportTableMarkdown": "Export as Markdown",
+    "tableRows": "Rows",
+    "tableColumns": "Columns",
+    "includeHeaderRow": "Include header row",
+    "tablePreview": "Preview",
+    "createTable": "Create table",
+    "tableDimensions": "Dimensions",
+    "tableHeaders": "Headers",
+    "tableWidth": "Width",
+    "tableOptions": "Options",
+    "resizableColumns": "Resizable columns",
+    "fixedLayout": "Fixed layout",
+    "headerRow": "Header row",
+    "headerColumn": "Header column",
+    "autoWidth": "Auto",
+    "fullWidth": "100%",
+    "customWidth": "Custom",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -155,7 +197,29 @@
     "chatWithAI": "Chat with AI",
     "chatWelcome": "Hello",
     "chatDescription": "Ask me anything about this note. I'll answer based on the note's context.",
-    "send": "Send"
+    "send": "Send",
+    "tone": {
+      "label": "Change tone",
+      "professional": "Professional",
+      "formalEmail": "Formal Email",
+      "socialMedia": "Social Media",
+      "casual": "Casual",
+      "friendly": "Friendly",
+      "confident": "Confident"
+    },
+    "analysis": {
+      "menu_label": "Analyze Image",
+      "title": "Analyze Image",
+      "description": "Upload an image to extract text, analyze data, or generate a description.",
+      "upload_instruction": "Click or drag image to upload",
+      "select_type": "Select Analysis Type",
+      "type": {
+        "general": "General",
+        "whiteboard": "Whiteboard",
+        "receipt": "Receipt"
+      },
+      "submit": "Analyze"
+    }
   },
   "sharedNotes": {
     "title": "Shared with you",
@@ -260,6 +324,7 @@
   "common": {
     "confirm": "Confirm",
     "cancel": "Cancel",
+    "delete": "Delete",
     "language": "Language",
     "searchLanguage": "Search language...",
     "noLanguageFound": "No language found"
@@ -424,5 +489,6 @@
     "genericErrorDescription": "An unexpected error occurred. Please try again.",
     "appError": "App crashed",
     "appErrorDescription": "Something went wrong and the app needs to reload. We apologize for the inconvenience."
-  }
+  },
+  "webContent": {}
 }

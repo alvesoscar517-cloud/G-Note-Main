@@ -5,7 +5,7 @@ import imageCompression from 'browser-image-compression'
 import { Palette, X, Check, Upload } from 'lucide-react'
 import * as Popover from '@radix-ui/react-popover'
 import { cn } from '@/lib/utils'
-import { useThemeStore } from '@/stores/themeStore'
+import { useAppStore } from '@/stores/appStore'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import type { NoteStyle } from '@/types'
 
@@ -77,8 +77,8 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<'color' | 'image'>('color')
-  const { theme } = useThemeStore()
-  
+  const { theme } = useAppStore()
+
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
   // Always show light colors in picker for better visibility, but apply dark colors when in dark mode
   const displayColors = LIGHT_COLORS
@@ -115,7 +115,7 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
         maxWidthOrHeight: 1200,
         useWebWorker: true,
       })
-      
+
       const reader = new FileReader()
       reader.onload = () => {
         onChange({
@@ -175,8 +175,13 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
         <TooltipTrigger asChild>
           <Popover.Trigger asChild>
             <button
+              onPointerDown={(e) => {
+                e.preventDefault()
+              }}
               className={cn(
-                'p-2 sm:p-1.5 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors touch-manipulation',
+                'flex items-center justify-center w-[44px] h-[44px] sm:w-auto sm:h-auto rounded-full transition-colors touch-manipulation',
+                'sm:p-1.5 sm:rounded-full',
+                'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700',
                 hasCustomStyle && 'bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-white'
               )}
             >
@@ -189,10 +194,12 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
 
       <Popover.Content
         side="top"
-        align="center"
+        align="end"
+        alignOffset={-8}
         sideOffset={8}
-        collisionPadding={16}
+        collisionPadding={24}
         avoidCollisions={true}
+        sticky="always"
         onOpenAutoFocus={(e) => e.preventDefault()}
         onCloseAutoFocus={(e) => e.preventDefault()}
         onClick={(e) => e.stopPropagation()}
@@ -201,196 +208,196 @@ export function NoteStylePicker({ style, onChange }: NoteStylePickerProps) {
           // Prevent the event from bubbling to the backdrop which would close the note modal
           e.stopPropagation()
         }}
-        className="z-[100] w-[280px] max-w-[calc(100vw-32px)] bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 p-3 animate-in fade-in-0 zoom-in-95"
+        className="z-[100] w-[280px] max-w-[calc(100vw-48px)] bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 p-3 max-h-[calc(100vh-80px)] overflow-y-auto"
       >
-          {/* Tabs */}
-          <div className="flex gap-1 mb-3">
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setTab('color')
-              }}
-              className={cn(
-                'flex-1 py-1.5 px-3 text-sm font-medium rounded-lg transition-colors',
-                tab === 'color'
-                  ? 'bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-white'
-                  : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
-              )}
-            >
-              {t('stylePicker.colorTab')}
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                setTab('image')
-              }}
-              className={cn(
-                'flex-1 py-1.5 px-3 text-sm font-medium rounded-lg transition-colors',
-                tab === 'image'
-                  ? 'bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-white'
-                  : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
-              )}
-            >
-              {t('stylePicker.imageTab')}
-            </button>
+        {/* Tabs */}
+        <div className="flex gap-1 mb-3">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setTab('color')
+            }}
+            className={cn(
+              'flex-1 py-1.5 px-3 text-sm font-medium rounded-lg transition-colors',
+              tab === 'color'
+                ? 'bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-white'
+                : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+            )}
+          >
+            {t('stylePicker.colorTab')}
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setTab('image')
+            }}
+            className={cn(
+              'flex-1 py-1.5 px-3 text-sm font-medium rounded-lg transition-colors',
+              tab === 'image'
+                ? 'bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-white'
+                : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+            )}
+          >
+            {t('stylePicker.imageTab')}
+          </button>
+        </div>
+
+        {tab === 'color' && (
+          <div className="grid grid-cols-6 gap-2">
+            {displayColors.map((color, index) => (
+              <Tooltip key={color.name}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleColorSelect(index)
+                    }}
+                    className={cn(
+                      'w-8 h-8 rounded-full border-2 transition-all hover:scale-110 flex items-center justify-center',
+                      selectedIndex === index
+                        ? 'border-neutral-900 dark:border-white'
+                        : 'border-neutral-300 dark:border-neutral-600'
+                    )}
+                    style={{ backgroundColor: color.value }}
+                  >
+                    {selectedIndex === index && (
+                      <Check className="w-4 h-4" style={{ color: color.textColor }} />
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>{color.name}</TooltipContent>
+              </Tooltip>
+            ))}
           </div>
+        )}
 
-          {tab === 'color' && (
-            <div className="grid grid-cols-6 gap-2">
-              {displayColors.map((color, index) => (
-                <Tooltip key={color.name}>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleColorSelect(index)
-                      }}
-                      className={cn(
-                        'w-8 h-8 rounded-full border-2 transition-all hover:scale-110 flex items-center justify-center',
-                        selectedIndex === index
-                          ? 'border-neutral-900 dark:border-white'
-                          : 'border-neutral-300 dark:border-neutral-600'
-                      )}
-                      style={{ backgroundColor: color.value }}
-                    >
-                      {selectedIndex === index && (
-                        <Check className="w-4 h-4" style={{ color: color.textColor }} />
-                      )}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>{color.name}</TooltipContent>
-                </Tooltip>
-              ))}
-            </div>
-          )}
-
-          {tab === 'image' && (
-            <div className="space-y-3">
-              {/* Default backgrounds */}
-              {!style?.backgroundImage && (
-                <div className="space-y-1">
-                  <label className="text-xs text-neutral-500 dark:text-neutral-400">{t('stylePicker.templates')}</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {DEFAULT_BACKGROUNDS.map((bg) => (
-                      <Tooltip key={bg.name}>
-                        <TooltipTrigger asChild>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleDefaultBgSelect(bg.src)
-                            }}
-                            className="h-16 rounded-lg border border-neutral-200 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-400 transition-colors overflow-hidden"
-                          >
-                            <img 
-                              src={bg.src} 
-                              alt={bg.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent>{bg.name}</TooltipContent>
-                      </Tooltip>
-                    ))}
-                  </div>
+        {tab === 'image' && (
+          <div className="space-y-3">
+            {/* Default backgrounds */}
+            {!style?.backgroundImage && (
+              <div className="space-y-1">
+                <label className="text-xs text-neutral-500 dark:text-neutral-400">{t('stylePicker.templates')}</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {DEFAULT_BACKGROUNDS.map((bg) => (
+                    <Tooltip key={bg.name}>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDefaultBgSelect(bg.src)
+                          }}
+                          className="h-16 rounded-lg border border-neutral-200 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-400 transition-colors overflow-hidden"
+                        >
+                          <img
+                            src={bg.src}
+                            alt={bg.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>{bg.name}</TooltipContent>
+                    </Tooltip>
+                  ))}
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Upload area - only show when no image selected */}
-              {!style?.backgroundImage && (
-                <div
-                  {...getRootProps()}
-                  className={cn(
-                    'border-2 border-dashed rounded-lg p-2 text-center cursor-pointer transition-colors',
-                    isDragActive
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-neutral-300 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-500'
-                  )}
-                >
-                  <input {...getInputProps()} />
-                  <Upload className="w-5 h-5 mx-auto mb-1 text-neutral-400" />
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    {isDragActive ? t('stylePicker.dropImage') : t('stylePicker.uploadImage')}
-                  </p>
+            {/* Upload area - only show when no image selected */}
+            {!style?.backgroundImage && (
+              <div
+                {...getRootProps()}
+                className={cn(
+                  'border-2 border-dashed rounded-lg p-2 text-center cursor-pointer transition-colors',
+                  isDragActive
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                    : 'border-neutral-300 dark:border-neutral-600 hover:border-neutral-400 dark:hover:border-neutral-500'
+                )}
+              >
+                <input {...getInputProps()} />
+                <Upload className="w-5 h-5 mx-auto mb-1 text-neutral-400" />
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                  {isDragActive ? t('stylePicker.dropImage') : t('stylePicker.uploadImage')}
+                </p>
+              </div>
+            )}
+
+            {/* Current image preview & controls */}
+            {style?.backgroundImage && (
+              <div className="space-y-2">
+                <div className="relative rounded-lg overflow-hidden h-20 bg-white dark:bg-neutral-800">
+                  <img
+                    src={style.backgroundImage}
+                    alt="Background"
+                    className="w-full h-full object-cover"
+                    style={{ filter: IMAGE_FILTERS.find(f => f.value === style.backgroundFilter)?.css }}
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleRemoveImage()
+                    }}
+                    className="absolute top-1 right-1 p-1 bg-black/50 rounded-full text-white hover:bg-black/70"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 </div>
-              )}
 
-              {/* Current image preview & controls */}
-              {style?.backgroundImage && (
-                <div className="space-y-2">
-                  <div className="relative rounded-lg overflow-hidden h-20 bg-white dark:bg-neutral-800">
-                    <img
-                      src={style.backgroundImage}
-                      alt="Background"
-                      className="w-full h-full object-cover"
-                      style={{ filter: IMAGE_FILTERS.find(f => f.value === style.backgroundFilter)?.css }}
-                    />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleRemoveImage()
-                      }}
-                      className="absolute top-1 right-1 p-1 bg-black/50 rounded-full text-white hover:bg-black/70"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
+                {/* Opacity slider */}
+                <div className="space-y-1" onClick={(e) => e.stopPropagation()}>
+                  <label className="text-xs text-neutral-500 dark:text-neutral-400">
+                    {t('stylePicker.opacity')}: {Math.round((style.backgroundOpacity ?? 1) * 100)}%
+                  </label>
+                  <input
+                    type="range"
+                    min="0.3"
+                    max="1"
+                    step="0.05"
+                    value={style.backgroundOpacity ?? 1}
+                    onChange={(e) => handleOpacityChange(parseFloat(e.target.value))}
+                    className="w-full h-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-full appearance-none cursor-pointer accent-neutral-900 dark:accent-white"
+                  />
+                </div>
 
-                  {/* Opacity slider */}
-                  <div className="space-y-1" onClick={(e) => e.stopPropagation()}>
-                    <label className="text-xs text-neutral-500 dark:text-neutral-400">
-                      {t('stylePicker.opacity')}: {Math.round((style.backgroundOpacity ?? 1) * 100)}%
-                    </label>
-                    <input
-                      type="range"
-                      min="0.3"
-                      max="1"
-                      step="0.05"
-                      value={style.backgroundOpacity ?? 1}
-                      onChange={(e) => handleOpacityChange(parseFloat(e.target.value))}
-                      className="w-full h-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-full appearance-none cursor-pointer accent-neutral-900 dark:accent-white"
-                    />
-                  </div>
-
-                  {/* Filters - only show for uploaded images (base64), not for default backgrounds */}
-                  {style.backgroundImage.startsWith('data:') && (
-                    <div className="space-y-1">
-                      <label className="text-xs text-neutral-500 dark:text-neutral-400">{t('stylePicker.filter')}</label>
-                      <div className="grid grid-cols-4 gap-1.5">
-                        {IMAGE_FILTERS.map((filter) => (
-                          <button
-                            key={filter.name}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleFilterSelect(filter)
-                            }}
-                            className={cn(
-                              'relative rounded-md overflow-hidden h-12 transition-all',
-                              style.backgroundFilter === filter.value || (!style.backgroundFilter && !filter.value)
-                                ? 'ring-2 ring-neutral-900 dark:ring-white'
-                                : 'hover:ring-1 hover:ring-neutral-400'
-                            )}
-                          >
-                            <img
-                              src={style.backgroundImage}
-                              alt={filter.name}
-                              className="w-full h-full object-cover"
-                              style={{ filter: filter.css }}
-                            />
-                            <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] py-0.5 text-center">
-                              {filter.name}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
+                {/* Filters - only show for uploaded images (base64), not for default backgrounds */}
+                {style.backgroundImage.startsWith('data:') && (
+                  <div className="space-y-1">
+                    <label className="text-xs text-neutral-500 dark:text-neutral-400">{t('stylePicker.filter')}</label>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {IMAGE_FILTERS.map((filter) => (
+                        <button
+                          key={filter.name}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleFilterSelect(filter)
+                          }}
+                          className={cn(
+                            'relative rounded-md overflow-hidden h-12 transition-all',
+                            style.backgroundFilter === filter.value || (!style.backgroundFilter && !filter.value)
+                              ? 'ring-2 ring-neutral-900 dark:ring-white'
+                              : 'hover:ring-1 hover:ring-neutral-400'
+                          )}
+                        >
+                          <img
+                            src={style.backgroundImage}
+                            alt={filter.name}
+                            className="w-full h-full object-cover"
+                            style={{ filter: filter.css }}
+                          />
+                          <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] py-0.5 text-center">
+                            {filter.name}
+                          </span>
+                        </button>
+                      ))}
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
-          <Popover.Arrow className="fill-white dark:fill-neutral-800" />
-        </Popover.Content>
+        <Popover.Arrow className="fill-white dark:fill-neutral-800" />
+      </Popover.Content>
     </Popover.Root>
   )
 }
@@ -419,8 +426,8 @@ export function NoteBackground({ style, className }: { style?: NoteStyle; classN
   return (
     <>
       {/* Solid base layer - prevents seeing through to content below */}
-      <div 
-        className={cn('absolute inset-0 pointer-events-none bg-white dark:bg-neutral-900', className)} 
+      <div
+        className={cn('absolute inset-0 pointer-events-none bg-white dark:bg-neutral-900', className)}
       />
       {/* Image layer on top */}
       <div

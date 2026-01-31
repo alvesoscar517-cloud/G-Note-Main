@@ -40,11 +40,11 @@ export function DrivePermissionError({ onClose }: DrivePermissionErrorProps) {
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-sm bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl animate-in fade-in-0 zoom-in-95 border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+      <div className="relative w-full max-w-sm bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 p-1.5 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors z-10"
+          className="absolute top-3 right-3 p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors z-10"
         >
           <X className="w-5 h-5" />
         </button>

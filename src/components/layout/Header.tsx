@@ -1,30 +1,28 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useDebounce } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
-import { Search, Plus, Moon, Sun, LogOut, RefreshCw, Settings, X, Coins, ChevronRight, ArrowLeft, Maximize2, Trash2 } from 'lucide-react'
+import { Search, Plus, Moon, Sun, LogOut, Settings, X, Coins, ChevronRight, ArrowLeft, Maximize2, Trash2 } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
-import { useNetworkStore } from '@/stores/networkStore'
-import { useThemeStore } from '@/stores/themeStore'
+import { useAppStore, type ModalSize } from '@/stores/appStore'
 import { useCreditsStore } from '@/stores/creditsStore'
-import { useUIStore, type ModalSize } from '@/stores/uiStore'
 import { LanguageSelector, LanguageButton } from '@/components/ui/LanguageSelector'
 import { OfflineIndicator } from '@/components/ui/OfflineIndicator'
 import { TrashView } from '@/components/notes/TrashView'
 import { DriveSearchResults } from '@/components/search/DriveSearchResults'
-import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 import { LogoutConfirmDialog } from '@/components/auth/LogoutConfirmDialog'
 import { SharedNotesPanel, SharedNotesBadge } from '@/components/notes/SharedNotesPanel'
 import { useModalStatusBar } from '@/hooks/useModalStatusBar'
 import { cn } from '@/lib/utils'
-import { getValidAccessToken } from '@/lib/tokenManager'
+// Token manager import removed - not currently used
 
 // Modal size options
 const MODAL_SIZE_OPTIONS: { value: ModalSize; labelKey: string }[] = [
   { value: 'default', labelKey: 'settings.modalSizeDefault' },
   { value: 'large', labelKey: 'settings.modalSizeLarge' },
-  { value: 'xlarge', labelKey: 'settings.modalSizeXLarge' }
+  { value: 'xlarge', labelKey: 'settings.modalSizeXLarge' },
+  { value: 'fullscreen', labelKey: 'settings.modalSizeFullscreen' }
 ]
 
 // Hardcoded packages - no API loading needed
@@ -59,19 +57,16 @@ const CREDIT_PACKAGES = [
 export function Header() {
   const { t } = useTranslation()
   const { user, logout } = useAuthStore()
-  const isOnline = useNetworkStore(state => state.isOnline)
-  
+  // isOnline removed - not currently used directly in this component
+
   // Use selectors to prevent unnecessary re-renders
   const setSearchQuery = useNotesStore(state => state.setSearchQuery)
   const addNote = useNotesStore(state => state.addNote)
-  const syncWithDrive = useNotesStore(state => state.syncWithDrive)
-  const loadSharedNotes = useNotesStore(state => state.loadSharedNotes)
-  const isSyncing = useNotesStore(state => state.isSyncing)
+  // REMOVED: syncWithDrive, isSyncing, loadSharedNotes - Manual sync no longer needed
   const notes = useNotesStore(state => state.notes)
-  
-  const { theme, toggleTheme } = useThemeStore()
+
+  const { theme, toggleTheme, modalSize, setModalSize } = useAppStore()
   const { credits, fetchCredits, openCheckout } = useCreditsStore()
-  const { modalSize, setModalSize } = useUIStore()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [packagesOpen, setPackagesOpen] = useState(false)
   const [languageOpen, setLanguageOpen] = useState(false)
@@ -80,23 +75,22 @@ export function Header() {
   const [sharedNotesOpen, setSharedNotesOpen] = useState(false)
   const [driveSearchEnabled, setDriveSearchEnabled] = useState(false)
   const [showDriveResults, setShowDriveResults] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
-  
+
   // Update status bar color when any small modal is open
   // Note: trashOpen is excluded because TrashView is fullscreen
   const anyModalOpen = settingsOpen || packagesOpen || languageOpen || modalSizeOpen || sharedNotesOpen
   useModalStatusBar(anyModalOpen)
-  
+
   // Local search input state + debounce
   const [localSearch, setLocalSearch] = useState('')
   const [debouncedSearch] = useDebounce(localSearch, 200)
-  
+
   // Memoize trash count to prevent unnecessary re-renders
   const trashCount = useMemo(() => {
     return notes.filter(n => n.isDeleted).length
   }, [notes])
-  
+
   // Update store when debounced value changes
   useEffect(() => {
     // Only update local search when Drive search is disabled
@@ -138,17 +132,7 @@ export function Header() {
     addNote()
   }
 
-  const handleSync = async () => {
-    if (!isSyncing) {
-      // Get valid token (auto-refresh if expired)
-      const accessToken = await getValidAccessToken()
-      if (accessToken) {
-        await syncWithDrive(accessToken)
-        // Also load shared notes after sync
-        await loadSharedNotes()
-      }
-    }
-  }
+  // REMOVED: handleSync - Manual sync no longer needed, happens automatically
 
   const handleLogout = async () => {
     // Close settings modal and show confirmation dialog
@@ -158,13 +142,8 @@ export function Header() {
 
   const handleConfirmLogout = async () => {
     setShowLogoutConfirm(false)
-    setIsLoggingOut(true)
     setSettingsOpen(false)
-    try {
-      await logout()
-    } finally {
-      setIsLoggingOut(false)
-    }
+    await logout()
   }
 
   const handleToggleTheme = () => {
@@ -203,9 +182,6 @@ export function Header() {
 
   return (
     <>
-      {/* Logout Loading Overlay */}
-      <LoadingOverlay isVisible={isLoggingOut} text={t('settings.loggingOut')} />
-
       {/* Logout Confirmation Dialog */}
       <LogoutConfirmDialog
         open={showLogoutConfirm}
@@ -218,14 +194,14 @@ export function Header() {
           <div className="flex items-center justify-between gap-4">
             {/* Logo & Search */}
             <div className="flex items-center gap-3 flex-1">
-              <img 
-                src={isDark ? "/g-note-dark.svg" : "/g-note.svg"} 
-                alt="G-Note" 
-                className="w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0" 
+              <img
+                src={isDark ? "/g-note-dark.svg" : "/g-note.svg"}
+                alt="G-Note"
+                className="w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0"
               />
-              
+
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
                 <Input
                   value={localSearch}
                   onChange={(e) => setLocalSearch(e.target.value)}
@@ -247,19 +223,19 @@ export function Header() {
                   {driveSearchEnabled ? (
                     <img src="/drive-color-svgrepo-com.svg" alt="Drive" className="w-4 h-4" />
                   ) : (
-                    <img 
-                      src="/drive-google-svgrepo-com.svg" 
-                      alt="Drive" 
+                    <img
+                      src="/drive-google-svgrepo-com.svg"
+                      alt="Drive"
                       className="w-4 h-4 opacity-50"
                       style={{ filter: isDark ? 'invert(1)' : 'none' }}
                     />
                   )}
                 </button>
-                
+
                 {/* Drive Search Results Dropdown */}
                 {showDriveResults && debouncedSearch.trim() && (
                   <div className="absolute top-full left-0 right-0 mt-2 z-[100] mx-0 sm:mx-0">
-                    <DriveSearchResults 
+                    <DriveSearchResults
                       query={debouncedSearch}
                       onClose={() => setShowDriveResults(false)}
                     />
@@ -272,20 +248,20 @@ export function Header() {
             <div className="flex items-center gap-1">
               {/* Offline Indicator */}
               <OfflineIndicator className="mr-1" />
-              
+
               {/* Shared Notes Badge */}
               <SharedNotesBadge onClick={() => setSharedNotesOpen(true)} />
-              
-              <button 
-                onClick={handleAddNote} 
-                className="p-2 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
+
+              <button
+                onClick={handleAddNote}
+                className="p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
               >
                 <Plus className="w-5 h-5" />
               </button>
 
               <button
                 onClick={() => setSettingsOpen(true)}
-                className="p-2 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
+                className="p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
               >
                 <Settings className="w-5 h-5" />
               </button>
@@ -298,17 +274,17 @@ export function Header() {
       {settingsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 safe-x">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/50"
             onClick={() => setSettingsOpen(false)}
           />
-          
+
           {/* Modal - scrollable in landscape */}
-          <div className="relative w-full max-w-xs sm:max-w-sm max-h-[90vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl animate-in fade-in-0 zoom-in-95 border border-neutral-200 dark:border-neutral-700 modal-safe-area">
+          <div className="relative w-full max-w-xs sm:max-w-sm max-h-[90vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl  border border-neutral-200 dark:border-neutral-700 modal-safe-area">
             {/* Close button */}
             <button
               onClick={() => setSettingsOpen(false)}
-              className="absolute top-3 right-3 p-1.5 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors z-10"
+              className="absolute top-3 right-3 p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors z-10"
             >
               <X className="w-5 h-5" />
             </button>
@@ -338,12 +314,12 @@ export function Header() {
                 </p>
               </div>
             )}
-            
+
             {/* Menu items */}
             <div className="p-2 pb-6 space-y-0.5">
               {/* AI Credits */}
               <MenuItem
-                icon={<Coins className="w-4 h-4" />}
+                icon={<Coins className="w-5 h-5" />}
                 label={t('settings.aiCredits')}
                 onClick={() => {
                   setSettingsOpen(false)
@@ -356,30 +332,25 @@ export function Header() {
                 showArrow
                 badge={credits.toLocaleString()}
               />
-              
+
+              {/* REMOVED: Manual Sync - Sync now happens automatically in background */}
+
               <MenuItem
-                icon={<RefreshCw className={cn("w-4 h-4", isSyncing && "animate-spin")} />}
-                label={t('settings.sync')}
-                description={t('settings.syncDescription')}
-                onClick={handleSync}
-                disabled={!isOnline || isSyncing}
-              />
-              <MenuItem
-                icon={isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                icon={isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 label={isDark ? t('settings.lightMode') : t('settings.darkMode')}
                 description={t('settings.themeDescription')}
                 onClick={handleToggleTheme}
               />
-              
+
               {/* Language selector */}
               <LanguageButton onClick={() => {
                 setSettingsOpen(false)
                 setLanguageOpen(true)
               }} />
-              
+
               {/* Trash */}
               <MenuItem
-                icon={<Trash2 className="w-4 h-4" />}
+                icon={<Trash2 className="w-5 h-5" />}
                 label={t('trash.title')}
                 onClick={() => {
                   setSettingsOpen(false)
@@ -388,11 +359,11 @@ export function Header() {
                 showArrow
                 badge={trashCount > 0 ? trashCount.toString() : undefined}
               />
-              
+
               {/* Modal size - only show on desktop */}
               <div className="hidden md:block">
                 <MenuItem
-                  icon={<Maximize2 className="w-4 h-4" />}
+                  icon={<Maximize2 className="w-5 h-5" />}
                   label={t('settings.modalSize')}
                   description={t('settings.modalSizeDescription')}
                   onClick={() => {
@@ -402,10 +373,10 @@ export function Header() {
                   showArrow
                 />
               </div>
-              
+
               {user && (
                 <MenuItem
-                  icon={<LogOut className="w-4 h-4" />}
+                  icon={<LogOut className="w-5 h-5" />}
                   label={t('settings.logout')}
                   description={t('settings.logoutDescription')}
                   onClick={handleLogout}
@@ -419,23 +390,23 @@ export function Header() {
       {/* Credits Packages Modal */}
       {packagesOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 safe-x">
-          <div 
+          <div
             className="absolute inset-0 bg-black/50"
             onClick={() => setPackagesOpen(false)}
           />
-          
-          <div className="relative w-full max-w-[320px] sm:max-w-sm max-h-[85vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl animate-in fade-in-0 zoom-in-95 border border-neutral-200 dark:border-neutral-700 modal-safe-area">
+
+          <div className="relative w-full max-w-[320px] sm:max-w-sm max-h-[85vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl  border border-neutral-200 dark:border-neutral-700 modal-safe-area">
             <button
               onClick={() => setPackagesOpen(false)}
-              className="absolute top-2 right-2 p-1.5 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors z-10"
+              className="absolute top-2 right-2 p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors z-10"
             >
               <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
-            
+
             {/* Header - compact */}
             <div className="pt-4 pb-2 px-4 text-center">
-              <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 mb-2">
-                <Coins className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full border border-neutral-200 dark:border-neutral-700 mb-4">
+                <Coins className="w-6 h-6 text-neutral-600 dark:text-neutral-400" />
               </div>
               <h2 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white">
                 {t('credits.title')}
@@ -444,7 +415,7 @@ export function Header() {
                 {t('credits.balance')}: <span className="font-semibold">{credits.toLocaleString()}</span> {t('credits.aiCredits')}
               </p>
             </div>
-            
+
             {/* Packages - compact spacing */}
             <div className="px-3 pb-3 space-y-2">
               {CREDIT_PACKAGES.map((pkg) => (
@@ -453,9 +424,8 @@ export function Header() {
                   onClick={() => handleBuyPackage(pkg.id)}
                   className={cn(
                     "relative p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer hover:shadow-md active:scale-[0.98]",
-                    pkg.badge 
-                      ? "border-neutral-400 dark:border-neutral-500 bg-neutral-50 dark:bg-neutral-800" 
-                      : "border-neutral-200 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-500"
+                    "border-neutral-200 dark:border-neutral-700",
+                    pkg.badge && "bg-neutral-50 dark:bg-neutral-800"
                   )}
                 >
                   {pkg.badge && (
@@ -463,10 +433,10 @@ export function Header() {
                       {t('credits.bestValue')}
                     </span>
                   )}
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border border-neutral-200 dark:border-neutral-600 flex items-center justify-center flex-shrink-0">
                         <img src={pkg.icon} alt="" className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
                       <div className="min-w-0">
@@ -488,17 +458,17 @@ export function Header() {
                 </div>
               ))}
             </div>
-            
+
             {/* Footer with Lemon Squeezy logo */}
             <div className="px-4 pb-3 pt-1 flex items-center justify-center">
-              <img 
-                src="/lemonsqueezy-black.svg" 
-                alt="Lemon Squeezy" 
+              <img
+                src="/lemonsqueezy-black.svg"
+                alt="Lemon Squeezy"
                 className="h-3 dark:hidden"
               />
-              <img 
-                src="/lemonsqueezy-white.svg" 
-                alt="Lemon Squeezy" 
+              <img
+                src="/lemonsqueezy-white.svg"
+                alt="Lemon Squeezy"
                 className="h-3 hidden dark:block"
               />
             </div>
@@ -509,12 +479,12 @@ export function Header() {
       {/* Language Modal */}
       {languageOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 safe-x">
-          <div 
+          <div
             className="absolute inset-0 bg-black/50"
             onClick={() => setLanguageOpen(false)}
           />
-          
-          <div className="relative w-full max-w-xs sm:max-w-sm max-h-[90vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl animate-in fade-in-0 zoom-in-95 border border-neutral-200 dark:border-neutral-700 modal-safe-area">
+
+          <div className="relative w-full max-w-xs sm:max-w-sm max-h-[90vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl  border border-neutral-200 dark:border-neutral-700 modal-safe-area">
             {/* Header */}
             <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 sticky top-0 bg-white dark:bg-neutral-900 z-10">
               <button
@@ -522,7 +492,7 @@ export function Header() {
                   setLanguageOpen(false)
                   setSettingsOpen(true)
                 }}
-                className="p-1.5 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                className="p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -530,7 +500,7 @@ export function Header() {
                 {t('common.language')}
               </h3>
             </div>
-            
+
             <LanguageSelector onClose={() => setLanguageOpen(false)} />
           </div>
         </div>
@@ -539,12 +509,12 @@ export function Header() {
       {/* Modal Size Selector */}
       {modalSizeOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 safe-x">
-          <div 
+          <div
             className="absolute inset-0 bg-black/50"
             onClick={() => setModalSizeOpen(false)}
           />
-          
-          <div className="relative w-full max-w-xs sm:max-w-sm max-h-[90vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl animate-in fade-in-0 zoom-in-95 border border-neutral-200 dark:border-neutral-700 modal-safe-area">
+
+          <div className="relative w-full max-w-xs sm:max-w-sm max-h-[90vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl  border border-neutral-200 dark:border-neutral-700 modal-safe-area">
             {/* Header */}
             <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3">
               <button
@@ -552,7 +522,7 @@ export function Header() {
                   setModalSizeOpen(false)
                   setSettingsOpen(true)
                 }}
-                className="p-1.5 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                className="p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -560,7 +530,7 @@ export function Header() {
                 {t('settings.modalSize')}
               </h3>
             </div>
-            
+
             {/* Size options */}
             <div className="p-2 sm:p-3 space-y-1">
               {MODAL_SIZE_OPTIONS.map((option) => (
@@ -600,15 +570,15 @@ export function Header() {
   )
 }
 
-function MenuItem({ 
-  icon, 
+function MenuItem({
+  icon,
   label,
   description,
-  onClick, 
+  onClick,
   disabled,
   showArrow,
   badge
-}: { 
+}: {
   icon: React.ReactNode
   label: string
   description?: string
@@ -628,7 +598,7 @@ function MenuItem({
         disabled && "opacity-50 cursor-not-allowed"
       )}
     >
-      <div className="p-1.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400">
+      <div className="p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
@@ -650,3 +620,4 @@ function MenuItem({
     </button>
   )
 }
+

@@ -109,7 +109,7 @@ export function GlobalSearch({ open, onClose, onSelectNote }: GlobalSearchProps)
       />
       
       {/* Search Modal */}
-      <div className="relative w-full max-w-xl bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden animate-in fade-in-0 zoom-in-95">
+      <div className="relative w-full max-w-xl bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
         {/* Search Input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-neutral-200 dark:border-neutral-700">
           <Search className="w-5 h-5 text-neutral-400" />

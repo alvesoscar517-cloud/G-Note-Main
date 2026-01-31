@@ -28,6 +28,9 @@ export function VantaWaves({ className }: VantaCloudsProps) {
       gyroControls: false,
       minHeight: 200.0,
       minWidth: 200.0,
+      speed: 1.0,
+      scale: 1.0,
+      scaleMobile: 1.0,
     })
 
     return () => {

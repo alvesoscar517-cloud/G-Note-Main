@@ -38,7 +38,6 @@ export interface SyncResult {
   notesChanged: boolean
   syncedNotes: Note[]
   errors?: SyncError[]
-  staleLocalIds?: string[]
   conflicts?: ConflictInfo[]
 }
 
@@ -87,7 +86,3 @@ export interface TombstoneData {
   id: string
   deletedAt: number
 }
-
-// ============ Stale Device Detection ============
-
-export const STALE_DEVICE_THRESHOLD_MS = 30 * 24 * 60 * 60 * 1000 // 30 days

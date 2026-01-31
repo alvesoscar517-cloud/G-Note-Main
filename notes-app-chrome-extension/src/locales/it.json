@@ -48,6 +48,7 @@
     "modalSizeDefault": "Predefinita",
     "modalSizeLarge": "Grande",
     "modalSizeXLarge": "Molto grande",
+    "modalSizeFullscreen": "Schermo intero",
     "displayMode": "Modalità di visualizzazione",
     "displayModeDescription": "Scegli come aprire l'estensione",
     "fullscreen": "Schermo intero",
@@ -132,7 +133,48 @@
     "versionHistory": "Cronologia versioni",
     "fullscreen": "Schermo intero",
     "exitFullscreen": "Esci da schermo intero",
-    "more": "Altro"
+    "more": "Altro",
+    "insertTable": "Inserisci tabella",
+    "tableProperties": "Proprietà tabella",
+    "addColumnBefore": "Aggiungi colonna prima",
+    "addColumnAfter": "Aggiungi colonna dopo",
+    "addRowBefore": "Aggiungi riga prima",
+    "addRowAfter": "Aggiungi riga dopo",
+    "deleteColumn": "Elimina colonna",
+    "deleteRow": "Elimina riga",
+    "deleteTable": "Elimina tabella",
+    "mergeCells": "Unisci celle",
+    "splitCell": "Dividi cella",
+    "toggleHeaderRow": "Attiva/disattiva riga intestazione",
+    "toggleHeaderColumn": "Attiva/disattiva colonna intestazione",
+    "exportTableCSV": "Esporta come CSV",
+    "exportTableMarkdown": "Esporta come Markdown",
+    "tableRows": "Righe",
+    "tableColumns": "Colonne",
+    "includeHeaderRow": "Includi riga intestazione",
+    "tablePreview": "Anteprima",
+    "createTable": "Crea tabella",
+    "tableDimensions": "Dimensioni",
+    "tableHeaders": "Intestazioni",
+    "tableWidth": "Larghezza",
+    "tableOptions": "Opzioni",
+    "resizableColumns": "Colonne ridimensionabili",
+    "fixedLayout": "Layout fisso",
+    "headerRow": "Riga intestazione",
+    "headerColumn": "Colonna intestazione",
+    "autoWidth": "Automatico",
+    "fullWidth": "100%",
+    "customWidth": "Personalizzato",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -155,7 +197,16 @@
     "chatWithAI": "Chat con AI",
     "chatWelcome": "Ciao",
     "chatDescription": "Chiedimi qualsiasi cosa su questa nota. Risponderò in base al contesto della nota.",
-    "send": "Invia"
+    "send": "Invia",
+    "tone": {
+      "label": "Cambia tono",
+      "professional": "Professionale",
+      "formalEmail": "Email formale",
+      "socialMedia": "Social Media",
+      "casual": "Informale",
+      "friendly": "Amichevole",
+      "confident": "Sicuro"
+    }
   },
   "sharedNotes": {
     "title": "Condiviso con te",
@@ -262,7 +313,8 @@
     "cancel": "Annulla",
     "language": "Lingua",
     "searchLanguage": "Cerca lingua...",
-    "noLanguageFound": "Lingua non trovata"
+    "noLanguageFound": "Lingua non trovata",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "Proprio ora",
@@ -424,5 +476,6 @@
     "genericErrorDescription": "Si è verificato un errore imprevisto. Riprova.",
     "appError": "L'app si è bloccata",
     "appErrorDescription": "Qualcosa è andato storto e l'app deve essere ricaricata. Ci scusiamo per l'inconveniente."
-  }
+  },
+  "webContent": {}
 }

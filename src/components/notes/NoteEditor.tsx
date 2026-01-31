@@ -6,8 +6,14 @@ import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
+import { TableRow } from '@tiptap/extension-table-row'
+import { TableHeader } from '@tiptap/extension-table-header'
+import { TableCell } from '@tiptap/extension-table-cell'
+import { MobileScrollableTable } from './table/MobileScrollableTable'
+import { initTableScrollIndicators } from './table/tableScrollIndicators'
 import { ResizableImage } from './ResizableImageExtension'
 import { DrawingModal } from './DrawingModal'
+import { ImageAnalysisModal } from './ImageAnalysisModal'
 import { CollaborationCursors } from './CollaborationCursors'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import { common, createLowlight } from 'lowlight'
@@ -18,13 +24,18 @@ import Subscript from '@tiptap/extension-subscript'
 import Superscript from '@tiptap/extension-superscript'
 import TextAlign from '@tiptap/extension-text-align'
 import Link from '@tiptap/extension-link'
+import { TextStyle } from '@tiptap/extension-text-style'
+import { Color } from '@tiptap/extension-color'
+import Typography from '@tiptap/extension-typography'
+import FontFamily from '@tiptap/extension-font-family'
+import Youtube from '@tiptap/extension-youtube'
 import { marked } from 'marked'
 import * as Y from 'yjs'
 import { WebrtcProvider } from 'y-webrtc'
 import Collaboration from '@tiptap/extension-collaboration'
 import { generateUserColor } from '@/lib/collaboration'
 import {
-  Undo2, 
+  Undo2,
   Redo2,
   Bold,
   Italic,
@@ -45,10 +56,7 @@ import {
   History,
   Maximize2,
   Minimize2,
-  Copy,
-  Scissors,
-  ClipboardPaste,
-  TextSelect,
+  // Copy, Scissors, ClipboardPaste, TextSelect - removed (unused)
   Sparkles,
   Underline as UnderlineIcon,
   Highlighter,
@@ -65,31 +73,30 @@ import {
   AlignRight,
   AlignJustify,
   RemoveFormatting,
-  ArrowLeft
+  ArrowLeft,
+  Table as TableIcon
 } from 'lucide-react'
 import { useNotesStore } from '@/stores/notesStore'
 import { useAuthStore } from '@/stores/authStore'
-import { useNetworkStore, NetworkRequiredError } from '@/stores/networkStore'
+import { useAppStore, NetworkRequiredError } from '@/stores/appStore'
 import { cn } from '@/lib/utils'
 import { ConfirmDialog, InputDialog } from '@/components/ui/Dialog'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { DrawingErrorBoundary } from '@/components/ui/ErrorBoundary'
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from '@/components/ui/ContextMenu'
+// ContextMenu imports removed - now using EditorContextMenu component
 import { ShareDialog } from './ShareDialog'
 import { VersionHistoryPanel } from './VersionHistoryPanel'
 import { NoteStylePicker } from './NoteStylePicker'
 import { NoteActionsMenu } from './NoteActionsMenu'
-import { AIMenu, SummaryModal, InsufficientCreditsModal } from './AIMenu'
+import { AIMenu, InsufficientCreditsModal } from './AIMenu'
 import { AIChatView } from './AIChatView'
 import { SpeechButton } from './SpeechButton'
-import { EditorSkeleton } from '@/components/ui/Skeleton'
+import { EditorSkeleton, Skeleton } from '@/components/ui/Skeleton'
 import { useNetworkRequiredOverlay } from '@/components/ui/OfflineIndicator'
 import { useResponsiveToolbar } from '@/hooks/useResponsiveToolbar'
+import { TableInsertDialog } from './table/TableInsertDialog'
+import { EditorContextMenu } from './EditorContextMenu'
+import { TablePropertiesDialog } from './table/TablePropertiesDialog'
 import { useScrollableDrag } from '@/hooks/useScrollableDrag'
 import * as AI from '@/lib/ai'
 import { InsufficientCreditsError } from '@/lib/ai'
@@ -98,12 +105,12 @@ import type { Note, NoteStyle, AIChatMessage } from '@/types'
 // Remove duplicate Message type - use AIChatMessage from types
 
 // Editable title component with ellipsis support
-function EditableTitle({ 
-  value, 
-  onChange, 
+function EditableTitle({
+  value,
+  onChange,
   placeholder,
-  className 
-}: { 
+  className
+}: {
   value: string
   onChange: (value: string) => void
   placeholder: string
@@ -157,26 +164,21 @@ function EditableTitle({
   const displayValue = value?.replace(/\s+/g, ' ').trimEnd() || placeholder
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div
-          onClick={() => setIsEditing(true)}
-          className={cn(
-            'overflow-hidden cursor-text',
-            !value && 'text-neutral-400',
-            className
-          )}
-          style={{
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            wordBreak: 'break-all'
-          }}
-        >
-          {displayValue}
-        </div>
-      </TooltipTrigger>
-      <TooltipContent side="bottom">{value || placeholder}</TooltipContent>
-    </Tooltip>
+    <div
+      onClick={() => setIsEditing(true)}
+      className={cn(
+        'overflow-hidden cursor-text',
+        !value && 'text-neutral-400',
+        className
+      )}
+      style={{
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        wordBreak: 'break-all'
+      }}
+    >
+      {displayValue}
+    </div>
   )
 }
 
@@ -188,6 +190,9 @@ interface NoteEditorProps {
   isFullscreen?: boolean
   canToggleFullscreen?: boolean
   onToggleFullscreen?: () => void
+  isFreeMode?: boolean // Hide close button and lock fullscreen in free mode
+  onLockedFeatureClick?: (featureName: string) => void // Callback when locked feature is clicked in free mode
+  customUpdateHandler?: (updates: Partial<Note>) => void // Custom update handler for free mode (bypasses store)
 }
 
 interface CollaboratorInfo {
@@ -196,15 +201,15 @@ interface CollaboratorInfo {
   picture?: string
 }
 
-export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen, canToggleFullscreen = true, onToggleFullscreen }: NoteEditorProps) {
+export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen, canToggleFullscreen = true, onToggleFullscreen, isFreeMode = false, onLockedFeatureClick, customUpdateHandler }: NoteEditorProps) {
   const { t } = useTranslation()
   const { updateNote, deleteNote } = useNotesStore()
   const { user } = useAuthStore()
-  const isOnline = useNetworkStore(state => state.isOnline)
-  
+  const isOnline = useAppStore(state => state.isOnline)
+
   // Network required overlay for offline handling
   const { showOverlay: showNetworkOverlay, OverlayComponent: NetworkOverlay } = useNetworkRequiredOverlay()
-  
+
   // Track note ID to detect when note changes
   const currentNoteIdRef = useRef(note.id)
   const isFirstRender = useRef(true)
@@ -212,31 +217,35 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showShareDialog, setShowShareDialog] = useState(false)
   const [showVersionHistory, setShowVersionHistory] = useState(false)
+  const [showTableInsertDialog, setShowTableInsertDialog] = useState(false)
+  const [showTablePropertiesDialog, setShowTablePropertiesDialog] = useState(false)
   const [roomId, setRoomId] = useState<string | null>(null)
   const [isRoomHost, setIsRoomHost] = useState(false) // Track if user created the room (host) or joined (guest)
   const [collaborators, setCollaborators] = useState<CollaboratorInfo[]>([])
   const [userColor] = useState(() => generateUserColor())
-  
+
   // AI states
   const [isAILoading, setIsAILoading] = useState(false) // For actions that modify editor
   const [isAskAILoading, setIsAskAILoading] = useState(false) // For ask AI only
   const [isStreaming, setIsStreaming] = useState(false)
+  const [isContinuing, setIsContinuing] = useState(false)
   const [showAIChatView, setShowAIChatView] = useState(false) // Fullscreen chat view
   const [chatMessages, setChatMessages] = useState<AIChatMessage[]>(note.aiChatHistory || []) // Chat history from note
-  const [showSummary, setShowSummary] = useState(false)
-  const [summaryContent, setSummaryContent] = useState('')
-  const [selectedText, setSelectedText] = useState('') // Text currently highlighted
+  const [isSummarizing, setIsSummarizing] = useState(false)
+  // selectedText state removed - was unused
   const [aiContextText, setAiContextText] = useState('') // Text to use for AI query
   const [aiError, setAiError] = useState<string | null>(null)
   const [showCreditsError, setShowCreditsError] = useState(false)
   const [showDrawingModal, setShowDrawingModal] = useState(false)
   const [showLinkDialog, setShowLinkDialog] = useState(false)
+  const [showImageAnalysis, setShowImageAnalysis] = useState(false)
+  const [isAnalyzingImage, setIsAnalyzingImage] = useState(false)
   const editorContainerRef = useRef<HTMLDivElement>(null)
   const toolbarRef = useRef<HTMLDivElement>(null)
-  
+
   // Responsive toolbar visibility
   const toolbarVisibility = useResponsiveToolbar(toolbarRef)
-  
+
   // Scrollable drag for toolbar
   const toolbarScrollRef = useScrollableDrag<HTMLDivElement>()
 
@@ -268,17 +277,17 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       }
     }
   }, [chatMessages, note.id, note.aiChatHistory, updateNote])
-  
+
   // WebRTC provider and Y.Doc for collaboration
   const [provider, setProvider] = useState<WebrtcProvider | null>(null)
   const [ydoc, setYdoc] = useState<Y.Doc | null>(null)
   const [isProviderReady, setIsProviderReady] = useState(false)
   const [awarenessDoc, setAwarenessDoc] = useState<Y.Doc | null>(null)
-  
+
   // Use refs to track current provider/ydoc for cleanup
   const providerRef = useRef<WebrtcProvider | null>(null)
   const ydocRef = useRef<Y.Doc | null>(null)
-  
+
   // Use refs for user info to avoid re-running effect when these change
   const userNameRef = useRef(user?.name)
   const userAvatarRef = useRef(user?.avatar)
@@ -297,7 +306,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       ydocRef.current.destroy()
       ydocRef.current = null
     }
-    
+
     if (!roomId) {
       setProvider(null)
       setYdoc(null)
@@ -314,16 +323,16 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
 
     const setupCollaboration = async () => {
       console.log('[Collab] Starting collaboration for room:', roomId)
-      
+
       newYdoc = new Y.Doc()
-      
+
       // Get signaling servers from environment variable
       const signalingServers = import.meta.env.VITE_SIGNALING_SERVERS
         ? import.meta.env.VITE_SIGNALING_SERVERS.split(',').map((s: string) => s.trim())
         : []
-      
+
       console.log('[Collab] Using signaling servers:', signalingServers)
-      
+
       // Fetch ICE servers from Metered API (includes STUN + TURN)
       // This enables cross-network connections (WiFi to 4G, etc.)
       const meteredApiKey = import.meta.env.VITE_METERED_API_KEY
@@ -332,7 +341,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
       ]
-      
+
       if (meteredApiKey) {
         try {
           const response = await fetch(`https://gnote.metered.live/api/v1/turn/credentials?apiKey=${meteredApiKey}`)
@@ -345,9 +354,9 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           console.warn('[Collab] Failed to fetch Metered ICE servers, using fallback:', error)
         }
       }
-      
+
       if (cancelled) return
-      
+
       newProvider = new WebrtcProvider(`notes-app-${roomId}`, newYdoc, {
         signaling: signalingServers,
         peerOpts: {
@@ -372,7 +381,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       newProvider.on('synced', (event: { synced: boolean }) => {
         console.log('[Collab] Provider synced:', event.synced)
       })
-      
+
       newProvider.on('peers', (event: { added: string[], removed: string[], webrtcPeers: string[], bcPeers: string[] }) => {
         console.log('[Collab] Peers changed:', event)
       })
@@ -381,7 +390,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
 
       setYdoc(newYdoc)
       setProvider(newProvider)
-      
+
       // Wait for awareness to be fully initialized with doc before marking ready
       // CollaborationCursor needs awareness.doc to be available
       const checkReady = () => {
@@ -398,7 +407,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           readyTimeout = setTimeout(checkReady, 100)
         }
       }
-      
+
       // Start checking after initial setup - give more time for initialization
       readyTimeout = setTimeout(checkReady, 300)
 
@@ -433,13 +442,13 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       if (readyTimeout) clearTimeout(readyTimeout)
       if (interval) clearInterval(interval)
       if (newProvider) {
-        newProvider.awareness.off('change', () => {})
+        newProvider.awareness.off('change', () => { })
       }
       setIsProviderReady(false)
       // Cleanup will be done at the start of next effect run
     }
   }, [roomId, userColor]) // Only re-run when roomId or userColor changes, not user info
-  
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -475,14 +484,23 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   }, [roomId])
 
   // Debounced update note content - reduced for snappier feel
+  // Use ref to avoid stale closure with customUpdateHandler
+  const customUpdateHandlerRef = useRef(customUpdateHandler)
+  customUpdateHandlerRef.current = customUpdateHandler
+
+  // Use customUpdateHandler if provided (for free mode), otherwise use store's updateNote
   const debouncedUpdate = useDebouncedCallback((id: string, content: string) => {
     lastSavedContentRef.current = content
-    updateNote(id, { content })
+    if (customUpdateHandlerRef.current) {
+      customUpdateHandlerRef.current({ content })
+    } else {
+      updateNote(id, { content })
+    }
   }, 300)
 
   // Track last saved content to avoid unnecessary saves
   const lastSavedContentRef = useRef<string>(note.content || '')
-  
+
   // Store note.id in ref to use in editor callback (avoids stale closure)
   const noteIdRef = useRef(note.id)
   noteIdRef.current = note.id
@@ -491,17 +509,17 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   // This ensures we only switch to collaboration mode when everything is initialized
   // CollaborationCursor requires provider.awareness.doc to be available
   const isCollaborationReady = !!(
-    roomId && 
-    ydoc && 
-    provider && 
-    isProviderReady && 
+    roomId &&
+    ydoc &&
+    provider &&
+    isProviderReady &&
     awarenessDoc
   )
-  
+
   // Disable history when roomId is set (even before full collaboration ready)
   // This prevents conflict between StarterKit history and Collaboration extension
   const shouldDisableHistory = !!roomId
-  
+
   // Memoize extensions to prevent recreation on every render
   const extensions = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -528,6 +546,14 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         nested: true,
         HTMLAttributes: { class: 'task-item' }
       }),
+      TextStyle,
+      Color,
+      Typography,
+      FontFamily,
+      Youtube.configure({
+        controls: false,
+        nocookie: true,
+      }),
       ResizableImage,
       // Link extension for hyperlinks
       Link.configure({
@@ -553,6 +579,24 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       Superscript,
       TextAlign.configure({
         types: ['heading', 'paragraph']
+      }),
+      // Table extensions
+      MobileScrollableTable.configure({
+        resizable: true,
+        HTMLAttributes: {
+          class: 'border-collapse table-fixed w-full my-4'
+        }
+      }),
+      TableRow,
+      TableHeader.configure({
+        HTMLAttributes: {
+          class: 'border border-neutral-300 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-800 px-3 py-2 text-left font-semibold'
+        }
+      }),
+      TableCell.configure({
+        HTMLAttributes: {
+          class: 'border border-neutral-300 dark:border-neutral-600 px-3 py-2'
+        }
       })
     ]
 
@@ -565,7 +609,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           field: 'prosemirror', // Use 'prosemirror' as the Y.js fragment name
         })
       )
-      
+
       // Note: CollaborationCursor is disabled due to compatibility issues
       // with y-webrtc provider. The "Cannot read properties of undefined (reading 'doc')"
       // error occurs because yCursorPlugin expects awareness.doc to be set synchronously,
@@ -622,21 +666,21 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     if (!roomId || !provider || !editor || !ydoc || !isProviderReady) {
       return
     }
-    
+
     const fragment = ydoc.getXmlFragment('prosemirror')
     let initTimeout: ReturnType<typeof setTimeout> | null = null
     let peerWaitTimeout: ReturnType<typeof setTimeout> | null = null
-    
+
     console.log('[Collab] Collaboration ready, isHost:', isRoomHost, 'fragment length:', fragment.length)
-    
+
     // Only the HOST should initialize Y.js document with their content
     // Guests should wait for sync from the host
     // Use lastSavedContentRef to get initial content without causing re-renders
     const initialContent = lastSavedContentRef.current || note.content
-    
+
     if (isRoomHost && initialContent) {
       console.log('[Collab] Host initializing content...')
-      
+
       // Function to set content when ready
       const setInitialContent = () => {
         const currentFragment = ydoc.getXmlFragment('prosemirror')
@@ -647,10 +691,10 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           console.log('[Collab] Fragment already has content, skipping init')
         }
       }
-      
+
       // Wait a bit for Y.js to be fully ready before setting content
       initTimeout = setTimeout(setInitialContent, 500)
-      
+
       // Also set content again after a longer delay to ensure sync with late joiners
       peerWaitTimeout = setTimeout(() => {
         const currentFragment = ydoc.getXmlFragment('prosemirror')
@@ -661,19 +705,19 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       }, 2000)
     } else if (!isRoomHost) {
       console.log('[Collab] Guest waiting for sync from host...')
-      
+
       // Listen for Y.js document updates to know when content arrives
       const onUpdate = () => {
         const currentFragment = ydoc.getXmlFragment('prosemirror')
         console.log('[Collab] Y.js update received, fragment length:', currentFragment.length)
       }
       ydoc.on('update', onUpdate)
-      
+
       return () => {
         ydoc.off('update', onUpdate)
       }
     }
-    
+
     // Periodic auto-save during collaboration (every 10 seconds)
     const autoSaveInterval = setInterval(() => {
       const content = editor.getHTML()
@@ -686,17 +730,17 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     return () => {
       if (initTimeout) clearTimeout(initTimeout)
       if (peerWaitTimeout) clearTimeout(peerWaitTimeout)
-      
+
       // Save content before leaving collaboration
       const finalContent = editor.getHTML()
       if (noteIdRef.current && finalContent !== lastSavedContentRef.current) {
         lastSavedContentRef.current = finalContent
         updateNote(noteIdRef.current, { content: finalContent })
       }
-      
+
       clearInterval(autoSaveInterval)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, provider, editor, ydoc, isProviderReady, updateNote, isRoomHost])
 
   // Save on page unload or visibility change (prevent data loss)
@@ -733,6 +777,26 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     }
   }, [editor])
 
+  // Initialize scroll indicators for table wrappers
+  useEffect(() => {
+    if (!editor) return
+
+    let cleanup: (() => void) | undefined
+
+    // Wait for editor to be fully mounted
+    const timer = setTimeout(() => {
+      const editorElement = editor.view.dom
+      if (editorElement) {
+        cleanup = initTableScrollIndicators(editorElement)
+      }
+    }, 100)
+
+    return () => {
+      clearTimeout(timer)
+      if (cleanup) cleanup()
+    }
+  }, [editor])
+
   const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !editor) return
@@ -750,23 +814,23 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     fileInputRef.current?.click()
   }, [])
 
-  // Store the text captured when context menu opened
-  const capturedTextRef = useRef<string>('')
+  // NOTE: capturedTextRef is currently unused but kept for potential future context menu features\n  // const capturedTextRef = useRef<string>('')
 
-  const handleContextMenuOpen = useCallback(() => {
-    const selection = window.getSelection()
-    if (selection && selection.toString().trim().length > 0) {
-      capturedTextRef.current = selection.toString()
-      setSelectedText(selection.toString())
-    } else {
-      capturedTextRef.current = ''
-      setSelectedText('')
-    }
-  }, [])
 
   const handleDelete = () => {
-    deleteNote(note.id)
-    onClose()
+    if (isFreeMode) {
+      // In free mode, reset note content instead of deleting
+      updateNote(note.id, {
+        title: '',
+        content: '',
+        style: undefined
+      })
+      setShowDeleteDialog(false)
+    } else {
+      // Normal mode: delete the note
+      deleteNote(note.id)
+      onClose()
+    }
   }
 
   const handleCreateRoom = (newRoomId: string) => {
@@ -800,95 +864,65 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     }
   }
 
+  const handleInsertTable = (rows: number, cols: number, withHeaderRow: boolean) => {
+    editor?.chain().focus().insertTable({ rows, cols, withHeaderRow }).run()
+  }
+
   const handleStyleChange = (style: NoteStyle) => {
     if (note) {
-      updateNote(note.id, { style })
+      if (customUpdateHandler) {
+        customUpdateHandler({ style })
+      } else {
+        updateNote(note.id, { style })
+      }
     }
   }
 
   // Import document handler
   const handleImportDocument = useCallback((title: string, content: string) => {
     if (!editor || !note) return
-    
+
     // Update title if imported file has one and current note is untitled
     if (title && !note.title) {
-      updateNote(note.id, { title })
+      if (customUpdateHandler) {
+        customUpdateHandler({ title })
+      } else {
+        updateNote(note.id, { title })
+      }
     }
-    
+
     // Set content to editor
     editor.commands.setContent(content)
-    
+
     // Trigger save
     debouncedUpdate(note.id, content)
-  }, [editor, note, updateNote, debouncedUpdate])
+  }, [editor, note, updateNote, debouncedUpdate, customUpdateHandler])
 
   // AI handlers
   const getEditorText = () => {
     return editor?.getText() || ''
   }
 
-  // Convert markdown to HTML and set to editor
-  const setMarkdownContent = (markdown: string) => {
-    if (!editor) return
-    // Use marked to convert markdown to HTML, then set to editor
-    const html = marked.parse(markdown, { async: false }) as string
-    editor.commands.setContent(html)
-  }
 
-  // Simulate streaming text effect with markdown support
-  const streamText = async (markdownText: string, onComplete?: () => void, asTaskList?: boolean) => {
-    if (!editor) return
-    
-    setIsStreaming(true)
-    editor.commands.setContent('') // Clear editor
-    
-    const words = markdownText.split(' ')
-    let currentText = ''
-    
-    for (let i = 0; i < words.length; i++) {
-      currentText += (i === 0 ? '' : ' ') + words[i]
-      // Set as plain text during streaming for performance
-      editor.commands.setContent(`<p>${currentText}</p>`)
-      
-      // Auto scroll to bottom - smooth scroll during streaming
-      if (editorContainerRef.current) {
-        editorContainerRef.current.scrollTo({
-          top: editorContainerRef.current.scrollHeight,
-          behavior: 'smooth'
-        })
-      }
-      
-      // Random delay for natural feel (15-35ms per word)
-      await new Promise(resolve => setTimeout(resolve, 15 + Math.random() * 20))
-    }
-    
-    // After streaming, parse markdown properly
-    if (asTaskList) {
-      // Convert markdown list to Tiptap task list format
-      const taskListHtml = convertToTaskList(markdownText)
-      editor.commands.setContent(taskListHtml)
-    } else {
-      setMarkdownContent(markdownText)
-    }
-    
-    // Final scroll to ensure everything is visible
+
+  // Simulate streaming text effect with markdown support - REMOVED (Legacy)
+  // We now use real streaming from the backend
+
+  // Helper to scroll to bottom
+  const scrollToBottom = () => {
     if (editorContainerRef.current) {
       editorContainerRef.current.scrollTo({
         top: editorContainerRef.current.scrollHeight,
         behavior: 'smooth'
       })
     }
-    
-    setIsStreaming(false)
-    if (note) updateNote(note.id, { content: editor.getHTML() })
-    onComplete?.()
   }
 
   // Convert markdown list items to Tiptap task list HTML
   const convertToTaskList = (markdown: string): string => {
     const lines = markdown.split('\n')
     const taskItems: string[] = []
-    
+
     for (const line of lines) {
       // Match markdown list items: - item, * item, or numbered 1. item
       const match = line.match(/^[\s]*[-*][\s]+(.+)$/) || line.match(/^[\s]*\d+\.[\s]+(.+)$/)
@@ -897,25 +931,34 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         taskItems.push(`<li data-type="taskItem" data-checked="false"><label><input type="checkbox"><span></span></label><div><p>${text}</p></div></li>`)
       }
     }
-    
+
     if (taskItems.length > 0) {
       return `<ul data-type="taskList">${taskItems.join('')}</ul>`
     }
-    
+
     // Fallback: if no list items found, just return as paragraph
     return `<p>${markdown}</p>`
   }
 
   const handleAIAction = async (action: AI.AIAction, extra?: string) => {
     if (!editor || isAILoading || isStreaming) return
-    
+
     // Check network for AI features
     if (!isOnline) {
       showNetworkOverlay(t('ai.title'))
       return
     }
-    
-    const content = getEditorText()
+
+    // Determine content based on selection
+    const selection = editor.state.selection
+    const isSelectionMode = !selection.empty
+    const startPos = selection.from
+    let endPos = selection.to
+
+    const content = isSelectionMode
+      ? editor.state.doc.textBetween(selection.from, selection.to, '\n')
+      : getEditorText()
+
     if (!content.trim()) return
 
     if (action === 'ask') {
@@ -924,80 +967,193 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       return
     }
 
-    setIsAILoading(true)
-    
-    // Clear editor and show skeleton for actions that replace content
-    const replaceActions = ['improve', 'translate', 'extract-tasks']
-    if (replaceActions.includes(action)) {
-      editor.commands.setContent('')
+    if (action === 'ocr') {
+      setShowImageAnalysis(true)
+      return
     }
-    
+
+    if (action === 'summarize') {
+      setIsSummarizing(true)
+      if (editorContainerRef.current) {
+        editorContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    } else {
+      setIsAILoading(true)
+
+      // Clear editor and show skeleton for actions that replace content
+      const replaceActions = ['improve', 'translate', 'extract-tasks', 'tone']
+      if (replaceActions.includes(action)) {
+        if (isSelectionMode) {
+          editor.commands.deleteSelection()
+          endPos = startPos
+        } else {
+          editor.commands.setContent('')
+        }
+      }
+    }
+
+    // Helper to apply updates to editor (full doc or selection)
+    const applyUpdate = (fullText: string, asTaskList = false) => {
+      let html = ''
+      if (asTaskList) {
+        html = convertToTaskList(fullText)
+      } else {
+        html = marked.parse(fullText, { async: false }) as string
+      }
+
+      if (isSelectionMode) {
+        // Select the range we want to replace (growing content)
+        editor.commands.setTextSelection({ from: startPos, to: endPos })
+        editor.commands.insertContent(html)
+        // Update endPos to match the new end of inserted content
+        endPos = editor.state.selection.to
+      } else {
+        editor.commands.setContent(html)
+        scrollToBottom()
+      }
+    }
+
+    // Batch update logic
+    let lastUpdate = 0
+    const updateEditor = (fullText: string, asTaskList = false) => {
+      const now = Date.now()
+      // Limit updates to ~20fps (50ms)
+      if (now - lastUpdate > 50) {
+        applyUpdate(fullText, asTaskList)
+        lastUpdate = now
+      }
+    }
+
     try {
       let result: string
+      let accumulatedText = ''
+      let isFirstChunk = true
 
       switch (action) {
         case 'summarize':
+          // Insert summary at the top
           result = await AI.summarize(content)
-          setSummaryContent(result)
-          setShowSummary(true)
-          setIsAILoading(false)
-          break
-        
-        case 'continue':
-          result = await AI.continueWriting(content)
-          setIsAILoading(false)
-          // Stream append to existing content
-          const originalHtml = editor.getHTML()
-          setIsStreaming(true)
-          
-          const newWords = result.split(' ')
-          let appendText = '\n\n'
-          for (let i = 0; i < newWords.length; i++) {
-            appendText += (i === 0 ? '' : ' ') + newWords[i]
-            editor.commands.setContent(originalHtml + `<p>${appendText}</p>`)
-            // Auto scroll during streaming
-            if (editorContainerRef.current) {
-              editorContainerRef.current.scrollTo({
-                top: editorContainerRef.current.scrollHeight,
-                behavior: 'smooth'
-              })
-            }
-            await new Promise(resolve => setTimeout(resolve, 15 + Math.random() * 20))
-          }
-          // Parse markdown for the appended content
-          setMarkdownContent(content + '\n\n' + result)
-          // Final scroll
-          if (editorContainerRef.current) {
-            editorContainerRef.current.scrollTo({
-              top: editorContainerRef.current.scrollHeight,
-              behavior: 'smooth'
-            })
-          }
-          setIsStreaming(false)
+          const summaryHtml = `<p><strong>${t('ai.summary')}</strong>: ${result}</p><hr />`
+          editor.commands.insertContentAt(0, summaryHtml)
+          setIsSummarizing(false)
           if (note) updateNote(note.id, { content: editor.getHTML() })
           break
-        
-        case 'improve':
-          result = await AI.improveWriting(content)
+
+        case 'continue':
           setIsAILoading(false)
-          await streamText(result)
+          setIsContinuing(true) // Show skeleton at bottom
+
+          // Wait for render to show skeleton, then scroll
+          setTimeout(() => scrollToBottom(), 100)
+
+          accumulatedText = '\n\n' // Start with newline separators
+
+          await AI.continueWritingStream(content, (chunk) => {
+            if (isFirstChunk) {
+              setIsContinuing(false)
+              setIsStreaming(true)
+              isFirstChunk = false
+            }
+            accumulatedText += chunk
+            const fullNewContent = content + accumulatedText
+            updateEditor(fullNewContent)
+          })
+
+          // Final flush
+          applyUpdate(content + accumulatedText)
+
+          setIsStreaming(false)
+          setIsContinuing(false)
+          if (note) updateNote(note.id, { content: editor.getHTML() })
           break
-        
+
+        case 'improve':
+          // Keep isAILoading=true initially (Skeleton shown)
+          accumulatedText = ''
+          await AI.improveWritingStream(content, (chunk) => {
+            if (isFirstChunk) {
+              setIsAILoading(false) // Hide skeleton
+              setIsStreaming(true) // Show editor with streaming
+              isFirstChunk = false
+            }
+            accumulatedText += chunk
+            updateEditor(accumulatedText)
+          })
+
+          // Final flush
+          applyUpdate(accumulatedText)
+
+          setIsStreaming(false)
+          setIsAILoading(false)
+          if (note) updateNote(note.id, { content: editor.getHTML() })
+          break
+
         case 'translate':
           if (!extra) {
             setIsAILoading(false)
             return
           }
-          result = await AI.translate(content, extra)
+          accumulatedText = ''
+          await AI.translateStream(content, extra, (chunk) => {
+            if (isFirstChunk) {
+              setIsAILoading(false)
+              setIsStreaming(true)
+              isFirstChunk = false
+            }
+            accumulatedText += chunk
+            updateEditor(accumulatedText)
+          })
+
+          // Final flush
+          applyUpdate(accumulatedText)
+
+          setIsStreaming(false)
           setIsAILoading(false)
-          await streamText(result)
+          if (note) updateNote(note.id, { content: editor.getHTML() })
           break
-        
-        case 'extract-tasks':
-          result = await AI.extractTasks(content)
+
+        case 'tone':
+          if (!extra) {
+            setIsAILoading(false)
+            return
+          }
+          accumulatedText = ''
+          await AI.changeToneStream(content, extra, (chunk) => {
+            if (isFirstChunk) {
+              setIsAILoading(false)
+              setIsStreaming(true)
+              isFirstChunk = false
+            }
+            accumulatedText += chunk
+            updateEditor(accumulatedText)
+          })
+
+          // Final flush
+          applyUpdate(accumulatedText)
+
+          setIsStreaming(false)
           setIsAILoading(false)
-          // Convert to Tiptap task list format instead of regular markdown
-          await streamText(result, undefined, true)
+          if (note) updateNote(note.id, { content: editor.getHTML() })
+          break
+
+        case 'extract-tasks':
+          accumulatedText = ''
+          await AI.extractTasksStream(content, (chunk) => {
+            if (isFirstChunk) {
+              setIsAILoading(false)
+              setIsStreaming(true)
+              isFirstChunk = false
+            }
+            accumulatedText += chunk
+            updateEditor(accumulatedText, true) // asTaskList = true
+          })
+
+          // Final flush
+          applyUpdate(accumulatedText, true)
+
+          setIsStreaming(false)
+          setIsAILoading(false)
+          if (note) updateNote(note.id, { content: editor.getHTML() })
           break
       }
     } catch (error) {
@@ -1005,57 +1161,116 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       if (error instanceof InsufficientCreditsError) {
         setShowCreditsError(true)
         // Restore content if it was cleared
-        if (replaceActions.includes(action)) {
+        if (typeof replaceActions !== 'undefined' && replaceActions.includes(action)) {
           editor.commands.setContent(note.content || '')
         }
       } else {
         setAiError((error as Error).message || t('ai.error'))
       }
       setIsAILoading(false)
+      setIsSummarizing(false)
       setIsStreaming(false)
     }
+    setIsAILoading(false)
+    setIsSummarizing(false)
+    setIsStreaming(false)
   }
 
-  const handleCopy = () => {
-    if (selectedText) {
-      navigator.clipboard.writeText(selectedText)
-    } else {
-      document.execCommand('copy')
+
+  const onAnalyzeImage = async (file: File, type: string) => {
+    if (!editor || isStreaming) return
+
+    // Check network
+    if (!isOnline) {
+      showNetworkOverlay(t('ai.title'))
+      return
     }
-  }
 
-  const handleCut = () => {
-    if (selectedText) {
-      navigator.clipboard.writeText(selectedText)
-      editor?.commands.deleteSelection()
-    } else {
-      document.execCommand('cut')
+    setIsAnalyzingImage(true)
+    setIsStreaming(true) // Show streaming indicator in editor if needed
+
+    const selection = editor.state.selection
+    const isSelectionMode = !selection.empty
+    const startPos = selection.from
+    let endPos = selection.to
+
+    if (isSelectionMode) {
+      editor.commands.deleteSelection()
+      endPos = startPos
     }
-  }
 
-  const handlePaste = async () => {
+    // Helper to apply updates
+    const applyUpdate = (fullText: string) => {
+      // Convert markdown to HTML using marked
+      // Note: marked is synchronous by default
+      const html = marked.parse(fullText, { async: false }) as string
+
+      // Always insert at cursor/selection-start
+      // We need to re-select because insertion moves cursor
+      // But for streaming append, we want to insert AFTER previous content
+      // Actually, for "replace/insert", we can just use insertContent which handles cursor move
+
+      // Re-set selection to insertion point?
+      // No, insertContent moves cursor to end of inserted content by default.
+      // So if we just want to replace the *accumulated* block, we need to select the range we just inserted.
+
+      // Better strategy: Just insert the *new* chunk? No, markdown parsing needs full context for smooth rendering.
+      // So we generally replace the whole block.
+
+      editor.commands.setTextSelection({ from: startPos, to: endPos })
+      editor.commands.insertContent(html)
+      // Update endPos to match the new end of inserted content
+      endPos = editor.state.selection.to
+    }
+
+    // Rate limited update
+    let lastUpdate = 0
+    const updateEditor = (fullText: string) => {
+      const now = Date.now()
+      if (now - lastUpdate > 50) {
+        applyUpdate(fullText)
+        lastUpdate = now
+      }
+    }
+
     try {
-      const text = await navigator.clipboard.readText()
-      editor?.commands.insertContent(text)
-    } catch {
-      document.execCommand('paste')
+      let accumulatedText = ''
+      let isFirstChunk = true
+
+      if (type === 'whiteboard') {
+        accumulatedText += '\n' // Start on new line
+      }
+
+      await AI.analyzeImageStream(file, type, (chunk) => {
+        if (isFirstChunk) {
+          setShowImageAnalysis(false)
+          isFirstChunk = false
+        }
+        accumulatedText += chunk
+        updateEditor(accumulatedText)
+      })
+
+      // Final flush
+      applyUpdate(accumulatedText)
+
+      setIsStreaming(false)
+      setIsAnalyzingImage(false)
+      setShowImageAnalysis(false)
+      if (note) updateNote(note.id, { content: editor.getHTML() })
+
+    } catch (error) {
+      console.error('Image Analysis Error:', error)
+      setIsStreaming(false)
+      setIsAnalyzingImage(false)
+      if (error instanceof InsufficientCreditsError) {
+        setShowImageAnalysis(false)
+        setShowCreditsError(true)
+      } else {
+        setAiError((error as Error).message || t('ai.error'))
+      }
     }
   }
 
-  const handleSelectAll = () => {
-    // Focus editor first, then select all
-    editor?.chain().focus().selectAll().run()
-  }
-
-  const handleSelectionAskAI = () => {
-    // Use captured text from when context menu opened (more reliable than selectedText state)
-    const textToUse = capturedTextRef.current || selectedText
-    if (textToUse) {
-      setAiContextText(textToUse)
-    }
-    // Open fullscreen chat view directly
-    setShowAIChatView(true)
-  }
 
   return (
     <div className="flex flex-col h-full">
@@ -1067,7 +1282,15 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         className="hidden"
       />
 
+      <ImageAnalysisModal
+        open={showImageAnalysis}
+        onOpenChange={setShowImageAnalysis}
+        onAnalyze={onAnalyzeImage}
+        isAnalyzing={isAnalyzingImage}
+      />
+
       {/* AI Chat View - Fullscreen */}
+
       <AIChatView
         open={showAIChatView}
         onClose={() => {
@@ -1081,7 +1304,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         isLoading={isAskAILoading}
         onSendMessage={async (question, onStream) => {
           if (isAskAILoading) return
-          
+
           const content = aiContextText || getEditorText()
           if (!content.trim()) return
 
@@ -1095,34 +1318,54 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           setChatMessages(prev => [...prev, userMessage])
 
           setIsAskAILoading(true)
-          
+
           try {
-            const result = await AI.askAI(content, question)
-            
+            // Use streaming API
+            const aiMessageId = (Date.now() + 1).toString()
             const aiMessage: AIChatMessage = {
-              id: (Date.now() + 1).toString(),
+              id: aiMessageId,
               role: 'assistant',
-              content: result,
+              content: '',
               timestamp: Date.now()
             }
-            
-            // Add empty message first for streaming
-            setChatMessages(prev => [...prev, { ...aiMessage, content: '' }])
+
+            // Add empty message first
+            setChatMessages(prev => [...prev, aiMessage])
+
+            // NOTE: AIChatView will handle visual streaming if we pass 'onStream' callback
+            // But AIChatView's streaming effect is visual only (CSS/State)
+            // Ideally we want AIChatView to consume the stream.
+            // But NoteEditor manages the state 'chatMessages'.
+            // So we update 'chatMessages' repeatedly.
+            // BUT AIChatView MIGHT flicker if we update state too fast.
+            // AIChatView has internal buffer logic IF we use its handleSubmit.
+            // But here we are using onSendMessage which overrides handleSubmit in AIChatView.
+
+            // Let's just accumulate and call onStream (which updates AIChatView's buffer).
+            // AND update our local state occasionally.
+
+            let accumulated = ''
+
+            // Trigger visual streaming immediately to show loading dots
+            if (onStream) onStream(aiMessageId, '')
+
+            await AI.askAIStream(content, question, (chunk) => {
+              accumulated += chunk
+              // Update AIChatView's visual stream
+              if (onStream) onStream(aiMessageId, accumulated)
+            })
+
             setIsAskAILoading(false)
-            
-            // Stream the text if callback provided
-            if (onStream) {
-              await onStream(aiMessage.id, result)
-            }
-            
-            // Update with final content
-            setChatMessages(prev => prev.map(m => 
-              m.id === aiMessage.id ? aiMessage : m
+
+            // Final state update
+            setChatMessages(prev => prev.map(m =>
+              m.id === aiMessageId ? { ...m, content: accumulated } : m
             ))
+
           } catch (error) {
             console.error('AI error:', error)
             setIsAskAILoading(false)
-            
+
             if (error instanceof InsufficientCreditsError) {
               setShowAIChatView(false)
               setShowCreditsError(true)
@@ -1151,6 +1394,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         description={t('notes.deleteConfirm')}
         confirmText={t('notes.delete')}
         cancelText={t('notes.cancel')}
+        headerIcon={<Trash2 className="w-5 h-5" />}
       />
 
       <ShareDialog
@@ -1190,6 +1434,19 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         title={t('editor.insertLink')}
         placeholder={t('editor.linkPrompt')}
         inputType="url"
+        headerIcon={<LinkIcon className="w-5 h-5" />}
+      />
+
+      <TableInsertDialog
+        open={showTableInsertDialog}
+        onClose={() => setShowTableInsertDialog(false)}
+        onInsert={handleInsertTable}
+      />
+
+      <TablePropertiesDialog
+        open={showTablePropertiesDialog}
+        onClose={() => setShowTablePropertiesDialog(false)}
+        editor={editor}
       />
 
       {/* Collaboration indicator - Mobile (title is now in NoteModal header) */}
@@ -1223,32 +1480,40 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       )}
 
       {/* Scrollable Content Area - includes back button, title, pin */}
-      <div 
-        ref={editorContainerRef} 
+      <div
+        ref={editorContainerRef}
         className="flex-1 overflow-y-auto px-4 relative"
       >
         {/* Header row - Back + Title + Pin - scrolls with content on all devices */}
         <div className="flex items-center gap-2 pt-4 pb-2 min-w-0">
-          {/* Back button - on mobile always, on desktop only when fullscreen */}
-          <button
-            onClick={onClose}
-            className={cn(
-              "p-2 -ml-2 rounded-full text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shrink-0",
-              isFullscreen ? "flex" : "md:hidden"
-            )}
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          
+          {/* Back button - on mobile always, on desktop only when fullscreen - hidden in free mode */}
+          {!isFreeMode && (
+            <button
+              onClick={onClose}
+              className={cn(
+                "p-1.5 -ml-2 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors shrink-0",
+                isFullscreen ? "flex" : "md:hidden"
+              )}
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          )}
+
           <div className="flex-1 min-w-0">
             <EditableTitle
               value={note.title}
-              onChange={(value) => updateNote(note.id, { title: value })}
+              onChange={(value) => {
+                if (customUpdateHandler) {
+                  customUpdateHandler({ title: value })
+                } else {
+                  updateNote(note.id, { title: value })
+                }
+              }}
               placeholder={t('notes.title')}
               className="text-xl font-medium text-neutral-900 dark:text-white"
             />
           </div>
-          
+
           {/* Collaboration indicator - Desktop only (mobile has its own above) */}
           {roomId && collaborators.length > 0 && (
             <div className="hidden md:flex items-center gap-1">
@@ -1284,76 +1549,73 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </div>
           )}
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={onTogglePin}
-                className="p-2 rounded-full text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-              >
-                {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>{isPinned ? t('notes.unpin') : t('notes.pin')}</TooltipContent>
-          </Tooltip>
+          {/* Pin button - hidden in free mode */}
+          {!isFreeMode && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onTogglePin}
+                  className="p-2 rounded-full text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                >
+                  {isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{isPinned ? t('notes.unpin') : t('notes.pin')}</TooltipContent>
+            </Tooltip>
+          )}
         </div>
 
-        {/* Editor Content or Skeleton Loading */}
+        {/* Editor Content or Skeleton Loading for Replace Actions */}
         {isAILoading ? (
           <EditorSkeleton />
         ) : (
-          <ContextMenu>
-            <ContextMenuTrigger asChild onContextMenu={handleContextMenuOpen}>
-              <div className="relative">
-                <EditorContent 
-                  editor={editor} 
-                  className="min-h-[200px] text-neutral-700 dark:text-neutral-300"
+          <EditorContextMenu
+            editor={editor}
+            onOpenTableProperties={() => setShowTablePropertiesDialog(true)}
+            onAskAI={(text) => {
+              setAiContextText(text)
+              setShowAIChatView(true)
+            }}
+          >
+            <div className="relative">
+              {isSummarizing && (
+                <div className="px-4 py-4 space-y-2 animate-in fade-in slide-in-from-top-4 duration-300">
+                  <Skeleton className="h-6 w-1/3" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <hr className="my-4 border-neutral-200 dark:border-neutral-700" />
+                </div>
+              )}
+              <EditorContent
+                editor={editor}
+                className="min-h-[200px] text-neutral-700 dark:text-neutral-300"
+              />
+              {/* Continuing Skeleton (shown at bottom) */}
+              {isContinuing && (
+                <div className="px-4 py-2">
+                  <Skeleton className="h-4 w-full mb-2" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+              )}
+              {/* Collaboration cursors overlay */}
+              {isCollaborationReady && provider && (
+                <CollaborationCursors
+                  editor={editor}
+                  provider={provider}
                 />
-                {/* Collaboration cursors overlay */}
-                {isCollaborationReady && provider && (
-                  <CollaborationCursors 
-                    editor={editor} 
-                    provider={provider}
-                  />
-                )}
-              </div>
-            </ContextMenuTrigger>
-            <ContextMenuContent>
-              <ContextMenuItem onClick={handleCut}>
-                <Scissors className="w-4 h-4 mr-2" />
-                {t('contextMenu.cut')}
-              </ContextMenuItem>
-              <ContextMenuItem onClick={handleCopy}>
-                <Copy className="w-4 h-4 mr-2" />
-                {t('contextMenu.copy')}
-              </ContextMenuItem>
-              <ContextMenuItem onClick={handlePaste}>
-                <ClipboardPaste className="w-4 h-4 mr-2" />
-                {t('contextMenu.paste')}
-              </ContextMenuItem>
-              <ContextMenuItem onClick={handleSelectAll}>
-                <TextSelect className="w-4 h-4 mr-2" />
-                {t('contextMenu.selectAll')}
-              </ContextMenuItem>
-              <ContextMenuItem onClick={handleSelectionAskAI}>
-                <Sparkles className="w-4 h-4 mr-2" />
-                {t('ai.ask')}
-              </ContextMenuItem>
-            </ContextMenuContent>
-          </ContextMenu>
+              )}
+            </div>
+          </EditorContextMenu>
         )}
       </div>
 
       {/* Footer Toolbar */}
-      <div 
-        ref={toolbarRef} 
+      <div
+        ref={toolbarRef}
         className="flex items-center justify-between py-1.5 bg-neutral-100/80 dark:bg-neutral-800/60 backdrop-blur-sm safe-x relative rounded-b-[12px] safe-bottom"
       >
         {/* AI Modals - positioned above toolbar */}
-        <SummaryModal
-          open={showSummary}
-          content={summaryContent}
-          onClose={() => setShowSummary(false)}
-        />
+
 
         <InsufficientCreditsModal
           open={showCreditsError}
@@ -1370,7 +1632,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         {/* AI Error Toast */}
         {aiError && (
           <div className="absolute inset-x-0 bottom-full mb-2 px-4 z-20">
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-4 py-2 text-sm text-red-700 dark:text-red-300 animate-in fade-in slide-in-from-bottom-2">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-4 py-2 text-sm text-red-700 dark:text-red-300">
               {aiError}
             </div>
           </div>
@@ -1379,12 +1641,21 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         <div ref={toolbarScrollRef} className="flex items-center gap-0.5 overflow-x-auto scrollbar-none" style={{ touchAction: 'pan-x' }}>
           {/* AI Menu - Priority 1 (always visible) */}
           {toolbarVisibility.ai && (
-            <AIMenu 
-              onAction={handleAIAction} 
-              disabled={!isOnline || isAILoading || isStreaming}
-            />
+            isFreeMode && onLockedFeatureClick ? (
+              <ToolbarButton
+                onClick={() => onLockedFeatureClick(t('ai.title'))}
+                tooltip={t('freeNote.featureLocked')}
+              >
+                <Sparkles className="w-[18px] h-[18px]" />
+              </ToolbarButton>
+            ) : (
+              <AIMenu
+                onAction={handleAIAction}
+                disabled={!isOnline || isAILoading || isStreaming}
+              />
+            )
           )}
-          
+
           {/* Speech to Text - Priority 1 */}
           {toolbarVisibility.voice && (
             <SpeechButton
@@ -1408,7 +1679,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               disabled={isAILoading || isStreaming}
             />
           )}
-          
+
           {/* Primary formatting tools - Priority 1 */}
           {toolbarVisibility.bold && (
             <ToolbarButton
@@ -1437,7 +1708,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <UnderlineIcon className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-          
+
           {/* Priority 2 - sm+ */}
           {toolbarVisibility.strikethrough && (
             <ToolbarButton
@@ -1457,7 +1728,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <Highlighter className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-          
+
           {/* Headings - Priority 2 & 3 */}
           {toolbarVisibility.heading1 && (
             <ToolbarButton
@@ -1486,7 +1757,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <Heading3 className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-          
+
           {/* Lists - Priority 2 & 3 */}
           {toolbarVisibility.bulletList && (
             <ToolbarButton
@@ -1515,7 +1786,20 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <CheckSquare className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-          
+
+          {/* Table - Priority 3 */}
+          {toolbarVisibility.table && (
+            <ToolbarButton
+              onClick={() => setShowTableInsertDialog(true)}
+              active={editor?.isActive('table')}
+              tooltip={t('editor.insertTable')}
+            >
+              <TableIcon className="w-[18px] h-[18px]" />
+            </ToolbarButton>
+          )}
+
+          {/* Table operations are now handled by TableContextMenu (right-click) */}
+
           {/* Text alignment - Priority 3 & 4 */}
           {toolbarVisibility.alignLeft && (
             <ToolbarButton
@@ -1553,7 +1837,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <AlignJustify className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-          
+
           {/* Code & Quote - Priority 4 */}
           {toolbarVisibility.inlineCode && (
             <ToolbarButton
@@ -1582,7 +1866,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <Quote className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-          
+
           {/* Subscript & Superscript - Priority 5 */}
           {toolbarVisibility.subscript && (
             <ToolbarButton
@@ -1602,7 +1886,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <SuperscriptIcon className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-          
+
           {/* Link - Priority 4 */}
           {toolbarVisibility.link && (
             <ToolbarButton
@@ -1619,7 +1903,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               {editor?.isActive('link') ? <Unlink className="w-[18px] h-[18px]" /> : <LinkIcon className="w-[18px] h-[18px]" />}
             </ToolbarButton>
           )}
-          
+
           {/* Horizontal rule - Priority 5 */}
           {toolbarVisibility.horizontalRule && (
             <ToolbarButton
@@ -1629,7 +1913,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <Minus className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-          
+
           {/* Clear formatting - Priority 5 */}
           {toolbarVisibility.clearFormatting && (
             <ToolbarButton
@@ -1646,19 +1930,19 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
               <ImagePlus className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-          
+
           {toolbarVisibility.drawing && (
-            <ToolbarButton 
-              onClick={() => setShowDrawingModal(true)} 
+            <ToolbarButton
+              onClick={() => setShowDrawingModal(true)}
               tooltip={t('drawing.insert')}
             >
               <Pencil className="w-[18px] h-[18px]" />
             </ToolbarButton>
           )}
-          
+
           {toolbarVisibility.style && (
-            <NoteStylePicker 
-              style={note.style} 
+            <NoteStylePicker
+              style={note.style}
               onChange={handleStyleChange}
             />
           )}
@@ -1696,13 +1980,21 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           {/* Share - Priority 5 */}
           {toolbarVisibility.share && (
             <ToolbarButton
-              onClick={() => roomId ? handleStopSharing() : setShowShareDialog(true)}
+              onClick={
+                isFreeMode && onLockedFeatureClick
+                  ? () => onLockedFeatureClick(t('share.title'))
+                  : !isOnline && !roomId
+                    ? undefined
+                    : () => roomId ? handleStopSharing() : setShowShareDialog(true)
+              }
               active={!!roomId}
-              disabled={!isOnline && !roomId} // Disable when offline and not already in a room
+              disabled={!isFreeMode && (!isOnline && !roomId)}
               tooltip={
-                !isOnline && !roomId 
-                  ? t('offline.networkRequired')
-                  : roomId ? t('editor.stopSharing') : t('editor.collaborate')
+                isFreeMode
+                  ? t('freeNote.featureLocked')
+                  : !isOnline && !roomId
+                    ? t('offline.networkRequired')
+                    : roomId ? t('editor.stopSharing') : t('editor.collaborate')
               }
             >
               {roomId ? <Users className="w-[18px] h-[18px]" /> : <Share2 className="w-[18px] h-[18px]" />}
@@ -1712,9 +2004,15 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           {/* History - Priority 5 */}
           {toolbarVisibility.history && (
             <ToolbarButton
-              onClick={() => setShowVersionHistory(true)}
-              disabled={!isOnline}
-              tooltip={!isOnline ? t('offline.networkRequired') : t('editor.versionHistory')}
+              onClick={
+                isFreeMode && onLockedFeatureClick
+                  ? () => onLockedFeatureClick(t('versionHistory.title'))
+                  : !isOnline
+                    ? undefined
+                    : () => setShowVersionHistory(true)
+              }
+              disabled={!isFreeMode && !isOnline}
+              tooltip={isFreeMode ? t('freeNote.featureLocked') : !isOnline ? t('offline.networkRequired') : t('editor.versionHistory')}
             >
               <History className="w-[18px] h-[18px]" />
             </ToolbarButton>
@@ -1742,16 +2040,18 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
         </div>
 
-        <button
-          onClick={onClose}
-          className={cn(
-            "px-3 py-1.5 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-[8px] transition-colors",
-            "hidden md:block",
-            isFullscreen && "md:hidden"
-          )}
-        >
-          {t('notes.close')}
-        </button>
+        {!isFreeMode && (
+          <button
+            onClick={onClose}
+            className={cn(
+              "px-3 py-1.5 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-[8px] transition-colors whitespace-nowrap shrink-0",
+              "hidden md:block",
+              isFullscreen && "md:hidden"
+            )}
+          >
+            {t('notes.close')}
+          </button>
+        )}
       </div>
     </div>
   )
@@ -1772,14 +2072,12 @@ function ToolbarButton({
   tooltip?: string
   className?: string
 }) {
-  // Prevent mouse events from stealing focus on desktop
-  const preventMouseFocusLoss = (e: React.MouseEvent) => {
-    e.preventDefault()
-  }
-
   const button = (
     <button
-      onMouseDown={preventMouseFocusLoss}
+      onPointerDown={(e) => {
+        // Prevent focus loss on both mouse and touch interactions
+        e.preventDefault()
+      }}
       onClick={() => {
         if (onClick && !disabled) {
           onClick()
@@ -1787,7 +2085,11 @@ function ToolbarButton({
       }}
       disabled={disabled}
       className={cn(
-        'p-1.5 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors',
+        // Mobile: larger touch target (min 44px)
+        'flex items-center justify-center w-[44px] h-[44px] sm:w-auto sm:h-auto rounded-full transition-colors',
+        // Desktop: tighter padding
+        'sm:p-1.5',
+        'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700',
         active && 'bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-white',
         disabled && 'opacity-40 cursor-not-allowed',
         className

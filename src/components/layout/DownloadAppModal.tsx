@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Share, Plus, MoreVertical, Download, ChevronRight, Smartphone, Monitor, Tablet, Info, ExternalLink, Puzzle } from 'lucide-react'
+import { X, Share, Plus, MoreVertical, Download, ChevronRight, Smartphone, Monitor, Tablet, ExternalLink, Puzzle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 // Chrome Extension ID
@@ -24,11 +24,11 @@ function BrowserIcon({ browser, className = "w-5 h-5" }: BrowserIconProps) {
     safari: '/safari-svgrepo-com.svg',
     firefox: '/firefox-svgrepo-com.svg'
   }
-  
+
   return (
-    <img 
-      src={iconMap[browser]} 
-      alt={browser} 
+    <img
+      src={iconMap[browser]}
+      alt={browser}
       className={`${className} dark:invert`}
       style={{ opacity: 0.8 }}
     />
@@ -49,14 +49,14 @@ function getDeviceInfo() {
   const isMac = /Macintosh/.test(ua)
   const isWindows = /Windows/.test(ua)
   const isTablet = /iPad/.test(ua) || (isAndroid && !/Mobile/.test(ua))
-  
+
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                       (window.navigator as any).standalone === true
-  
+    (window.navigator as any).standalone === true
+
   return { isIOS, isAndroid, isSafari, isChrome, isEdge, isFirefox, isSamsung, isOpera, isMac, isWindows, isTablet, isStandalone }
 }
 
-type Platform = 'ios' | 'android' | 'desktop' | 'extension'
+type Platform = 'ios' | 'android' | 'desktop'
 
 // Reusable card component for consistent styling
 interface BrowserCardProps {
@@ -68,7 +68,7 @@ interface BrowserCardProps {
 
 function BrowserCard({ browser, name, isRecommended, children }: BrowserCardProps) {
   const { t } = useTranslation()
-  
+
   return (
     <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl space-y-3">
       <div className="flex items-center gap-2">
@@ -91,7 +91,7 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
   const { t } = useTranslation()
   const [selectedPlatform, setSelectedPlatform] = useState<Platform>('ios')
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
-  
+
   const deviceInfo = getDeviceInfo()
 
   // Auto-select platform based on device
@@ -137,8 +137,6 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
         return <Tablet className="w-4 h-4" />
       case 'desktop':
         return <Monitor className="w-4 h-4" />
-      case 'extension':
-        return <Puzzle className="w-4 h-4" />
     }
   }
 
@@ -146,7 +144,6 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
     { id: 'ios', label: 'iOS' },
     { id: 'android', label: 'Android' },
     { id: 'desktop', label: 'Desktop' },
-    { id: 'extension', label: t('install.chromeExtension') },
   ]
 
   // Step buttons component for consistent styling
@@ -228,82 +225,57 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
 
       case 'desktop':
         return (
-          <div className="space-y-3">
-            {/* Native install button if available */}
-            {deferredPrompt && (
-              <Button onClick={handleNativeInstall} className="w-full h-12 text-base">
-                <Download className="w-5 h-5 mr-2" />
-                {t('install.installNow')}
-              </Button>
-            )}
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <h3 className="text-sm font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider px-1">
+                {t('install.appInstallation')}
+              </h3>
 
-            {/* Chrome/Edge - Recommended */}
-            <BrowserCard browser="chrome" name="Chrome / Edge" isRecommended>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">
-                {t('install.desktopChromeInstructions')}
-              </p>
-            </BrowserCard>
+              {/* Native install button if available */}
+              {deferredPrompt && (
+                <Button onClick={handleNativeInstall} className="w-full h-12 text-base bg-white text-neutral-900 hover:bg-neutral-100 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200 border-none">
+                  <Download className="w-5 h-5 mr-2" />
+                  {t('install.installNow')}
+                </Button>
+              )}
 
-            {/* Safari (macOS) */}
-            <BrowserCard browser="safari" name="Safari (macOS)">
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">
-                {t('install.desktopSafariInstructions')}
-              </p>
-            </BrowserCard>
-
-            {/* Firefox notice - neutral background */}
-            <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-lg bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center">
-                  <BrowserIcon browser="firefox" className="w-5 h-5" />
-                </div>
-                <span className="font-medium text-neutral-900 dark:text-white">Firefox</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Info className="w-4 h-4 text-neutral-500 dark:text-neutral-400 mt-0.5 shrink-0" />
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                  {t('install.desktopFirefoxInstructions')}
+              {/* Chrome/Edge - Recommended */}
+              <BrowserCard browser="chrome" name="Chrome / Edge" isRecommended>
+                <p className="text-sm text-neutral-600 dark:text-neutral-300">
+                  {t('install.desktopChromeInstructions')}
                 </p>
-              </div>
-            </div>
-          </div>
-        )
+              </BrowserCard>
 
-      case 'extension':
-        return (
-          <div className="space-y-3">
-            {/* Chrome Extension Card */}
-            <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center">
-                  <Puzzle className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
-                </div>
-                <span className="font-medium text-neutral-900 dark:text-white">{t('install.chromeExtension')}</span>
-                <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full">
-                  {t('install.new')}
-                </span>
-              </div>
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">
-                {t('install.chromeExtensionDescription')}
-              </p>
-              <a
-                href={CHROME_EXTENSION_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full h-10 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors"
-              >
-                <ExternalLink className="w-4 h-4" />
-                {t('install.addToChrome')}
-              </a>
-            </div>
-
-            {/* Info about extension */}
-            <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl">
-              <div className="flex items-start gap-2">
-                <Info className="w-4 h-4 text-neutral-500 dark:text-neutral-400 mt-0.5 shrink-0" />
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                  {t('install.chromeExtensionInfo')}
+              {/* Safari (macOS) */}
+              <BrowserCard browser="safari" name="Safari (macOS)">
+                <p className="text-sm text-neutral-600 dark:text-neutral-300">
+                  {t('install.desktopSafariInstructions')}
                 </p>
+              </BrowserCard>
+
+              {/* Chrome Extension - Simplified */}
+              <div className="p-4 bg-neutral-100 dark:bg-neutral-800 rounded-2xl space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center">
+                    <Puzzle className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
+                  </div>
+                  <span className="font-medium text-neutral-900 dark:text-white">{t('install.chromeExtension')}</span>
+                  <span className="text-xs px-2 py-0.5 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-full">
+                    {t('install.new')}
+                  </span>
+                </div>
+                <p className="text-sm text-neutral-600 dark:text-neutral-300">
+                  {t('install.chromeExtensionDescription')}
+                </p>
+                <a
+                  href={CHROME_EXTENSION_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full h-12 px-4 bg-white text-neutral-900 hover:bg-neutral-100 rounded-xl font-medium transition-colors shadow-sm"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  {t('install.addToChrome')}
+                </a>
               </div>
             </div>
           </div>
@@ -314,22 +286,22 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
   return (
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center safe-x">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
-      
+
       {/* Modal */}
-      <div className="relative w-full sm:max-w-md bg-white dark:bg-neutral-900 rounded-t-3xl sm:rounded-3xl shadow-2xl animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 max-h-[90vh] overflow-hidden safe-bottom">
+      <div className="relative w-full sm:max-w-md bg-white dark:bg-neutral-900 rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[90vh] overflow-hidden safe-bottom">
         {/* Header */}
         <div className="sticky top-0 bg-white dark:bg-neutral-900 px-5 pt-5 pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* App Icon - always white background with black logo */}
               <div className="w-10 h-10 rounded-xl bg-white shadow-md flex items-center justify-center p-1.5">
-                <img 
+                <img
                   src="/g-note.svg"
-                  alt="G-Note" 
+                  alt="G-Note"
                   className="w-full h-full"
                 />
               </div>
@@ -342,9 +314,12 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
                 </p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+            >
               <X className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
 
           {/* Platform tabs - scrollable on mobile */}
@@ -355,11 +330,10 @@ export function DownloadAppModal({ isOpen, onClose }: DownloadAppModalProps) {
                 <button
                   key={platform.id}
                   onClick={() => setSelectedPlatform(platform.id)}
-                  className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap shrink-0 ${
-                    isActive
-                      ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900'
-                      : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
-                  }`}
+                  className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all whitespace-nowrap shrink-0 ${isActive
+                    ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900'
+                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+                    }`}
                 >
                   {getPlatformIcon(platform.id)}
                   {platform.label}

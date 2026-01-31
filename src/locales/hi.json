@@ -48,6 +48,7 @@
     "modalSizeDefault": "डिफ़ॉल्ट",
     "modalSizeLarge": "बड़ा",
     "modalSizeXLarge": "बहुत बड़ा",
+    "modalSizeFullscreen": "पूर्ण स्क्रीन",
     "offlineLogoutTitle": "ऑफ़लाइन होने पर लॉग आउट करें?",
     "offlineLogoutWarning": "आप वर्तमान में ऑफ़लाइन हैं। सहेजे नहीं गए परिवर्तन Google Drive के साथ सिंक नहीं हुए हो सकते हैं। यदि आप अभी लॉग आउट करते हैं, तो आप इन परिवर्तनों को खो सकते हैं।",
     "logoutAnyway": "फिर भी लॉग आउट करें"
@@ -128,7 +129,48 @@
     "versionHistory": "संस्करण इतिहास",
     "fullscreen": "पूर्ण स्क्रीन",
     "exitFullscreen": "पूर्ण स्क्रीन से बाहर निकलें",
-    "more": "और"
+    "more": "और",
+    "insertTable": "तालिका डालें",
+    "addColumnBefore": "पहले कॉलम जोड़ें",
+    "addColumnAfter": "बाद में कॉलम जोड़ें",
+    "addRowBefore": "पहले पंक्ति जोड़ें",
+    "addRowAfter": "बाद में पंक्ति जोड़ें",
+    "deleteColumn": "कॉलम हटाएं",
+    "deleteRow": "पंक्ति हटाएं",
+    "deleteTable": "तालिका हटाएं",
+    "mergeCells": "सेल मर्ज करें",
+    "splitCell": "सेल विभाजित करें",
+    "toggleHeaderRow": "शीर्षक पंक्ति टॉगल करें",
+    "toggleHeaderColumn": "शीर्षक कॉलम टॉगल करें",
+    "exportTableCSV": "CSV के रूप में निर्यात करें",
+    "exportTableMarkdown": "Markdown के रूप में निर्यात करें",
+    "tableRows": "पंक्तियाँ",
+    "tableColumns": "कॉलम",
+    "includeHeaderRow": "शीर्षक पंक्ति शामिल करें",
+    "tablePreview": "पूर्वावलोकन",
+    "createTable": "तालिका बनाएं",
+    "tableProperties": "तालिका गुण",
+    "tableDimensions": "आयाम",
+    "tableHeaders": "शीर्षक",
+    "tableWidth": "चौड़ाई",
+    "tableOptions": "विकल्प",
+    "resizableColumns": "आकार बदलने योग्य कॉलम",
+    "fixedLayout": "निश्चित लेआउट",
+    "headerRow": "शीर्षक पंक्ति",
+    "headerColumn": "शीर्षक कॉलम",
+    "autoWidth": "स्वचालित",
+    "fullWidth": "100%",
+    "customWidth": "कस्टम",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -151,7 +193,30 @@
     "chatWithAI": "AI के साथ चैट",
     "chatWelcome": "नमस्ते",
     "chatDescription": "इस नोट के बारे में मुझसे कुछ भी पूछें। मैं नोट के संदर्भ के आधार पर उत्तर दूंगा।",
-    "send": "भेजें"
+    "send": "भेजें",
+    "tone": {
+      "label": "लहजा बदलें",
+      "professional": "पेशेवर",
+      "formalEmail": "औपचारिक ईमेल",
+      "socialMedia": "सोशल मीडिया",
+      "casual": "अनौपचारिक",
+      "friendly": "मित्रवत",
+      "confident": "आत्मविश्वासी"
+    },
+    "regenerate": "phir se banaye",
+    "analysis": {
+      "menu_label": "vishleshan karen",
+      "title": "vishleshan karen",
+      "description": "text nikalne, data ka vishleshan karne ya vivaran utpann karne ke liye ek chavi upload karen.",
+      "upload_instruction": "upload karne ke liye image par click karen ya drag karen",
+      "select_type": "vishleshan ka prakar chunen",
+      "type": {
+        "general": "General",
+        "whiteboard": "Whiteboard",
+        "receipt": "Receipt"
+      },
+      "submit": "vishleshan karen"
+    }
   },
   "sharedNotes": {
     "title": "आपके साथ साझा किया गया",
@@ -251,14 +316,20 @@
     "rotate": "घुमाएं",
     "flipH": "क्षैतिज पलटें",
     "flipV": "लंबवत पलटें",
-    "auto": "स्वचालित"
+    "auto": "स्वचालित",
+    "width": "Width",
+    "height": "Height",
+    "resize": "Resize"
   },
   "common": {
     "confirm": "पुष्टि करें",
     "cancel": "रद्द करें",
     "language": "भाषा",
     "searchLanguage": "भाषा खोजें...",
-    "noLanguageFound": "कोई भाषा नहीं मिली"
+    "noLanguageFound": "कोई भाषा नहीं मिली",
+    "delete": "Delete",
+    "copy": "Copy",
+    "copied": "Copied"
   },
   "time": {
     "justNow": "अभी",
@@ -333,7 +404,9 @@
     "error": "आवाज इनपुट त्रुटि",
     "notSupportedTitle": "सुविधा उपलब्ध नहीं है",
     "notSupportedMessage": "आपका ब्राउज़र आवाज इनपुट का समर्थन नहीं करता। सर्वोत्तम अनुभव के लिए कृपया Chrome, Edge या Safari जैसे आधुनिक ब्राउज़र का उपयोग करें।",
-    "understood": "समझ गया"
+    "understood": "समझ गया",
+    "notSupportedTip": "Tip: Make sure you're using the latest version of your browser.",
+    "gotIt": "Got it"
   },
   "trash": {
     "title": "कचरा",
@@ -413,5 +486,6 @@
     "genericErrorDescription": "एक अप्रत्याशित त्रुटि हुई। कृपया पुनः प्रयास करें।",
     "appError": "ऐप क्रैश हो गया",
     "appErrorDescription": "कुछ गलत हो गया और ऐप को रीलोड करने की आवश्यकता है। असुविधा के लिए हम क्षमा चाहते हैं।"
-  }
+  },
+  "webContent": {}
 }

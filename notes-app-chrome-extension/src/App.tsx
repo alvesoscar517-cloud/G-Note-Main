@@ -1,16 +1,13 @@
 import { useEffect, useCallback, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
+
 import { LayoutGroup } from 'framer-motion'
 import { useAuthStore } from '@/stores/authStore'
-import { useNotesStore, smartSyncManager, flushPendingNoteUpdates } from '@/stores/notesStore'
-import { useThemeStore } from '@/stores/themeStore'
-import { useNetworkStore } from '@/stores/networkStore'
-import { useMigrationStore } from '@/stores/migrationStore'
-// import { migrationEngine } from '@/lib/migration/removeCollectionMigration' // Disabled - migration complete
+import { useNotesStore } from '@/stores/notesStore'
+import { useAppStore } from '@/stores/appStore'
+import { syncManager } from '@/lib/sync/simpleSyncManager'
 import { LoginScreen } from '@/components/auth/LoginScreen'
 import { DrivePermissionError } from '@/components/auth/DrivePermissionError'
 import { Header } from '@/components/layout/Header'
-import { MigrationProgress } from '@/components/layout/MigrationProgress'
 import { VirtualizedNotesList } from '@/components/notes/VirtualizedNotesList'
 import { NoteModal } from '@/components/notes/NoteModal'
 import { PublicNoteView } from '@/components/notes/PublicNoteView'
@@ -19,9 +16,8 @@ import { TooltipProvider } from '@/components/ui/Tooltip'
 import { useBlockContextMenu } from '@/components/ui/ContextMenuBlocker'
 import { AppErrorBoundary, ListErrorBoundary, ModalErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { initOfflineSync } from '@/lib/offlineSync'
-import { isTokenExpired } from '@/lib/tokenRefresh'
+import { tokenManager, isTokenExpired } from '@/lib/tokenManager'
 import { chromeRefreshToken, isChromeExtension } from '@/lib/chromeAuth'
-import { getValidAccessToken } from '@/lib/tokenManager'
 
 // Check for public view mode
 function getViewFileId(): string | null {
@@ -32,114 +28,51 @@ function getViewFileId(): string | null {
 function AppContent() {
   const { user, setUser } = useAuthStore()
   const { syncWithDrive, checkDriveHasData, loadSharedNotes, initOfflineStorage, syncError } = useNotesStore()
-  const { initTheme } = useThemeStore()
-  const initNetwork = useNetworkStore(state => state.initialize)
-  const isOnline = useNetworkStore(state => state.isOnline)
+  const { initTheme } = useAppStore()
+  const initNetwork = useAppStore(state => state.initialize)
+  const isOnline = useAppStore(state => state.isOnline)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showPermissionError, setShowPermissionError] = useState(false)
-  
-  // Migration state
-  const { migrationResult, /* setMigrating, setMigrationResult, */ reset: resetMigration } = useMigrationStore()
-  const [showMigrationDialog, setShowMigrationDialog] = useState(false)
-  
+
   // Block default context menu globally
   useBlockContextMenu()
-  
+
   const viewFileId = getViewFileId()
-  
-  // Check for migration on app initialization
-  // MIGRATION DISABLED - Collection feature has been removed
-  // Uncomment this block if you need to run migration again
-  /*
-  useEffect(() => {
-    const checkAndRunMigration = async () => {
-      try {
-        console.log('[Extension] Checking if migration is needed...')
-        const needsMigration = await migrationEngine.needsMigration()
-        
-        if (needsMigration) {
-          console.log('[Extension] Migration needed, starting migration...')
-          setMigrating(true)
-          setShowMigrationDialog(true)
-          
-          // Run migration
-          const result = await migrationEngine.migrate()
-          
-          console.log('[Extension] Migration completed:', result)
-          setMigrationResult(result)
-          
-          // Keep dialog open to show result
-          // User will close it by clicking "Continue" or "Close"
-        } else {
-          console.log('[Extension] No migration needed')
-        }
-      } catch (error) {
-        console.error('[Extension] Migration check failed:', error)
-        // Don't block app if migration check fails
-        // The app can still function normally
-      }
-    }
-    
-    // Run migration check after IndexedDB is initialized
-    // Wait a bit to ensure DB is ready
-    const timer = setTimeout(() => {
-      checkAndRunMigration()
-    }, 500)
-    
-    return () => clearTimeout(timer)
-  }, [setMigrating, setMigrationResult])
-  */
-  
-  // Handle migration dialog close
-  const handleMigrationComplete = () => {
-    setShowMigrationDialog(false)
-    resetMigration()
-  }
-  
+
   // Initialize network status monitoring and offline storage
   useEffect(() => {
     const cleanupNetwork = initNetwork()
     const cleanupOfflineSync = initOfflineSync()
-    
+
     // Initialize offline storage (IndexedDB)
     initOfflineStorage()
-    
-    // Start periodic sync when logged in
-    if (user?.accessToken) {
-      smartSyncManager.startPeriodicSync()
-    }
-    
+
     // Sync and flush on page unload/visibility change
     const handleBeforeUnload = async () => {
-      await flushPendingNoteUpdates()
+      await syncManager.flush()
     }
-    
+
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'hidden') {
-        await flushPendingNoteUpdates()
-        // Trigger sync when app goes to background
-        smartSyncManager.syncNow()
+        // Only flush to IndexedDB when going to background
+        // Sync will happen when app comes back online (handled by offlineSync)
+        await syncManager.flush()
       }
     }
-    
+
     window.addEventListener('beforeunload', handleBeforeUnload)
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    
+
     return () => {
       cleanupNetwork()
       cleanupOfflineSync()
-      smartSyncManager.stop()
+      syncManager.stop()
       window.removeEventListener('beforeunload', handleBeforeUnload)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [initNetwork, initOfflineStorage, user?.accessToken])
+  }, [initNetwork, initOfflineStorage])
 
-  // Debounced sync - wait 2s after last change before syncing
-  const debouncedSync = useDebouncedCallback(async () => {
-    if (!user?.accessToken || isTokenExpired(user.tokenExpiry)) return
-    if (!isOnline) return // Don't sync when offline
-    await syncWithDrive(user.accessToken)
-  }, 2000)
+
 
   // Initialize theme on mount
   useEffect(() => {
@@ -156,16 +89,16 @@ function AppContent() {
   // Chrome Extension token refresh
   const checkAndRefreshToken = useCallback(async () => {
     if (!user || isRefreshing || !isChromeExtension()) return false
-    
+
     if (isTokenExpired(user.tokenExpiry)) {
       if (!isOnline) {
         console.log('Token expired but offline - allowing local editing')
         return false
       }
-      
+
       console.log('Token expired, attempting refresh via Chrome Identity API...')
       setIsRefreshing(true)
-      
+
       try {
         const result = await chromeRefreshToken()
         if (result.success && result.token) {
@@ -182,7 +115,7 @@ function AppContent() {
       } finally {
         setIsRefreshing(false)
       }
-      
+
       return false
     }
     return true
@@ -219,13 +152,13 @@ function AppContent() {
   // Graceful: skip sync if offline or token expired, but don't block local editing
   useEffect(() => {
     if (!user?.accessToken) return
-    
+
     // Don't sync if offline - local changes will be queued
     if (!isOnline) {
       console.log('[App] Offline, skipping auto-sync')
       return
     }
-    
+
     // Don't sync if token is expired - will retry after refresh
     if (isTokenExpired(user.tokenExpiry)) {
       console.log('[App] Token expired, skipping auto-sync')
@@ -235,21 +168,21 @@ function AppContent() {
     let lastSync = 0
     const doSync = async () => {
       if (!isOnline) return
-      
+
       const now = Date.now()
       if (now - lastSync < 5000) return
       lastSync = now
-      
+
       // Get valid token (auto-refresh if expired)
-      const accessToken = await getValidAccessToken()
+      const accessToken = await tokenManager.getValidToken()
       if (!accessToken) return
-      
+
       // Check if Drive has data first (only on initial sync when no local notes)
       const currentNotes = useNotesStore.getState().notes
       if (currentNotes.length === 0) {
         await checkDriveHasData(accessToken)
       }
-      
+
       await syncWithDrive(accessToken)
       await loadSharedNotes()
     }
@@ -260,7 +193,7 @@ function AppContent() {
       // Check token and online status before syncing
       if (isTokenExpired(user.tokenExpiry)) return
       if (!isOnline) return
-      
+
       const hasPending = useNotesStore.getState().notes.some(n => n.syncStatus === 'pending')
       if (hasPending) doSync()
     }, 30000)
@@ -268,26 +201,9 @@ function AppContent() {
     return () => clearInterval(interval)
   }, [user?.accessToken, user?.tokenExpiry, isOnline])
 
-  // Sync when notes change (debounced)
-  // Skip if offline or token expired - changes are queued in IndexedDB
-  // Use interval-based check instead of effect dependency to avoid re-renders
-  useEffect(() => {
-    if (!user?.accessToken) return
-    if (!isOnline) return
-    if (isTokenExpired(user.tokenExpiry)) return
-
-    // Check for pending changes every 500ms instead of on every notes change
-    const checkPending = () => {
-      const state = useNotesStore.getState()
-      const hasPending = state.notes.some(n => n.syncStatus === 'pending')
-      if (hasPending && !state.isSyncing) {
-        debouncedSync()
-      }
-    }
-
-    const interval = setInterval(checkPending, 500)
-    return () => clearInterval(interval)
-  }, [user?.accessToken, user?.tokenExpiry, isOnline, debouncedSync])
+  // REMOVED: Polling-based sync check (replaced by event-driven sync in SimpleSyncManager)
+  // SimpleSyncManager now handles sync scheduling via scheduleSync() called from note actions
+  // This eliminates the 500ms polling overhead and improves performance
 
   // If viewing a public note, show the view page
   if (viewFileId) {
@@ -304,7 +220,7 @@ function AppContent() {
         <div className="pt-3 px-4">
           <Header />
         </div>
-        <main className="max-w-6xl w-full mx-auto px-4 py-6">
+        <main className="max-w-6xl w-full mx-auto px-4 pt-6 pb-32">
           <ListErrorBoundary>
             <VirtualizedNotesList />
           </ListErrorBoundary>
@@ -314,14 +230,7 @@ function AppContent() {
         </ModalErrorBoundary>
         <WebContentDialog />
       </div>
-      
-      {/* Migration Progress Dialog */}
-      <MigrationProgress
-        isOpen={showMigrationDialog}
-        migrationResult={migrationResult}
-        onComplete={handleMigrationComplete}
-      />
-      
+
       {/* Drive Permission Error Dialog */}
       {showPermissionError && (
         <DrivePermissionError onClose={() => setShowPermissionError(false)} />

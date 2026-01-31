@@ -48,6 +48,7 @@
     "modalSizeDefault": "Default",
     "modalSizeLarge": "Besar",
     "modalSizeXLarge": "Sangat besar",
+    "modalSizeFullscreen": "Layar penuh",
     "displayMode": "Mode Tampilan",
     "displayModeDescription": "Pilih cara membuka ekstensi",
     "fullscreen": "Layar Penuh",
@@ -135,7 +136,48 @@
     "versionHistory": "Riwayat versi",
     "fullscreen": "Layar penuh",
     "exitFullscreen": "Keluar layar penuh",
-    "more": "Lainnya"
+    "more": "Lainnya",
+    "insertTable": "Sisipkan tabel",
+    "tableProperties": "Properti tabel",
+    "addColumnBefore": "Tambah kolom sebelum",
+    "addColumnAfter": "Tambah kolom setelah",
+    "addRowBefore": "Tambah baris sebelum",
+    "addRowAfter": "Tambah baris setelah",
+    "deleteColumn": "Hapus kolom",
+    "deleteRow": "Hapus baris",
+    "deleteTable": "Hapus tabel",
+    "mergeCells": "Gabung sel",
+    "splitCell": "Pisah sel",
+    "toggleHeaderRow": "Alihkan baris header",
+    "toggleHeaderColumn": "Alihkan kolom header",
+    "exportTableCSV": "Ekspor sebagai CSV",
+    "exportTableMarkdown": "Ekspor sebagai Markdown",
+    "tableRows": "Baris",
+    "tableColumns": "Kolom",
+    "includeHeaderRow": "Sertakan baris header",
+    "tablePreview": "Pratinjau",
+    "createTable": "Buat tabel",
+    "tableDimensions": "Dimensi",
+    "tableHeaders": "Header",
+    "tableWidth": "Lebar",
+    "tableOptions": "Opsi",
+    "resizableColumns": "Kolom dapat diubah ukurannya",
+    "fixedLayout": "Tata letak tetap",
+    "headerRow": "Baris header",
+    "headerColumn": "Kolom header",
+    "autoWidth": "Otomatis",
+    "fullWidth": "100%",
+    "customWidth": "Kustom",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -158,7 +200,16 @@
     "chatWithAI": "Chat dengan AI",
     "chatWelcome": "Halo",
     "chatDescription": "Tanyakan apa saja tentang catatan ini. Saya akan menjawab berdasarkan konteks catatan.",
-    "send": "Kirim"
+    "send": "Kirim",
+    "tone": {
+      "label": "Ubah nada",
+      "professional": "Profesional",
+      "formalEmail": "Email Resmi",
+      "socialMedia": "Media Sosial",
+      "casual": "Santai",
+      "friendly": "Ramah",
+      "confident": "Percaya Diri"
+    }
   },
   "sharedNotes": {
     "title": "Dibagikan dengan Anda",
@@ -265,7 +316,8 @@
     "cancel": "Batal",
     "language": "Bahasa",
     "searchLanguage": "Cari bahasa...",
-    "noLanguageFound": "Bahasa tidak ditemukan"
+    "noLanguageFound": "Bahasa tidak ditemukan",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "Baru saja",
@@ -346,7 +398,9 @@
     "permissionRequired": "Aktifkan input suara",
     "permissionMessage": "Izinkan akses mikrofon untuk menggunakan suara ke teks.",
     "enableVoice": "Aktifkan input suara",
-    "enable": "Aktifkan"
+    "enable": "Aktifkan",
+    "notSupportedTip": "Tip: Make sure you're using the latest version of your browser.",
+    "gotIt": "Got it"
   },
   "trash": {
     "title": "Sampah",
@@ -426,5 +480,6 @@
     "genericErrorDescription": "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
     "appError": "Aplikasi error",
     "appErrorDescription": "Terjadi kesalahan dan aplikasi perlu dimuat ulang. Kami mohon maaf atas ketidaknyamanan ini."
-  }
+  },
+  "webContent": {}
 }

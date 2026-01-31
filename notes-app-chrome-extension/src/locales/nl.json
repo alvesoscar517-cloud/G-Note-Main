@@ -48,6 +48,7 @@
     "modalSizeDefault": "Standaard",
     "modalSizeLarge": "Groot",
     "modalSizeXLarge": "Extra groot",
+    "modalSizeFullscreen": "Volledig scherm",
     "displayMode": "Weergavemodus",
     "displayModeDescription": "Kies hoe de extensie wordt geopend",
     "fullscreen": "Volledig scherm",
@@ -135,7 +136,48 @@
     "versionHistory": "Versiegeschiedenis",
     "fullscreen": "Volledig scherm",
     "exitFullscreen": "Volledig scherm verlaten",
-    "more": "Meer"
+    "more": "Meer",
+    "insertTable": "Tabel invoegen",
+    "tableProperties": "Tabeleigenschappen",
+    "addColumnBefore": "Kolom ervoor toevoegen",
+    "addColumnAfter": "Kolom erna toevoegen",
+    "addRowBefore": "Rij ervoor toevoegen",
+    "addRowAfter": "Rij erna toevoegen",
+    "deleteColumn": "Kolom verwijderen",
+    "deleteRow": "Rij verwijderen",
+    "deleteTable": "Tabel verwijderen",
+    "mergeCells": "Cellen samenvoegen",
+    "splitCell": "Cel splitsen",
+    "toggleHeaderRow": "Koprij schakelen",
+    "toggleHeaderColumn": "Kopkolom schakelen",
+    "exportTableCSV": "Exporteren als CSV",
+    "exportTableMarkdown": "Exporteren als Markdown",
+    "tableRows": "Rijen",
+    "tableColumns": "Kolommen",
+    "includeHeaderRow": "Koprij opnemen",
+    "tablePreview": "Voorbeeld",
+    "createTable": "Tabel maken",
+    "tableDimensions": "Afmetingen",
+    "tableHeaders": "Koppen",
+    "tableWidth": "Breedte",
+    "tableOptions": "Opties",
+    "resizableColumns": "Verstelbare kolommen",
+    "fixedLayout": "Vaste lay-out",
+    "headerRow": "Koprij",
+    "headerColumn": "Kopkolom",
+    "autoWidth": "Automatisch",
+    "fullWidth": "100%",
+    "customWidth": "Aangepast",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -158,7 +200,16 @@
     "chatWithAI": "Chat met AI",
     "chatWelcome": "Hallo",
     "chatDescription": "Vraag me alles over deze notitie. Ik zal antwoorden op basis van de context van de notitie.",
-    "send": "Verzenden"
+    "send": "Verzenden",
+    "tone": {
+      "label": "Toon wijzigen",
+      "professional": "Professioneel",
+      "formalEmail": "Formele e-mail",
+      "socialMedia": "Sociale media",
+      "casual": "Informeel",
+      "friendly": "Vriendelijk",
+      "confident": "Zelfverzekerd"
+    }
   },
   "sharedNotes": {
     "title": "Met u gedeeld",
@@ -265,7 +316,8 @@
     "cancel": "Annuleren",
     "language": "Taal",
     "searchLanguage": "Taal zoeken...",
-    "noLanguageFound": "Geen taal gevonden"
+    "noLanguageFound": "Geen taal gevonden",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "Zojuist",
@@ -346,7 +398,9 @@
     "permissionRequired": "Spraakinvoer inschakelen",
     "permissionMessage": "Sta microfoontoegang toe om spraak-naar-tekst te gebruiken.",
     "enableVoice": "Spraakinvoer inschakelen",
-    "enable": "Inschakelen"
+    "enable": "Inschakelen",
+    "notSupportedTip": "Tip: Make sure you're using the latest version of your browser.",
+    "gotIt": "Got it"
   },
   "trash": {
     "title": "Prullenbak",
@@ -426,5 +480,6 @@
     "genericErrorDescription": "Er is een onverwachte fout opgetreden. Probeer het opnieuw.",
     "appError": "App gecrasht",
     "appErrorDescription": "Er is iets misgegaan en de app moet opnieuw worden geladen. Onze excuses voor het ongemak."
-  }
+  },
+  "webContent": {}
 }

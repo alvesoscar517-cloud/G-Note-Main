@@ -47,7 +47,8 @@
     "modalSizeDescription": "Größe des Notizeditors anpassen",
     "modalSizeDefault": "Standard",
     "modalSizeLarge": "Groß",
-    "modalSizeXLarge": "Sehr groß"
+    "modalSizeXLarge": "Sehr groß",
+    "modalSizeFullscreen": "Vollbild"
   },
   "credits": {
     "title": "AI-Credits kaufen",
@@ -125,7 +126,48 @@
     "versionHistory": "Versionsverlauf",
     "fullscreen": "Vollbild",
     "exitFullscreen": "Vollbild beenden",
-    "more": "Mehr"
+    "more": "Mehr",
+    "insertTable": "Tabelle einfügen",
+    "addColumnBefore": "Spalte davor einfügen",
+    "addColumnAfter": "Spalte danach einfügen",
+    "addRowBefore": "Zeile davor einfügen",
+    "addRowAfter": "Zeile danach einfügen",
+    "deleteColumn": "Spalte löschen",
+    "deleteRow": "Zeile löschen",
+    "deleteTable": "Tabelle löschen",
+    "mergeCells": "Zellen verbinden",
+    "splitCell": "Zelle teilen",
+    "toggleHeaderRow": "Kopfzeile umschalten",
+    "toggleHeaderColumn": "Kopfspalte umschalten",
+    "exportTableCSV": "Als CSV exportieren",
+    "exportTableMarkdown": "Als Markdown exportieren",
+    "tableRows": "Zeilen",
+    "tableColumns": "Spalten",
+    "includeHeaderRow": "Kopfzeile einschließen",
+    "tablePreview": "Vorschau",
+    "createTable": "Tabelle erstellen",
+    "tableProperties": "Tabelleneigenschaften",
+    "tableDimensions": "Abmessungen",
+    "tableHeaders": "Kopfzeilen",
+    "tableWidth": "Breite",
+    "tableOptions": "Optionen",
+    "resizableColumns": "Größenänderbare Spalten",
+    "fixedLayout": "Festes Layout",
+    "headerRow": "Kopfzeile",
+    "headerColumn": "Kopfspalte",
+    "autoWidth": "Automatisch",
+    "fullWidth": "100%",
+    "customWidth": "Benutzerdefiniert",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -148,7 +190,30 @@
     "chatWithAI": "Chat mit AI",
     "chatWelcome": "Hallo",
     "chatDescription": "Fragen Sie mich alles über diese Notiz. Ich antworte basierend auf dem Kontext der Notiz.",
-    "send": "Senden"
+    "send": "Senden",
+    "tone": {
+      "label": "Tonfall ändern",
+      "professional": "Professionell",
+      "formalEmail": "Formelle E-Mail",
+      "socialMedia": "Soziale Medien",
+      "casual": "Locker",
+      "friendly": "Freundlich",
+      "confident": "Selbstbewusst"
+    },
+    "regenerate": "Neu generieren",
+    "analysis": {
+      "menu_label": "Analysieren",
+      "title": "Analysieren",
+      "description": "Laden Sie ein Bild hoch, um Text zu extrahieren, Daten zu analysieren oder eine Beschreibung zu erstellen.",
+      "upload_instruction": "Klicken oder ziehen Sie das Bild zum Hochladen",
+      "select_type": "Analysetyp auswählen",
+      "type": {
+        "general": "General",
+        "whiteboard": "Whiteboard",
+        "receipt": "Receipt"
+      },
+      "submit": "Analysieren"
+    }
   },
   "sharedNotes": {
     "title": "Mit Ihnen geteilt",
@@ -248,14 +313,20 @@
     "rotate": "Drehen",
     "flipH": "Horizontal spiegeln",
     "flipV": "Vertikal spiegeln",
-    "auto": "Auto"
+    "auto": "Auto",
+    "width": "Width",
+    "height": "Height",
+    "resize": "Resize"
   },
   "common": {
     "confirm": "Bestätigen",
     "cancel": "Abbrechen",
     "language": "Sprache",
     "searchLanguage": "Sprache suchen...",
-    "noLanguageFound": "Keine Sprache gefunden"
+    "noLanguageFound": "Keine Sprache gefunden",
+    "delete": "Delete",
+    "copy": "Kopieren",
+    "copied": "Kopiert"
   },
   "time": {
     "justNow": "Gerade eben",
@@ -411,5 +482,6 @@
     "genericErrorDescription": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "appError": "App abgestürzt",
     "appErrorDescription": "Ein Fehler ist aufgetreten und die App muss neu geladen werden. Wir entschuldigen uns für die Unannehmlichkeiten."
-  }
+  },
+  "webContent": {}
 }

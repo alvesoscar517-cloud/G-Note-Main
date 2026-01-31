@@ -48,6 +48,7 @@
     "modalSizeDefault": "افتراضي",
     "modalSizeLarge": "كبير",
     "modalSizeXLarge": "كبير جداً",
+    "modalSizeFullscreen": "ملء الشاشة",
     "displayMode": "وضع العرض",
     "displayModeDescription": "اختر كيفية فتح الإضافة",
     "fullscreen": "ملء الشاشة",
@@ -135,7 +136,48 @@
     "versionHistory": "سجل الإصدارات",
     "fullscreen": "ملء الشاشة",
     "exitFullscreen": "الخروج من ملء الشاشة",
-    "more": "المزيد"
+    "more": "المزيد",
+    "insertTable": "إدراج جدول",
+    "tableProperties": "خصائص الجدول",
+    "addColumnBefore": "إضافة عمود قبل",
+    "addColumnAfter": "إضافة عمود بعد",
+    "addRowBefore": "إضافة صف قبل",
+    "addRowAfter": "إضافة صف بعد",
+    "deleteColumn": "حذف العمود",
+    "deleteRow": "حذف الصف",
+    "deleteTable": "حذف الجدول",
+    "mergeCells": "دمج الخلايا",
+    "splitCell": "تقسيم الخلية",
+    "toggleHeaderRow": "تبديل صف الرأس",
+    "toggleHeaderColumn": "تبديل عمود الرأس",
+    "exportTableCSV": "تصدير كـ CSV",
+    "exportTableMarkdown": "تصدير كـ Markdown",
+    "tableRows": "الصفوف",
+    "tableColumns": "الأعمدة",
+    "includeHeaderRow": "تضمين صف الرأس",
+    "tablePreview": "معاينة",
+    "createTable": "إنشاء جدول",
+    "tableDimensions": "الأبعاد",
+    "tableHeaders": "الرؤوس",
+    "tableWidth": "العرض",
+    "tableOptions": "الخيارات",
+    "resizableColumns": "أعمدة قابلة لتغيير الحجم",
+    "fixedLayout": "تخطيط ثابت",
+    "headerRow": "صف الرأس",
+    "headerColumn": "عمود الرأس",
+    "autoWidth": "تلقائي",
+    "fullWidth": "100%",
+    "customWidth": "مخصص",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -158,7 +200,16 @@
     "chatWithAI": "الدردشة مع AI",
     "chatWelcome": "مرحبا",
     "chatDescription": "اسألني أي شيء عن هذه الملاحظة. سأجيب بناءً على سياق الملاحظة.",
-    "send": "إرسال"
+    "send": "إرسال",
+    "tone": {
+      "label": "تغيير النبرة",
+      "professional": "مهني",
+      "formalEmail": "بريد رسمي",
+      "socialMedia": "وسائل التواصل الاجتماعي",
+      "casual": "غير رسمي",
+      "friendly": "ودود",
+      "confident": "واثق"
+    }
   },
   "sharedNotes": {
     "title": "مشاركة معك",
@@ -265,7 +316,8 @@
     "cancel": "إلغاء",
     "language": "اللغة",
     "searchLanguage": "بحث عن لغة...",
-    "noLanguageFound": "لم يتم العثور على لغة"
+    "noLanguageFound": "لم يتم العثور على لغة",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "الآن",
@@ -346,7 +398,9 @@
     "permissionRequired": "تفعيل الإدخال الصوتي",
     "permissionMessage": "اسمح بالوصول إلى الميكروفون لاستخدام تحويل الصوت إلى نص.",
     "enableVoice": "تفعيل الإدخال الصوتي",
-    "enable": "تفعيل"
+    "enable": "تفعيل",
+    "notSupportedTip": "Tip: Make sure you're using the latest version of your browser.",
+    "gotIt": "Got it"
   },
   "trash": {
     "title": "سلة المهملات",
@@ -426,5 +480,6 @@
     "genericErrorDescription": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
     "appError": "تعطل التطبيق",
     "appErrorDescription": "حدث خطأ ويحتاج التطبيق إلى إعادة التحميل. نعتذر عن الإزعاج."
-  }
+  },
+  "webContent": {}
 }

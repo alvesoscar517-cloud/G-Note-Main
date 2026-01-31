@@ -20,7 +20,7 @@ import {
   deleteNoteDriveFile,
   setSyncAccessToken
 } from './sync/syncEngine'
-import { useNetworkStore } from '@/stores/networkStore'
+import { useAppStore } from '@/stores/appStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
 import type { Note } from '@/types'
@@ -41,7 +41,7 @@ export async function processSyncQueue(): Promise<{ success: number; failed: num
     return { success: 0, failed: 0 }
   }
 
-  const { isOnline } = useNetworkStore.getState()
+  const { isOnline } = useAppStore.getState()
   if (!isOnline) {
     console.log('[OfflineSync] Offline, skipping sync queue processing')
     return { success: 0, failed: 0 }
@@ -189,7 +189,7 @@ export function scheduleSyncRetry(attempt: number = 0): void {
   const maxDelay = 30000 // Max 30 seconds
 
   syncTimeout = setTimeout(async () => {
-    const { isOnline } = useNetworkStore.getState()
+    const { isOnline } = useAppStore.getState()
     if (isOnline) {
       const result = await processSyncQueue()
       if (result.failed > 0 && attempt < MAX_RETRIES) {
@@ -204,7 +204,7 @@ export function scheduleSyncRetry(attempt: number = 0): void {
  */
 export function initOfflineSync(): () => void {
   // Subscribe to network status changes
-  const unsubscribe = useNetworkStore.subscribe(
+  const unsubscribe = useAppStore.subscribe(
     state => state.isOnline,
     async (isOnline, wasOnline) => {
       if (isOnline && !wasOnline) {
@@ -221,7 +221,7 @@ export function initOfflineSync(): () => void {
   getSyncQueueCount().then(count => {
     if (count > 0) {
       console.log(`[OfflineSync] Found ${count} pending items in queue`)
-      const { isOnline } = useNetworkStore.getState()
+      const { isOnline } = useAppStore.getState()
       if (isOnline) {
         processSyncQueue()
       }

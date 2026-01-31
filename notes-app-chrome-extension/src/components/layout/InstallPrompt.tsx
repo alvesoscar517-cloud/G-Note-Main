@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Download, X, Share, Plus, MoreVertical, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { useThemeStore } from '@/stores/themeStore'
+import { useAppStore } from '@/stores/appStore'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -64,7 +64,7 @@ function getInstallMethod(): InstallMethod {
 
 export function InstallPrompt() {
   const { t } = useTranslation()
-  const { theme } = useThemeStore()
+  const { theme } = useAppStore()
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
   const [dismissed, setDismissed] = useState(false)

@@ -4,7 +4,7 @@
  */
 import { useState, useEffect, useCallback } from 'react'
 import { WifiOff, Cloud, RefreshCw } from 'lucide-react'
-import { useNetworkStore } from '@/stores/networkStore'
+import { useAppStore } from '@/stores/appStore'
 import { useNotesStore } from '@/stores/notesStore'
 import { getSyncQueueCount } from '@/lib/db/syncQueueRepository'
 import { processSyncQueue } from '@/lib/offlineSync'
@@ -16,7 +16,7 @@ interface OfflineIndicatorProps {
 }
 
 export function OfflineIndicator({ className, showDetails = false }: OfflineIndicatorProps) {
-  const isOnline = useNetworkStore(state => state.isOnline)
+  const isOnline = useAppStore(state => state.isOnline)
   const notes = useNotesStore(state => state.notes)
   const [queueCount, setQueueCount] = useState(0)
   const [isSyncing, setIsSyncing] = useState(false)
@@ -102,7 +102,7 @@ export function NetworkRequiredOverlay({ open, onClose, feature }: NetworkRequir
         className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-sm bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 animate-in fade-in-0 zoom-in-95">
+      <div className="relative w-full max-w-sm bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl p-6 border border-neutral-200 dark:border-neutral-700">
         <div className="flex flex-col items-center text-center">
           <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-4">
             <WifiOff className="w-8 h-8 text-amber-600 dark:text-amber-400" />
@@ -134,7 +134,7 @@ export function NetworkRequiredOverlay({ open, onClose, feature }: NetworkRequir
 export function useNetworkRequiredOverlay() {
   const [isOpen, setIsOpen] = useState(false)
   const [feature, setFeature] = useState<string | undefined>()
-  const isOnline = useNetworkStore(state => state.isOnline)
+  const isOnline = useAppStore(state => state.isOnline)
 
   const showOverlay = (featureName?: string) => {
     if (!isOnline) {

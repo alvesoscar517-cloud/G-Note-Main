@@ -48,6 +48,7 @@
     "modalSizeDefault": "Varsayılan",
     "modalSizeLarge": "Büyük",
     "modalSizeXLarge": "Çok büyük",
+    "modalSizeFullscreen": "Tam ekran",
     "displayMode": "Görüntüleme Modu",
     "displayModeDescription": "Uzantının nasıl açılacağını seçin",
     "fullscreen": "Tam Ekran",
@@ -135,7 +136,48 @@
     "versionHistory": "Sürüm geçmişi",
     "fullscreen": "Tam ekran",
     "exitFullscreen": "Tam ekrandan çık",
-    "more": "Daha fazla"
+    "more": "Daha fazla",
+    "insertTable": "Tablo ekle",
+    "tableProperties": "Tablo özellikleri",
+    "addColumnBefore": "Önce sütun ekle",
+    "addColumnAfter": "Sonra sütun ekle",
+    "addRowBefore": "Önce satır ekle",
+    "addRowAfter": "Sonra satır ekle",
+    "deleteColumn": "Sütunu sil",
+    "deleteRow": "Satırı sil",
+    "deleteTable": "Tabloyu sil",
+    "mergeCells": "Hücreleri birleştir",
+    "splitCell": "Hücreyi böl",
+    "toggleHeaderRow": "Başlık satırını değiştir",
+    "toggleHeaderColumn": "Başlık sütununu değiştir",
+    "exportTableCSV": "CSV olarak dışa aktar",
+    "exportTableMarkdown": "Markdown olarak dışa aktar",
+    "tableRows": "Satırlar",
+    "tableColumns": "Sütunlar",
+    "includeHeaderRow": "Başlık satırını dahil et",
+    "tablePreview": "Önizleme",
+    "createTable": "Tablo oluştur",
+    "tableDimensions": "Boyutlar",
+    "tableHeaders": "Başlıklar",
+    "tableWidth": "Genişlik",
+    "tableOptions": "Seçenekler",
+    "resizableColumns": "Yeniden boyutlandırılabilir sütunlar",
+    "fixedLayout": "Sabit düzen",
+    "headerRow": "Başlık satırı",
+    "headerColumn": "Başlık sütunu",
+    "autoWidth": "Otomatik",
+    "fullWidth": "100%",
+    "customWidth": "Özel",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -158,7 +200,16 @@
     "chatWithAI": "AI ile sohbet",
     "chatWelcome": "Merhaba",
     "chatDescription": "Bu not hakkında bana her şeyi sorabilirsiniz. Notun bağlamına göre cevap vereceğim.",
-    "send": "Gönder"
+    "send": "Gönder",
+    "tone": {
+      "label": "Ton değiştir",
+      "professional": "Profesyonel",
+      "formalEmail": "Resmi E-posta",
+      "socialMedia": "Sosyal Medya",
+      "casual": "Gündelik",
+      "friendly": "Arkadaşça",
+      "confident": "Kendinden Emin"
+    }
   },
   "sharedNotes": {
     "title": "Sizinle paylaşılan",
@@ -265,7 +316,8 @@
     "cancel": "İptal",
     "language": "Dil",
     "searchLanguage": "Dil ara...",
-    "noLanguageFound": "Dil bulunamadi"
+    "noLanguageFound": "Dil bulunamadi",
+    "delete": "Delete"
   },
   "time": {
     "justNow": "Az önce",
@@ -346,7 +398,9 @@
     "permissionRequired": "Sesli girişi etkinleştir",
     "permissionMessage": "Sesten metne özelliğini kullanmak için mikrofon erişimine izin verin.",
     "enableVoice": "Sesli girişi etkinleştir",
-    "enable": "Etkinleştir"
+    "enable": "Etkinleştir",
+    "notSupportedTip": "Tip: Make sure you're using the latest version of your browser.",
+    "gotIt": "Got it"
   },
   "trash": {
     "title": "Çöp Kutusu",
@@ -426,5 +480,6 @@
     "genericErrorDescription": "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.",
     "appError": "Uygulama çöktü",
     "appErrorDescription": "Bir sorun oluştu ve uygulamanın yeniden yüklenmesi gerekiyor. Rahatsızlık için özür dileriz."
-  }
+  },
+  "webContent": {}
 }

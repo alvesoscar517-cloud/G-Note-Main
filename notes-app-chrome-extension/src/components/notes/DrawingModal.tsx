@@ -314,7 +314,7 @@ export function DrawingModal({ open, onClose, onSave }: DrawingModalProps) {
       <div className="flex items-center justify-between pb-1.5 sm:py-2 pt-2 border-b border-neutral-200 dark:border-neutral-700 px-2 sm:px-3">
         <button
           onClick={onClose}
-          className="p-1.5 -ml-1 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
+          className="p-1.5 -ml-1 rounded-lg border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
         >
           <X className="w-5 h-5" />
         </button>

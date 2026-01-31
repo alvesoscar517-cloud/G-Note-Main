@@ -30,13 +30,6 @@ interface AuthError {
   grantedScopes?: string[]
 }
 
-// Check if token is expired or about to expire (within 5 minutes)
-export function isTokenExpired(tokenExpiry?: number): boolean {
-  if (!tokenExpiry) return true
-  const bufferTime = 5 * 60 * 1000 // 5 minutes
-  return Date.now() > tokenExpiry - bufferTime
-}
-
 // Check if backend is available
 export function hasAuthBackend(): boolean {
   return !!API_URL
@@ -174,90 +167,6 @@ export function parseAuthCode(): string | null {
     // Clear code from URL
     window.history.replaceState(null, '', window.location.pathname)
     return code
-  }
-  
-  return null
-}
-
-// Fallback: Attempt silent token refresh using hidden iframe (implicit flow)
-// Used when no backend is available
-export function silentRefreshImplicit(): Promise<TokenResponse | null> {
-  return new Promise((resolve) => {
-    if (!GOOGLE_CLIENT_ID) {
-      resolve(null)
-      return
-    }
-
-    const iframe = document.createElement('iframe')
-    iframe.style.display = 'none'
-    
-    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth')
-    authUrl.searchParams.set('client_id', GOOGLE_CLIENT_ID)
-    authUrl.searchParams.set('redirect_uri', window.location.origin)
-    authUrl.searchParams.set('response_type', 'token')
-    authUrl.searchParams.set('scope', SCOPES)
-    authUrl.searchParams.set('prompt', 'none') // Silent - no UI
-    
-    const state = Math.random().toString(36).substring(7)
-    authUrl.searchParams.set('state', state)
-    
-    const timeout = setTimeout(() => {
-      cleanup()
-      resolve(null)
-    }, 10000)
-
-    const cleanup = () => {
-      clearTimeout(timeout)
-      window.removeEventListener('message', handleMessage)
-      if (iframe.parentNode) {
-        iframe.parentNode.removeChild(iframe)
-      }
-    }
-
-    const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) return
-      
-      try {
-        const data = event.data
-        if (data.type === 'oauth_response' && data.state === state) {
-          cleanup()
-          if (data.access_token) {
-            resolve({
-              access_token: data.access_token,
-              expires_in: parseInt(data.expires_in) || 3600
-            })
-          } else {
-            resolve(null)
-          }
-        }
-      } catch {
-        // Ignore parse errors
-      }
-    }
-
-    window.addEventListener('message', handleMessage)
-    
-    iframe.src = authUrl.toString()
-    document.body.appendChild(iframe)
-  })
-}
-
-// Parse OAuth response from URL hash (for implicit flow fallback)
-export function parseOAuthResponse(): TokenResponse | null {
-  const hash = window.location.hash.substring(1)
-  if (!hash) return null
-  
-  const params = new URLSearchParams(hash)
-  const accessToken = params.get('access_token')
-  const expiresIn = params.get('expires_in')
-  
-  if (accessToken) {
-    window.history.replaceState(null, '', window.location.pathname + window.location.search)
-    
-    return {
-      access_token: accessToken,
-      expires_in: parseInt(expiresIn || '3600')
-    }
   }
   
   return null

@@ -66,7 +66,7 @@ export function SharedNotesPanel({ open, onClose }: SharedNotesPanelProps) {
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-md max-h-[80vh] overflow-hidden bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl animate-in fade-in-0 zoom-in-95 border border-neutral-200 dark:border-neutral-700">
+      <div className="relative w-full max-w-md max-h-[80vh] overflow-hidden bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200 dark:border-neutral-700">
           <div className="flex items-center gap-2">
@@ -82,7 +82,7 @@ export function SharedNotesPanel({ open, onClose }: SharedNotesPanelProps) {
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            className="p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

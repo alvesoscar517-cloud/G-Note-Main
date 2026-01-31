@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { Button } from './Button'
 import { Input } from './Input'
 import { useEdgeSwipeBack } from '@/hooks/useEdgeSwipeBack'
-import { onModalOpen, onModalClose } from '@/stores/themeStore'
+import { onModalOpen, onModalClose } from '@/stores/appStore'
 
 interface DialogProps {
   open: boolean
@@ -47,7 +47,7 @@ export function Dialog({ open, onClose, children }: DialogProps) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 safe-x">
-      <div 
+      <div
         className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
@@ -56,8 +56,7 @@ export function Dialog({ open, onClose, children }: DialogProps) {
         style={swipeStyle}
         className={cn(
           'relative z-10 w-full max-w-sm max-h-[90vh] overflow-y-auto bg-white dark:bg-neutral-900 rounded-[16px] shadow-xl',
-          'border border-neutral-200 dark:border-neutral-700',
-          'animate-in fade-in zoom-in-95 duration-200 modal-safe-area'
+          'border border-neutral-200 dark:border-neutral-700 modal-safe-area'
         )}
       >
         {children}
@@ -68,14 +67,22 @@ export function Dialog({ open, onClose, children }: DialogProps) {
 
 interface DialogHeaderProps {
   children: React.ReactNode
+  icon?: React.ReactNode
 }
 
-export function DialogHeader({ children }: DialogHeaderProps) {
+export function DialogHeader({ children, icon }: DialogHeaderProps) {
   return (
     <div className="px-5 py-3">
-      <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
-        {children}
-      </h2>
+      <div className="flex items-center gap-3">
+        {icon && (
+          <div className="flex items-center justify-center text-neutral-600 dark:text-neutral-400 shrink-0">
+            {icon}
+          </div>
+        )}
+        <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
+          {children}
+        </h2>
+      </div>
     </div>
   )
 }
@@ -104,6 +111,9 @@ interface ConfirmDialogProps {
   description: string
   confirmText?: string
   cancelText?: string
+  confirmIcon?: React.ReactNode
+  cancelIcon?: React.ReactNode
+  headerIcon?: React.ReactNode
 }
 
 export function ConfirmDialog({
@@ -113,7 +123,10 @@ export function ConfirmDialog({
   title,
   description,
   confirmText,
-  cancelText
+  cancelText,
+  confirmIcon,
+  cancelIcon,
+  headerIcon
 }: ConfirmDialogProps) {
   const { t } = useTranslation()
   const handleConfirm = () => {
@@ -123,13 +136,15 @@ export function ConfirmDialog({
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogHeader>{title}</DialogHeader>
+      <DialogHeader icon={headerIcon}>{title}</DialogHeader>
       <DialogContent>{description}</DialogContent>
       <DialogFooter>
-        <Button variant="ghost" onClick={onClose}>
+        <Button variant="ghost" onClick={onClose} className="flex items-center gap-2">
+          {cancelIcon}
           {cancelText || t('common.cancel')}
         </Button>
-        <Button onClick={handleConfirm}>
+        <Button onClick={handleConfirm} className="flex items-center gap-2">
+          {confirmIcon}
           {confirmText || t('common.confirm')}
         </Button>
       </DialogFooter>
@@ -147,6 +162,7 @@ interface InputDialogProps {
   confirmText?: string
   cancelText?: string
   inputType?: string
+  headerIcon?: React.ReactNode
 }
 
 export function InputDialog({
@@ -158,7 +174,8 @@ export function InputDialog({
   defaultValue = '',
   confirmText,
   cancelText,
-  inputType = 'text'
+  inputType = 'text',
+  headerIcon
 }: InputDialogProps) {
   const { t } = useTranslation()
   const [value, setValue] = useState(defaultValue)
@@ -188,7 +205,7 @@ export function InputDialog({
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogHeader>{title}</DialogHeader>
+      <DialogHeader icon={headerIcon}>{title}</DialogHeader>
       <DialogContent>
         <Input
           ref={inputRef}

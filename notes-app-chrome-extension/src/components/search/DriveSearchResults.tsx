@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
-import { useNetworkStore } from '@/stores/networkStore'
+import { useAppStore } from '@/stores/appStore'
 import { 
   searchDocuments, 
   type DriveSearchResult 
@@ -37,7 +37,7 @@ export function DriveSearchResults({ query, onClose }: DriveSearchResultsProps) 
   const notes = useNotesStore(state => state.notes)
   const setSelectedNote = useNotesStore(state => state.setSelectedNote)
   const setModalOpen = useNotesStore(state => state.setModalOpen)
-  const isOnline = useNetworkStore(state => state.isOnline)
+  const isOnline = useAppStore(state => state.isOnline)
   
   const [results, setResults] = useState<DriveSearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)

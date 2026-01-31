@@ -3,7 +3,7 @@
  * Provides easy access to offline functionality across the app
  */
 import { useCallback, useEffect, useState } from 'react'
-import { useNetworkStore, NetworkRequiredError, onBackOnline } from '@/stores/networkStore'
+import { useAppStore, NetworkRequiredError, onBackOnline } from '@/stores/appStore'
 import { 
   addToSyncQueue, 
   getSyncQueueCount, 
@@ -16,9 +16,9 @@ import type { Note } from '@/types'
  * Hook to check network status and handle offline scenarios
  */
 export function useOffline() {
-  const isOnline = useNetworkStore(state => state.isOnline)
-  const wasOffline = useNetworkStore(state => state.wasOffline)
-  const addToRetryQueue = useNetworkStore(state => state.addToRetryQueue)
+  const isOnline = useAppStore(state => state.isOnline)
+  const wasOffline = useAppStore(state => state.wasOffline)
+  const addToRetryQueue = useAppStore(state => state.addToRetryQueue)
   const [pendingCount, setPendingCount] = useState(0)
   const [pendingItems, setPendingItems] = useState<SyncQueueItem[]>([])
 
@@ -139,7 +139,7 @@ export function useOffline() {
  * Shows appropriate UI when offline
  */
 export function useNetworkFeature(featureName: string) {
-  const isOnline = useNetworkStore(state => state.isOnline)
+  const isOnline = useAppStore(state => state.isOnline)
 
   const checkAndExecute = useCallback(async <T>(
     fn: () => Promise<T>,
@@ -165,7 +165,7 @@ export function useNetworkFeature(featureName: string) {
  * Allows user to continue editing offline even with expired token
  */
 export function useOfflineGraceful() {
-  const isOnline = useNetworkStore(state => state.isOnline)
+  const isOnline = useAppStore(state => state.isOnline)
   const [canEditOffline, setCanEditOffline] = useState(true)
 
   // When offline, always allow editing (will sync when back online)
@@ -187,8 +187,8 @@ export function useOfflineGraceful() {
  * Hook to automatically sync when coming back online
  */
 export function useAutoSyncOnReconnect(syncFn: () => Promise<void>) {
-  const isOnline = useNetworkStore(state => state.isOnline)
-  const wasOffline = useNetworkStore(state => state.wasOffline)
+  const isOnline = useAppStore(state => state.isOnline)
+  const wasOffline = useAppStore(state => state.wasOffline)
 
   useEffect(() => {
     // When coming back online after being offline, trigger sync

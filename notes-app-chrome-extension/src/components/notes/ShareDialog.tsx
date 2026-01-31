@@ -8,9 +8,9 @@ import { generateRoomId, sanitizeRoomId, isValidRoomId, checkRoomExists } from '
 import { driveShare } from '@/lib/driveShare'
 import { shareService } from '@/lib/shareService'
 import { useNotesStore } from '@/stores/notesStore'
-import { useNetworkStore } from '@/stores/networkStore'
+import { useAppStore } from '@/stores/appStore'
 import { useAuthStore } from '@/stores/authStore'
-import { getValidAccessToken, TokenExpiredError } from '@/lib/tokenManager'
+import { tokenManager, TokenExpiredError } from '@/lib/tokenManager'
 
 interface ShareDialogProps {
   open: boolean
@@ -24,9 +24,9 @@ interface ShareDialogProps {
 
 type TabType = 'public' | 'realtime' | 'email' | 'join'
 
-export function ShareDialog({ 
-  open, 
-  onClose, 
+export function ShareDialog({
+  open,
+  onClose,
   existingRoomId,
   onCreateRoom,
   onJoinRoom,
@@ -34,10 +34,10 @@ export function ShareDialog({
 }: ShareDialogProps) {
   const { t } = useTranslation()
   const { getSelectedNote, updateNote } = useNotesStore()
-  const isOnline = useNetworkStore(state => state.isOnline)
+  const isOnline = useAppStore(state => state.isOnline)
   const user = useAuthStore(state => state.user)
   const note = getSelectedNote()
-  
+
   const [copied, setCopied] = useState(false)
   const [joinRoomId, setJoinRoomId] = useState('')
   const [shareEmail, setShareEmail] = useState('')
@@ -48,7 +48,7 @@ export function ShareDialog({
   const [shareError, setShareError] = useState<string | null>(null)
   const [joinError, setJoinError] = useState<string | null>(null)
   const [publicLink, setPublicLink] = useState<string | null>(null)
-  
+
   // Check if currently in a realtime session
   const isInRealtimeSession = !!existingRoomId
 
@@ -76,19 +76,19 @@ export function ShareDialog({
   const handleJoinRoom = async () => {
     const sanitized = sanitizeRoomId(joinRoomId)
     if (!sanitized || !isValidRoomId(sanitized)) return
-    
+
     setIsCheckingRoom(true)
     setJoinError(null)
-    
+
     try {
       // Check if room exists before joining
       const roomInfo = await checkRoomExists(sanitized)
-      
+
       if (!roomInfo.exists) {
         setJoinError(t('share.roomNotFound'))
         return
       }
-      
+
       onJoinRoom(sanitized)
       onClose()
     } catch (error) {
@@ -102,18 +102,18 @@ export function ShareDialog({
 
   const handleSharePublic = async () => {
     if (!note) return
-    
+
     setIsSharing(true)
     setShareError(null)
-    
+
     try {
       // Get valid token (auto-refresh if expired)
-      const accessToken = await getValidAccessToken()
+      const accessToken = await tokenManager.getValidToken()
       if (!accessToken) {
         setShareError(t('share.sessionExpired'))
         return
       }
-      
+
       driveShare.setAccessToken(accessToken)
       // Pass existing publicFileId to update instead of creating new
       const fileId = await driveShare.sharePublic(note, note.publicFileId)
@@ -121,7 +121,7 @@ export function ShareDialog({
       const link = `https://gnote.graphosai.com?view=${fileId}`
       setPublicLink(link)
       setShareSuccess(true)
-      
+
       // Save publicFileId to note if it's new
       if (!note.publicFileId) {
         updateNote(note.id, { publicFileId: fileId })
@@ -140,11 +140,11 @@ export function ShareDialog({
 
   const handleShareViaEmail = async () => {
     if (!shareEmail.trim() || !note || !user) return
-    
+
     setIsSharing(true)
     setShareError(null)
     setShareSuccess(false)
-    
+
     try {
       // Check note size locally first
       const sizeCheck = shareService.checkNoteSize(note)
@@ -178,7 +178,7 @@ export function ShareDialog({
         }
         return
       }
-      
+
       setShareSuccess(true)
       setShareEmail('')
       setTimeout(() => {
@@ -219,7 +219,7 @@ export function ShareDialog({
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogHeader>{t('share.title')}</DialogHeader>
-      
+
       <DialogContent>
         <div className="min-h-[140px]">
           {/* Offline Warning */}
@@ -234,9 +234,9 @@ export function ShareDialog({
               </p>
             </div>
           )}
-          
+
           {/* Tabs */}
-          <div className="flex gap-1 mb-4 p-1 bg-neutral-100 dark:bg-neutral-800 rounded-[10px]">
+          <div className="flex gap-1 mb-4 p-1 bg-neutral-100 dark:bg-neutral-800 rounded-[10px] overflow-x-auto scrollbar-none">
             <TabButton active={mode === 'public'} onClick={() => { setMode('public'); resetState(); }}>
               <Globe className="w-3.5 h-3.5" />
               {t('share.public')}
@@ -267,9 +267,9 @@ export function ShareDialog({
                     {t('share.publicSuccess')}
                   </p>
                   <div className="flex gap-2">
-                    <Input 
-                      value={publicLink} 
-                      readOnly 
+                    <Input
+                      value={publicLink}
+                      readOnly
                       className="text-xs"
                     />
                     <Button variant="outline" size="icon" onClick={() => handleCopy(publicLink)}>
@@ -291,9 +291,9 @@ export function ShareDialog({
                     {t('share.shareCodeToInvite')}
                   </p>
                   <div className="flex gap-2">
-                    <Input 
-                      value={existingRoomId || ''} 
-                      readOnly 
+                    <Input
+                      value={existingRoomId || ''}
+                      readOnly
                       className="font-mono text-center tracking-wider"
                     />
                     <Button variant="outline" size="icon" onClick={() => existingRoomId && handleCopy(existingRoomId)}>
@@ -317,7 +317,7 @@ export function ShareDialog({
               <p className="text-sm">
                 {t('share.emailDescription')}
               </p>
-              <Input 
+              <Input
                 type="email"
                 value={shareEmail}
                 onChange={(e) => setShareEmail(e.target.value)}
@@ -338,7 +338,7 @@ export function ShareDialog({
               <p className="text-sm">
                 {t('share.joinDescription')}
               </p>
-              <Input 
+              <Input
                 value={joinRoomId}
                 onChange={(e) => {
                   setJoinRoomId(sanitizeRoomId(e.target.value))
@@ -365,7 +365,7 @@ export function ShareDialog({
         <Button variant="ghost" onClick={handleClose}>
           {t('share.close')}
         </Button>
-        
+
         {mode === 'public' && !publicLink && (
           <Button onClick={handleSharePublic} disabled={isSharing || !isOnline}>
             {isSharing ? <Loader2 className="w-4 h-4 animate-spin" /> : t('share.createLink')}
@@ -377,28 +377,28 @@ export function ShareDialog({
             {isSharing ? <Loader2 className="w-4 h-4 animate-spin" /> : t('share.updateLink')}
           </Button>
         )}
-        
+
         {mode === 'realtime' && !isInRealtimeSession && (
           <Button onClick={handleStartRealtime} disabled={!isOnline}>
             {t('share.start')}
           </Button>
         )}
-        
+
         {mode === 'realtime' && isInRealtimeSession && onStopSharing && (
           <Button onClick={() => { onStopSharing(); handleClose(); }} variant="destructive">
             {t('share.stopSharing')}
           </Button>
         )}
-        
+
         {mode === 'email' && (
           <Button onClick={handleShareViaEmail} disabled={!shareEmail.trim() || isSharing || !isOnline}>
             {isSharing ? <Loader2 className="w-4 h-4 animate-spin" /> : t('share.shareButton')}
           </Button>
         )}
-        
+
         {mode === 'join' && (
-          <Button 
-            onClick={handleJoinRoom} 
+          <Button
+            onClick={handleJoinRoom}
             disabled={!isValidRoomId(sanitizeRoomId(joinRoomId)) || !isOnline || isCheckingRoom}
           >
             {isCheckingRoom ? <Loader2 className="w-4 h-4 animate-spin" /> : t('share.joinButton')}
@@ -409,19 +409,18 @@ export function ShareDialog({
   )
 }
 
-function TabButton({ children, active, onClick }: { 
+function TabButton({ children, active, onClick }: {
   children: React.ReactNode
   active: boolean
-  onClick: () => void 
+  onClick: () => void
 }) {
   return (
     <button
       onClick={onClick}
-      className={`flex-1 flex items-center justify-center gap-1 py-1.5 px-1 rounded-[8px] text-xs font-medium transition-colors ${
-        active 
-          ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-sm' 
+      className={`flex-1 flex items-center justify-center gap-1 py-1.5 px-1 rounded-[8px] text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${active
+          ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-sm'
           : 'text-neutral-500 dark:text-neutral-400'
-      }`}
+        }`}
     >
       {children}
     </button>

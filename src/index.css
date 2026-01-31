@@ -86,7 +86,7 @@ html.dark body {
       /* Respect user's device orientation lock setting */
     }
   }
-  
+
   /* Only allow landscape when device orientation is unlocked */
   /* This is handled by the browser respecting screen.orientation.lock */
 }
@@ -129,16 +129,16 @@ html.dark body {
   .safe-left {
     padding-left: 0.75rem !important;
   }
-  
+
   .safe-right {
     padding-right: 0.75rem !important;
   }
-  
+
   .safe-x {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
   }
-  
+
   .safe-all {
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
@@ -148,7 +148,6 @@ html.dark body {
 /* Status bar background - extends content under status bar with matching background */
 .status-bar-bg {
   padding-top: env(safe-area-inset-top);
-  background-color: inherit;
 }
 
 /* Disable text selection globally except for specific elements */
@@ -230,7 +229,8 @@ select:focus,
   margin: 0.5em 0;
 }
 
-.tiptap ul, .tiptap ol {
+.tiptap ul,
+.tiptap ol {
   padding-left: 1.5rem;
   margin: 0.5em 0;
 }
@@ -274,7 +274,7 @@ select:focus,
   margin: 0.25rem 0;
 }
 
-.tiptap ul[data-type="taskList"] li > label {
+.tiptap ul[data-type="taskList"] li>label {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -283,7 +283,7 @@ select:focus,
   user-select: none;
 }
 
-.tiptap ul[data-type="taskList"] li > label input[type="checkbox"] {
+.tiptap ul[data-type="taskList"] li>label input[type="checkbox"] {
   width: 1.1rem;
   height: 1.1rem;
   border: 2px solid #d1d5db;
@@ -292,16 +292,16 @@ select:focus,
   accent-color: #171717;
 }
 
-.tiptap ul[data-type="taskList"] li > div {
+.tiptap ul[data-type="taskList"] li>div {
   flex: 1;
   min-width: 0;
 }
 
-.tiptap ul[data-type="taskList"] li > div p {
+.tiptap ul[data-type="taskList"] li>div p {
   margin: 0;
 }
 
-.tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
+.tiptap ul[data-type="taskList"] li[data-checked="true"]>div {
   text-decoration: line-through;
   color: #9ca3af;
 }
@@ -449,6 +449,190 @@ select:focus,
   opacity: 0.95;
 }
 
+/* Table wrapper for mobile scrolling */
+.tiptap-table-wrapper {
+  width: 100%;
+  margin: 1rem 0;
+  position: relative;
+}
+
+/* Scroll indicators (shadows) for mobile */
+@media (max-width: 768px) {
+
+  .tiptap-table-wrapper::before,
+  .tiptap-table-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 1;
+  }
+
+  /* Left shadow */
+  .tiptap-table-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.1), transparent);
+  }
+
+  /* Right shadow */
+  .tiptap-table-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.1), transparent);
+  }
+
+  /* Show shadows when scrollable */
+  .tiptap-table-wrapper.scroll-left::before {
+    opacity: 1;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.15), transparent);
+  }
+
+  .tiptap-table-wrapper.scroll-right::after {
+    opacity: 1;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.15), transparent);
+  }
+
+  /* Dark mode shadows */
+  .dark .tiptap-table-wrapper.scroll-left::before {
+    opacity: 1;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.4), transparent);
+  }
+
+  .dark .tiptap-table-wrapper.scroll-right::after {
+    opacity: 1;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.4), transparent);
+  }
+}
+
+/* Tables */
+.tiptap table {
+  border-collapse: collapse;
+  table-layout: auto;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Mobile: Enable horizontal scrolling */
+@media (max-width: 768px) {
+  .tiptap-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    /* Add negative margin to allow table to extend to edges */
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    /* Ensure horizontal scrollbar is visible if the browser wants to show it */
+    scrollbar-width: auto;
+  }
+
+  .tiptap-table-wrapper::-webkit-scrollbar:horizontal {
+    display: block !important;
+    height: 4px !important;
+  }
+
+  .tiptap-table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+  }
+
+  .dark .tiptap-table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Reduce font size and padding on mobile for better fit */
+  .tiptap table {
+    font-size: 0.8125rem;
+    min-width: 400px;
+    /* Prevent table from being crushed too much */
+    table-layout: auto !important;
+    /* Allow columns to fit content */
+  }
+
+  .tiptap table td,
+  .tiptap table th {
+    padding: 6px 8px !important;
+  }
+}
+
+.tiptap table td,
+.tiptap table th {
+  min-width: 1em;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+  transition: background-color 0.15s ease;
+}
+
+/* Hover effect for better UX */
+.tiptap table td:hover,
+.tiptap table th:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.dark .tiptap table td,
+.dark .tiptap table th {
+  border-color: #4b5563;
+}
+
+.dark .tiptap table td:hover,
+.dark .tiptap table th:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.tiptap table th {
+  font-weight: 600;
+  text-align: left;
+  background-color: #f3f4f6;
+}
+
+.dark .tiptap table th {
+  background-color: #374151;
+}
+
+.tiptap table .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(59, 130, 246, 0.1);
+  pointer-events: none;
+}
+
+.tiptap table .column-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  bottom: -2px;
+  width: 4px;
+  background-color: #3b82f6;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.tiptap .resize-cursor,
+.ProseMirror.resize-cursor {
+  cursor: col-resize !important;
+}
+
+.tiptap table td,
+.tiptap table th {
+  position: relative;
+}
+
+.tiptap table p {
+  margin: 0;
+}
+
 .tiptap img.ProseMirror-selectednode {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
@@ -507,75 +691,27 @@ select:focus,
 }
 
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+/* Animations - Keep only loading and swipe animations */
 
-@keyframes zoomIn95 {
-  from { 
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to { 
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes slideInFromBottom {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInFromTop {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInFromLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInFromRight {
-  from {
-    opacity: 0;
-    transform: translateX(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
+/* Shimmer animations for loading states */
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 @keyframes shimmerLine {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .shimmer-line {
@@ -589,61 +725,52 @@ select:focus,
   background-size: 200% 100%;
 }
 
-.animate-in {
-  animation-fill-mode: both;
-}
-
-.fade-in {
-  animation-name: fadeIn;
-}
-
-.zoom-in-95 {
-  animation-name: zoomIn95;
-}
-
-.slide-in-from-bottom-2,
-[data-side="bottom"].slide-in-from-top-2 {
-  animation-name: slideInFromTop;
-}
-
-[data-side="top"].slide-in-from-bottom-2 {
-  animation-name: slideInFromBottom;
-}
-
-[data-side="left"].slide-in-from-right-2 {
-  animation-name: slideInFromRight;
-}
-
-[data-side="right"].slide-in-from-left-2 {
-  animation-name: slideInFromLeft;
-}
-
-.duration-200 {
-  animation-duration: 200ms;
-  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.fade-in-0 {
-  animation: fadeIn 150ms cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-[data-state="closed"].fade-out-0 {
-  animation: fadeIn 100ms cubic-bezier(0.32, 0.72, 0, 1) reverse;
-}
-
-[data-state="closed"].zoom-out-95 {
-  animation: zoomIn95 100ms cubic-bezier(0.32, 0.72, 0, 1) reverse;
-}
-
 .animate-shimmer {
   animation: shimmer 1.5s infinite;
+}
+
+/* Swipe indicator animation */
+@keyframes pulseSwipe {
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.swipe-indicator {
+  animation: pulseSwipe 2s ease-in-out infinite;
+}
+
+/* Loading dots animation */
+@keyframes loadingDot {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-loading-dot {
+  animation: loadingDot 1.4s infinite ease-in-out both;
 }
 
 /* Scrollbar - Only show on desktop */
 @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
   }
 
   ::-webkit-scrollbar-track {
@@ -651,25 +778,57 @@ select:focus,
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 3px;
+    background: #e5e7eb;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background-clip: content-box;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
+    background: #d1d5db;
+    border: 0;
   }
 
   .dark ::-webkit-scrollbar-thumb {
-    background: #4b5563;
+    background: #262626;
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
+    background: #404040;
   }
 }
 
+
+/* Scan Animation */
+@keyframes scan {
+  0% {
+    top: 0%;
+  }
+
+  50% {
+    top: 100%;
+  }
+
+  100% {
+    top: 0%;
+  }
+}
+
+.animate-scan {
+  animation: scan 3s ease-in-out infinite;
+}
+
+/* AI Chat Response Editor override */
+.ai-chat-response .tiptap {
+  min-height: auto !important;
+  padding: 0 !important;
+}
+
+
 /* Hide scrollbar on mobile/tablet */
-@media (max-width: 1023px), (hover: none), (pointer: coarse) {
+@media (max-width: 1023px),
+(hover: none),
+(pointer: coarse) {
   * {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -690,7 +849,8 @@ select:focus,
 }
 
 /* Hide horizontal scrollbar globally */
-html, body {
+html,
+body {
   overflow-x: hidden;
 }
 
@@ -720,8 +880,15 @@ html, body {
 
 /* Swipe indicator animation */
 @keyframes pulseSwipe {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 .swipe-indicator {
@@ -730,10 +897,14 @@ html, body {
 
 /* Loading dots animation */
 @keyframes loadingDot {
-  0%, 80%, 100% {
+
+  0%,
+  80%,
+  100% {
     transform: scale(0.6);
     opacity: 0.4;
   }
+
   40% {
     transform: scale(1);
     opacity: 1;
@@ -744,17 +915,11 @@ html, body {
   animation: loadingDot 1.4s infinite ease-in-out both;
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
-  .animate-in,
-  .fade-in,
-  .zoom-in-95,
-  [class*="slide-in"],
-  .animate-loading-dot {
+
+  .animate-loading-dot,
+  .swipe-indicator {
     animation: none !important;
     transition: none !important;
   }

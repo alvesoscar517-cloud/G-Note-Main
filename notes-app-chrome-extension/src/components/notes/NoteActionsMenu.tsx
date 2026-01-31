@@ -15,7 +15,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { useAuthStore } from '@/stores/authStore'
-import { useNetworkStore } from '@/stores/networkStore'
+import { useAppStore } from '@/stores/appStore'
 import { 
   exportNote, 
   importDocument, 
@@ -68,7 +68,7 @@ export function NoteActionsMenu({
   const [ocrWarning, setOcrWarning] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const user = useAuthStore(state => state.user)
-  const isOnline = useNetworkStore(state => state.isOnline)
+  const isOnline = useAppStore(state => state.isOnline)
 
   const handleExport = useCallback(async (format: ExportFormat) => {
     if (!user?.accessToken) return
@@ -178,8 +178,7 @@ export function NoteActionsMenu({
             avoidCollisions={true}
             className={cn(
               'z-50 w-[220px] max-w-[calc(100vw-32px)] rounded-xl border border-neutral-200 dark:border-neutral-700',
-              'bg-white dark:bg-neutral-800 shadow-lg',
-              'animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95'
+              'bg-white dark:bg-neutral-800 shadow-lg'
             )}
           >
             {showExportOptions ? (

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useThemeStore } from '@/stores/themeStore'
+import { useAppStore } from '@/stores/appStore'
 
 const sections = [
   { id: 'acceptance', label: 'Acceptance of Terms' },
@@ -24,7 +24,7 @@ const sections = [
 
 export function TermsOfService() {
   const navigate = useNavigate()
-  const { initTheme } = useThemeStore()
+  const { initTheme } = useAppStore()
   const [activeSection, setActiveSection] = useState('acceptance')
 
   useEffect(() => {
@@ -59,12 +59,12 @@ export function TermsOfService() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+    <div className="h-screen overflow-y-auto bg-neutral-50 dark:bg-neutral-950">
       <div className="max-w-6xl px-6 py-12 lg:px-12">
         {/* Back button */}
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 mb-10 transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 border border-neutral-200 dark:border-neutral-800 rounded-lg text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 mb-10 transition-colors w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
           <span className="text-sm">Back</span>
@@ -83,11 +83,10 @@ export function TermsOfService() {
                     <li key={section.id}>
                       <button
                         onClick={() => scrollToSection(section.id)}
-                        className={`block w-full text-left pl-4 py-1.5 text-[13px] transition-colors -ml-px border-l ${
-                          activeSection === section.id
+                        className={`block w-full text-left pl-4 py-1.5 text-[13px] transition-colors -ml-px border-l ${activeSection === section.id
                             ? 'border-neutral-900 dark:border-neutral-100 text-neutral-900 dark:text-neutral-100'
                             : 'border-transparent text-neutral-500 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
-                        }`}
+                          }`}
                       >
                         {section.label}
                       </button>

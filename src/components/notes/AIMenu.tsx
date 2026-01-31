@@ -7,20 +7,28 @@ import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import { common, createLowlight } from 'lowlight'
 import { Markdown } from 'tiptap-markdown'
 import Link from '@tiptap/extension-link'
-import { 
-  Sparkles, 
-  FileText, 
-  PenLine, 
-  Wand2, 
-  Languages, 
-  ListTodo, 
+import {
+  Sparkles,
+  FileText,
+  PenLine,
+  Wand2,
+  Languages,
+  ListTodo,
   MessageCircleQuestion,
   Send,
   X,
   Copy,
   Scissors,
   Coins,
-  Mic
+  Mic,
+  Briefcase,
+  Mail,
+  Share2,
+  Coffee,
+  Smile,
+  Zap,
+  MessageSquareQuote,
+  ScanLine
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
@@ -78,10 +86,12 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [showLanguages, setShowLanguages] = useState(false)
+  const [showTones, setShowTones] = useState(false)
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       setShowLanguages(false)
+      setShowTones(false)
     }
     setOpen(newOpen)
   }
@@ -89,6 +99,12 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
   const handleAction = (action: AI.AIAction) => {
     if (action === 'translate') {
       setShowLanguages(true)
+      setShowTones(false)
+      return
+    }
+    if (action === 'tone') {
+      setShowTones(true)
+      setShowLanguages(false)
       return
     }
     setOpen(false)
@@ -101,6 +117,24 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
     onAction('translate', langName)
   }
 
+  const handleTone = (toneId: string) => {
+    setShowTones(false)
+    setOpen(false)
+    onAction('tone', toneId)
+  }
+
+  const getToneIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Briefcase': return Briefcase
+      case 'Mail': return Mail
+      case 'Share2': return Share2
+      case 'Coffee': return Coffee
+      case 'Smile': return Smile
+      case 'Zap': return Zap
+      default: return MessageSquareQuote
+    }
+  }
+
   return (
     <Popover.Root open={open} onOpenChange={handleOpenChange}>
       <Popover.Trigger asChild>
@@ -109,8 +143,13 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
             <TooltipTrigger asChild>
               <button
                 disabled={disabled}
+                onPointerDown={(e) => {
+                  e.preventDefault()
+                }}
                 className={cn(
-                  'p-1.5 rounded-full text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors touch-manipulation',
+                  'flex items-center justify-center w-[44px] h-[44px] sm:w-auto sm:h-auto rounded-full transition-colors touch-manipulation',
+                  'sm:p-1.5',
+                  'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700',
                   disabled && 'opacity-40 cursor-not-allowed',
                   open && 'bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-white'
                 )}
@@ -125,26 +164,69 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
 
       <Popover.Portal>
         <Popover.Content
-          className="z-50 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 animate-in fade-in zoom-in-95 duration-200"
+          className="z-50 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700"
           side="top"
           sideOffset={8}
           align="start"
         >
-          {/* Main menu - hide when showing languages */}
-          {!showLanguages && (
+          {/* Main menu - hide when showing languages or tones */}
+          {!showLanguages && !showTones && (
             <div className="min-w-[180px] p-1">
               <MenuItem icon={FileText} label={t('ai.summarize')} onClick={() => handleAction('summarize')} />
               <MenuItem icon={PenLine} label={t('ai.continue')} onClick={() => handleAction('continue')} />
               <MenuItem icon={Wand2} label={t('ai.improve')} onClick={() => handleAction('improve')} />
-              <MenuItem 
-                icon={Languages} 
-                label={t('ai.translate')} 
-                onClick={() => handleAction('translate')} 
-                hasSubmenu 
+              <MenuItem
+                icon={MessageSquareQuote}
+                label={t('ai.tone.label')}
+                onClick={() => handleAction('tone')}
+                hasSubmenu
+                active={showTones}
+              />
+              <MenuItem
+                icon={ScanLine}
+                label={t('ai.analysis.menu_label')}
+                onClick={() => handleAction('ocr')}
+              />
+              <MenuItem
+                icon={Languages}
+                label={t('ai.translate')}
+                onClick={() => handleAction('translate')}
+                hasSubmenu
                 active={showLanguages}
               />
               <MenuItem icon={ListTodo} label={t('ai.extractTasks')} onClick={() => handleAction('extract-tasks')} />
               <MenuItem icon={MessageCircleQuestion} label={t('ai.ask')} onClick={() => handleAction('ask')} />
+            </div>
+          )}
+
+          {/* Tone submenu */}
+          {showTones && (
+            <div className="w-[180px] flex flex-col overflow-hidden">
+              {/* Back button */}
+              <button
+                onClick={() => setShowTones(false)}
+                className="flex items-center gap-2 px-2.5 py-1.5 text-[13px] text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg mb-0.5"
+              >
+                <span>‹</span>
+                {t('ai.tone.label')}
+              </button>
+
+              {/* Tone list */}
+              <div className="max-h-[220px] overflow-y-auto p-1 pt-0">
+                {AI.TONES.map((tone) => {
+                  const Icon = getToneIcon(tone.icon)
+                  return (
+                    <button
+                      key={tone.id}
+                      onClick={() => handleTone(tone.id)} // Pass ID, prompts handle the actual text
+                      className="w-full flex items-center gap-2 px-2 py-1.5 text-[13px] text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+                    >
+                      <Icon className="w-4 h-4 text-neutral-500" />
+                      <span className="truncate">{t(tone.labelKey)}</span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           )}
 
@@ -159,7 +241,7 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
                 <span>‹</span>
                 {t('ai.translate')}
               </button>
-              
+
               {/* Language list */}
               <div className="max-h-[220px] overflow-y-auto p-1 pt-0">
                 {AI.LANGUAGES.map((lang) => (
@@ -182,13 +264,13 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
   )
 }
 
-function MenuItem({ 
-  icon: Icon, 
-  label, 
-  onClick, 
+function MenuItem({
+  icon: Icon,
+  label,
+  onClick,
   hasSubmenu,
   active
-}: { 
+}: {
   icon: React.ElementType
   label: string
   onClick: () => void
@@ -229,7 +311,7 @@ export function AskAIInput({ open, onSubmit, contextText, onClearContext, isLoad
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
 
   // Check if speech recognition is supported
-  const isSpeechSupported = typeof window !== 'undefined' && 
+  const isSpeechSupported = typeof window !== 'undefined' &&
     ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
 
   useEffect(() => {
@@ -310,7 +392,7 @@ export function AskAIInput({ open, onSubmit, contextText, onClearContext, isLoad
   return (
     <div className="absolute bottom-full left-0 right-0 mb-2 px-2 flex flex-col items-center gap-1">
       {/* Prompt input */}
-      <div className="w-full max-w-xl bg-neutral-100 dark:bg-neutral-800 backdrop-blur-md rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
+      <div className="w-full max-w-xl bg-neutral-100 dark:bg-neutral-800 backdrop-blur-md rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
         <form onSubmit={handleSubmit} className="flex flex-col">
           {/* Context text attachment - shown above textarea */}
           {contextText && (
@@ -330,7 +412,7 @@ export function AskAIInput({ open, onSubmit, contextText, onClearContext, isLoad
               </div>
             </div>
           )}
-          
+
           {/* Textarea */}
           <div className="relative">
             <textarea
@@ -381,28 +463,28 @@ export function AskAIInput({ open, onSubmit, contextText, onClearContext, isLoad
                   </TooltipTrigger>
                   <TooltipContent>
                     {isListening ? t('speech.stop') : t('speech.start')}
-                </TooltipContent>
-              </Tooltip>
-            )}
-          </div>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+            </div>
 
-          {/* Submit Button */}
-          <PromptSubmitButton 
-            disabled={!question.trim() || !!isLoading} 
-            status={status} 
-          />
-        </div>
-      </form>
+            {/* Submit Button */}
+            <PromptSubmitButton
+              disabled={!question.trim() || !!isLoading}
+              status={status}
+            />
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
   )
 }
 
 // Submit button with spinning loading state
-function PromptSubmitButton({ 
-  disabled, 
-  status 
-}: { 
+function PromptSubmitButton({
+  disabled,
+  status
+}: {
   disabled: boolean
   status: 'ready' | 'streaming' | 'submitted' | 'error'
 }) {
@@ -448,16 +530,16 @@ export function SelectionToolbar({ position, onCopy, onCut, onAskAI }: Selection
 
   const toolbarHeight = 44 // approximate height of toolbar
   const minTopSpace = 60 // minimum space needed above selection
-  
+
   // Show below selection if not enough space above
   const showBelow = position.viewportTop < minTopSpace
-  const topPosition = showBelow 
-    ? position.bottom + 10 
+  const topPosition = showBelow
+    ? position.bottom + 10
     : position.top - toolbarHeight - 8
 
   return (
     <div
-      className="fixed z-50 flex items-center gap-0.5 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 p-1 animate-in fade-in zoom-in-95 duration-200"
+      className="fixed z-50 flex items-center gap-0.5 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 p-1"
       style={{ top: topPosition, left: position.left }}
     >
       <Tooltip>
@@ -537,7 +619,7 @@ interface SummaryModalProps {
 
 export function SummaryModal({ open, content, onClose }: SummaryModalProps) {
   const { t } = useTranslation()
-  
+
   const editor = useEditor({
     extensions: readOnlyExtensions,
     content: '',
@@ -560,11 +642,11 @@ export function SummaryModal({ open, content, onClose }: SummaryModalProps) {
 
   return (
     <div className="absolute inset-x-0 bottom-full mb-2 px-4 z-20 flex justify-center">
-      <div className="w-full max-w-lg max-h-[35vh] overflow-y-auto scrollbar-none bg-neutral-100 dark:bg-neutral-800 backdrop-blur-md rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 animate-in fade-in slide-in-from-bottom-2 duration-200">
+      <div className="w-full max-w-lg max-h-[35vh] overflow-y-auto scrollbar-none bg-neutral-100 dark:bg-neutral-800 backdrop-blur-md rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700">
         {/* Header */}
         <div className="flex items-center justify-between gap-2 px-4 pt-4 pb-2">
           <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-neutral-200 dark:bg-neutral-700">
+            <div className="p-1.5 rounded-lg border border-neutral-300 dark:border-neutral-600">
               <FileText className="w-4 h-4 text-neutral-700 dark:text-neutral-300" />
             </div>
             <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">
@@ -573,16 +655,16 @@ export function SummaryModal({ open, content, onClose }: SummaryModalProps) {
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+            className="p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
-        
+
         {/* Content - Tiptap editor */}
         <div className="selectable px-4 pb-4 text-sm text-neutral-700 dark:text-neutral-300">
-          <EditorContent 
-            editor={editor} 
+          <EditorContent
+            editor={editor}
             className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0.5 prose-headings:text-neutral-800 dark:prose-headings:text-neutral-200 prose-code:bg-neutral-200 dark:prose-code:bg-neutral-700 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-neutral-200 dark:prose-pre:bg-neutral-700"
           />
         </div>
@@ -622,21 +704,21 @@ export function AIAnswerModal({ open, answer, onClose }: AIAnswerModalProps) {
   return (
     <>
       {/* Backdrop - click to close */}
-      <div 
-        className="fixed inset-0 z-25 bg-black/20 dark:bg-black/40 animate-in fade-in duration-200"
+      <div
+        className="fixed inset-0 z-25 bg-black/20 dark:bg-black/40"
         onClick={onClose}
       />
-      
+
       {/* Modal content */}
       <div className="absolute inset-x-0 bottom-full mb-2 px-4 z-30 flex justify-center pointer-events-none">
-        <div 
-          className="w-full max-w-lg max-h-[35vh] overflow-y-auto scrollbar-none bg-neutral-100 dark:bg-neutral-800 backdrop-blur-md rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-auto"
+        <div
+          className="w-full max-w-lg max-h-[35vh] overflow-y-auto scrollbar-none bg-neutral-100 dark:bg-neutral-800 backdrop-blur-md rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 pointer-events-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Content only - no header */}
           <div className="selectable px-4 py-4 text-sm text-neutral-700 dark:text-neutral-300">
-            <EditorContent 
-              editor={editor} 
+            <EditorContent
+              editor={editor}
               className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0.5 prose-headings:text-neutral-800 dark:prose-headings:text-neutral-200 prose-code:bg-neutral-200 dark:prose-code:bg-neutral-700 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-neutral-200 dark:prose-pre:bg-neutral-700"
             />
           </div>
@@ -659,7 +741,7 @@ export function InsufficientCreditsModal({ open, onClose, onBuyCredits }: Insuff
 
   return (
     <div className="absolute inset-x-0 bottom-full mb-2 px-4 z-20 flex justify-center">
-      <div className="w-auto max-w-sm bg-neutral-100 dark:bg-neutral-800 backdrop-blur-md rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 animate-in fade-in slide-in-from-bottom-2 duration-200">
+      <div className="w-auto max-w-sm bg-neutral-100 dark:bg-neutral-800 backdrop-blur-md rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700">
         <div className="flex items-center gap-3 p-4">
           <div className="p-2.5 rounded-xl bg-neutral-200 dark:bg-neutral-700">
             <Coins className="w-5 h-5 text-neutral-700 dark:text-neutral-300" />
@@ -678,7 +760,7 @@ export function InsufficientCreditsModal({ open, onClose, onBuyCredits }: Insuff
           </button>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+            className="p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>

@@ -48,6 +48,7 @@
     "modalSizeDefault": "Standaard",
     "modalSizeLarge": "Groot",
     "modalSizeXLarge": "Extra groot",
+    "modalSizeFullscreen": "Volledig scherm",
     "offlineLogoutTitle": "Uitloggen terwijl offline?",
     "offlineLogoutWarning": "Je bent momenteel offline. Niet-opgeslagen wijzigingen zijn mogelijk niet gesynchroniseerd met Google Drive. Als je nu uitlogt, kun je deze wijzigingen verliezen.",
     "logoutAnyway": "Toch uitloggen"
@@ -128,7 +129,48 @@
     "versionHistory": "Versiegeschiedenis",
     "fullscreen": "Volledig scherm",
     "exitFullscreen": "Volledig scherm verlaten",
-    "more": "Meer"
+    "more": "Meer",
+    "insertTable": "Tabel invoegen",
+    "addColumnBefore": "Kolom ervoor toevoegen",
+    "addColumnAfter": "Kolom erna toevoegen",
+    "addRowBefore": "Rij ervoor toevoegen",
+    "addRowAfter": "Rij erna toevoegen",
+    "deleteColumn": "Kolom verwijderen",
+    "deleteRow": "Rij verwijderen",
+    "deleteTable": "Tabel verwijderen",
+    "mergeCells": "Cellen samenvoegen",
+    "splitCell": "Cel splitsen",
+    "toggleHeaderRow": "Koprij schakelen",
+    "toggleHeaderColumn": "Kopkolom schakelen",
+    "exportTableCSV": "Exporteren als CSV",
+    "exportTableMarkdown": "Exporteren als Markdown",
+    "tableRows": "Rijen",
+    "tableColumns": "Kolommen",
+    "includeHeaderRow": "Koprij opnemen",
+    "tablePreview": "Voorbeeld",
+    "createTable": "Tabel maken",
+    "tableProperties": "Tabeleigenschappen",
+    "tableDimensions": "Afmetingen",
+    "tableHeaders": "Koppen",
+    "tableWidth": "Breedte",
+    "tableOptions": "Opties",
+    "resizableColumns": "Verstelbare kolommen",
+    "fixedLayout": "Vaste lay-out",
+    "headerRow": "Koprij",
+    "headerColumn": "Kopkolom",
+    "autoWidth": "Automatisch",
+    "fullWidth": "100%",
+    "customWidth": "Aangepast",
+    "tableOperations": "Table",
+    "columnOperations": "Column",
+    "rowOperations": "Row",
+    "cellOperations": "Cell",
+    "column": "Column",
+    "row": "Row",
+    "table": "Table",
+    "deleteTableConfirmTitle": "Delete Table?",
+    "deleteTableConfirmDescription": "Are you sure you want to delete this table? This action cannot be undone.",
+    "stylePreviewOnly": "Style preview only"
   },
   "ai": {
     "title": "AI",
@@ -151,7 +193,30 @@
     "chatWithAI": "Chat met AI",
     "chatWelcome": "Hallo",
     "chatDescription": "Vraag me alles over deze notitie. Ik zal antwoorden op basis van de context van de notitie.",
-    "send": "Verzenden"
+    "send": "Verzenden",
+    "tone": {
+      "label": "Toon wijzigen",
+      "professional": "Professioneel",
+      "formalEmail": "Formele e-mail",
+      "socialMedia": "Sociale media",
+      "casual": "Informeel",
+      "friendly": "Vriendelijk",
+      "confident": "Zelfverzekerd"
+    },
+    "regenerate": "Opnieuw genereren",
+    "analysis": {
+      "menu_label": "Analyseren",
+      "title": "Analyseren",
+      "description": "Upload een afbeelding om tekst te extraheren, gegevens te analyseren of een beschrijving te genereren.",
+      "upload_instruction": "Klik of sleep afbeelding om te uploaden",
+      "select_type": "Selecteer analysetype",
+      "type": {
+        "general": "General",
+        "whiteboard": "Whiteboard",
+        "receipt": "Receipt"
+      },
+      "submit": "Analyseren"
+    }
   },
   "sharedNotes": {
     "title": "Met u gedeeld",
@@ -251,14 +316,20 @@
     "rotate": "Draaien",
     "flipH": "Horizontaal spiegelen",
     "flipV": "Verticaal spiegelen",
-    "auto": "Auto"
+    "auto": "Auto",
+    "width": "Width",
+    "height": "Height",
+    "resize": "Resize"
   },
   "common": {
     "confirm": "Bevestigen",
     "cancel": "Annuleren",
     "language": "Taal",
     "searchLanguage": "Taal zoeken...",
-    "noLanguageFound": "Geen taal gevonden"
+    "noLanguageFound": "Geen taal gevonden",
+    "delete": "Delete",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd"
   },
   "time": {
     "justNow": "Zojuist",
@@ -333,7 +404,9 @@
     "error": "Spraakinvoerfout",
     "notSupportedTitle": "Functie niet beschikbaar",
     "notSupportedMessage": "Uw browser ondersteunt geen spraakinvoer. Gebruik een moderne browser zoals Chrome, Edge of Safari voor de beste ervaring.",
-    "understood": "Begrepen"
+    "understood": "Begrepen",
+    "notSupportedTip": "Tip: Make sure you're using the latest version of your browser.",
+    "gotIt": "Got it"
   },
   "trash": {
     "title": "Prullenbak",
@@ -413,5 +486,6 @@
     "genericErrorDescription": "Er is een onverwachte fout opgetreden. Probeer het opnieuw.",
     "appError": "App gecrasht",
     "appErrorDescription": "Er is iets misgegaan en de app moet opnieuw worden geladen. Onze excuses voor het ongemak."
-  }
+  },
+  "webContent": {}
 }

@@ -212,7 +212,7 @@ export function InstallPrompt() {
   const isNativeInstall = installMethod === 'native' && deferredPrompt
 
   return (
-    <div className="fixed bottom-4 left-2 right-2 sm:left-4 sm:right-4 md:left-auto md:right-4 md:w-96 z-50 animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed bottom-4 left-2 right-2 sm:left-4 sm:right-4 md:left-auto md:right-4 md:w-96 z-50">
       <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-700 p-3 sm:p-4 backdrop-blur-xl">
         <div className="flex items-start gap-2.5 sm:gap-3">
           {/* App Icon - always white background with black logo */}

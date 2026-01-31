@@ -37,7 +37,6 @@ import { setLastSyncTimestamp } from '../db/metadataRepository'
 import type { Note } from '@/types'
 import type { TombstoneEntry } from '../drive/types'
 import type { SyncResult, TombstoneData, ConflictInfo } from './types'
-import { STALE_DEVICE_THRESHOLD_MS } from './types'
 
 // Storage key for last sync (also in localStorage for quick access)
 const LAST_SYNC_KEY = 'gnote-last-sync-timestamp'
@@ -45,22 +44,6 @@ const LAST_SYNC_KEY = 'gnote-last-sync-timestamp'
 // Concurrency settings for parallel operations
 const DOWNLOAD_CONCURRENCY = 5
 const UPLOAD_CONCURRENCY = 3
-
-/**
- * Check if device has been offline longer than tombstone retention period
- */
-function isStaleDevice(): boolean {
-  try {
-    const stored = localStorage.getItem(LAST_SYNC_KEY)
-    const lastSync = stored ? parseInt(stored, 10) : 0
-    if (lastSync === 0) return false // First sync
-    
-    const timeSinceLastSync = Date.now() - lastSync
-    return timeSinceLastSync > STALE_DEVICE_THRESHOLD_MS
-  } catch {
-    return false
-  }
-}
 
 /**
  * Save last sync timestamp to both localStorage and IndexedDB
@@ -72,27 +55,6 @@ async function saveLastSyncTimestamp(timestamp: number): Promise<void> {
     // Ignore localStorage errors
   }
   await setLastSyncTimestamp(timestamp)
-}
-
-/**
- * Get IDs of local notes that should be removed due to stale data
- */
-function getStaleLocalNoteIds(
-  localNoteIds: string[],
-  remoteNoteIds: Set<string>,
-  syncQueueIds: Set<string>
-): string[] {
-  if (!isStaleDevice()) return []
-
-  const staleIds: string[] = []
-  for (const localId of localNoteIds) {
-    // If note exists locally but not on remote, and wasn't created while offline
-    if (!remoteNoteIds.has(localId) && !syncQueueIds.has(localId)) {
-      staleIds.push(localId)
-      console.log(`[SyncEngine] Stale device: removing local note ${localId}`)
-    }
-  }
-  return staleIds
 }
 
 /**
@@ -209,8 +171,7 @@ async function batchUploadNotes(
 export async function syncWithDrive(
   accessToken: string,
   localNotes: Note[],
-  localDeletedNoteIds: TombstoneData[],
-  syncQueueIds?: Set<string>
+  localDeletedNoteIds: TombstoneData[]
 ): Promise<SyncResult> {
   // Set access token
   driveClient.setAccessToken(accessToken)
@@ -220,13 +181,6 @@ export async function syncWithDrive(
 
   const now = Date.now()
   const conflicts: ConflictInfo[] = []
-  const staleLocalIds: string[] = []
-
-  // Check if device is stale
-  const isStale = isStaleDevice()
-  if (isStale) {
-    console.warn('[SyncEngine] Device has been offline > 30 days. Using remote authority mode.')
-  }
 
   // ============ Load Remote Tombstones ============
   const remoteDeletedIndex = await getOrCreateDeletedIdsIndex()
@@ -243,14 +197,6 @@ export async function syncWithDrive(
 
   // ============ Sync Notes ============
   const notesIndex = await getOrCreateNotesIndex()
-  const remoteNoteIds = new Set(notesIndex.notes.map(n => n.id))
-
-  // Handle stale device
-  if (isStale && syncQueueIds) {
-    const localNoteIds = localNotes.map(n => n.id)
-    const staleNotes = getStaleLocalNoteIds(localNoteIds, remoteNoteIds, syncQueueIds)
-    staleLocalIds.push(...staleNotes)
-  }
 
   // Download remote notes in parallel
   const folderId = await getOrCreateFolder()
@@ -266,7 +212,6 @@ export async function syncWithDrive(
 
   // Merge notes with conflict resolution
   const mergedNotesMap = new Map<string, Note>()
-  const staleIdSet = new Set(staleLocalIds)
 
   // Add remote notes first
   for (const note of remoteNotes) {
@@ -278,9 +223,6 @@ export async function syncWithDrive(
 
   // Merge local notes
   for (const localNote of validLocalNotes) {
-    // Skip stale notes
-    if (staleIdSet.has(localNote.id)) continue
-
     const remoteNote = mergedNotesMap.get(localNote.id)
     if (!remoteNote) {
       mergedNotesMap.set(localNote.id, localNote)
@@ -340,8 +282,7 @@ export async function syncWithDrive(
     success: true,
     notesChanged,
     syncedNotes,
-    conflicts: conflicts.length > 0 ? conflicts : undefined,
-    staleLocalIds: staleLocalIds.length > 0 ? staleLocalIds : undefined
+    conflicts: conflicts.length > 0 ? conflicts : undefined
   }
 }
 
