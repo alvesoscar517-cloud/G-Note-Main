@@ -7,34 +7,18 @@ import { searchNotes, type SearchResult } from '@/lib/search'
 import { useAppStore } from '@/stores/appStore'
 import { useAuthStore } from '@/stores/authStore'
 
-// Direct imports from new db layer
+// Database layer imports
 import {
   saveNotes,
   getNotesByUserId,
   assignUserIdToOrphanedNotes,
   deleteNote as deleteNoteFromDb
 } from '@/lib/db/noteRepository'
-import {
-  addToSyncQueue,
-  saveNoteWithQueue
-} from '@/lib/db/syncQueueRepository'
-import {
-  addTombstone,
-  getAllTombstones
-} from '@/lib/db/tombstoneRepository'
-import { isIndexedDBAvailable, safeDbWrite } from '@/lib/db/utils'
+import { saveNoteWithQueue } from '@/lib/db/syncQueueRepository'
+import { isIndexedDBAvailable } from '@/lib/db/utils'
 
-// Direct imports from new sync layer
-import {
-  syncWithDrive as engineSyncWithDrive,
-  checkHasData as engineCheckHasData,
-  deleteNoteDriveFile,
-  setSyncAccessToken,
-  getRemoteTombstones
-} from '@/lib/sync/syncEngine'
-
-// Import SimpleSyncManager
-import { syncManager } from '@/lib/sync/simpleSyncManager'
+// Sync Service - centralized sync logic
+import { syncService } from '@/lib/sync/syncService'
 
 interface NotesState {
   notes: Note[]
@@ -153,20 +137,17 @@ export const useNotesStore = create<NotesState>()(
 
           if (user?.id) {
             // Migration: Assign current user ID to any notes that don't have one
-            // This handles the first run after update, and prevents data loss
             await assignUserIdToOrphanedNotes(user.id)
 
             // Load only this user's notes
             offlineNotes = await getNotesByUserId(user.id)
             console.log(`[NotesStore] Loaded ${offlineNotes.length} notes for user ${user.id}`)
           } else {
-            // If no user is logged in, we do NOT load notes from IndexedDB
-            // This prevents data leakage between users on shared devices
             console.log('[NotesStore] No user logged in, skipping IndexedDB load')
             offlineNotes = []
           }
 
-          // Simply load from IndexedDB - no merge needed since logout clears everything
+          // Simply load from IndexedDB
           set({
             notes: offlineNotes,
             isOfflineReady: true
@@ -174,8 +155,8 @@ export const useNotesStore = create<NotesState>()(
 
           console.log(`[NotesStore] Loaded ${offlineNotes.length} notes from IndexedDB`)
 
-          // Initialize SimpleSyncManager with callbacks
-          syncManager.initialize(
+          // Initialize SyncService with callbacks
+          syncService.initializeSyncManager(
             // Sync callback
             async () => {
               const authStore = useAuthStore.getState()
@@ -183,27 +164,11 @@ export const useNotesStore = create<NotesState>()(
                 await get().syncWithDrive(authStore.user.accessToken)
               }
             },
-            // Save callback
-            async (note: Note) => {
-              await safeDbWrite(
-                () => saveNoteWithQueue(note, {
-                  type: 'update',
-                  entityType: 'note',
-                  entityId: note.id,
-                  data: note
-                }),
-                () => console.error('[NotesStore] Storage quota exceeded while saving note')
-              )
-            },
-            // Has pending changes callback (for periodic sync optimization)
-            () => {
-              const state = get()
-              return state.notes.some(n => n.syncStatus === 'pending')
-            }
+            // Save callback - created by syncService
+            syncService.createSaveCallback(),
+            // Has pending changes callback
+            () => get().notes.some(n => n.syncStatus === 'pending')
           )
-
-          // Start periodic sync
-          syncManager.startPeriodicSync()
         } catch (error) {
           console.error('[NotesStore] Failed to init offline storage:', error)
           set({ isOfflineReady: true })
@@ -270,9 +235,9 @@ export const useNotesStore = create<NotesState>()(
           return { notes: newNotes }
         })
 
-        // Use SimpleSyncManager for debounced save and sync scheduling
+        // Use SyncService for debounced save and sync scheduling
         if (updatedNote) {
-          syncManager.addPendingNote(updatedNote)
+          syncService.addPendingNote(updatedNote)
         }
       },
 
@@ -312,8 +277,8 @@ export const useNotesStore = create<NotesState>()(
             data: trashedNote
           }).catch(console.error)
 
-          // Trigger sync schedule (event-driven)
-          syncManager.scheduleSync()
+          // Trigger sync schedule
+          syncService.scheduleSync()
         }
       },
 
@@ -345,8 +310,8 @@ export const useNotesStore = create<NotesState>()(
             data: restoredNote
           }).catch(console.error)
 
-          // Trigger sync schedule (event-driven)
-          syncManager.scheduleSync()
+          // Trigger sync schedule
+          syncService.scheduleSync()
         }
       },
 
@@ -356,15 +321,11 @@ export const useNotesStore = create<NotesState>()(
         const isOnline = useAppStore.getState().isOnline
 
         if (note?.driveFileId) {
-          if (isOnline) {
-            deleteNoteDriveFile(id).catch(console.error)
-          } else {
-            addToSyncQueue({ type: 'delete', entityType: 'note', entityId: id }).catch(console.error)
-          }
+          syncService.deleteNoteDriveFile(id, isOnline).catch(console.error)
         }
 
         // Track deletion for sync and delete from IndexedDB
-        addTombstone(id, 'note').catch(console.error)
+        syncService.trackDeletion(id).catch(console.error)
         deleteNoteFromDb(id).catch(console.error)
 
         set((state) => ({
@@ -380,13 +341,9 @@ export const useNotesStore = create<NotesState>()(
 
         trashNotes.forEach(note => {
           if (note.driveFileId) {
-            if (isOnline) {
-              deleteNoteDriveFile(note.id).catch(console.error)
-            } else {
-              addToSyncQueue({ type: 'delete', entityType: 'note', entityId: note.id }).catch(console.error)
-            }
+            syncService.deleteNoteDriveFile(note.id, isOnline).catch(console.error)
           }
-          addTombstone(note.id, 'note').catch(console.error)
+          syncService.trackDeletion(note.id).catch(console.error)
           deleteNoteFromDb(note.id).catch(console.error)
         })
 
@@ -428,9 +385,9 @@ export const useNotesStore = create<NotesState>()(
           }).catch(console.error)
         })
 
-        // Trigger sync schedule (event-driven)
+        // Trigger sync schedule
         if (restoredNotes.length > 0) {
-          syncManager.scheduleSync()
+          syncService.scheduleSync()
         }
       },
 
@@ -441,13 +398,9 @@ export const useNotesStore = create<NotesState>()(
         ids.forEach(id => {
           const note = notes.find(n => n.id === id)
           if (note?.driveFileId) {
-            if (isOnline) {
-              deleteNoteDriveFile(id).catch(console.error)
-            } else {
-              addToSyncQueue({ type: 'delete', entityType: 'note', entityId: id }).catch(console.error)
-            }
+            syncService.deleteNoteDriveFile(id, isOnline).catch(console.error)
           }
-          addTombstone(id, 'note').catch(console.error)
+          syncService.trackDeletion(id).catch(console.error)
           deleteNoteFromDb(id).catch(console.error)
         })
 
@@ -523,8 +476,8 @@ export const useNotesStore = create<NotesState>()(
             data: updatedNote
           }).catch(console.error)
 
-          // Trigger sync schedule (event-driven)
-          syncManager.scheduleSync()
+          // Trigger sync schedule
+          syncService.scheduleSync()
         }
       },
 
@@ -549,15 +502,13 @@ export const useNotesStore = create<NotesState>()(
         set({ isCheckingDriveData: true })
 
         try {
-          setSyncAccessToken(accessToken)
-          const result = await engineCheckHasData(accessToken)
+          const result = await syncService.checkDriveHasData(accessToken)
 
           set({
             driveHasData: result.hasData,
             isCheckingDriveData: false
           })
 
-          console.log(`[NotesStore] Drive has data: ${result.hasData}, noteCount: ${result.noteCount}`)
           return result.hasData
         } catch (error) {
           console.error('[NotesStore] checkDriveHasData error:', error)
@@ -579,135 +530,30 @@ export const useNotesStore = create<NotesState>()(
           return
         }
 
-        // Flush any pending updates before sync
-        await syncManager.flush()
-
         set({ isSyncing: true, syncError: null })
 
-        try {
-          setSyncAccessToken(accessToken)
+        // Use SyncService for all sync logic
+        const result = await syncService.syncWithDrive(accessToken, {
+          notes,
+          selectedNoteId,
+          isModalOpen
+        })
 
-          // Get tombstones from IndexedDB (for accurate offline delete tracking)
-          const tombstones = await getAllTombstones()
-          const localDeletedNotes = tombstones
-            .filter(d => d.entityType === 'note')
-            .map(d => ({ id: d.id, deletedAt: d.deletedAt }))
-
-          // Filter out active note from sync to prevent conflicts while editing
-          // Active note = note being edited in modal
-          const activeNoteId = isModalOpen ? selectedNoteId : null
-          const notesToSync = activeNoteId
-            ? notes.filter(n => n.id !== activeNoteId)
-            : notes
-
-          if (activeNoteId) {
-            console.log(`[NotesStore] Excluding active note ${activeNoteId} from sync (being edited)`)
-          }
-
-          // Sync with new engine (simplified - no stale device detection)
-          const result = await engineSyncWithDrive(
-            accessToken,
-            notesToSync,
-            localDeletedNotes
-          )
-
-          const { syncedNotes } = result
-
-          // Get remote tombstones to filter out deleted notes
-          const remoteTombstones = getRemoteTombstones()
-
-          // Helper to check if a note should be deleted based on tombstone
-          const shouldDeleteNote = (noteId: string, noteUpdatedAt: number): boolean => {
-            const deletedAt = remoteTombstones.get(noteId)
-            if (!deletedAt) return false
-            return deletedAt > noteUpdatedAt
-          }
-
-          // Collect IDs to delete from IndexedDB (outside of set())
-          const noteIdsToDelete: string[] = []
-
-          // Merge synced data with current state (handle edits during sync)
-          set((state) => {
-            const syncedNotesMap = new Map(syncedNotes.map(n => [n.id, n]))
-
-            // Merge notes - preserve local pending changes, but respect tombstones
-            const mergedNotes = state.notes
-              .filter(currentNote => {
-                // Remove notes that have been deleted on remote (tombstone wins if newer)
-                if (shouldDeleteNote(currentNote.id, currentNote.updatedAt)) {
-                  console.log(`[NotesStore] Removing local note ${currentNote.id} - deleted on remote`)
-                  noteIdsToDelete.push(currentNote.id)
-                  return false
-                }
-                return true
-              })
-              .map(currentNote => {
-                // Preserve active note (don't overwrite with synced version)
-                // Preserve active note (don't overwrite with synced version)
-                // Use FRESH state from set() callback as activeNoteId closure might be stale
-                const currentActiveNoteId = state.isModalOpen ? state.selectedNoteId : null
-                if (currentNote.id === currentActiveNoteId) {
-                  return currentNote
-                }
-
-                const syncedNote = syncedNotesMap.get(currentNote.id)
-
-                if (!syncedNote) return currentNote
-
-                // If local note was modified during sync, keep local version
-                if (currentNote.syncStatus === 'pending' &&
-                  (currentNote.version || 1) > (syncedNote.version || 1)) {
-                  return currentNote
-                }
-
-                return syncedNote
-              })
-
-            // Add new notes from sync (from other devices)
-            const localDeletedNoteIdSet = new Set(localDeletedNotes.map(d => d.id))
-            syncedNotes.forEach(syncedNote => {
-              const currentActiveNoteId = state.isModalOpen ? state.selectedNoteId : null
-              const existsLocally = state.notes.find(n => n.id === syncedNote.id)
-              // Don't add if it's the active note (already in local state)
-              if (!existsLocally && !localDeletedNoteIdSet.has(syncedNote.id) && syncedNote.id !== currentActiveNoteId) {
-                mergedNotes.push(syncedNote)
-              }
-            })
-
-            return {
-              notes: mergedNotes,
-              lastSyncTime: Date.now(),
-              isSyncing: false,
-              isInitialSync: false, // First sync completed
-              isNewUser: false // Reset new user flag after sync
-            }
+        if (result.success) {
+          // Update state with merged notes
+          set({
+            notes: result.mergedNotes,
+            lastSyncTime: Date.now(),
+            isSyncing: false,
+            isInitialSync: false,
+            isNewUser: false
           })
+        } else {
+          // Handle errors based on type
+          const { error, errorType } = result
 
-          // Delete from IndexedDB outside of set() to avoid race conditions
-          if (noteIdsToDelete.length > 0) {
-            await Promise.all(noteIdsToDelete.map(id => deleteNoteFromDb(id).catch(console.error)))
-          }
-
-          // Save synced data to IndexedDB
-          const { notes: finalNotes } = get()
-          await saveNotes(finalNotes)
-
-        } catch (error) {
-          console.error('Sync failed:', error)
-
-          const errorMessage = error instanceof Error ? error.message : 'Sync failed'
-          const isAuthError = errorMessage.includes('401') ||
-            errorMessage.includes('authentication') ||
-            errorMessage.includes('credential')
-          const isPermissionError = errorMessage === 'DRIVE_PERMISSION_DENIED' ||
-            errorMessage.includes('403') ||
-            errorMessage.includes('insufficient')
-          const isQuotaError = errorMessage === 'DRIVE_QUOTA_EXCEEDED'
-          const isConflictError = errorMessage === 'DRIVE_CONFLICT_412' ||
-            errorMessage === 'DRIVE_CONFLICT_MAX_RETRIES'
-
-          // Handle quota exceeded (X.3)
-          if (isQuotaError) {
+          // Handle quota exceeded
+          if (errorType === 'quota') {
             set({
               syncError: 'DRIVE_QUOTA_EXCEEDED',
               isSyncing: false,
@@ -717,8 +563,8 @@ export const useNotesStore = create<NotesState>()(
             return
           }
 
-          // Handle conflict errors (X.1) - retry sync
-          if (isConflictError) {
+          // Handle conflict errors - retry sync
+          if (errorType === 'conflict') {
             console.log('[NotesStore] Sync conflict detected, will retry...')
             set({
               syncError: null,
@@ -726,49 +572,44 @@ export const useNotesStore = create<NotesState>()(
             })
             // Auto-retry after short delay
             setTimeout(() => {
-              const user = (async () => {
-                const { useAuthStore } = await import('./authStore')
-                return useAuthStore.getState().user
-              })()
-              user.then(u => {
-                if (u?.accessToken) {
-                  get().syncWithDrive(u.accessToken)
-                }
-              })
+              const user = useAuthStore.getState().user
+              if (user?.accessToken) {
+                get().syncWithDrive(user.accessToken)
+              }
             }, 1000)
             return
           }
 
-          // Handle permission error - user didn't grant Drive access
-          if (isPermissionError) {
+          // Handle permission error
+          if (errorType === 'permission') {
             set({
               syncError: 'DRIVE_PERMISSION_DENIED',
               isSyncing: false,
               isInitialSync: false
             })
-            // Don't logout, just show error - user can re-login with correct permissions
             return
           }
 
-          set({
-            syncError: isAuthError ? 'Refreshing session...' : errorMessage,
-            isSyncing: false,
-            isInitialSync: false, // Even on error, mark initial sync as done
-            notes: get().notes.map(n => ({ ...n, syncStatus: 'error' as const }))
-          })
+          // Handle auth error
+          if (errorType === 'auth') {
+            set({
+              syncError: error || 'Refreshing session...',
+              isSyncing: false,
+              isInitialSync: false,
+              notes: notes.map(n => ({ ...n, syncStatus: 'error' as const }))
+            })
 
-          if (isAuthError) {
-            const { useAuthStore } = await import('./authStore')
+            // Try to refresh token
             const { silentRefreshWithBackend, hasAuthBackend } = await import('@/lib/tokenRefresh')
             const user = useAuthStore.getState().user
 
             if (user && hasAuthBackend()) {
-              const result = await silentRefreshWithBackend(user.id)
-              if (result) {
+              const refreshResult = await silentRefreshWithBackend(user.id)
+              if (refreshResult) {
                 useAuthStore.getState().setUser({
                   ...user,
-                  accessToken: result.access_token,
-                  tokenExpiry: Date.now() + (result.expires_in * 1000)
+                  accessToken: refreshResult.access_token,
+                  tokenExpiry: Date.now() + (refreshResult.expires_in * 1000)
                 })
                 set({ syncError: null })
                 console.log('Token refreshed after 401, will retry sync')
@@ -778,7 +619,16 @@ export const useNotesStore = create<NotesState>()(
 
             console.log('Token refresh failed, logging out')
             useAuthStore.getState().logout()
+            return
           }
+
+          // Unknown error
+          set({
+            syncError: error || 'Sync failed',
+            isSyncing: false,
+            isInitialSync: false,
+            notes: notes.map(n => ({ ...n, syncStatus: 'error' as const }))
+          })
         }
       },
 

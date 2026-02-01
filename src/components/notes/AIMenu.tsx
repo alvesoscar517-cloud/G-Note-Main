@@ -147,8 +147,9 @@ export function AIMenu({ onAction, disabled }: AIMenuProps) {
                   e.preventDefault()
                 }}
                 className={cn(
-                  'flex items-center justify-center w-[44px] h-[44px] sm:w-auto sm:h-auto rounded-full transition-colors touch-manipulation',
-                  'sm:p-1.5',
+                  'flex items-center justify-center rounded-full transition-colors touch-manipulation flex-shrink-0',
+                  'w-10 h-10 aspect-square',
+                  'sm:w-8 sm:h-8',
                   'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700',
                   disabled && 'opacity-40 cursor-not-allowed',
                   open && 'bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-white'

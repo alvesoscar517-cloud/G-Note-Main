@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react'
-import { useWindowVirtualizer } from '@tanstack/react-virtual'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { EmptyState } from './EmptyState'
 import { NotesListSkeleton } from '@/components/ui/Skeleton'
 import { NoteCard } from './NoteCard'
@@ -15,50 +15,70 @@ const OVERSCAN = 5 // Number of items to render outside visible area
 type GridItem = { type: 'note'; note: Note }
 
 export function VirtualizedNotesList() {
-  const listRef = useRef<HTMLDivElement>(null)
-  const { 
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null)
+
+  const {
     notes,
-    getSearchResults, 
+    getSearchResults,
     searchQuery,
     isModalOpen
   } = useNotesStore()
-  
+
   // Get sync states
   const isSyncing = useNotesStore(state => state.isSyncing)
   const isInitialSync = useNotesStore(state => state.isInitialSync)
   const isNewUser = useNotesStore(state => state.isNewUser)
   const isCheckingDriveData = useNotesStore(state => state.isCheckingDriveData)
   const driveHasData = useNotesStore(state => state.driveHasData)
-  
+
   const [columnCount, setColumnCount] = useState(3)
-  
+
   // Store scroll position for restoration
   const scrollPositionRef = useRef(0)
   const wasModalOpenRef = useRef(false)
 
+  // Find the scrollable parent on mount
+  useEffect(() => {
+    // In our app structure, the scrollable element is the h-screen div in App.tsx
+    const findScrollParent = () => {
+      let parent = containerRef.current?.parentElement
+      while (parent) {
+        const overflowY = window.getComputedStyle(parent).overflowY
+        if (overflowY === 'auto' || overflowY === 'scroll') {
+          return parent as HTMLDivElement
+        }
+        parent = parent.parentElement
+      }
+      return null
+    }
+
+    setScrollElement(findScrollParent())
+  }, [])
+
   // Detect column count based on container width
   useEffect(() => {
     const updateColumnCount = () => {
-      if (!listRef.current) return
-      const width = listRef.current.offsetWidth
+      if (!containerRef.current) return
+      const width = containerRef.current.offsetWidth
       if (width < 640) setColumnCount(1) // sm breakpoint
       else if (width < 1024) setColumnCount(2) // lg breakpoint
       else setColumnCount(3)
     }
-    
+
     updateColumnCount()
     const observer = new ResizeObserver(updateColumnCount)
-    if (listRef.current) observer.observe(listRef.current)
+    if (containerRef.current) observer.observe(containerRef.current)
     return () => observer.disconnect()
   }, [])
 
   // Restore scroll position when modal closes
   useEffect(() => {
-    if (wasModalOpenRef.current && !isModalOpen) {
-      window.scrollTo(0, scrollPositionRef.current)
+    if (wasModalOpenRef.current && !isModalOpen && scrollElement) {
+      scrollElement.scrollTo(0, scrollPositionRef.current)
     }
     wasModalOpenRef.current = isModalOpen
-  }, [isModalOpen])
+  }, [isModalOpen, scrollElement])
 
   const searchResults = getSearchResults()
   const allNotes = searchResults.map(r => r.note)
@@ -73,7 +93,7 @@ export function VirtualizedNotesList() {
   const rows = useMemo(() => {
     const result: GridItem[][] = []
     let currentRow: GridItem[] = []
-    
+
     gridItems.forEach(item => {
       currentRow.push(item)
       if (currentRow.length === columnCount) {
@@ -81,11 +101,11 @@ export function VirtualizedNotesList() {
         currentRow = []
       }
     })
-    
+
     if (currentRow.length > 0) {
       result.push(currentRow)
     }
-    
+
     return result
   }, [gridItems, columnCount])
 
@@ -94,24 +114,26 @@ export function VirtualizedNotesList() {
     return CARD_HEIGHT + GAP
   }, [])
 
-  const virtualizer = useWindowVirtualizer({
+  const virtualizer = useVirtualizer({
     count: rows.length,
+    getScrollElement: () => scrollElement,
     estimateSize: getRowHeight,
     overscan: OVERSCAN,
-    scrollMargin: listRef.current?.offsetTop ?? 0,
   })
 
-  const handleScroll = () => {
-    if (!isModalOpen) {
-      scrollPositionRef.current = window.scrollY
-    }
-  }
-
-  // Add scroll listener for window
+  // Add scroll listener to track position
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [isModalOpen])
+    if (!scrollElement) return
+
+    const handleScroll = () => {
+      if (!isModalOpen) {
+        scrollPositionRef.current = scrollElement.scrollTop
+      }
+    }
+
+    scrollElement.addEventListener('scroll', handleScroll, { passive: true })
+    return () => scrollElement.removeEventListener('scroll', handleScroll)
+  }, [isModalOpen, scrollElement])
 
   // Show skeleton
   const activeNotes = notes.filter(n => !n.isDeleted)
@@ -120,7 +142,7 @@ export function VirtualizedNotesList() {
     isCheckingDriveData ||
     (driveHasData === true && isSyncing)
   )
-  
+
   if (showSkeleton) {
     return <NotesListSkeleton />
   }
@@ -134,9 +156,9 @@ export function VirtualizedNotesList() {
 
   // Simple virtualized grid
   return (
-    <div 
-      ref={listRef} 
-      className="relative"
+    <div
+      ref={containerRef}
+      className="relative w-full"
     >
       <div
         style={{
@@ -147,6 +169,8 @@ export function VirtualizedNotesList() {
       >
         {virtualizer.getVirtualItems().map(virtualRow => {
           const row = rows[virtualRow.index]
+          if (!row) return null
+
           return (
             <div
               key={virtualRow.key}
@@ -156,7 +180,7 @@ export function VirtualizedNotesList() {
                 left: 0,
                 width: '100%',
                 height: `${virtualRow.size}px`,
-                transform: `translateY(${virtualRow.start - virtualizer.options.scrollMargin}px)`,
+                transform: `translateY(${virtualRow.start}px)`,
               }}
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-1 px-1">

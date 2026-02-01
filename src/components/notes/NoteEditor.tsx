@@ -1,39 +1,6 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useEditor, EditorContent } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import Placeholder from '@tiptap/extension-placeholder'
-import TaskList from '@tiptap/extension-task-list'
-import TaskItem from '@tiptap/extension-task-item'
-import { TableRow } from '@tiptap/extension-table-row'
-import { TableHeader } from '@tiptap/extension-table-header'
-import { TableCell } from '@tiptap/extension-table-cell'
-import { MobileScrollableTable } from './table/MobileScrollableTable'
-import { initTableScrollIndicators } from './table/tableScrollIndicators'
-import { ResizableImage } from './ResizableImageExtension'
-import { DrawingModal } from './DrawingModal'
-import { ImageAnalysisModal } from './ImageAnalysisModal'
-import { CollaborationCursors } from './CollaborationCursors'
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
-import { common, createLowlight } from 'lowlight'
-import { Markdown } from 'tiptap-markdown'
-import Underline from '@tiptap/extension-underline'
-import Highlight from '@tiptap/extension-highlight'
-import Subscript from '@tiptap/extension-subscript'
-import Superscript from '@tiptap/extension-superscript'
-import TextAlign from '@tiptap/extension-text-align'
-import Link from '@tiptap/extension-link'
-import { TextStyle } from '@tiptap/extension-text-style'
-import { Color } from '@tiptap/extension-color'
-import Typography from '@tiptap/extension-typography'
-import FontFamily from '@tiptap/extension-font-family'
-import Youtube from '@tiptap/extension-youtube'
-import { marked } from 'marked'
-import * as Y from 'yjs'
-import { WebrtcProvider } from 'y-webrtc'
-import Collaboration from '@tiptap/extension-collaboration'
-import { generateUserColor } from '@/lib/collaboration'
+import { EditorContent } from '@tiptap/react'
 import {
   Undo2,
   Redo2,
@@ -56,7 +23,6 @@ import {
   History,
   Maximize2,
   Minimize2,
-  // Copy, Scissors, ClipboardPaste, TextSelect - removed (unused)
   Sparkles,
   Underline as UnderlineIcon,
   Highlighter,
@@ -78,12 +44,11 @@ import {
 } from 'lucide-react'
 import { useNotesStore } from '@/stores/notesStore'
 import { useAuthStore } from '@/stores/authStore'
-import { useAppStore, NetworkRequiredError } from '@/stores/appStore'
+import { useAppStore } from '@/stores/appStore'
 import { cn } from '@/lib/utils'
 import { ConfirmDialog, InputDialog } from '@/components/ui/Dialog'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip'
 import { DrawingErrorBoundary } from '@/components/ui/ErrorBoundary'
-// ContextMenu imports removed - now using EditorContextMenu component
 import { ShareDialog } from './ShareDialog'
 import { VersionHistoryPanel } from './VersionHistoryPanel'
 import { NoteStylePicker } from './NoteStylePicker'
@@ -97,12 +62,14 @@ import { useResponsiveToolbar } from '@/hooks/useResponsiveToolbar'
 import { TableInsertDialog } from './table/TableInsertDialog'
 import { EditorContextMenu } from './EditorContextMenu'
 import { TablePropertiesDialog } from './table/TablePropertiesDialog'
+import { DrawingModal } from './DrawingModal'
+import { ImageAnalysisModal } from './ImageAnalysisModal'
+import { CollaborationCursors } from './CollaborationCursors'
 import { useScrollableDrag } from '@/hooks/useScrollableDrag'
-import * as AI from '@/lib/ai'
-import { InsufficientCreditsError } from '@/lib/ai'
-import type { Note, NoteStyle, AIChatMessage } from '@/types'
-
-// Remove duplicate Message type - use AIChatMessage from types
+import { useCollaboration } from '@/hooks/useCollaboration'
+import { useNoteEditor } from '@/hooks/useNoteEditor'
+import { useNoteAI } from '@/hooks/useNoteAI'
+import type { Note, NoteStyle } from '@/types'
 
 // Editable title component with ellipsis support
 function EditableTitle({
@@ -195,12 +162,6 @@ interface NoteEditorProps {
   customUpdateHandler?: (updates: Partial<Note>) => void // Custom update handler for free mode (bypasses store)
 }
 
-interface CollaboratorInfo {
-  name: string
-  color: string
-  picture?: string
-}
-
 export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen, canToggleFullscreen = true, onToggleFullscreen, isFreeMode = false, onLockedFeatureClick, customUpdateHandler }: NoteEditorProps) {
   const { t } = useTranslation()
   const { updateNote, deleteNote } = useNotesStore()
@@ -208,306 +169,35 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   const isOnline = useAppStore(state => state.isOnline)
 
   // Network required overlay for offline handling
-  const { showOverlay: showNetworkOverlay, OverlayComponent: NetworkOverlay } = useNetworkRequiredOverlay()
+  const { OverlayComponent: NetworkOverlay } = useNetworkRequiredOverlay()
 
-  // Track note ID to detect when note changes
-  const currentNoteIdRef = useRef(note.id)
-  const isFirstRender = useRef(true)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showShareDialog, setShowShareDialog] = useState(false)
   const [showVersionHistory, setShowVersionHistory] = useState(false)
   const [showTableInsertDialog, setShowTableInsertDialog] = useState(false)
   const [showTablePropertiesDialog, setShowTablePropertiesDialog] = useState(false)
-  const [roomId, setRoomId] = useState<string | null>(null)
-  const [isRoomHost, setIsRoomHost] = useState(false) // Track if user created the room (host) or joined (guest)
-  const [collaborators, setCollaborators] = useState<CollaboratorInfo[]>([])
-  const [userColor] = useState(() => generateUserColor())
-
-  // AI states
-  const [isAILoading, setIsAILoading] = useState(false) // For actions that modify editor
-  const [isAskAILoading, setIsAskAILoading] = useState(false) // For ask AI only
-  const [isStreaming, setIsStreaming] = useState(false)
-  const [isContinuing, setIsContinuing] = useState(false)
-  const [showAIChatView, setShowAIChatView] = useState(false) // Fullscreen chat view
-  const [chatMessages, setChatMessages] = useState<AIChatMessage[]>(note.aiChatHistory || []) // Chat history from note
-  const [isSummarizing, setIsSummarizing] = useState(false)
-  // selectedText state removed - was unused
-  const [aiContextText, setAiContextText] = useState('') // Text to use for AI query
-  const [aiError, setAiError] = useState<string | null>(null)
-  const [showCreditsError, setShowCreditsError] = useState(false)
   const [showDrawingModal, setShowDrawingModal] = useState(false)
   const [showLinkDialog, setShowLinkDialog] = useState(false)
-  const [showImageAnalysis, setShowImageAnalysis] = useState(false)
-  const [isAnalyzingImage, setIsAnalyzingImage] = useState(false)
-  const editorContainerRef = useRef<HTMLDivElement>(null)
+
+  const [roomId, setRoomId] = useState<string | null>(null)
+  const [isRoomHost, setIsRoomHost] = useState(false)
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const toolbarRef = useRef<HTMLDivElement>(null)
 
-  // Responsive toolbar visibility
-  const toolbarVisibility = useResponsiveToolbar(toolbarRef)
-
-  // Scrollable drag for toolbar
-  const toolbarScrollRef = useScrollableDrag<HTMLDivElement>()
-
-  // Clear AI error after 5 seconds
-  useEffect(() => {
-    if (aiError) {
-      const timer = setTimeout(() => setAiError(null), 5000)
-      return () => clearTimeout(timer)
-    }
-  }, [aiError])
-
-  // Sync chat history when note changes
-  useEffect(() => {
-    // Load chat history from note
-    setChatMessages(note.aiChatHistory || [])
-  }, [note.id])
-
-  // Save chat history to note when messages change
-  useEffect(() => {
-    if (chatMessages.length > 0 && note.id) {
-      // Only save if different from current note's history
-      const currentHistory = note.aiChatHistory || []
-      if (JSON.stringify(chatMessages) !== JSON.stringify(currentHistory)) {
-        // Debounce to avoid too many updates
-        const timer = setTimeout(() => {
-          updateNote(note.id, { aiChatHistory: chatMessages })
-        }, 500)
-        return () => clearTimeout(timer)
-      }
-    }
-  }, [chatMessages, note.id, note.aiChatHistory, updateNote])
-
-  // WebRTC provider and Y.Doc for collaboration
-  const [provider, setProvider] = useState<WebrtcProvider | null>(null)
-  const [ydoc, setYdoc] = useState<Y.Doc | null>(null)
-  const [isProviderReady, setIsProviderReady] = useState(false)
-  const [awarenessDoc, setAwarenessDoc] = useState<Y.Doc | null>(null)
-
-  // Use refs to track current provider/ydoc for cleanup
-  const providerRef = useRef<WebrtcProvider | null>(null)
-  const ydocRef = useRef<Y.Doc | null>(null)
-
-  // Use refs for user info to avoid re-running effect when these change
-  const userNameRef = useRef(user?.name)
-  const userAvatarRef = useRef(user?.avatar)
-  userNameRef.current = user?.name
-  userAvatarRef.current = user?.avatar
-
-  // Setup collaboration when roomId changes
-  useEffect(() => {
-    // Cleanup previous provider/ydoc if exists
-    if (providerRef.current) {
-      providerRef.current.disconnect()
-      providerRef.current.destroy()
-      providerRef.current = null
-    }
-    if (ydocRef.current) {
-      ydocRef.current.destroy()
-      ydocRef.current = null
-    }
-
-    if (!roomId) {
-      setProvider(null)
-      setYdoc(null)
-      setIsProviderReady(false)
-      setAwarenessDoc(null)
-      return
-    }
-
-    let cancelled = false
-    let readyTimeout: ReturnType<typeof setTimeout>
-    let interval: ReturnType<typeof setInterval>
-    let newProvider: WebrtcProvider | null = null
-    let newYdoc: Y.Doc | null = null
-
-    const setupCollaboration = async () => {
-      console.log('[Collab] Starting collaboration for room:', roomId)
-
-      newYdoc = new Y.Doc()
-
-      // Get signaling servers from environment variable
-      const signalingServers = import.meta.env.VITE_SIGNALING_SERVERS
-        ? import.meta.env.VITE_SIGNALING_SERVERS.split(',').map((s: string) => s.trim())
-        : []
-
-      console.log('[Collab] Using signaling servers:', signalingServers)
-
-      // Fetch ICE servers from Metered API (includes STUN + TURN)
-      // This enables cross-network connections (WiFi to 4G, etc.)
-      const meteredApiKey = import.meta.env.VITE_METERED_API_KEY
-      let iceServers: RTCIceServer[] = [
-        // Fallback STUN servers if API fails
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-      ]
-
-      if (meteredApiKey) {
-        try {
-          const response = await fetch(`https://gnote.metered.live/api/v1/turn/credentials?apiKey=${meteredApiKey}`)
-          if (response.ok) {
-            const meteredServers = await response.json()
-            iceServers = meteredServers
-            console.log('[Collab] Loaded ICE servers from Metered:', iceServers.length, 'servers')
-          }
-        } catch (error) {
-          console.warn('[Collab] Failed to fetch Metered ICE servers, using fallback:', error)
-        }
-      }
-
-      if (cancelled) return
-
-      newProvider = new WebrtcProvider(`notes-app-${roomId}`, newYdoc, {
-        signaling: signalingServers,
-        peerOpts: {
-          config: {
-            iceServers: iceServers
-          }
-        }
-      })
-
-      // Store in refs for cleanup
-      providerRef.current = newProvider
-      ydocRef.current = newYdoc
-
-      newProvider.awareness.setLocalStateField('user', {
-        name: userNameRef.current || 'Anonymous',
-        color: userColor,
-        colorLight: userColor + '40',
-        picture: userAvatarRef.current || null
-      })
-
-      // Log connection status
-      newProvider.on('synced', (event: { synced: boolean }) => {
-        console.log('[Collab] Provider synced:', event.synced)
-      })
-
-      newProvider.on('peers', (event: { added: string[], removed: string[], webrtcPeers: string[], bcPeers: string[] }) => {
-        console.log('[Collab] Peers changed:', event)
-      })
-
-      if (cancelled) return
-
-      setYdoc(newYdoc)
-      setProvider(newProvider)
-
-      // Wait for awareness to be fully initialized with doc before marking ready
-      // CollaborationCursor needs awareness.doc to be available
-      const checkReady = () => {
-        if (cancelled || !newProvider) return
-        // Check if awareness has doc property (required by CollaborationCursor)
-        // Also verify the doc is the same as our ydoc
-        const aDoc = (newProvider.awareness as any).doc
-        if (newProvider.awareness && aDoc && aDoc === newYdoc) {
-          console.log('[Collab] Provider ready, awareness doc available')
-          setAwarenessDoc(aDoc)
-          setIsProviderReady(true)
-        } else {
-          // Retry after a short delay
-          readyTimeout = setTimeout(checkReady, 100)
-        }
-      }
-
-      // Start checking after initial setup - give more time for initialization
-      readyTimeout = setTimeout(checkReady, 300)
-
-      // Update collaborators list
-      const updateCollaborators = () => {
-        if (!newProvider) return
-        const collabs: CollaboratorInfo[] = []
-        newProvider.awareness.getStates().forEach((state) => {
-          if (state.user) {
-            collabs.push({
-              name: state.user.name || 'Anonymous',
-              color: state.user.color || '#888',
-              picture: state.user.picture || undefined
-            })
-          }
-        })
-        console.log('[Collab] Collaborators updated:', collabs.length)
-        setCollaborators(collabs)
-      }
-
-      newProvider.awareness.on('change', updateCollaborators)
-      // Initial update
-      updateCollaborators()
-      interval = setInterval(updateCollaborators, 2000)
-    }
-
-    setupCollaboration()
-
-    return () => {
-      console.log('[Collab] Cleaning up room:', roomId)
-      cancelled = true
-      if (readyTimeout) clearTimeout(readyTimeout)
-      if (interval) clearInterval(interval)
-      if (newProvider) {
-        newProvider.awareness.off('change', () => { })
-      }
-      setIsProviderReady(false)
-      // Cleanup will be done at the start of next effect run
-    }
-  }, [roomId, userColor]) // Only re-run when roomId or userColor changes, not user info
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (providerRef.current) {
-        providerRef.current.disconnect()
-        providerRef.current.destroy()
-      }
-      if (ydocRef.current) {
-        ydocRef.current.destroy()
-      }
-    }
-  }, [])
-
-  // Reconnect WebRTC when tab becomes visible again (after phone sleep/unlock)
-  useEffect(() => {
-    if (!roomId || !providerRef.current) return
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && providerRef.current) {
-        console.log('[Collab] Tab visible, checking connection...')
-        // WebrtcProvider will auto-reconnect, but we can force it
-        if (!providerRef.current.connected) {
-          console.log('[Collab] Reconnecting...')
-          providerRef.current.connect()
-        }
-      }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-    }
-  }, [roomId])
-
-  // Debounced update note content - reduced for snappier feel
-  // Use ref to avoid stale closure with customUpdateHandler
-  const customUpdateHandlerRef = useRef(customUpdateHandler)
-  customUpdateHandlerRef.current = customUpdateHandler
-
-  // Use customUpdateHandler if provided (for free mode), otherwise use store's updateNote
-  const debouncedUpdate = useDebouncedCallback((id: string, content: string) => {
-    lastSavedContentRef.current = content
-    if (customUpdateHandlerRef.current) {
-      customUpdateHandlerRef.current({ content })
-    } else {
-      updateNote(id, { content })
-    }
-  }, 300)
-
-  // Track last saved content to avoid unnecessary saves
-  const lastSavedContentRef = useRef<string>(note.content || '')
-
-  // Store note.id in ref to use in editor callback (avoids stale closure)
-  const noteIdRef = useRef(note.id)
-  noteIdRef.current = note.id
+  // Use hooks
+  const {
+    provider,
+    ydoc,
+    isProviderReady,
+    collaborators,
+    awarenessDoc
+  } = useCollaboration({
+    roomId,
+    userInfo: user ? { name: user.name, avatar: user.avatar } : null
+  })
 
   // Determine if collaboration mode is fully ready
-  // This ensures we only switch to collaboration mode when everything is initialized
-  // CollaborationCursor requires provider.awareness.doc to be available
   const isCollaborationReady = !!(
     roomId &&
     ydoc &&
@@ -516,290 +206,59 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     awarenessDoc
   )
 
-  // Disable history when roomId is set (even before full collaboration ready)
-  // This prevents conflict between StarterKit history and Collaboration extension
-  const shouldDisableHistory = !!roomId
+  const {
+    editor,
+    lastSavedContentRef,
+    debouncedUpdate
+  } = useNoteEditor({
+    note,
+    roomId,
+    isCollaborationReady,
+    provider,
+    ydoc,
+    awarenessDoc,
+    isRoomHost,
+    customUpdateHandler
+  })
 
-  // Memoize extensions to prevent recreation on every render
-  const extensions = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const baseExtensions: any[] = [
-      StarterKit.configure({
-        heading: { levels: [1, 2, 3] },
-        codeBlock: false,
-        // Disable history when in collaboration mode (y-prosemirror handles it)
-        // Use shouldDisableHistory to disable early, before full collaboration ready
-        ...(shouldDisableHistory ? { history: false } : {}),
-        // We use our own Link and Underline extensions configuration below
-        // so we need to disable them in StarterKit to avoid duplicates
-        link: false,
-        underline: false,
-      }),
-      CodeBlockLowlight.configure({
-        lowlight: createLowlight(common),
-        defaultLanguage: 'javascript',
-        HTMLAttributes: {
-          class: 'hljs'
-        }
-      }),
-      Placeholder.configure({
-        placeholder: t('notes.placeholder')
-      }),
-      TaskList,
-      TaskItem.configure({
-        nested: true,
-        HTMLAttributes: { class: 'task-item' }
-      }),
-      TextStyle,
-      Color,
-      Typography,
-      FontFamily,
-      Youtube.configure({
-        controls: false,
-        nocookie: true,
-      }),
-      ResizableImage,
-      // Link extension for hyperlinks
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-blue-500 underline cursor-pointer'
-        }
-      }),
-      // Underline extension
-      Underline,
-      // Markdown extension for markdown support
-      Markdown.configure({
-        html: true,
-        transformPastedText: true,
-        transformCopiedText: false, // Disable markdown in copied text - we handle plain text separately
-        linkify: false,
-        breaks: false,
-      }),
-      Highlight.configure({
-        multicolor: false
-      }),
-      Subscript,
-      Superscript,
-      TextAlign.configure({
-        types: ['heading', 'paragraph']
-      }),
-      // Table extensions
-      MobileScrollableTable.configure({
-        resizable: true,
-        HTMLAttributes: {
-          class: 'border-collapse table-fixed w-full my-4'
-        }
-      }),
-      TableRow,
-      TableHeader.configure({
-        HTMLAttributes: {
-          class: 'border border-neutral-300 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-800 px-3 py-2 text-left font-semibold'
-        }
-      }),
-      TableCell.configure({
-        HTMLAttributes: {
-          class: 'border border-neutral-300 dark:border-neutral-600 px-3 py-2'
-        }
-      })
-    ]
+  const {
+    isAILoading,
+    isAskAILoading,
+    isStreaming,
+    isContinuing,
+    showAIChatView,
+    setShowAIChatView,
+    chatMessages,
+    isSummarizing,
+    aiContextText,
+    setAiContextText,
+    aiError,
+    showCreditsError,
+    setShowCreditsError,
+    showImageAnalysis,
+    setShowImageAnalysis,
+    isAnalyzingImage,
+    handleAIAction,
+    onAnalyzeImage,
+    askAI,
+    editorContainerRef,
+    getEditorText
+  } = useNoteAI({
+    editor,
+    note,
+    t
+  })
 
-    // Add collaboration extensions when in a room
-    // Only add if provider and ydoc are fully ready
-    if (isCollaborationReady && ydoc && provider && awarenessDoc) {
-      baseExtensions.push(
-        Collaboration.configure({
-          document: ydoc,
-          field: 'prosemirror', // Use 'prosemirror' as the Y.js fragment name
-        })
-      )
+  // Get live driveFileId from store (optimized: only subscribe to driveFileId changes)
+  const liveDriveFileId = useNotesStore(state =>
+    state.notes.find(n => n.id === note.id)?.driveFileId
+  ) ?? note.driveFileId
 
-      // Note: CollaborationCursor is disabled due to compatibility issues
-      // with y-webrtc provider. The "Cannot read properties of undefined (reading 'doc')"
-      // error occurs because yCursorPlugin expects awareness.doc to be set synchronously,
-      // but y-webrtc sets it asynchronously. Content sync still works without cursor.
-    }
+  // Responsive toolbar visibility
+  const toolbarVisibility = useResponsiveToolbar(toolbarRef)
 
-    return baseExtensions
-  }, [t, isCollaborationReady, shouldDisableHistory, ydoc, provider, awarenessDoc, user?.name, userColor])
-
-  // Editor - only recreate when roomId changes, NOT when note changes
-  const editor = useEditor({
-    extensions,
-    // When in collaboration mode, don't set initial content - Y.js document is the source of truth
-    // Content will be synced from the host via Y.js
-    content: isCollaborationReady ? '' : (note.content || ''),
-    onUpdate: ({ editor }) => {
-      if (noteIdRef.current && !roomId) {
-        debouncedUpdate(noteIdRef.current, editor.getHTML())
-      }
-    },
-    // Performance optimizations
-    editorProps: {
-      attributes: {
-        class: 'focus:outline-none'
-      }
-    },
-    // Defer parsing for faster initial render
-    parseOptions: {
-      preserveWhitespace: 'full'
-    }
-  }, [isCollaborationReady, extensions]) // Only depend on collaboration state and memoized extensions
-
-  // Update editor content when note changes (without recreating editor)
-  useEffect(() => {
-    if (editor && currentNoteIdRef.current !== note.id) {
-      currentNoteIdRef.current = note.id
-      lastSavedContentRef.current = note.content || ''
-      editor.commands.setContent(note.content || '')
-    }
-  }, [note.id, note.content, editor])
-
-  // Set initial content on first render
-  useEffect(() => {
-    if (editor && isFirstRender.current) {
-      isFirstRender.current = false
-      if (editor.getHTML() !== note.content) {
-        editor.commands.setContent(note.content || '')
-      }
-    }
-  }, [editor, note.content])
-
-  // When starting collaboration, initialize Y.js document with current content
-  useEffect(() => {
-    if (!roomId || !provider || !editor || !ydoc || !isProviderReady) {
-      return
-    }
-
-    const fragment = ydoc.getXmlFragment('prosemirror')
-    let initTimeout: ReturnType<typeof setTimeout> | null = null
-    let peerWaitTimeout: ReturnType<typeof setTimeout> | null = null
-
-    console.log('[Collab] Collaboration ready, isHost:', isRoomHost, 'fragment length:', fragment.length)
-
-    // Only the HOST should initialize Y.js document with their content
-    // Guests should wait for sync from the host
-    // Use lastSavedContentRef to get initial content without causing re-renders
-    const initialContent = lastSavedContentRef.current || note.content
-
-    if (isRoomHost && initialContent) {
-      console.log('[Collab] Host initializing content...')
-
-      // Function to set content when ready
-      const setInitialContent = () => {
-        const currentFragment = ydoc.getXmlFragment('prosemirror')
-        if (currentFragment.length === 0) {
-          console.log('[Collab] Setting initial content to Y.js document')
-          editor.commands.setContent(initialContent)
-        } else {
-          console.log('[Collab] Fragment already has content, skipping init')
-        }
-      }
-
-      // Wait a bit for Y.js to be fully ready before setting content
-      initTimeout = setTimeout(setInitialContent, 500)
-
-      // Also set content again after a longer delay to ensure sync with late joiners
-      peerWaitTimeout = setTimeout(() => {
-        const currentFragment = ydoc.getXmlFragment('prosemirror')
-        if (currentFragment.length === 0 && initialContent) {
-          console.log('[Collab] Re-setting content after peer wait')
-          editor.commands.setContent(initialContent)
-        }
-      }, 2000)
-    } else if (!isRoomHost) {
-      console.log('[Collab] Guest waiting for sync from host...')
-
-      // Listen for Y.js document updates to know when content arrives
-      const onUpdate = () => {
-        const currentFragment = ydoc.getXmlFragment('prosemirror')
-        console.log('[Collab] Y.js update received, fragment length:', currentFragment.length)
-      }
-      ydoc.on('update', onUpdate)
-
-      return () => {
-        ydoc.off('update', onUpdate)
-      }
-    }
-
-    // Periodic auto-save during collaboration (every 10 seconds)
-    const autoSaveInterval = setInterval(() => {
-      const content = editor.getHTML()
-      if (noteIdRef.current && content !== lastSavedContentRef.current) {
-        lastSavedContentRef.current = content
-        updateNote(noteIdRef.current, { content })
-      }
-    }, 10000)
-
-    return () => {
-      if (initTimeout) clearTimeout(initTimeout)
-      if (peerWaitTimeout) clearTimeout(peerWaitTimeout)
-
-      // Save content before leaving collaboration
-      const finalContent = editor.getHTML()
-      if (noteIdRef.current && finalContent !== lastSavedContentRef.current) {
-        lastSavedContentRef.current = finalContent
-        updateNote(noteIdRef.current, { content: finalContent })
-      }
-
-      clearInterval(autoSaveInterval)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomId, provider, editor, ydoc, isProviderReady, updateNote, isRoomHost])
-
-  // Save on page unload or visibility change (prevent data loss)
-  useEffect(() => {
-    const saveCurrentContent = () => {
-      if (editor && noteIdRef.current) {
-        const content = editor.getHTML()
-        if (content !== lastSavedContentRef.current) {
-          lastSavedContentRef.current = content
-          // Use sync update for immediate save
-          useNotesStore.getState().updateNote(noteIdRef.current, { content })
-        }
-      }
-    }
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        saveCurrentContent()
-      }
-    }
-
-    const handleBeforeUnload = () => {
-      saveCurrentContent()
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    window.addEventListener('beforeunload', handleBeforeUnload)
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-      // Final save on unmount
-      saveCurrentContent()
-    }
-  }, [editor])
-
-  // Initialize scroll indicators for table wrappers
-  useEffect(() => {
-    if (!editor) return
-
-    let cleanup: (() => void) | undefined
-
-    // Wait for editor to be fully mounted
-    const timer = setTimeout(() => {
-      const editorElement = editor.view.dom
-      if (editorElement) {
-        cleanup = initTableScrollIndicators(editorElement)
-      }
-    }, 100)
-
-    return () => {
-      clearTimeout(timer)
-      if (cleanup) cleanup()
-    }
-  }, [editor])
+  // Scrollable drag for toolbar
+  const toolbarScrollRef = useScrollableDrag<HTMLDivElement>()
 
   const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -817,9 +276,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
   const addImage = useCallback(() => {
     fileInputRef.current?.click()
   }, [])
-
-  // NOTE: capturedTextRef is currently unused but kept for potential future context menu features\n  // const capturedTextRef = useRef<string>('')
-
 
   const handleDelete = () => {
     if (isFreeMode) {
@@ -849,16 +305,15 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
 
   const handleStopSharing = () => {
     // Save current content before stopping collaboration
-    if (editor && noteIdRef.current) {
+    if (editor && note.id) {
       const content = editor.getHTML()
       if (content !== lastSavedContentRef.current) {
         lastSavedContentRef.current = content
-        updateNote(noteIdRef.current, { content })
+        updateNote(note.id, { content })
       }
     }
     setRoomId(null)
     setIsRoomHost(false)
-    setCollaborators([])
   }
 
   const handleRestoreVersion = (content: string, title: string) => {
@@ -882,7 +337,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
     }
   }
 
-  // Import document handler
   const handleImportDocument = useCallback((title: string, content: string) => {
     if (!editor || !note) return
 
@@ -895,387 +349,10 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       }
     }
 
-    // Set content to editor
+    // Set content to editor (should rely on editor prop, but here we update editor and sync)
     editor.commands.setContent(content)
-
-    // Trigger save
     debouncedUpdate(note.id, content)
   }, [editor, note, updateNote, debouncedUpdate, customUpdateHandler])
-
-  // AI handlers
-  const getEditorText = () => {
-    return editor?.getText() || ''
-  }
-
-
-
-  // Simulate streaming text effect with markdown support - REMOVED (Legacy)
-  // We now use real streaming from the backend
-
-  // Helper to scroll to bottom
-  const scrollToBottom = () => {
-    if (editorContainerRef.current) {
-      editorContainerRef.current.scrollTo({
-        top: editorContainerRef.current.scrollHeight,
-        behavior: 'smooth'
-      })
-    }
-  }
-
-  // Convert markdown list items to Tiptap task list HTML
-  const convertToTaskList = (markdown: string): string => {
-    const lines = markdown.split('\n')
-    const taskItems: string[] = []
-
-    for (const line of lines) {
-      // Match markdown list items: - item, * item, or numbered 1. item
-      const match = line.match(/^[\s]*[-*][\s]+(.+)$/) || line.match(/^[\s]*\d+\.[\s]+(.+)$/)
-      if (match) {
-        const text = match[1].trim()
-        taskItems.push(`<li data-type="taskItem" data-checked="false"><label><input type="checkbox"><span></span></label><div><p>${text}</p></div></li>`)
-      }
-    }
-
-    if (taskItems.length > 0) {
-      return `<ul data-type="taskList">${taskItems.join('')}</ul>`
-    }
-
-    // Fallback: if no list items found, just return as paragraph
-    return `<p>${markdown}</p>`
-  }
-
-  const handleAIAction = async (action: AI.AIAction, extra?: string) => {
-    if (!editor || isAILoading || isStreaming) return
-
-    // Check network for AI features
-    if (!isOnline) {
-      showNetworkOverlay(t('ai.title'))
-      return
-    }
-
-    // Determine content based on selection
-    const selection = editor.state.selection
-    const isSelectionMode = !selection.empty
-    const startPos = selection.from
-    let endPos = selection.to
-
-    const content = isSelectionMode
-      ? editor.state.doc.textBetween(selection.from, selection.to, '\n')
-      : getEditorText()
-
-    if (!content.trim()) return
-
-    if (action === 'ask') {
-      // Open fullscreen chat view directly
-      setShowAIChatView(true)
-      return
-    }
-
-    if (action === 'ocr') {
-      setShowImageAnalysis(true)
-      return
-    }
-
-    // Define actions that replace content (used in error handling too)
-    const replaceActions = ['improve', 'translate', 'extract-tasks', 'tone']
-
-    if (action === 'summarize') {
-      setIsSummarizing(true)
-      if (editorContainerRef.current) {
-        editorContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' })
-      }
-    } else {
-      setIsAILoading(true)
-
-      // Clear editor and show skeleton for actions that replace content
-      if (replaceActions.includes(action)) {
-        if (isSelectionMode) {
-          editor.commands.deleteSelection()
-          endPos = startPos
-        } else {
-          editor.commands.setContent('')
-        }
-      }
-    }
-
-    // Helper to apply updates to editor (full doc or selection)
-    const applyUpdate = (fullText: string, asTaskList = false) => {
-      let html = ''
-      if (asTaskList) {
-        html = convertToTaskList(fullText)
-      } else {
-        html = marked.parse(fullText, { async: false }) as string
-      }
-
-      if (isSelectionMode) {
-        // Select the range we want to replace (growing content)
-        editor.commands.setTextSelection({ from: startPos, to: endPos })
-        editor.commands.insertContent(html)
-        // Update endPos to match the new end of inserted content
-        endPos = editor.state.selection.to
-      } else {
-        editor.commands.setContent(html)
-        scrollToBottom()
-      }
-    }
-
-    // Batch update logic
-    let lastUpdate = 0
-    const updateEditor = (fullText: string, asTaskList = false) => {
-      const now = Date.now()
-      // Limit updates to ~20fps (50ms)
-      if (now - lastUpdate > 50) {
-        applyUpdate(fullText, asTaskList)
-        lastUpdate = now
-      }
-    }
-
-    try {
-      let result: string
-      let accumulatedText = ''
-      let isFirstChunk = true
-
-      switch (action) {
-        case 'summarize':
-          // Insert summary at the top
-          result = await AI.summarize(content)
-          const summaryHtml = `<p><strong>${t('ai.summary')}</strong>: ${result}</p><hr />`
-          editor.commands.insertContentAt(0, summaryHtml)
-          setIsSummarizing(false)
-          if (note) updateNote(note.id, { content: editor.getHTML() })
-          break
-
-        case 'continue':
-          setIsAILoading(false)
-          setIsContinuing(true) // Show skeleton at bottom
-
-          // Wait for render to show skeleton, then scroll
-          setTimeout(() => scrollToBottom(), 100)
-
-          accumulatedText = '\n\n' // Start with newline separators
-
-          await AI.continueWritingStream(content, (chunk) => {
-            if (isFirstChunk) {
-              setIsContinuing(false)
-              setIsStreaming(true)
-              isFirstChunk = false
-            }
-            accumulatedText += chunk
-            const fullNewContent = content + accumulatedText
-            updateEditor(fullNewContent)
-          })
-
-          // Final flush
-          applyUpdate(content + accumulatedText)
-
-          setIsStreaming(false)
-          setIsContinuing(false)
-          if (note) updateNote(note.id, { content: editor.getHTML() })
-          break
-
-        case 'improve':
-          // Keep isAILoading=true initially (Skeleton shown)
-          accumulatedText = ''
-          await AI.improveWritingStream(content, (chunk) => {
-            if (isFirstChunk) {
-              setIsAILoading(false) // Hide skeleton
-              setIsStreaming(true) // Show editor with streaming
-              isFirstChunk = false
-            }
-            accumulatedText += chunk
-            updateEditor(accumulatedText)
-          })
-
-          // Final flush
-          applyUpdate(accumulatedText)
-
-          setIsStreaming(false)
-          setIsAILoading(false)
-          if (note) updateNote(note.id, { content: editor.getHTML() })
-          break
-
-        case 'translate':
-          if (!extra) {
-            setIsAILoading(false)
-            return
-          }
-          accumulatedText = ''
-          await AI.translateStream(content, extra, (chunk) => {
-            if (isFirstChunk) {
-              setIsAILoading(false)
-              setIsStreaming(true)
-              isFirstChunk = false
-            }
-            accumulatedText += chunk
-            updateEditor(accumulatedText)
-          })
-
-          // Final flush
-          applyUpdate(accumulatedText)
-
-          setIsStreaming(false)
-          setIsAILoading(false)
-          if (note) updateNote(note.id, { content: editor.getHTML() })
-          break
-
-        case 'tone':
-          if (!extra) {
-            setIsAILoading(false)
-            return
-          }
-          accumulatedText = ''
-          await AI.changeToneStream(content, extra, (chunk) => {
-            if (isFirstChunk) {
-              setIsAILoading(false)
-              setIsStreaming(true)
-              isFirstChunk = false
-            }
-            accumulatedText += chunk
-            updateEditor(accumulatedText)
-          })
-
-          // Final flush
-          applyUpdate(accumulatedText)
-
-          setIsStreaming(false)
-          setIsAILoading(false)
-          if (note) updateNote(note.id, { content: editor.getHTML() })
-          break
-
-        case 'extract-tasks':
-          accumulatedText = ''
-          await AI.extractTasksStream(content, (chunk) => {
-            if (isFirstChunk) {
-              setIsAILoading(false)
-              setIsStreaming(true)
-              isFirstChunk = false
-            }
-            accumulatedText += chunk
-            updateEditor(accumulatedText, true) // asTaskList = true
-          })
-
-          // Final flush
-          applyUpdate(accumulatedText, true)
-
-          setIsStreaming(false)
-          setIsAILoading(false)
-          if (note) updateNote(note.id, { content: editor.getHTML() })
-          break
-      }
-    } catch (error) {
-      console.error('AI error:', error)
-      if (error instanceof InsufficientCreditsError) {
-        setShowCreditsError(true)
-        // Restore content if it was cleared
-        if (replaceActions.includes(action)) {
-          editor.commands.setContent(note.content || '')
-        }
-      } else {
-        setAiError((error as Error).message || t('ai.error'))
-      }
-      setIsAILoading(false)
-      setIsSummarizing(false)
-      setIsStreaming(false)
-    }
-    setIsAILoading(false)
-    setIsSummarizing(false)
-    setIsStreaming(false)
-  }
-
-
-  const onAnalyzeImage = async (file: File, type: string) => {
-    if (!editor || isStreaming) return
-
-    // Check network
-    if (!isOnline) {
-      showNetworkOverlay(t('ai.title'))
-      return
-    }
-
-    setIsAnalyzingImage(true)
-    setIsStreaming(true) // Show streaming indicator in editor if needed
-
-    const selection = editor.state.selection
-    const isSelectionMode = !selection.empty
-    const startPos = selection.from
-    let endPos = selection.to
-
-    if (isSelectionMode) {
-      editor.commands.deleteSelection()
-      endPos = startPos
-    }
-
-    // Helper to apply updates
-    const applyUpdate = (fullText: string) => {
-      // Convert markdown to HTML using marked
-      // Note: marked is synchronous by default
-      const html = marked.parse(fullText, { async: false }) as string
-
-      // Always insert at cursor/selection-start
-      // We need to re-select because insertion moves cursor
-      // But for streaming append, we want to insert AFTER previous content
-      // Actually, for "replace/insert", we can just use insertContent which handles cursor move
-
-      // Re-set selection to insertion point?
-      // No, insertContent moves cursor to end of inserted content by default.
-      // So if we just want to replace the *accumulated* block, we need to select the range we just inserted.
-
-      // Better strategy: Just insert the *new* chunk? No, markdown parsing needs full context for smooth rendering.
-      // So we generally replace the whole block.
-
-      editor.commands.setTextSelection({ from: startPos, to: endPos })
-      editor.commands.insertContent(html)
-      // Update endPos to match the new end of inserted content
-      endPos = editor.state.selection.to
-    }
-
-    // Rate limited update
-    let lastUpdate = 0
-    const updateEditor = (fullText: string) => {
-      const now = Date.now()
-      if (now - lastUpdate > 50) {
-        applyUpdate(fullText)
-        lastUpdate = now
-      }
-    }
-
-    try {
-      let accumulatedText = ''
-      let isFirstChunk = true
-
-      if (type === 'whiteboard') {
-        accumulatedText += '\n' // Start on new line
-      }
-
-      await AI.analyzeImageStream(file, type, (chunk) => {
-        if (isFirstChunk) {
-          setShowImageAnalysis(false)
-          isFirstChunk = false
-        }
-        accumulatedText += chunk
-        updateEditor(accumulatedText)
-      })
-
-      // Final flush
-      applyUpdate(accumulatedText)
-
-      setIsStreaming(false)
-      setIsAnalyzingImage(false)
-      setShowImageAnalysis(false)
-      if (note) updateNote(note.id, { content: editor.getHTML() })
-
-    } catch (error) {
-      console.error('Image Analysis Error:', error)
-      setIsStreaming(false)
-      setIsAnalyzingImage(false)
-      if (error instanceof InsufficientCreditsError) {
-        setShowImageAnalysis(false)
-        setShowCreditsError(true)
-      } else {
-        setAiError((error as Error).message || t('ai.error'))
-      }
-    }
-  }
 
 
   return (
@@ -1295,101 +372,21 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         isAnalyzing={isAnalyzingImage}
       />
 
-      {/* AI Chat View - Fullscreen */}
-
       <AIChatView
         open={showAIChatView}
-        onClose={() => {
-          setShowAIChatView(false)
-          // Don't clear context and messages - keep for next time
-        }}
+        onClose={() => setShowAIChatView(false)}
         noteContent={aiContextText || getEditorText()}
         contextText={aiContextText}
         onClearContext={() => setAiContextText('')}
         initialMessages={chatMessages}
         isLoading={isAskAILoading}
-        onSendMessage={async (question, onStream) => {
-          if (isAskAILoading) return
-
-          const content = aiContextText || getEditorText()
-          if (!content.trim()) return
-
-          // Add user message first
-          const userMessage: AIChatMessage = {
-            id: Date.now().toString(),
-            role: 'user',
-            content: question,
-            timestamp: Date.now()
-          }
-          setChatMessages(prev => [...prev, userMessage])
-
-          setIsAskAILoading(true)
-
-          try {
-            // Use streaming API
-            const aiMessageId = (Date.now() + 1).toString()
-            const aiMessage: AIChatMessage = {
-              id: aiMessageId,
-              role: 'assistant',
-              content: '',
-              timestamp: Date.now()
-            }
-
-            // Add empty message first
-            setChatMessages(prev => [...prev, aiMessage])
-
-            // NOTE: AIChatView will handle visual streaming if we pass 'onStream' callback
-            // But AIChatView's streaming effect is visual only (CSS/State)
-            // Ideally we want AIChatView to consume the stream.
-            // But NoteEditor manages the state 'chatMessages'.
-            // So we update 'chatMessages' repeatedly.
-            // BUT AIChatView MIGHT flicker if we update state too fast.
-            // AIChatView has internal buffer logic IF we use its handleSubmit.
-            // But here we are using onSendMessage which overrides handleSubmit in AIChatView.
-
-            // Let's just accumulate and call onStream (which updates AIChatView's buffer).
-            // AND update our local state occasionally.
-
-            let accumulated = ''
-
-            // Trigger visual streaming immediately to show loading dots
-            if (onStream) onStream(aiMessageId, '')
-
-            await AI.askAIStream(content, question, (chunk) => {
-              accumulated += chunk
-              // Update AIChatView's visual stream
-              if (onStream) onStream(aiMessageId, accumulated)
-            })
-
-            setIsAskAILoading(false)
-
-            // Final state update
-            setChatMessages(prev => prev.map(m =>
-              m.id === aiMessageId ? { ...m, content: accumulated } : m
-            ))
-
-          } catch (error) {
-            console.error('AI error:', error)
-            setIsAskAILoading(false)
-
-            if (error instanceof InsufficientCreditsError) {
-              setShowAIChatView(false)
-              setShowCreditsError(true)
-            } else if (error instanceof NetworkRequiredError) {
-              setShowAIChatView(false)
-              showNetworkOverlay(t('ai.title'))
-            } else {
-              setAiError((error as Error).message || t('ai.error'))
-            }
-          }
-        }}
+        onSendMessage={askAI}
         onInsufficientCredits={() => {
           setShowAIChatView(false)
           setShowCreditsError(true)
         }}
       />
 
-      {/* Network Required Overlay */}
       <NetworkOverlay />
 
       <ConfirmDialog
@@ -1416,7 +413,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       <VersionHistoryPanel
         open={showVersionHistory}
         onClose={() => setShowVersionHistory(false)}
-        driveFileId={note.driveFileId}
+        driveFileId={liveDriveFileId}
         onRestore={handleRestoreVersion}
       />
 
@@ -1425,7 +422,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           open={showDrawingModal}
           onClose={() => setShowDrawingModal(false)}
           onSave={(imageDataUrl) => {
-            // Insert drawing as image into editor
             editor?.chain().focus().setImage({ src: imageDataUrl }).run()
           }}
         />
@@ -1455,7 +451,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         editor={editor}
       />
 
-      {/* Collaboration indicator - Mobile (title is now in NoteModal header) */}
+      {/* Collaboration indicator - Mobile */}
       {roomId && collaborators.length > 0 && (
         <div className="md:hidden flex items-center gap-1 px-4 pt-2">
           <div className="flex -space-x-1">
@@ -1485,14 +481,12 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         </div>
       )}
 
-      {/* Scrollable Content Area - includes back button, title, pin */}
+      {/* Scrollable Content Area */}
       <div
         ref={editorContainerRef}
         className="flex-1 overflow-y-auto px-4 relative"
       >
-        {/* Header row - Back + Title + Pin - scrolls with content on all devices */}
         <div className="flex items-center gap-2 pt-4 pb-2 min-w-0">
-          {/* Back button - on mobile always, on desktop only when fullscreen - hidden in free mode */}
           {!isFreeMode && (
             <button
               onClick={onClose}
@@ -1520,7 +514,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             />
           </div>
 
-          {/* Collaboration indicator - Desktop only (mobile has its own above) */}
           {roomId && collaborators.length > 0 && (
             <div className="hidden md:flex items-center gap-1">
               <div className="flex -space-x-1">
@@ -1555,7 +548,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </div>
           )}
 
-          {/* Pin button - hidden in free mode */}
           {!isFreeMode && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -1571,7 +563,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           )}
         </div>
 
-        {/* Editor Content or Skeleton Loading for Replace Actions */}
         {isAILoading ? (
           <EditorSkeleton />
         ) : (
@@ -1596,11 +587,11 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
                 editor={editor}
                 className="min-h-[200px] text-neutral-700 dark:text-neutral-300"
               />
-              {/* Continuing Skeleton (shown at bottom) */}
               {isContinuing && (
-                <div className="px-4 py-2">
-                  <Skeleton className="h-4 w-full mb-2" />
-                  <Skeleton className="h-4 w-2/3" />
+                <div className="px-4 py-2 space-y-2 animate-pulse opacity-50">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-4/6" />
                 </div>
               )}
               {/* Collaboration cursors overlay */}
@@ -1620,14 +611,10 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         ref={toolbarRef}
         className="flex items-center justify-between py-1.5 bg-neutral-100/80 dark:bg-neutral-800/60 backdrop-blur-sm safe-x relative rounded-b-[12px] safe-bottom"
       >
-        {/* AI Modals - positioned above toolbar */}
-
-
         <InsufficientCreditsModal
           open={showCreditsError}
           onClose={() => setShowCreditsError(false)}
           onBuyCredits={() => {
-            // Close note modal first, then open credits modal
             onClose()
             setTimeout(() => {
               window.dispatchEvent(new CustomEvent('open-credits-modal'))
@@ -1635,7 +622,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           }}
         />
 
-        {/* AI Error Toast */}
         {aiError && (
           <div className="absolute inset-x-0 bottom-full mb-2 px-4 z-20">
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg px-4 py-2 text-sm text-red-700 dark:text-red-300">
@@ -1644,8 +630,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
           </div>
         )}
 
-        <div ref={toolbarScrollRef} className="flex items-center gap-0.5 overflow-x-auto scrollbar-none" style={{ touchAction: 'pan-x' }}>
-          {/* AI Menu - Priority 1 (always visible) */}
+        <div ref={toolbarScrollRef} className="flex items-center gap-1 overflow-x-auto scrollbar-none h-10 sm:h-8" style={{ touchAction: 'pan-x' }}>
           {toolbarVisibility.ai && (
             isFreeMode && onLockedFeatureClick ? (
               <ToolbarButton
@@ -1662,14 +647,11 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             )
           )}
 
-          {/* Speech to Text - Priority 1 */}
           {toolbarVisibility.voice && (
             <SpeechButton
               onTranscript={(text, isFinal, replaceLength) => {
                 if (editor) {
-                  // Delete previous interim text if needed
                   if (replaceLength && replaceLength > 0) {
-                    // Move cursor back and delete the interim text
                     const { from } = editor.state.selection
                     const deleteFrom = Math.max(0, from - replaceLength)
                     editor.chain()
@@ -1677,7 +659,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
                       .insertContent(text + (isFinal ? ' ' : ''))
                       .run()
                   } else {
-                    // Just insert new text
                     editor.commands.insertContent(text + (isFinal ? ' ' : ''))
                   }
                 }
@@ -1686,7 +667,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             />
           )}
 
-          {/* Primary formatting tools - Priority 1 */}
           {toolbarVisibility.bold && (
             <ToolbarButton
               onClick={() => editor?.chain().toggleBold().run()}
@@ -1715,7 +695,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Priority 2 - sm+ */}
           {toolbarVisibility.strikethrough && (
             <ToolbarButton
               onClick={() => editor?.chain().toggleStrike().run()}
@@ -1735,7 +714,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Headings - Priority 2 & 3 */}
           {toolbarVisibility.heading1 && (
             <ToolbarButton
               onClick={() => editor?.chain().toggleHeading({ level: 1 }).run()}
@@ -1764,7 +742,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Lists - Priority 2 & 3 */}
           {toolbarVisibility.bulletList && (
             <ToolbarButton
               onClick={() => editor?.chain().toggleBulletList().run()}
@@ -1793,7 +770,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Table - Priority 3 */}
           {toolbarVisibility.table && (
             <ToolbarButton
               onClick={() => setShowTableInsertDialog(true)}
@@ -1804,9 +780,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Table operations are now handled by TableContextMenu (right-click) */}
-
-          {/* Text alignment - Priority 3 & 4 */}
           {toolbarVisibility.alignLeft && (
             <ToolbarButton
               onClick={() => editor?.chain().setTextAlign('left').run()}
@@ -1844,7 +817,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Code & Quote - Priority 4 */}
           {toolbarVisibility.inlineCode && (
             <ToolbarButton
               onClick={() => editor?.chain().toggleCode().run()}
@@ -1873,7 +845,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Subscript & Superscript - Priority 5 */}
           {toolbarVisibility.subscript && (
             <ToolbarButton
               onClick={() => editor?.chain().toggleSubscript().run()}
@@ -1893,7 +864,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Link - Priority 4 */}
           {toolbarVisibility.link && (
             <ToolbarButton
               onClick={() => {
@@ -1910,7 +880,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Horizontal rule - Priority 5 */}
           {toolbarVisibility.horizontalRule && (
             <ToolbarButton
               onClick={() => editor?.chain().setHorizontalRule().run()}
@@ -1920,7 +889,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Clear formatting - Priority 5 */}
           {toolbarVisibility.clearFormatting && (
             <ToolbarButton
               onClick={() => editor?.chain().clearNodes().unsetAllMarks().run()}
@@ -1930,7 +898,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Image & Drawing - Priority 5 */}
           {toolbarVisibility.image && (
             <ToolbarButton onClick={addImage} tooltip={t('editor.insertImage')}>
               <ImagePlus className="w-[18px] h-[18px]" />
@@ -1953,7 +920,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             />
           )}
 
-          {/* Undo/Redo - Priority 1 */}
           {toolbarVisibility.undo && (
             <ToolbarButton
               onClick={() => editor?.chain().undo().run()}
@@ -1973,7 +939,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Export/Import menu - Priority 5 */}
           {toolbarVisibility.exportImport && (
             <NoteActionsMenu
               noteTitle={note.title}
@@ -1983,7 +948,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             />
           )}
 
-          {/* Share - Priority 5 */}
           {toolbarVisibility.share && (
             <ToolbarButton
               onClick={
@@ -2007,7 +971,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* History - Priority 5 */}
           {toolbarVisibility.history && (
             <ToolbarButton
               onClick={
@@ -2024,7 +987,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Delete - Priority 1 */}
           {toolbarVisibility.delete && (
             <ToolbarButton
               onClick={() => setShowDeleteDialog(true)}
@@ -2034,7 +996,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
             </ToolbarButton>
           )}
 
-          {/* Fullscreen - Priority 5 */}
           {toolbarVisibility.fullscreen && onToggleFullscreen && canToggleFullscreen && (
             <ToolbarButton
               onClick={onToggleFullscreen}
@@ -2091,10 +1052,11 @@ function ToolbarButton({
       }}
       disabled={disabled}
       className={cn(
-        // Mobile: larger touch target (min 44px)
-        'flex items-center justify-center w-[44px] h-[44px] sm:w-auto sm:h-auto rounded-full transition-colors',
-        // Desktop: tighter padding
-        'sm:p-1.5',
+        // Mobile: comfortable touch target (40x40 is enough when grouped)
+        // Fixed size on mobile (w-10 = 40px), auto on desktop
+        'flex items-center justify-center rounded-full transition-colors flex-shrink-0',
+        'w-10 h-10 aspect-square',
+        'sm:w-8 sm:h-8',
         'text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700',
         active && 'bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-white',
         disabled && 'opacity-40 cursor-not-allowed',

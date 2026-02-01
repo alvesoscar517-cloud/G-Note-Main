@@ -16,7 +16,7 @@ import { LogoutConfirmDialog } from '@/components/auth/LogoutConfirmDialog'
 import { SharedNotesPanel, SharedNotesBadge } from '@/components/notes/SharedNotesPanel'
 import { useModalStatusBar } from '@/hooks/useModalStatusBar'
 import { cn } from '@/lib/utils'
-// Token manager import removed - not currently used
+import { hapticLight } from '@/lib/haptics'
 
 // Modal size options
 const MODAL_SIZE_OPTIONS: { value: ModalSize; labelKey: string }[] = [
@@ -148,6 +148,7 @@ export function Header() {
   }, [user?.id, fetchCredits])
 
   const handleAddNote = () => {
+    hapticLight()
     addNote()
   }
 
@@ -166,6 +167,7 @@ export function Header() {
   }
 
   const handleToggleTheme = () => {
+    hapticLight()
     toggleTheme()
   }
 
@@ -273,16 +275,21 @@ export function Header() {
 
               <button
                 onClick={handleAddNote}
-                className="p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
+                aria-label={t('header.newNote')}
+                className="p-2.5 sm:p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-5 h-5" aria-hidden="true" />
               </button>
 
               <button
-                onClick={() => setSettingsOpen(true)}
-                className="p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation"
+                onClick={() => {
+                  hapticLight()
+                  setSettingsOpen(true)
+                }}
+                aria-label={t('settings.title') || 'Settings'}
+                className="p-2.5 sm:p-1.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
               >
-                <Settings className="w-5 h-5" />
+                <Settings className="w-5 h-5" aria-hidden="true" />
               </button>
             </div>
           </div>

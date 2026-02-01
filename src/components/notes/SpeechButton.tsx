@@ -115,8 +115,9 @@ export function SpeechButton({ onTranscript, disabled, className }: SpeechButton
             onClick={handleClick}
             disabled={disabled}
             className={cn(
-              'relative flex items-center justify-center w-[44px] h-[44px] sm:w-auto sm:h-auto rounded-full transition-all duration-200 touch-manipulation',
-              'sm:p-1.5',
+              'relative flex items-center justify-center rounded-full transition-all duration-200 touch-manipulation flex-shrink-0',
+              'w-10 h-10 aspect-square',
+              'sm:w-8 sm:h-8',
               isListening
                 ? 'text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900/30'
                 : !isSupported
