@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next'
-import { useWebContent } from '@/hooks/useWebContent'
 import { Dialog, DialogHeader, DialogContent, DialogFooter } from '@/components/ui/Dialog'
 import { ExternalLink, FileText } from 'lucide-react'
+
+// Extension-specific hook (local import)
+import { useWebContent } from '../../hooks/useWebContent'
 
 export function WebContentDialog() {
   const { t } = useTranslation()

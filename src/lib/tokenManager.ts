@@ -4,7 +4,7 @@
  */
 
 import { useAuthStore } from '@/stores/authStore'
-import { silentRefreshWithBackend, hasAuthBackend } from './tokenRefresh'
+import { platformRefreshToken } from '@/lib/platform/auth'
 
 // Token expiry buffer (5 minutes)
 const TOKEN_EXPIRY_BUFFER_MS = 5 * 60 * 1000
@@ -58,22 +58,21 @@ class TokenManager {
     if (!user) return null
 
     try {
-      // Try backend refresh (has refresh token)
-      if (hasAuthBackend()) {
-        const result = await silentRefreshWithBackend(user.id)
-        if (result?.access_token) {
-          const newExpiry = Date.now() + (result.expires_in * 1000)
-          setUser({
-            ...user,
-            accessToken: result.access_token,
-            tokenExpiry: newExpiry
-          })
-          console.log('[TokenManager] Token refreshed successfully')
-          return result.access_token
-        }
+      // Use platform adapter for token refresh
+      const result = await platformRefreshToken(user.id)
+      
+      if (result.success && result.token && result.expiresIn) {
+        const newExpiry = Date.now() + (result.expiresIn * 1000)
+        setUser({
+          ...user,
+          accessToken: result.token,
+          tokenExpiry: newExpiry
+        })
+        console.log('[TokenManager] Token refreshed successfully')
+        return result.token
       }
 
-      // If backend refresh fails, user needs to re-login
+      // If refresh fails, user needs to re-login
       console.log('[TokenManager] Token refresh failed, user needs to re-login')
       return null
     } catch (error) {

@@ -78,8 +78,8 @@ export function PrivacyPolicy() {
                       <button
                         onClick={() => scrollToSection(section.id)}
                         className={`block w-full text-left pl-4 py-1.5 text-[13px] transition-colors -ml-px border-l ${activeSection === section.id
-                            ? 'border-neutral-900 dark:border-neutral-100 text-neutral-900 dark:text-neutral-100'
-                            : 'border-transparent text-neutral-500 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+                          ? 'border-neutral-900 dark:border-neutral-100 text-neutral-900 dark:text-neutral-100'
+                          : 'border-transparent text-neutral-500 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
                           }`}
                       >
                         {section.label}
@@ -101,7 +101,7 @@ export function PrivacyPolicy() {
                 <section id="introduction" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">1. Introduction</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px]">
-                    G-Note ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our note-taking application available at gnote.graphosai.com and our Chrome extension.
+                    G-Note AI ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our note-taking application available at gnoteai.com and our Chrome extension.
                   </p>
                 </section>
 
@@ -166,7 +166,7 @@ export function PrivacyPolicy() {
                   <ul className="list-disc pl-5 text-neutral-600 dark:text-neutral-400 space-y-2 text-[15px]">
                     <li>Access your personal data stored in Google Drive</li>
                     <li>Delete your notes and account data at any time</li>
-                    <li>Revoke G-Note's access to your Google account through Google's security settings</li>
+                    <li>Revoke G-Note AI's access to your Google account through Google's security settings</li>
                     <li>Export your notes in various formats (PDF, Word, HTML, Markdown)</li>
                   </ul>
                 </section>
@@ -174,14 +174,14 @@ export function PrivacyPolicy() {
                 <section id="cookies" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">7. Cookies and Tracking</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px]">
-                    G-Note uses essential cookies and local storage for authentication and app functionality. We do not use tracking cookies or third-party analytics that collect personal information.
+                    G-Note AI uses essential cookies and local storage for authentication and app functionality. We do not use tracking cookies or third-party analytics that collect personal information.
                   </p>
                 </section>
 
                 <section id="children" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">8. Children's Privacy</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px]">
-                    G-Note is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you believe we have collected information from a child under 13, please contact us immediately.
+                    G-Note AI is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13. If you believe we have collected information from a child under 13, please contact us immediately.
                   </p>
                 </section>
 
@@ -196,8 +196,8 @@ export function PrivacyPolicy() {
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">10. Contact Us</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px]">
                     If you have any questions about this Privacy Policy, please contact us at:{' '}
-                    <a href="mailto:Support@graphosai.com" className="text-neutral-900 dark:text-neutral-100 underline underline-offset-2">
-                      Support@graphoasai.com
+                    <a href="mailto:Support@gnoteai.com" className="text-neutral-900 dark:text-neutral-100 underline underline-offset-2">
+                      Support@gnoteai.com
                     </a>
                   </p>
                 </section>

@@ -51,7 +51,10 @@
     "modalSizeFullscreen": "Volledig scherm",
     "offlineLogoutTitle": "Uitloggen terwijl offline?",
     "offlineLogoutWarning": "Je bent momenteel offline. Niet-opgeslagen wijzigingen zijn mogelijk niet gesynchroniseerd met Google Drive. Als je nu uitlogt, kun je deze wijzigingen verliezen.",
-    "logoutAnyway": "Toch uitloggen"
+    "logoutAnyway": "Toch uitloggen",
+    "launchMode": "Startmodus",
+    "launchSidePanel": "(Herstarten om toe te passen)",
+    "launchFullscreen": "(Herstarten om toe te passen)"
   },
   "credits": {
     "title": "AI-credits kopen",
@@ -88,7 +91,7 @@
     "updated": "Bijgewerkt:"
   },
   "emptyState": {
-    "welcome": "Welkom bij G-Note!",
+    "welcome": "Welkom bij G-Note AI!",
     "getStarted": "Klik op de + knop rechtsboven om je eerste notitie te maken",
     "noResults": "Geen resultaten gevonden",
     "noResultsFor": "Geen notities komen overeen met \"{{query}}\"",
@@ -239,7 +242,7 @@
     "start": "Sessie starten",
     "stopSharing": "Sessie beëindigen",
     "email": "E-mail",
-    "emailDescription": "Deel direct met een andere G-Note-gebruiker:",
+    "emailDescription": "Deel direct met een andere G-Note AI-gebruiker:",
     "emailPlaceholder": "E-mail ontvanger...",
     "shareSuccess": "Succesvol gedeeld!",
     "shareButton": "Delen",
@@ -252,7 +255,7 @@
     "error": "Kan niet delen",
     "sessionExpired": "Sessie verlopen. Log opnieuw in.",
     "fileTooLarge": "Notitie is te groot om te delen (max 1 MB). Probeer afbeeldingen te verwijderen.",
-    "userNotFound": "Gebruiker niet gevonden. Ze hebben een G-Note-account nodig om gedeelde notities te ontvangen.",
+    "userNotFound": "Gebruiker niet gevonden. Ze hebben een G-Note AI-account nodig om gedeelde notities te ontvangen.",
     "emailSent": "Notitie gedeeld! Er is een e-mailmelding verzonden."
   },
   "versionHistory": {
@@ -263,7 +266,7 @@
     "close": "Sluiten"
   },
   "install": {
-    "title": "G-Note installeren",
+    "title": "G-Note AI installeren",
     "description": "Toevoegen aan startscherm voor snelle toegang",
     "install": "Installeren",
     "later": "Later",
@@ -277,7 +280,7 @@
     "recommended": "Aanbevolen",
     "installNow": "Nu installeren",
     "alreadyInstalled": "Al geïnstalleerd!",
-    "alreadyInstalledDescription": "Je gebruikt de app-versie van G-Note.",
+    "alreadyInstalledDescription": "Je gebruikt de app-versie van G-Note AI.",
     "androidChromeInstructions": "Tik op het menu-icoon (⋮) bovenaan, selecteer dan \"App installeren\" of \"Toevoegen aan startscherm\"",
     "desktopChromeInstructions": "Klik op het installatie-icoon (⬇) in de adresbalk, of ga naar Menu → App installeren",
     "iosSafariInstructions": "Tik op de Deel-knop hieronder, dan \"Zet op beginscherm\"",
@@ -487,5 +490,9 @@
     "appError": "App gecrasht",
     "appErrorDescription": "Er is iets misgegaan en de app moet opnieuw worden geladen. Onze excuses voor het ongemak."
   },
-  "webContent": {}
+  "webContent": {
+    "title": "Nieuwe webnotitie",
+    "description": "Inhoud van {{source}}",
+    "createNote": "Notitie maken"
+  }
 }

@@ -8,7 +8,7 @@
       <TileColor>#0a0a0a</TileColor>
     </tile>
     <notification>
-      <polling-uri src="https://gnote.graphosai.com/notifications.xml"/>
+      <polling-uri src="https://gnoteai.com/notifications.xml"/>
       <frequency>30</frequency>
       <cycle>1</cycle>
     </notification>

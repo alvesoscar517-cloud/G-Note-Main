@@ -1,10 +1,14 @@
 {
   "extName": {
-    "message": "G-Note: सरल और आधुनिक नोट्स ऐप",
+    "message": "G-Note AI",
     "description": "Chrome वेब स्टोर खोज अनुकूलन के लिए एक्सटेंशन नाम"
   },
   "extDescription": {
     "message": "सरल और आधुनिक नोट्स ऐप। Google Drive के साथ सिंक करें।",
     "description": "एक्सटेंशन विवरण"
+  },
+  "addToGNote": {
+    "message": "G-Note AI में जोड़ें",
+    "description": "Context menu item"
   }
 }

@@ -17,38 +17,38 @@ const PORT = process.env.PORT || 8080
 const server = createServer(app)
 
 // Parse ALLOWED_ORIGINS - supports multiple origins separated by comma
-// Example: ALLOWED_ORIGINS=http://localhost:5173,https://gnote.app,chrome-extension://xxx
+// Example: ALLOWED_ORIGINS=http://localhost:5173,https://gnoteai.com,chrome-extension://xxx
 const parseAllowedOrigins = () => {
   const originsEnv = process.env.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || ''
-  
+
   if (!originsEnv) {
     // Default: allow all (for development)
     return true
   }
-  
+
   // Split by comma and trim whitespace
   const origins = originsEnv.split(',').map(o => o.trim()).filter(Boolean)
-  
+
   return (origin, callback) => {
     // Allow requests with no origin (like mobile apps, curl, etc.)
     if (!origin) {
       return callback(null, true)
     }
-    
+
     // Check if origin matches any allowed origin
     const isAllowed = origins.some(allowed => {
       // Exact match
       if (origin === allowed) return true
-      
+
       // Wildcard support: chrome-extension://* matches any extension
       if (allowed.endsWith('*')) {
         const prefix = allowed.slice(0, -1)
         if (origin.startsWith(prefix)) return true
       }
-      
+
       return false
     })
-    
+
     if (isAllowed) {
       callback(null, true)
     } else {
@@ -85,8 +85,8 @@ app.use('/share', shareRoutes)
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     timestamp: Date.now(),
     configuredPlatforms: getConfiguredPlatforms()
   })

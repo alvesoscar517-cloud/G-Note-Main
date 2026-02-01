@@ -48,7 +48,10 @@
     "modalSizeDefault": "Default",
     "modalSizeLarge": "Large",
     "modalSizeXLarge": "Extra large",
-    "modalSizeFullscreen": "Fullscreen"
+    "modalSizeFullscreen": "Fullscreen",
+    "launchMode": "Launch Mode",
+    "launchSidePanel": "(Restart to apply)",
+    "launchFullscreen": "(Restart to apply)"
   },
   "credits": {
     "title": "Buy AI Credits",
@@ -86,7 +89,7 @@
     "updated": "Updated:"
   },
   "emptyState": {
-    "welcome": "Welcome to G-Note!",
+    "welcome": "Welcome to G-Note AI AI!",
     "getStarted": "Start your first note by clicking the + button in the top corner",
     "noResults": "No results found",
     "noResultsFor": "No notes match \"{{query}}\"",
@@ -237,7 +240,7 @@
     "start": "Start session",
     "stopSharing": "End session",
     "email": "Email",
-    "emailDescription": "Share directly with another G-Note user:",
+    "emailDescription": "Share directly with another G-Note AI AI user:",
     "emailPlaceholder": "Recipient email...",
     "shareSuccess": "Shared successfully!",
     "shareButton": "Share",
@@ -250,7 +253,7 @@
     "error": "Unable to share",
     "sessionExpired": "Session expired. Please sign in again.",
     "fileTooLarge": "Note is too large to share (max 1MB). Try removing images.",
-    "userNotFound": "User not found. They need a G-Note account to receive shared notes.",
+    "userNotFound": "User not found. They need a G-Note AI AI account to receive shared notes.",
     "emailSent": "Note shared! An email notification has been sent."
   },
   "versionHistory": {
@@ -261,7 +264,7 @@
     "close": "Close"
   },
   "install": {
-    "title": "Install G-Note",
+    "title": "Install G-Note AI AI",
     "description": "Add to home screen for quick access",
     "install": "Install",
     "later": "Later",
@@ -275,7 +278,7 @@
     "recommended": "Recommended",
     "installNow": "Install Now",
     "alreadyInstalled": "Already Installed!",
-    "alreadyInstalledDescription": "You're using the app version of G-Note.",
+    "alreadyInstalledDescription": "You're using the app version of G-Note AI AI.",
     "androidChromeInstructions": "Tap the menu icon (⋮) at the top, then select \"Install app\" or \"Add to Home screen\"",
     "desktopChromeInstructions": "Click the install icon (⬇) in the address bar, or go to Menu → Install app",
     "iosSafariInstructions": "Tap the Share button below, then \"Add to Home Screen\"",
@@ -486,5 +489,9 @@
     "appError": "App crashed",
     "appErrorDescription": "Something went wrong and the app needs to reload. We apologize for the inconvenience."
   },
-  "webContent": {}
+  "webContent": {
+    "title": "New Web Note",
+    "description": "Content from {{source}}",
+    "createNote": "Create Note"
+  }
 }

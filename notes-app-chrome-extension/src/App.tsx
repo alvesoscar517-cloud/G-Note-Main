@@ -1,6 +1,8 @@
+import { MemoryRouter } from 'react-router-dom'
+import { LayoutGroup } from 'framer-motion'
 import { useEffect, useCallback, useState } from 'react'
 
-import { LayoutGroup } from 'framer-motion'
+// Shared imports from @/ (unified codebase)
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
 import { useAppStore } from '@/stores/appStore'
@@ -11,18 +13,28 @@ import { Header } from '@/components/layout/Header'
 import { VirtualizedNotesList } from '@/components/notes/VirtualizedNotesList'
 import { NoteModal } from '@/components/notes/NoteModal'
 import { PublicNoteView } from '@/components/notes/PublicNoteView'
-import { WebContentDialog } from '@/components/notes/WebContentDialog'
 import { TooltipProvider } from '@/components/ui/Tooltip'
 import { useBlockContextMenu } from '@/components/ui/ContextMenuBlocker'
 import { AppErrorBoundary, ListErrorBoundary, ModalErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { initOfflineSync } from '@/lib/offlineSync'
 import { tokenManager, isTokenExpired } from '@/lib/tokenManager'
-import { chromeRefreshToken, isChromeExtension } from '@/lib/chromeAuth'
+import { isChromeExtension } from '@/lib/platform/detection'
+import { platformRefreshToken } from '@/lib/platform/auth'
+
+// Extension-specific imports (local)
+import { WebContentDialog } from './components/notes/WebContentDialog'
+import { LoadingOverlay } from '@/components/ui/LoadingOverlay'
 
 // Check for public view mode
 function getViewFileId(): string | null {
   const params = new URLSearchParams(window.location.search)
   return params.get('view')
+}
+
+// Global loading overlay (e.g. for logout)
+function GlobalLoading() {
+  const isLoggingOut = useAuthStore(state => state.isLoggingOut)
+  return <LoadingOverlay isVisible={isLoggingOut} />
 }
 
 function AppContent() {
@@ -72,8 +84,6 @@ function AppContent() {
     }
   }, [initNetwork, initOfflineStorage])
 
-
-
   // Initialize theme on mount
   useEffect(() => {
     initTheme()
@@ -96,16 +106,16 @@ function AppContent() {
         return false
       }
 
-      console.log('Token expired, attempting refresh via Chrome Identity API...')
+      console.log('Token expired, attempting refresh via platform adapter...')
       setIsRefreshing(true)
 
       try {
-        const result = await chromeRefreshToken()
+        const result = await platformRefreshToken(user.id)
         if (result.success && result.token) {
           setUser({
             ...user,
             accessToken: result.token,
-            tokenExpiry: Date.now() + (3600 * 1000) // 1 hour
+            tokenExpiry: Date.now() + ((result.expiresIn || 3600) * 1000)
           })
           console.log('Token refreshed successfully')
           return true
@@ -149,7 +159,6 @@ function AppContent() {
   }, [user?.accessToken, checkAndRefreshToken])
 
   // Auto sync when user logs in and periodically
-  // Graceful: skip sync if offline or token expired, but don't block local editing
   useEffect(() => {
     if (!user?.accessToken) return
 
@@ -201,10 +210,6 @@ function AppContent() {
     return () => clearInterval(interval)
   }, [user?.accessToken, user?.tokenExpiry, isOnline])
 
-  // REMOVED: Polling-based sync check (replaced by event-driven sync in SimpleSyncManager)
-  // SimpleSyncManager now handles sync scheduling via scheduleSync() called from note actions
-  // This eliminates the 500ms polling overhead and improves performance
-
   // If viewing a public note, show the view page
   if (viewFileId) {
     return <PublicNoteView fileId={viewFileId} />
@@ -242,9 +247,12 @@ function AppContent() {
 function App() {
   return (
     <AppErrorBoundary>
-      <TooltipProvider delayDuration={300}>
-        <AppContent />
-      </TooltipProvider>
+      <MemoryRouter>
+        <TooltipProvider delayDuration={300}>
+          <GlobalLoading />
+          <AppContent />
+        </TooltipProvider>
+      </MemoryRouter>
     </AppErrorBoundary>
   )
 }

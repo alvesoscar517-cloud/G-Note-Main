@@ -13,12 +13,12 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: [
-        'g-note.svg', 
-        'g-note-dark.svg', 
-        'apple-touch-icon.png', 
-        'favicon-32x32.png', 
-        'favicon-16x16.png', 
-        'drive-color-svgrepo-com.svg', 
+        'G-Note AI.svg',
+        'G-Note AI-dark.svg',
+        'apple-touch-icon.png',
+        'favicon-32x32.png',
+        'favicon-16x16.png',
+        'drive-color-svgrepo-com.svg',
         'drive-google-svgrepo-com.svg',
         'pwa-64x64.png',
         'pwa-192x192.png',
@@ -28,9 +28,9 @@ export default defineConfig({
         'apple-splash-*.png'
       ],
       manifest: {
-        name: 'G-Note - Free Note Taking App',
-        short_name: 'G-Note',
-        description: 'G-Note is a free, beautiful note-taking app that syncs with Google Drive. Create notes, collaborate in real-time, use AI assistance, and access your notes anywhere. Works offline!',
+        name: 'G-Note AI - Free Note Taking App',
+        short_name: 'G-Note AI',
+        description: 'G-Note AI is a free, beautiful note-taking app that syncs with Google Drive. Create notes, collaborate in real-time, use AI assistance, and access your notes anywhere. Works offline!',
         theme_color: '#fafafa',
         background_color: '#fafafa',
         display: 'standalone',
@@ -46,7 +46,7 @@ export default defineConfig({
         related_applications: [
           {
             platform: 'webapp',
-            url: 'https://gnote.graphosai.com'
+            url: 'https://gnoteai.com'
           }
         ],
         icons: [
@@ -106,7 +106,7 @@ export default defineConfig({
             sizes: '1200x630',
             type: 'image/png',
             form_factor: 'wide',
-            label: 'G-Note - Note Taking App'
+            label: 'G-Note AI - Note Taking App'
           }
         ],
         handle_links: 'preferred',

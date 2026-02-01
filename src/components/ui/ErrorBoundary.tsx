@@ -24,7 +24,15 @@ interface OverlayFallbackProps extends FallbackProps {
 }
 
 function OverlayFallback({ resetErrorBoundary, icon, titleKey, descriptionKey }: OverlayFallbackProps) {
-  const { t } = useTranslation()
+  // Safe translation hook - returns key if i18n not ready
+  let t: (key: string) => string
+  try {
+    const { t: translate } = useTranslation()
+    t = translate
+  } catch {
+    // Fallback if i18n context not available
+    t = (key: string) => key
+  }
   
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-white dark:bg-neutral-950">
@@ -125,7 +133,15 @@ export function GenericErrorFallback(props: FallbackProps) {
 
 // App-level fallback
 export function AppErrorFallback(props: FallbackProps) {
-  const { t } = useTranslation()
+  // Safe translation hook - returns key if i18n not ready
+  let t: (key: string) => string
+  try {
+    const { t: translate } = useTranslation()
+    t = translate
+  } catch {
+    // Fallback if i18n context not available
+    t = (key: string) => key
+  }
   
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-white dark:bg-neutral-950">

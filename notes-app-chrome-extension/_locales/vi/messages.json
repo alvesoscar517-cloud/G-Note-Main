@@ -1,10 +1,14 @@
 {
   "extName": {
-    "message": "G-Note: Ứng dụng Ghi chú Đơn giản & Hiện đại",
+    "message": "G-Note AI",
     "description": "Tên extension để tối ưu tìm kiếm trên Chrome Web Store"
   },
   "extDescription": {
     "message": "Ứng dụng ghi chú đơn giản & hiện đại. Đồng bộ với Google Drive.",
     "description": "Mô tả extension"
+  },
+  "addToGNote": {
+    "message": "Thêm vào G-Note AI",
+    "description": "Context menu để thêm text vào G-Note"
   }
 }

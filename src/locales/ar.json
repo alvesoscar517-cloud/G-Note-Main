@@ -51,7 +51,10 @@
     "modalSizeFullscreen": "ملء الشاشة",
     "offlineLogoutTitle": "تسجيل الخروج وأنت غير متصل؟",
     "offlineLogoutWarning": "أنت غير متصل بالإنترنت حالياً. قد لا تكون التغييرات غير المحفوظة قد تمت مزامنتها مع Google Drive. إذا قمت بتسجيل الخروج الآن، فقد تفقد هذه التغييرات.",
-    "logoutAnyway": "تسجيل الخروج على أي حال"
+    "logoutAnyway": "تسجيل الخروج على أي حال",
+    "launchMode": "وضع التشغيل",
+    "launchSidePanel": "(إعادة تشغيل للتطبيق)",
+    "launchFullscreen": "(إعادة تشغيل للتطبيق)"
   },
   "credits": {
     "title": "شراء رصيد AI",
@@ -88,7 +91,7 @@
     "updated": "تم التحديث:"
   },
   "emptyState": {
-    "welcome": "مرحباً بك في G-Note!",
+    "welcome": "مرحباً بك في G-Note AI!",
     "getStarted": "انقر على زر + في الزاوية العلوية لإنشاء ملاحظتك الأولى",
     "noResults": "لم يتم العثور على نتائج",
     "noResultsFor": "لا توجد ملاحظات تطابق \"{{query}}\"",
@@ -239,7 +242,7 @@
     "start": "بدء الجلسة",
     "stopSharing": "إنهاء الجلسة",
     "email": "بريد إلكتروني",
-    "emailDescription": "مشاركة مباشرة مع مستخدم G-Note آخر:",
+    "emailDescription": "مشاركة مباشرة مع مستخدم G-Note AI آخر:",
     "emailPlaceholder": "بريد المستلم...",
     "shareSuccess": "تمت المشاركة بنجاح!",
     "shareButton": "مشاركة",
@@ -252,7 +255,7 @@
     "error": "تعذرت المشاركة",
     "sessionExpired": "انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.",
     "fileTooLarge": "الملاحظة كبيرة جداً للمشاركة (الحد الأقصى 1 ميجابايت). حاول إزالة الصور.",
-    "userNotFound": "المستخدم غير موجود. يحتاجون إلى حساب G-Note لاستلام الملاحظات المشتركة.",
+    "userNotFound": "المستخدم غير موجود. يحتاجون إلى حساب G-Note AI لاستلام الملاحظات المشتركة.",
     "emailSent": "تمت مشاركة الملاحظة! تم إرسال إشعار بالبريد الإلكتروني."
   },
   "versionHistory": {
@@ -263,7 +266,7 @@
     "close": "إغلاق"
   },
   "install": {
-    "title": "تثبيت G-Note",
+    "title": "تثبيت G-Note AI",
     "description": "أضف إلى الشاشة الرئيسية للوصول السريع",
     "install": "تثبيت",
     "later": "لاحقاً",
@@ -277,7 +280,7 @@
     "recommended": "موصى به",
     "installNow": "تثبيت الآن",
     "alreadyInstalled": "مثبت بالفعل!",
-    "alreadyInstalledDescription": "أنت تستخدم نسخة التطبيق من G-Note.",
+    "alreadyInstalledDescription": "أنت تستخدم نسخة التطبيق من G-Note AI.",
     "androidChromeInstructions": "اضغط على أيقونة القائمة (⋮) في الأعلى، ثم اختر \"تثبيت التطبيق\" أو \"إضافة إلى الشاشة الرئيسية\"",
     "desktopChromeInstructions": "انقر على أيقونة التثبيت (⬇) في شريط العنوان، أو اذهب إلى القائمة ← تثبيت التطبيق",
     "iosSafariInstructions": "اضغط على زر المشاركة أدناه، ثم \"إضافة إلى الشاشة الرئيسية\"",
@@ -487,5 +490,9 @@
     "appError": "تعطل التطبيق",
     "appErrorDescription": "حدث خطأ ويحتاج التطبيق إلى إعادة التحميل. نعتذر عن الإزعاج."
   },
-  "webContent": {}
+  "webContent": {
+    "title": "ملاحظة ويب جديدة",
+    "description": "المحتوى من {{source}}",
+    "createNote": "إنشاء ملاحظة"
+  }
 }

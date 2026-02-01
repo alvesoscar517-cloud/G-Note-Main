@@ -48,7 +48,10 @@
     "modalSizeDefault": "デフォルト",
     "modalSizeLarge": "大",
     "modalSizeXLarge": "特大",
-    "modalSizeFullscreen": "全画面"
+    "modalSizeFullscreen": "全画面",
+    "launchMode": "起動モード",
+    "launchSidePanel": "(再起動して適用)",
+    "launchFullscreen": "(再起動して適用)"
   },
   "credits": {
     "title": "AIクレジットを購入",
@@ -85,7 +88,7 @@
     "updated": "更新日:"
   },
   "emptyState": {
-    "welcome": "G-Noteへようこそ！",
+    "welcome": "G-Note AIへようこそ！",
     "getStarted": "右上の+ボタンをクリックして最初のメモを作成しましょう",
     "noResults": "結果が見つかりません",
     "noResultsFor": "「{{query}}」に一致するメモはありません",
@@ -236,7 +239,7 @@
     "start": "セッション開始",
     "stopSharing": "セッション終了",
     "email": "メール",
-    "emailDescription": "他の G-Note ユーザーに直接共有：",
+    "emailDescription": "他の G-Note AI ユーザーに直接共有：",
     "emailPlaceholder": "受信者のメール...",
     "shareSuccess": "共有しました！",
     "shareButton": "共有",
@@ -249,7 +252,7 @@
     "error": "共有できません",
     "sessionExpired": "セッションが期限切れです。再度ログインしてください。",
     "fileTooLarge": "メモが大きすぎて共有できません（最大1MB）。画像を削除してみてください。",
-    "userNotFound": "ユーザーが見つかりません。共有メモを受け取るには G-Note アカウントが必要です。",
+    "userNotFound": "ユーザーが見つかりません。共有メモを受け取るには G-Note AI アカウントが必要です。",
     "emailSent": "共有しました！メール通知が送信されました。"
   },
   "versionHistory": {
@@ -260,7 +263,7 @@
     "close": "閉じる"
   },
   "install": {
-    "title": "G-Noteをインストール",
+    "title": "G-Note AIをインストール",
     "description": "ホーム画面に追加して素早くアクセス",
     "install": "インストール",
     "later": "後で",
@@ -274,7 +277,7 @@
     "recommended": "おすすめ",
     "installNow": "今すぐインストール",
     "alreadyInstalled": "インストール済み！",
-    "alreadyInstalledDescription": "G-Noteのアプリ版をご利用中です。",
+    "alreadyInstalledDescription": "G-Note AIのアプリ版をご利用中です。",
     "androidChromeInstructions": "上部のメニューアイコン（⋮）をタップし、「アプリをインストール」または「ホーム画面に追加」を選択",
     "desktopChromeInstructions": "アドレスバーのインストールアイコン（⬇）をクリック、またはメニュー→アプリをインストール",
     "iosSafariInstructions": "下の共有ボタンをタップし、「ホーム画面に追加」を選択",
@@ -483,5 +486,9 @@
     "appError": "アプリがクラッシュしました",
     "appErrorDescription": "問題が発生し、アプリを再読み込みする必要があります。ご不便をおかけして申し訳ございません。"
   },
-  "webContent": {}
+  "webContent": {
+    "title": "新しいウェブノート",
+    "description": "{{source}} からのコンテンツ",
+    "createNote": "ノートを作成"
+  }
 }

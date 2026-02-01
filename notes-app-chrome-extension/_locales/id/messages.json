@@ -1,10 +1,14 @@
 {
   "extName": {
-    "message": "G-Note: Aplikasi Catatan Sederhana & Modern",
+    "message": "G-Note AI",
     "description": "Nama ekstensi untuk optimasi pencarian Chrome Web Store"
   },
   "extDescription": {
     "message": "Aplikasi catatan sederhana dan modern. Sinkronisasi dengan Google Drive.",
     "description": "Deskripsi ekstensi"
+  },
+  "addToGNote": {
+    "message": "Tambahkan ke G-Note AI",
+    "description": "Context menu item"
   }
 }

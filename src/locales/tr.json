@@ -51,7 +51,10 @@
     "modalSizeFullscreen": "Tam ekran",
     "offlineLogoutTitle": "Çevrimdışıyken çıkış yap?",
     "offlineLogoutWarning": "Şu anda çevrimdışısınız. Kaydedilmemiş değişiklikler Google Drive ile senkronize edilmemiş olabilir. Şimdi çıkış yaparsanız bu değişiklikleri kaybedebilirsiniz.",
-    "logoutAnyway": "Yine de çıkış yap"
+    "logoutAnyway": "Yine de çıkış yap",
+    "launchMode": "Başlatma Modu",
+    "launchSidePanel": "(Uygulamak için yeniden başlat)",
+    "launchFullscreen": "(Uygulamak için yeniden başlat)"
   },
   "credits": {
     "title": "AI Kredisi Satın Al",
@@ -88,7 +91,7 @@
     "updated": "Güncellendi:"
   },
   "emptyState": {
-    "welcome": "G-Note'a hoş geldiniz!",
+    "welcome": "G-Note AI'a hoş geldiniz!",
     "getStarted": "İlk notunuzu oluşturmak için sağ üst köşedeki + düğmesine tıklayın",
     "noResults": "Sonuç bulunamadı",
     "noResultsFor": "\"{{query}}\" ile eşleşen not yok",
@@ -239,7 +242,7 @@
     "start": "Oturumu başlat",
     "stopSharing": "Oturumu sonlandır",
     "email": "E-posta",
-    "emailDescription": "Başka bir G-Note kullanıcısıyla doğrudan paylaş:",
+    "emailDescription": "Başka bir G-Note AI kullanıcısıyla doğrudan paylaş:",
     "emailPlaceholder": "Alıcı e-postası...",
     "shareSuccess": "Başarıyla paylaşıldı!",
     "shareButton": "Paylaş",
@@ -252,7 +255,7 @@
     "error": "Paylaşılamıyor",
     "sessionExpired": "Oturum süresi doldu. Lütfen tekrar giriş yapın.",
     "fileTooLarge": "Not paylaşmak için çok büyük (maks. 1 MB). Resimleri kaldırmayı deneyin.",
-    "userNotFound": "Kullanıcı bulunamadı. Paylaşılan notları almak için G-Note hesabına ihtiyaçları var.",
+    "userNotFound": "Kullanıcı bulunamadı. Paylaşılan notları almak için G-Note AI hesabına ihtiyaçları var.",
     "emailSent": "Not paylaşıldı! E-posta bildirimi gönderildi."
   },
   "versionHistory": {
@@ -263,7 +266,7 @@
     "close": "Kapat"
   },
   "install": {
-    "title": "G-Note'u Yükle",
+    "title": "G-Note AI'u Yükle",
     "description": "Hızlı erişim için ana ekrana ekle",
     "install": "Yükle",
     "later": "Daha sonra",
@@ -277,7 +280,7 @@
     "recommended": "Önerilen",
     "installNow": "Şimdi Yükle",
     "alreadyInstalled": "Zaten Yüklü!",
-    "alreadyInstalledDescription": "G-Note'un uygulama sürümünü kullanıyorsunuz.",
+    "alreadyInstalledDescription": "G-Note AI'un uygulama sürümünü kullanıyorsunuz.",
     "androidChromeInstructions": "Üstteki menü simgesine (⋮) dokunun, ardından \"Uygulamayı yükle\" veya \"Ana ekrana ekle\"yi seçin",
     "desktopChromeInstructions": "Adres çubuğundaki yükleme simgesine (⬇) tıklayın veya Menü → Uygulamayı yükle'ye gidin",
     "iosSafariInstructions": "Aşağıdaki Paylaş düğmesine dokunun, ardından \"Ana Ekrana Ekle\"yi seçin",
@@ -487,5 +490,9 @@
     "appError": "Uygulama çöktü",
     "appErrorDescription": "Bir sorun oluştu ve uygulamanın yeniden yüklenmesi gerekiyor. Rahatsızlık için özür dileriz."
   },
-  "webContent": {}
+  "webContent": {
+    "title": "Yeni Web Notu",
+    "description": "{{source}} içeriği",
+    "createNote": "Not Oluştur"
+  }
 }

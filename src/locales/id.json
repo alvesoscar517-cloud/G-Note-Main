@@ -51,7 +51,10 @@
     "modalSizeFullscreen": "Layar penuh",
     "offlineLogoutTitle": "Keluar saat offline?",
     "offlineLogoutWarning": "Anda sedang offline. Perubahan yang belum disimpan mungkin belum disinkronkan ke Google Drive. Jika Anda keluar sekarang, Anda mungkin kehilangan perubahan tersebut.",
-    "logoutAnyway": "Tetap keluar"
+    "logoutAnyway": "Tetap keluar",
+    "launchMode": "Mode Peluncuran",
+    "launchSidePanel": "(Mulai ulang untuk menerapkan)",
+    "launchFullscreen": "(Mulai ulang untuk menerapkan)"
   },
   "credits": {
     "title": "Beli Kredit AI",
@@ -88,7 +91,7 @@
     "updated": "Diperbarui:"
   },
   "emptyState": {
-    "welcome": "Selamat datang di G-Note!",
+    "welcome": "Selamat datang di G-Note AI!",
     "getStarted": "Klik tombol + di pojok kanan atas untuk membuat catatan pertama Anda",
     "noResults": "Tidak ada hasil",
     "noResultsFor": "Tidak ada catatan yang cocok dengan \"{{query}}\"",
@@ -239,7 +242,7 @@
     "start": "Mulai sesi",
     "stopSharing": "Akhiri sesi",
     "email": "Email",
-    "emailDescription": "Bagikan langsung dengan pengguna G-Note lain:",
+    "emailDescription": "Bagikan langsung dengan pengguna G-Note AI lain:",
     "emailPlaceholder": "Email penerima...",
     "shareSuccess": "Berhasil dibagikan!",
     "shareButton": "Bagikan",
@@ -252,7 +255,7 @@
     "error": "Tidak dapat membagikan",
     "sessionExpired": "Sesi kedaluwarsa. Silakan masuk lagi.",
     "fileTooLarge": "Catatan terlalu besar untuk dibagikan (maks 1 MB). Coba hapus gambar.",
-    "userNotFound": "Pengguna tidak ditemukan. Mereka memerlukan akun G-Note untuk menerima catatan yang dibagikan.",
+    "userNotFound": "Pengguna tidak ditemukan. Mereka memerlukan akun G-Note AI untuk menerima catatan yang dibagikan.",
     "emailSent": "Catatan dibagikan! Notifikasi email telah dikirim."
   },
   "versionHistory": {
@@ -263,7 +266,7 @@
     "close": "Tutup"
   },
   "install": {
-    "title": "Instal G-Note",
+    "title": "Instal G-Note AI",
     "description": "Tambahkan ke layar utama untuk akses cepat",
     "install": "Instal",
     "later": "Nanti",
@@ -277,7 +280,7 @@
     "recommended": "Direkomendasikan",
     "installNow": "Instal Sekarang",
     "alreadyInstalled": "Sudah Terinstal!",
-    "alreadyInstalledDescription": "Anda menggunakan versi aplikasi G-Note.",
+    "alreadyInstalledDescription": "Anda menggunakan versi aplikasi G-Note AI.",
     "androidChromeInstructions": "Ketuk ikon menu (⋮) di atas, lalu pilih \"Instal aplikasi\" atau \"Tambahkan ke Layar Utama\"",
     "desktopChromeInstructions": "Klik ikon instal (⬇) di bilah alamat, atau buka Menu → Instal aplikasi",
     "iosSafariInstructions": "Ketuk tombol Bagikan di bawah, lalu \"Tambahkan ke Layar Utama\"",
@@ -487,5 +490,9 @@
     "appError": "Aplikasi error",
     "appErrorDescription": "Terjadi kesalahan dan aplikasi perlu dimuat ulang. Kami mohon maaf atas ketidaknyamanan ini."
   },
-  "webContent": {}
+  "webContent": {
+    "title": "Catatan Web Baru",
+    "description": "Konten dari {{source}}",
+    "createNote": "Buat Catatan"
+  }
 }

@@ -1,10 +1,14 @@
 {
   "extName": {
-    "message": "G-Note: Aplicación de Notas Simple & Moderna",
+    "message": "G-Note AI",
     "description": "Nombre de la extensión para optimización de búsqueda en Chrome Web Store"
   },
   "extDescription": {
     "message": "Aplicación de notas simple y moderna. Sincroniza con Google Drive.",
     "description": "Descripción de la extensión"
+  },
+  "addToGNote": {
+    "message": "Añadir a G-Note AI",
+    "description": "Context menu item"
   }
 }

@@ -529,7 +529,11 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
         codeBlock: false,
         // Disable history when in collaboration mode (y-prosemirror handles it)
         // Use shouldDisableHistory to disable early, before full collaboration ready
-        ...(shouldDisableHistory ? { history: false } : {})
+        ...(shouldDisableHistory ? { history: false } : {}),
+        // We use our own Link and Underline extensions configuration below
+        // so we need to disable them in StarterKit to avoid duplicates
+        link: false,
+        underline: false,
       }),
       CodeBlockLowlight.configure({
         lowlight: createLowlight(common),
@@ -972,6 +976,9 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       return
     }
 
+    // Define actions that replace content (used in error handling too)
+    const replaceActions = ['improve', 'translate', 'extract-tasks', 'tone']
+
     if (action === 'summarize') {
       setIsSummarizing(true)
       if (editorContainerRef.current) {
@@ -981,7 +988,6 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       setIsAILoading(true)
 
       // Clear editor and show skeleton for actions that replace content
-      const replaceActions = ['improve', 'translate', 'extract-tasks', 'tone']
       if (replaceActions.includes(action)) {
         if (isSelectionMode) {
           editor.commands.deleteSelection()
@@ -1161,7 +1167,7 @@ export function NoteEditor({ note, onClose, onTogglePin, isPinned, isFullscreen,
       if (error instanceof InsufficientCreditsError) {
         setShowCreditsError(true)
         // Restore content if it was cleared
-        if (typeof replaceActions !== 'undefined' && replaceActions.includes(action)) {
+        if (replaceActions.includes(action)) {
           editor.commands.setContent(note.content || '')
         }
       } else {

@@ -48,7 +48,10 @@
     "modalSizeDefault": "預設",
     "modalSizeLarge": "大",
     "modalSizeXLarge": "超大",
-    "modalSizeFullscreen": "全螢幕"
+    "modalSizeFullscreen": "全螢幕",
+    "launchMode": "啟動模式",
+    "launchSidePanel": "(重啟生效)",
+    "launchFullscreen": "(重啟生效)"
   },
   "credits": {
     "title": "購買 AI 點數",
@@ -85,7 +88,7 @@
     "updated": "更新於:"
   },
   "emptyState": {
-    "welcome": "歡迎使用 G-Note！",
+    "welcome": "歡迎使用 G-Note AI！",
     "getStarted": "點擊右上角的 + 按鈕開始建立第一則筆記",
     "noResults": "找不到結果",
     "noResultsFor": "沒有與「{{query}}」相符的筆記",
@@ -236,7 +239,7 @@
     "start": "開始會話",
     "stopSharing": "結束會話",
     "email": "電子郵件",
-    "emailDescription": "直接分享給其他 G-Note 用戶：",
+    "emailDescription": "直接分享給其他 G-Note AI 用戶：",
     "emailPlaceholder": "收件人電子郵件...",
     "shareSuccess": "分享成功！",
     "shareButton": "分享",
@@ -249,7 +252,7 @@
     "error": "無法分享",
     "sessionExpired": "會話已過期。請重新登入。",
     "fileTooLarge": "筆記太大無法分享（最大1MB）。請嘗試刪除一些圖片。",
-    "userNotFound": "找不到用戶。對方需要有 G-Note 帳戶才能接收分享的筆記。",
+    "userNotFound": "找不到用戶。對方需要有 G-Note AI 帳戶才能接收分享的筆記。",
     "emailSent": "已分享！郵件通知已發送。"
   },
   "versionHistory": {
@@ -260,7 +263,7 @@
     "close": "關閉"
   },
   "install": {
-    "title": "安裝 G-Note",
+    "title": "安裝 G-Note AI",
     "description": "加入主畫面以便快速存取",
     "install": "安裝",
     "later": "稍後",
@@ -274,7 +277,7 @@
     "recommended": "推薦",
     "installNow": "立即安裝",
     "alreadyInstalled": "已安裝！",
-    "alreadyInstalledDescription": "您正在使用 G-Note 的應用程式版本。",
+    "alreadyInstalledDescription": "您正在使用 G-Note AI 的應用程式版本。",
     "androidChromeInstructions": "點擊頂部的選單圖示 (⋮)，然後選擇「安裝應用程式」或「加入主畫面」",
     "desktopChromeInstructions": "點擊網址列中的安裝圖示 (⬇)，或前往 選單 → 安裝應用程式",
     "iosSafariInstructions": "點擊下方的分享按鈕，然後選擇「加入主畫面」",
@@ -483,5 +486,9 @@
     "appError": "應用程式當機",
     "appErrorDescription": "出現問題，應用程式需要重新載入。造成不便，深感抱歉。"
   },
-  "webContent": {}
+  "webContent": {
+    "title": "新網頁筆記",
+    "description": "來自 {{source}} 的內容",
+    "createNote": "建立筆記"
+  }
 }

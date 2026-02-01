@@ -1,6 +1,6 @@
 /* TEAM */
 App: G-Note
-Site: https://gnote.graphosai.com
+Site: https://gnoteai.com
 Description: Free note-taking app with Google Drive sync
 
 /* THANKS */

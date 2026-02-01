@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState } from 'react'
 // useDebouncedCallback was removed as debouncedSync is no longer used
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { LayoutGroup } from 'framer-motion'
 import { useAuthStore } from '@/stores/authStore'
@@ -338,7 +338,7 @@ function AppContent() {
   }
 
   if (!user) {
-    return <LoginScreen />
+    return <LoginScreen LinkComponent={Link} />
   }
 
   return (

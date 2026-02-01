@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User } from '@/types'
-import { logoutFromBackend } from '@/lib/tokenRefresh'
+import { platformLogout } from '@/lib/platform/auth'
 
 
 interface AuthState {
@@ -30,10 +30,9 @@ export const useAuthStore = create<AuthState>()(
         try {
           const user = get().user
           if (user?.id) {
-            // Remove refresh token from backend
-            logoutFromBackend(user.id)
+            // Use platform adapter for logout
+            await platformLogout(user.id)
           }
-
 
           // We NO LONGER clear all local data (IndexedDB) on logout
           // This allows for "smart" persistence where notes remain cached

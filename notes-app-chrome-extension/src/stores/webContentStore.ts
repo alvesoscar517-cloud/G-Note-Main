@@ -1,5 +1,7 @@
 import { create } from 'zustand'
-import { isChromeExtension } from '@/lib/chromeAuth'
+
+// Extension-specific import (local)
+import { isChromeExtension } from '../lib/chromeAuth'
 
 export interface PendingWebContent {
   html: string

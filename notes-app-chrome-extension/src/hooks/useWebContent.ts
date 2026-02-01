@@ -1,7 +1,9 @@
 import { useEffect, useCallback } from 'react'
-import { useWebContentStore, type PendingWebContent } from '@/stores/webContentStore'
 import { useNotesStore } from '@/stores/notesStore'
-import { isChromeExtension } from '@/lib/chromeAuth'
+
+// Extension-specific imports (local)
+import { useWebContentStore, type PendingWebContent } from '../stores/webContentStore'
+import { isChromeExtension } from '../lib/chromeAuth'
 
 /**
  * Hook to handle web content added via Chrome context menu

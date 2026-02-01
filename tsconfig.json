@@ -21,5 +21,6 @@
     }
   },
   "include": ["src"],
+  "exclude": ["notes-app-chrome-extension/**/*", "node_modules", "dist"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

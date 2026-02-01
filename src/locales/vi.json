@@ -48,7 +48,10 @@
     "modalSizeDefault": "Mặc định",
     "modalSizeLarge": "Lớn",
     "modalSizeXLarge": "Rất lớn",
-    "modalSizeFullscreen": "Toàn màn hình"
+    "modalSizeFullscreen": "Toàn màn hình",
+    "launchMode": "Chế độ khởi chạy",
+    "launchSidePanel": "(Khởi động lại để áp dụng)",
+    "launchFullscreen": "(Khởi động lại để áp dụng)"
   },
   "credits": {
     "title": "Mua AI Credits",
@@ -86,7 +89,7 @@
     "updated": "Cập nhật:"
   },
   "emptyState": {
-    "welcome": "Chào mừng bạn đến với G-Note!",
+    "welcome": "Chào mừng bạn đến với G-Note AI AI!",
     "getStarted": "Bắt đầu ghi chú đầu tiên bằng cách nhấn nút + ở góc trên",
     "noResults": "Không tìm thấy kết quả",
     "noResultsFor": "Không có ghi chú nào khớp với \"{{query}}\"",
@@ -237,7 +240,7 @@
     "start": "Bắt đầu phiên",
     "stopSharing": "Kết thúc phiên",
     "email": "Email",
-    "emailDescription": "Chia sẻ trực tiếp với người dùng G-Note khác:",
+    "emailDescription": "Chia sẻ trực tiếp với người dùng G-Note AI AI khác:",
     "emailPlaceholder": "Email người nhận...",
     "shareSuccess": "Đã chia sẻ thành công!",
     "shareButton": "Chia sẻ",
@@ -250,7 +253,7 @@
     "error": "Không thể chia sẻ",
     "sessionExpired": "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.",
     "fileTooLarge": "Ghi chú quá lớn để chia sẻ (tối đa 1MB). Hãy thử xóa bớt hình ảnh.",
-    "userNotFound": "Không tìm thấy người dùng. Họ cần có tài khoản G-Note để nhận ghi chú được chia sẻ.",
+    "userNotFound": "Không tìm thấy người dùng. Họ cần có tài khoản G-Note AI AI để nhận ghi chú được chia sẻ.",
     "emailSent": "Đã chia sẻ! Email thông báo đã được gửi."
   },
   "versionHistory": {
@@ -261,7 +264,7 @@
     "close": "Đóng"
   },
   "install": {
-    "title": "Cài đặt G-Note",
+    "title": "Cài đặt G-Note AI AI",
     "description": "Thêm vào màn hình chính để truy cập nhanh",
     "install": "Cài đặt",
     "later": "Để sau",
@@ -275,7 +278,7 @@
     "recommended": "Khuyên dùng",
     "installNow": "Cài đặt ngay",
     "alreadyInstalled": "Đã cài đặt!",
-    "alreadyInstalledDescription": "Bạn đang sử dụng phiên bản ứng dụng của G-Note.",
+    "alreadyInstalledDescription": "Bạn đang sử dụng phiên bản ứng dụng của G-Note AI AI.",
     "androidChromeInstructions": "Nhấn vào biểu tượng menu (⋮) ở góc trên, sau đó chọn \"Cài đặt ứng dụng\" hoặc \"Thêm vào màn hình chính\"",
     "desktopChromeInstructions": "Nhấn vào biểu tượng cài đặt (⬇) ở thanh địa chỉ, hoặc vào Menu → Cài đặt ứng dụng",
     "iosSafariInstructions": "Nhấn nút Chia sẻ bên dưới, sau đó chọn \"Thêm vào MH chính\"",
@@ -486,5 +489,9 @@
     "appError": "Ứng dụng gặp sự cố",
     "appErrorDescription": "Đã xảy ra lỗi và ứng dụng cần tải lại. Chúng tôi xin lỗi vì sự bất tiện này."
   },
-  "webContent": {}
+  "webContent": {
+    "title": "Ghi chú web mới",
+    "description": "Nội dung từ {{source}}",
+    "createNote": "Tạo ghi chú"
+  }
 }

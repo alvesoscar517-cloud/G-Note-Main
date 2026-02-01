@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useDebounce } from 'use-debounce'
 import { useTranslation } from 'react-i18next'
-import { Search, Plus, Moon, Sun, LogOut, Settings, X, Coins, ChevronRight, ArrowLeft, Maximize2, Trash2 } from 'lucide-react'
+import { Search, Plus, Moon, Sun, LogOut, Settings, X, Coins, ChevronRight, ArrowLeft, Maximize2, Trash2, Monitor } from 'lucide-react'
+import { isChromeExtension } from '@/lib/platform/detection'
 import { Input } from '@/components/ui/Input'
 import { useAuthStore } from '@/stores/authStore'
 import { useNotesStore } from '@/stores/notesStore'
@@ -76,6 +77,24 @@ export function Header() {
   const [driveSearchEnabled, setDriveSearchEnabled] = useState(false)
   const [showDriveResults, setShowDriveResults] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [launchType, setLaunchType] = useState<'sidePanel' | 'fullscreen'>('fullscreen')
+
+  // Load extension settings
+  useEffect(() => {
+    if (isChromeExtension() && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.get('launchType', (result: { launchType?: 'sidePanel' | 'fullscreen' }) => {
+        setLaunchType(result.launchType || 'fullscreen')
+      })
+    }
+  }, [])
+
+  const handleToggleLaunchType = () => {
+    if (!isChromeExtension() || typeof chrome === 'undefined' || !chrome.storage || !chrome.storage.local) return
+
+    const newType = launchType === 'sidePanel' ? 'fullscreen' : 'sidePanel'
+    setLaunchType(newType)
+    chrome.storage.local.set({ launchType: newType })
+  }
 
   // Update status bar color when any small modal is open
   // Note: trashOpen is excluded because TrashView is fullscreen
@@ -196,7 +215,7 @@ export function Header() {
             <div className="flex items-center gap-3 flex-1">
               <img
                 src={isDark ? "/g-note-dark.svg" : "/g-note.svg"}
-                alt="G-Note"
+                alt="G-Note AI"
                 className="w-8 h-8 sm:w-9 sm:h-9 flex-shrink-0"
               />
 
@@ -373,6 +392,17 @@ export function Header() {
                   showArrow
                 />
               </div>
+
+              {/* Extension Launch Mode */}
+              {isChromeExtension() && (
+                <MenuItem
+                  icon={<Monitor className="w-5 h-5" />}
+                  label={t('settings.launchMode') || 'Launch Mode'}
+                  description={launchType === 'sidePanel' ? (t('settings.launchSidePanel') || 'Opens in Side Panel') : (t('settings.launchFullscreen') || 'Opens in New Tab')}
+                  onClick={handleToggleLaunchType}
+                  badge={launchType === 'sidePanel' ? 'Side Panel' : 'Tab'}
+                />
+              )}
 
               {user && (
                 <MenuItem

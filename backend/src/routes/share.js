@@ -32,7 +32,7 @@ const getEmailFrom = () => {
 router.get('/check-user/:email', async (req, res) => {
   try {
     const { email } = req.params
-    
+
     if (!email) {
       return res.status(400).json({ error: 'Email is required' })
     }
@@ -42,7 +42,7 @@ router.get('/check-user/:email', async (req, res) => {
       .where('email', '==', email.toLowerCase())
       .limit(1)
       .get()
-    
+
     res.json({ exists: !snapshot.empty })
   } catch (error) {
     console.error('Error checking user:', error)
@@ -54,7 +54,7 @@ router.get('/check-user/:email', async (req, res) => {
 router.post('/email', async (req, res) => {
   try {
     const { note, recipientEmail, senderEmail, senderName } = req.body
-    
+
     if (!note || !recipientEmail || !senderEmail) {
       return res.status(400).json({ error: 'Missing required fields' })
     }
@@ -62,9 +62,9 @@ router.post('/email', async (req, res) => {
     // Validate note size
     const noteJson = JSON.stringify(note)
     const noteSize = Buffer.byteLength(noteJson, 'utf8')
-    
+
     if (noteSize > MAX_FILE_SIZE) {
-      return res.status(413).json({ 
+      return res.status(413).json({
         error: 'FILE_TOO_LARGE',
         message: 'Note is too large to share (max 1MB)'
       })
@@ -75,9 +75,9 @@ router.post('/email', async (req, res) => {
       .where('email', '==', recipientEmail.toLowerCase())
       .limit(1)
       .get()
-    
+
     if (recipientSnapshot.empty) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         error: 'USER_NOT_FOUND',
         message: 'Recipient not found in the system'
       })
@@ -103,16 +103,16 @@ router.post('/email', async (req, res) => {
     // Send email notification
     const emailTransporter = getTransporter()
     if (emailTransporter) {
-      const appUrl = process.env.APP_URL || 'https://gnote.graphosai.com'
+      const appUrl = process.env.APP_URL || 'https://gnoteai.com'
       const noteTitle = note.title || 'Untitled Note'
-      
+
       try {
         const emailFrom = getEmailFrom()
         await emailTransporter.sendMail({
-          from: `"G-Note" <${emailFrom}>`,
+          from: `"G-Note AI" <${emailFrom}>`,
           to: recipientEmail,
           subject: `${senderName || senderEmail} shared a note with you`,
-          text: `${senderName || senderEmail} has shared a note with you on G-Note.\n\nNote: "${noteTitle}"\n\nOpen G-Note to view: ${appUrl}\n\n--\nG-Note\nThis is an automated message.`,
+          text: `${senderName || senderEmail} has shared a note with you on G-Note AI.\n\nNote: "${noteTitle}"\n\nOpen G-Note AI to view: ${appUrl}\n\n--\nG-Note AI\nThis is an automated message.`,
           html: `
 <!DOCTYPE html>
 <html>
@@ -161,7 +161,7 @@ router.post('/email', async (req, res) => {
                     <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                       <tr>
                         <td style="background-color: #171717; padding: 12px 24px; border-radius: 8px;">
-                          <a href="${appUrl}" style="color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">Open G-Note</a>
+                          <a href="${appUrl}" style="color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">Open G-Note AI</a>
                         </td>
                       </tr>
                     </table>
@@ -177,7 +177,7 @@ router.post('/email', async (req, res) => {
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td style="padding-top: 24px; text-align: center;">
-              <p style="margin: 0; font-size: 12px; color: #a3a3a3;">This is an automated message from G-Note.</p>
+              <p style="margin: 0; font-size: 12px; color: #a3a3a3;">This is an automated message from G-Note AI.</p>
             </td>
           </tr>
         </table>
@@ -195,8 +195,8 @@ router.post('/email', async (req, res) => {
       }
     }
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       shareId: docRef.id,
       message: 'Note shared successfully'
     })
@@ -210,7 +210,7 @@ router.post('/email', async (req, res) => {
 router.get('/received/:userId', async (req, res) => {
   try {
     const { userId } = req.params
-    
+
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' })
     }
@@ -242,7 +242,7 @@ router.get('/received/:userId', async (req, res) => {
 router.post('/received/:shareId/accept', async (req, res) => {
   try {
     const { shareId } = req.params
-    
+
     if (!shareId) {
       return res.status(400).json({ error: 'Share ID is required' })
     }
@@ -261,7 +261,7 @@ router.post('/received/:shareId/accept', async (req, res) => {
 router.delete('/received/:shareId', async (req, res) => {
   try {
     const { shareId } = req.params
-    
+
     if (!shareId) {
       return res.status(400).json({ error: 'Share ID is required' })
     }

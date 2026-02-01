@@ -1,10 +1,14 @@
 {
   "extName": {
-    "message": "G-Note: تطبيق ملاحظات بسيط وعصري",
+    "message": "G-Note AI",
     "description": "اسم الإضافة لتحسين البحث في متجر Chrome الإلكتروني"
   },
   "extDescription": {
     "message": "تطبيق ملاحظات بسيط وعصري. مزامنة مع Google Drive.",
     "description": "وصف الإضافة"
+  },
+  "addToGNote": {
+    "message": "إضافة إلى G-Note AI",
+    "description": "Context menu item"
   }
 }

@@ -53,15 +53,28 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["offscreen.html", "offscreen.js", "offscreen-ui.js", "setup.html", "setup.js"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "offscreen.html",
+        "offscreen.js",
+        "offscreen-ui.js",
+        "setup.html",
+        "setup.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["src/contentScript.ts"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "src/contentScript.ts"
+      ],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "homepage_url": "https://gnoteai.com"
 }

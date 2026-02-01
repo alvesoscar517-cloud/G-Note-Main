@@ -1,204 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    
-    <!-- Primary Meta Tags -->
-    <title>G-Note - Free Note Taking App | Sync with Google Drive</title>
-    <meta name="title" content="G-Note - Free Note Taking App | Sync with Google Drive" />
-    <meta name="description" content="G-Note is a free, beautiful note-taking app that syncs with Google Drive. Create notes, collaborate in real-time, use AI assistance, and access your notes anywhere. Works offline!" />
-    <meta name="keywords" content="note taking app, notes app, google drive notes, free notes, cloud notes, productivity app, offline notes, AI notes, collaborative notes, PWA notes, ghi chú, メモ, 笔记, 메모" />
-    <meta name="author" content="G-Note" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <meta name="googlebot" content="index, follow" />
-    <meta name="google" content="notranslate" />
-    <meta name="rating" content="General" />
-    <meta name="revisit-after" content="7 days" />
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/g-note.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://gnote.graphosai.com" />
-    
-    <!-- Hreflang for 18 languages -->
-    <link rel="alternate" hreflang="en" href="https://gnote.graphosai.com" />
-    <link rel="alternate" hreflang="vi" href="https://gnote.graphosai.com/?lang=vi" />
-    <link rel="alternate" hreflang="ja" href="https://gnote.graphosai.com/?lang=ja" />
-    <link rel="alternate" hreflang="ko" href="https://gnote.graphosai.com/?lang=ko" />
-    <link rel="alternate" hreflang="zh-Hans" href="https://gnote.graphosai.com/?lang=zh-CN" />
-    <link rel="alternate" hreflang="zh-Hant" href="https://gnote.graphosai.com/?lang=zh-TW" />
-    <link rel="alternate" hreflang="de" href="https://gnote.graphosai.com/?lang=de" />
-    <link rel="alternate" hreflang="fr" href="https://gnote.graphosai.com/?lang=fr" />
-    <link rel="alternate" hreflang="es" href="https://gnote.graphosai.com/?lang=es" />
-    <link rel="alternate" hreflang="pt-BR" href="https://gnote.graphosai.com/?lang=pt-BR" />
-    <link rel="alternate" hreflang="it" href="https://gnote.graphosai.com/?lang=it" />
-    <link rel="alternate" hreflang="nl" href="https://gnote.graphosai.com/?lang=nl" />
-    <link rel="alternate" hreflang="ar" href="https://gnote.graphosai.com/?lang=ar" />
-    <link rel="alternate" hreflang="hi" href="https://gnote.graphosai.com/?lang=hi" />
-    <link rel="alternate" hreflang="tr" href="https://gnote.graphosai.com/?lang=tr" />
-    <link rel="alternate" hreflang="pl" href="https://gnote.graphosai.com/?lang=pl" />
-    <link rel="alternate" hreflang="th" href="https://gnote.graphosai.com/?lang=th" />
-    <link rel="alternate" hreflang="id" href="https://gnote.graphosai.com/?lang=id" />
-    <link rel="alternate" hreflang="x-default" href="https://gnote.graphosai.com" />
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://gnote.graphosai.com" />
-    <meta property="og:title" content="G-Note - Your Notes, Everywhere" />
-    <meta property="og:description" content="Free note-taking app with Google Drive sync. Beautiful, fast, and works offline. Start organizing your thoughts today!" />
-    <meta property="og:image" content="https://gnote.graphosai.com/og-image.png" />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="G-Note - Free Note Taking App" />
-    <meta property="og:site_name" content="G-Note" />
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:locale:alternate" content="vi_VN" />
-    <meta property="og:locale:alternate" content="ja_JP" />
-    <meta property="og:locale:alternate" content="ko_KR" />
-    <meta property="og:locale:alternate" content="zh_CN" />
-    <meta property="og:locale:alternate" content="zh_TW" />
-    <meta property="og:locale:alternate" content="de_DE" />
-    <meta property="og:locale:alternate" content="fr_FR" />
-    <meta property="og:locale:alternate" content="es_ES" />
-    <meta property="og:locale:alternate" content="pt_BR" />
-    <meta property="og:locale:alternate" content="it_IT" />
-    <meta property="og:locale:alternate" content="nl_NL" />
-    <meta property="og:locale:alternate" content="ar_SA" />
-    <meta property="og:locale:alternate" content="hi_IN" />
-    <meta property="og:locale:alternate" content="tr_TR" />
-    <meta property="og:locale:alternate" content="pl_PL" />
-    <meta property="og:locale:alternate" content="th_TH" />
-    <meta property="og:locale:alternate" content="id_ID" />
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://gnote.graphosai.com" />
-    <meta name="twitter:title" content="G-Note - Your Notes, Everywhere" />
-    <meta name="twitter:description" content="Free note-taking app with Google Drive sync. Beautiful, fast, and works offline. Start organizing your thoughts today!" />
-    <meta name="twitter:image" content="https://gnote.graphosai.com/og-image.png" />
-    <meta name="twitter:image:alt" content="G-Note - Free Note Taking App" />
-    <meta name="twitter:creator" content="@gnoteapp" />
-    <meta name="twitter:site" content="@gnoteapp" />
-    
-    <!-- Viewport & PWA -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
-    
-    <!-- iOS PWA -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="G-Note" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    
-    <!-- iOS Splash Screens - Light Mode Portrait -->
-    <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1668-2388.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1620-2160.png" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1640-2360.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1536-2048.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1290-2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1284-2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1179-2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1170-2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1125-2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1242-2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-828-1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1242-2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-750-1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-640-1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
-    
-    <!-- iOS Splash Screens - Light Mode Landscape -->
-    <link rel="apple-touch-startup-image" href="/apple-splash-2732-2048.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2388-1668.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2160-1620.png" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2360-1640.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2048-1536.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2796-1290.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2778-1284.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2556-1179.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2532-1170.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2436-1125.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2688-1242.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1792-828.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2208-1242.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1334-750.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1136-640.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
-    
-    <!-- iOS Splash Screens - Dark Mode Portrait -->
-    <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732-dark.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1668-2388-dark.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1620-2160-dark.png" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1640-2360-dark.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1536-2048-dark.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1290-2796-dark.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1284-2778-dark.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1179-2556-dark.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1170-2532-dark.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1125-2436-dark.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1242-2688-dark.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-828-1792-dark.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1242-2208-dark.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-750-1334-dark.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-640-1136-dark.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
-    
-    <!-- iOS Splash Screens - Dark Mode Landscape -->
-    <link rel="apple-touch-startup-image" href="/apple-splash-2732-2048-dark.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2388-1668-dark.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2160-1620-dark.png" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2360-1640-dark.png" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2048-1536-dark.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2796-1290-dark.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2778-1284-dark.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2556-1179-dark.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2532-1170-dark.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2436-1125-dark.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2688-1242-dark.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1792-828-dark.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-2208-1242-dark.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1334-750-dark.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    <link rel="apple-touch-startup-image" href="/apple-splash-1136-640-dark.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
-    
-    <!-- Android/Chrome -->
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="application-name" content="G-Note" />
-    
-    <!-- Microsoft -->
-    <meta name="msapplication-TileColor" content="#0a0a0a" />
-    <meta name="msapplication-TileImage" content="/pwa-192x192.png" />
-    <meta name="msapplication-tap-highlight" content="no" />
-    <meta name="msapplication-config" content="/browserconfig.xml" />
-    
-    <!-- Disable phone number detection -->
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="format-detection" content="date=no" />
-    <meta name="format-detection" content="address=no" />
-    <meta name="format-detection" content="email=no" />
-    
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://www.googleapis.com" />
-    <link rel="preconnect" href="https://lh3.googleusercontent.com" />
-    
-    <!-- DNS Prefetch -->
-    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-    
-    <!-- Structured Data (JSON-LD) -->
-    <script type="application/ld+json">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- Primary Meta Tags -->
+  <title>G-Note AI - Free Note Taking App | Sync with Google Drive</title>
+  <meta name="title" content="G-Note AI - Free Note Taking App | Sync with Google Drive" />
+  <meta name="description"
+    content="G-Note is a free, beautiful note-taking app that syncs with Google Drive. Create notes, collaborate in real-time, use AI assistance, and access your notes anywhere. Works offline!" />
+  <meta name="keywords"
+    content="note taking app, notes app, google drive notes, free notes, cloud notes, productivity app, offline notes, AI notes, collaborative notes, PWA notes, ghi chú, メモ, 笔记, 메모" />
+  <meta name="author" content="G-Note AI" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow" />
+  <meta name="google" content="notranslate" />
+  <meta name="rating" content="General" />
+  <meta name="revisit-after" content="7 days" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/g-note.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://gnoteai.com" />
+
+  <!-- Hreflang for 18 languages -->
+  <link rel="alternate" hreflang="en" href="https://gnoteai.com" />
+  <link rel="alternate" hreflang="vi" href="https://gnoteai.com/?lang=vi" />
+  <link rel="alternate" hreflang="ja" href="https://gnoteai.com/?lang=ja" />
+  <link rel="alternate" hreflang="ko" href="https://gnoteai.com/?lang=ko" />
+  <link rel="alternate" hreflang="zh-Hans" href="https://gnoteai.com/?lang=zh-CN" />
+  <link rel="alternate" hreflang="zh-Hant" href="https://gnoteai.com/?lang=zh-TW" />
+  <link rel="alternate" hreflang="de" href="https://gnoteai.com/?lang=de" />
+  <link rel="alternate" hreflang="fr" href="https://gnoteai.com/?lang=fr" />
+  <link rel="alternate" hreflang="es" href="https://gnoteai.com/?lang=es" />
+  <link rel="alternate" hreflang="pt-BR" href="https://gnoteai.com/?lang=pt-BR" />
+  <link rel="alternate" hreflang="it" href="https://gnoteai.com/?lang=it" />
+  <link rel="alternate" hreflang="nl" href="https://gnoteai.com/?lang=nl" />
+  <link rel="alternate" hreflang="ar" href="https://gnoteai.com/?lang=ar" />
+  <link rel="alternate" hreflang="hi" href="https://gnoteai.com/?lang=hi" />
+  <link rel="alternate" hreflang="tr" href="https://gnoteai.com/?lang=tr" />
+  <link rel="alternate" hreflang="pl" href="https://gnoteai.com/?lang=pl" />
+  <link rel="alternate" hreflang="th" href="https://gnoteai.com/?lang=th" />
+  <link rel="alternate" hreflang="id" href="https://gnoteai.com/?lang=id" />
+  <link rel="alternate" hreflang="x-default" href="https://gnoteai.com" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://gnoteai.com" />
+  <meta property="og:title" content="G-Note AI - Your Notes, Everywhere" />
+  <meta property="og:description"
+    content="Free note-taking app with Google Drive sync. Beautiful, fast, and works offline. Start organizing your thoughts today!" />
+  <meta property="og:image" content="https://gnoteai.com/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="G-Note AI - Free Note Taking App" />
+  <meta property="og:site_name" content="G-Note AI" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="vi_VN" />
+  <meta property="og:locale:alternate" content="ja_JP" />
+  <meta property="og:locale:alternate" content="ko_KR" />
+  <meta property="og:locale:alternate" content="zh_CN" />
+  <meta property="og:locale:alternate" content="zh_TW" />
+  <meta property="og:locale:alternate" content="de_DE" />
+  <meta property="og:locale:alternate" content="fr_FR" />
+  <meta property="og:locale:alternate" content="es_ES" />
+  <meta property="og:locale:alternate" content="pt_BR" />
+  <meta property="og:locale:alternate" content="it_IT" />
+  <meta property="og:locale:alternate" content="nl_NL" />
+  <meta property="og:locale:alternate" content="ar_SA" />
+  <meta property="og:locale:alternate" content="hi_IN" />
+  <meta property="og:locale:alternate" content="tr_TR" />
+  <meta property="og:locale:alternate" content="pl_PL" />
+  <meta property="og:locale:alternate" content="th_TH" />
+  <meta property="og:locale:alternate" content="id_ID" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://gnoteai.com" />
+  <meta name="twitter:title" content="G-Note AI - Your Notes, Everywhere" />
+  <meta name="twitter:description"
+    content="Free note-taking app with Google Drive sync. Beautiful, fast, and works offline. Start organizing your thoughts today!" />
+  <meta name="twitter:image" content="https://gnoteai.com/og-image.png" />
+  <meta name="twitter:image:alt" content="G-Note AI - Free Note Taking App" />
+  <meta name="twitter:creator" content="@gnoteapp" />
+  <meta name="twitter:site" content="@gnoteapp" />
+
+  <!-- Viewport & PWA -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+
+  <!-- iOS PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="G-Note AI" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- iOS Splash Screens - Light Mode Portrait -->
+  <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732.png"
+    media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1668-2388.png"
+    media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1620-2160.png"
+    media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1640-2360.png"
+    media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1536-2048.png"
+    media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1290-2796.png"
+    media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1284-2778.png"
+    media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1179-2556.png"
+    media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1170-2532.png"
+    media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1125-2436.png"
+    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1242-2688.png"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-828-1792.png"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1242-2208.png"
+    media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-750-1334.png"
+    media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-640-1136.png"
+    media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+  <!-- iOS Splash Screens - Light Mode Landscape -->
+  <link rel="apple-touch-startup-image" href="/apple-splash-2732-2048.png"
+    media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2388-1668.png"
+    media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2160-1620.png"
+    media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2360-1640.png"
+    media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2048-1536.png"
+    media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2796-1290.png"
+    media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2778-1284.png"
+    media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2556-1179.png"
+    media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2532-1170.png"
+    media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2436-1125.png"
+    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2688-1242.png"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1792-828.png"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2208-1242.png"
+    media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1334-750.png"
+    media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1136-640.png"
+    media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: light)" />
+
+  <!-- iOS Splash Screens - Dark Mode Portrait -->
+  <link rel="apple-touch-startup-image" href="/apple-splash-2048-2732-dark.png"
+    media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1668-2388-dark.png"
+    media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1620-2160-dark.png"
+    media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1640-2360-dark.png"
+    media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1536-2048-dark.png"
+    media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1290-2796-dark.png"
+    media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1284-2778-dark.png"
+    media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1179-2556-dark.png"
+    media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1170-2532-dark.png"
+    media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1125-2436-dark.png"
+    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1242-2688-dark.png"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-828-1792-dark.png"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1242-2208-dark.png"
+    media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-750-1334-dark.png"
+    media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-640-1136-dark.png"
+    media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+
+  <!-- iOS Splash Screens - Dark Mode Landscape -->
+  <link rel="apple-touch-startup-image" href="/apple-splash-2732-2048-dark.png"
+    media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2388-1668-dark.png"
+    media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2160-1620-dark.png"
+    media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2360-1640-dark.png"
+    media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2048-1536-dark.png"
+    media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2796-1290-dark.png"
+    media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2778-1284-dark.png"
+    media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2556-1179-dark.png"
+    media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2532-1170-dark.png"
+    media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2436-1125-dark.png"
+    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2688-1242-dark.png"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1792-828-dark.png"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-2208-1242-dark.png"
+    media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1334-750-dark.png"
+    media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+  <link rel="apple-touch-startup-image" href="/apple-splash-1136-640-dark.png"
+    media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape) and (prefers-color-scheme: dark)" />
+
+  <!-- Android/Chrome -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="G-Note AI" />
+
+  <!-- Microsoft -->
+  <meta name="msapplication-TileColor" content="#0a0a0a" />
+  <meta name="msapplication-TileImage" content="/pwa-192x192.png" />
+  <meta name="msapplication-tap-highlight" content="no" />
+  <meta name="msapplication-config" content="/browserconfig.xml" />
+
+  <!-- Disable phone number detection -->
+  <meta name="format-detection" content="telephone=no" />
+  <meta name="format-detection" content="date=no" />
+  <meta name="format-detection" content="address=no" />
+  <meta name="format-detection" content="email=no" />
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://www.googleapis.com" />
+  <link rel="preconnect" href="https://lh3.googleusercontent.com" />
+
+  <!-- DNS Prefetch -->
+  <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@graph": [
         {
           "@type": "WebApplication",
-          "@id": "https://gnote.graphosai.com/#webapp",
-          "name": "G-Note",
-          "description": "G-Note is a free, beautiful note-taking app that syncs with Google Drive. Create notes, collaborate in real-time, use AI assistance, and access your notes anywhere.",
-          "url": "https://gnote.graphosai.com",
+          "@id": "https://gnoteai.com/#webapp",
+          "name": "G-Note AI",
+          "description": "G-Note AI is a free, beautiful note-taking app that syncs with Google Drive. Create notes, collaborate in real-time, use AI assistance, and access your notes anywhere.",
+          "url": "https://gnoteai.com",
           "applicationCategory": "ProductivityApplication",
           "operatingSystem": "Any",
           "browserRequirements": "Requires JavaScript",
@@ -220,7 +286,7 @@
             "Version History",
             "Note Sharing"
           ],
-          "screenshot": "https://gnote.graphosai.com/og-image.png",
+          "screenshot": "https://gnoteai.com/og-image.png",
           "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "4.8",
@@ -231,53 +297,53 @@
         },
         {
           "@type": "Organization",
-          "@id": "https://gnote.graphosai.com/#organization",
-          "name": "G-Note",
-          "url": "https://gnote.graphosai.com",
+          "@id": "https://gnoteai.com/#organization",
+          "name": "G-Note AI",
+          "url": "https://gnoteai.com",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://gnote.graphosai.com/pwa-512x512.png",
+            "url": "https://gnoteai.com/pwa-512x512.png",
             "width": 512,
             "height": 512
           }
         },
         {
           "@type": "WebSite",
-          "@id": "https://gnote.graphosai.com/#website",
-          "url": "https://gnote.graphosai.com",
-          "name": "G-Note",
+          "@id": "https://gnoteai.com/#website",
+          "url": "https://gnoteai.com",
+          "name": "G-Note AI",
           "description": "Free note-taking app with Google Drive sync",
           "publisher": {
-            "@id": "https://gnote.graphosai.com/#organization"
+            "@id": "https://gnoteai.com/#organization"
           },
           "inLanguage": ["en", "vi", "ja", "ko", "zh-Hans", "zh-Hant", "de", "fr", "es", "pt-BR", "it", "nl", "ar", "hi", "tr", "pl", "th", "id"],
           "potentialAction": {
             "@type": "SearchAction",
             "target": {
               "@type": "EntryPoint",
-              "urlTemplate": "https://gnote.graphosai.com/?search={search_term_string}"
+              "urlTemplate": "https://gnoteai.com/?search={search_term_string}"
             },
             "query-input": "required name=search_term_string"
           }
         },
         {
           "@type": "FAQPage",
-          "@id": "https://gnote.graphosai.com/#faq",
+          "@id": "https://gnoteai.com/#faq",
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "Is G-Note free to use?",
+              "name": "Is G-Note AI free to use?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, G-Note is completely free to use with all core features including Google Drive sync, offline support, and rich text editing."
+                "text": "Yes, G-Note AI is completely free to use with all core features including Google Drive sync, offline support, and rich text editing."
               }
             },
             {
               "@type": "Question",
-              "name": "Does G-Note work offline?",
+              "name": "Does G-Note AI work offline?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, G-Note is a Progressive Web App (PWA) that works fully offline. Your notes are saved locally and sync automatically when you're back online."
+                "text": "Yes, G-Note AI is a Progressive Web App (PWA) that works fully offline. Your notes are saved locally and sync automatically when you're back online."
               }
             },
             {
@@ -285,15 +351,15 @@
               "name": "How does Google Drive sync work?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "G-Note securely syncs your notes to your Google Drive account. Your notes are stored in a dedicated folder and can be accessed from any device."
+                "text": "G-Note AI securely syncs your notes to your Google Drive account. Your notes are stored in a dedicated folder and can be accessed from any device."
               }
             },
             {
               "@type": "Question",
-              "name": "What languages does G-Note support?",
+              "name": "What languages does G-Note AI support?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "G-Note supports 18 languages including English, Vietnamese, Japanese, Korean, Chinese (Simplified & Traditional), German, French, Spanish, Portuguese, Italian, Dutch, Arabic, Hindi, Turkish, Polish, Thai, and Indonesian."
+                "text": "G-Note AI supports 18 languages including English, Vietnamese, Japanese, Korean, Chinese (Simplified & Traditional), German, French, Spanish, Portuguese, Italian, Dutch, Arabic, Hindi, Turkish, Polish, Thai, and Indonesian."
               }
             },
             {
@@ -301,14 +367,14 @@
               "name": "Can I collaborate with others on notes?",
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Yes, G-Note supports real-time collaboration. You can share notes via public links or start live collaboration sessions where multiple users can edit simultaneously."
+                "text": "Yes, G-Note AI supports real-time collaboration. You can share notes via public links or start live collaboration sessions where multiple users can edit simultaneously."
               }
             }
           ]
         },
         {
           "@type": "SoftwareApplication",
-          "name": "G-Note",
+          "name": "G-Note AI",
           "operatingSystem": "Web, iOS, Android, Windows, macOS, Linux",
           "applicationCategory": "ProductivityApplication",
           "offers": {
@@ -316,147 +382,171 @@
             "price": "0",
             "priceCurrency": "USD"
           },
-          "downloadUrl": "https://gnote.graphosai.com",
-          "installUrl": "https://gnote.graphosai.com"
+          "downloadUrl": "https://gnoteai.com",
+          "installUrl": "https://gnoteai.com"
         }
       ]
     }
     </script>
-    
-    <title>G-Note - Free Note Taking App | Sync with Google Drive</title>
-    
-    <!-- Inline critical CSS for splash screen -->
-    <style>
-      /* Splash screen styles - shown before React loads */
-      /* Works on ALL platforms: iOS, Android, Windows, macOS, Linux */
+
+  <title>G-Note - Free Note Taking App | Sync with Google Drive</title>
+
+  <!-- Inline critical CSS for splash screen -->
+  <style>
+    /* Splash screen styles - shown before React loads */
+    /* Works on ALL platforms: iOS, Android, Windows, macOS, Linux */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #fafafa;
+      transition: opacity 0.3s ease-out;
+      /* No padding needed - content is centered, background extends to edges */
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
       #splash-screen {
-        position: fixed;
-        inset: 0;
-        z-index: 99999;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-color: #fafafa;
-        transition: opacity 0.3s ease-out;
-        /* No padding needed - content is centered, background extends to edges */
-      }
-      
-      /* Dark mode support */
-      @media (prefers-color-scheme: dark) {
-        #splash-screen {
-          background-color: #0a0a0a;
-        }
-        .splash-title {
-          color: #ffffff !important;
-        }
-        .splash-dot {
-          background-color: #737373 !important;
-        }
-      }
-      
-      /* Override for user-selected theme */
-      .dark #splash-screen {
         background-color: #0a0a0a;
       }
-      .dark .splash-title {
+
+      .splash-title {
         color: #ffffff !important;
       }
-      .dark .splash-dot {
+
+      .splash-dot {
         background-color: #737373 !important;
       }
-      
-      #splash-screen.hidden {
-        opacity: 0;
-        pointer-events: none;
+    }
+
+    /* Override for user-selected theme */
+    .dark #splash-screen {
+      background-color: #0a0a0a;
+    }
+
+    .dark .splash-title {
+      color: #ffffff !important;
+    }
+
+    .dark .splash-dot {
+      background-color: #737373 !important;
+    }
+
+    #splash-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .splash-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #a3a3a3;
+      animation: loadingPulse 1.4s infinite ease-in-out both;
+    }
+
+    .splash-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .splash-dot:nth-child(2) {
+      animation-delay: 0.16s;
+    }
+
+    .splash-dot:nth-child(3) {
+      animation-delay: 0.32s;
+    }
+
+    @keyframes loadingPulse {
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0.6);
+        opacity: 0.4;
       }
-      
-      .splash-dots {
-        display: flex;
-        gap: 6px;
+
+      40% {
+        transform: scale(1);
+        opacity: 1;
       }
-      
-      .splash-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: #a3a3a3;
-        animation: loadingPulse 1.4s infinite ease-in-out both;
-      }
-      
-      .splash-dot:nth-child(1) { animation-delay: 0s; }
-      .splash-dot:nth-child(2) { animation-delay: 0.16s; }
-      .splash-dot:nth-child(3) { animation-delay: 0.32s; }
-      
-      @keyframes loadingPulse {
-        0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-        40% { transform: scale(1); opacity: 1; }
-      }
-    </style>
-    
-    <script>
-      // Prevent flash of wrong theme & set splash screen theme
-      // Works on ALL platforms: iOS, Android, Windows, macOS, Linux
-      (function() {
-        try {
-          var isDark = false;
-          var stored = localStorage.getItem('theme-storage');
-          
-          if (stored) {
-            var parsed = JSON.parse(stored);
-            var theme = parsed.state && parsed.state.theme || 'system';
-            isDark = theme === 'dark' || 
-              (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-          } else {
-            isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          }
-          
-          if (isDark) {
-            document.documentElement.classList.add('dark');
-            // Set html background for immediate effect (body not yet available)
-            document.documentElement.style.backgroundColor = '#0a0a0a';
-          } else {
-            document.documentElement.style.backgroundColor = '#fafafa';
-          }
-          
-          // Update theme-color meta tag for Android status bar
-          var themeColor = isDark ? '#0a0a0a' : '#fafafa';
-          var metaTheme = document.querySelector('meta[name="theme-color"]');
-          if (metaTheme) {
-            metaTheme.setAttribute('content', themeColor);
-          }
-        } catch (e) {
-          // Fallback to system preference
-          var sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (sysDark) {
-            document.documentElement.classList.add('dark');
-            document.documentElement.style.backgroundColor = '#0a0a0a';
-          } else {
-            document.documentElement.style.backgroundColor = '#fafafa';
-          }
-          // Update theme-color for fallback
-          var metaFallback = document.querySelector('meta[name="theme-color"]');
-          if (metaFallback) {
-            metaFallback.setAttribute('content', sysDark ? '#0a0a0a' : '#fafafa');
-          }
+    }
+  </style>
+
+  <script>
+    // Prevent flash of wrong theme & set splash screen theme
+    // Works on ALL platforms: iOS, Android, Windows, macOS, Linux
+    (function () {
+      try {
+        var isDark = false;
+        var stored = localStorage.getItem('theme-storage');
+
+        if (stored) {
+          var parsed = JSON.parse(stored);
+          var theme = parsed.state && parsed.state.theme || 'system';
+          isDark = theme === 'dark' ||
+            (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        } else {
+          isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
-      })();
-    </script>
-  </head>
-  <body style="margin: 0; padding: 0; min-height: 100vh; min-height: 100dvh;">
-    <!-- Universal splash screen - works on ALL platforms -->
-    <!-- iOS PWA: Uses apple-touch-startup-image (defined in head) with icon -->
-    <!-- Android PWA: Uses manifest.json icons + background_color -->
-    <!-- Web browsers: Uses this HTML splash screen with dots only -->
-    <div id="splash-screen" role="progressbar" aria-label="Loading G-Note">
-      <div class="splash-dots" aria-hidden="true">
-        <div class="splash-dot"></div>
-        <div class="splash-dot"></div>
-        <div class="splash-dot"></div>
-      </div>
+
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+          // Set html background for immediate effect (body not yet available)
+          document.documentElement.style.backgroundColor = '#0a0a0a';
+        } else {
+          document.documentElement.style.backgroundColor = '#fafafa';
+        }
+
+        // Update theme-color meta tag for Android status bar
+        var themeColor = isDark ? '#0a0a0a' : '#fafafa';
+        var metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) {
+          metaTheme.setAttribute('content', themeColor);
+        }
+      } catch (e) {
+        // Fallback to system preference
+        var sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (sysDark) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.style.backgroundColor = '#0a0a0a';
+        } else {
+          document.documentElement.style.backgroundColor = '#fafafa';
+        }
+        // Update theme-color for fallback
+        var metaFallback = document.querySelector('meta[name="theme-color"]');
+        if (metaFallback) {
+          metaFallback.setAttribute('content', sysDark ? '#0a0a0a' : '#fafafa');
+        }
+      }
+    })();
+  </script>
+</head>
+
+<body style="margin: 0; padding: 0; min-height: 100vh; min-height: 100dvh;">
+  <!-- Universal splash screen - works on ALL platforms -->
+  <!-- iOS PWA: Uses apple-touch-startup-image (defined in head) with icon -->
+  <!-- Android PWA: Uses manifest.json icons + background_color -->
+  <!-- Web browsers: Uses this HTML splash screen with dots only -->
+  <div id="splash-screen" role="progressbar" aria-label="Loading G-Note AI">
+    <div class="splash-dots" aria-hidden="true">
+      <div class="splash-dot"></div>
+      <div class="splash-dot"></div>
+      <div class="splash-dot"></div>
     </div>
-    
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  </div>
+
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

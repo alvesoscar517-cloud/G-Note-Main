@@ -1,13 +1,13 @@
-# G-Note - Modern Note-Taking App with Google Drive Sync
+# G-Note AI - Modern Note-Taking App with Google Drive Sync
 
-[![Version](https://img.shields.io/badge/version-1.1.7-blue.svg)](https://github.com/alvesoscar517-cloud/G-Note-Main)
+[![Version](https://img.shields.io/badge/version-1.1.7-blue.svg)](https://github.com/alvesoscar517-cloud/G-Note AI-Main)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-19.2.0-61dafb.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178c6.svg)](https://www.typescriptlang.org/)
 
 > A free, modern, offline-first note-taking application with Google Drive synchronization, real-time collaboration, and AI-powered features. Available as both a Progressive Web App (PWA) and Chrome Extension.
 
-**Live Demo**: [https://gnote.graphosai.com](https://gnote.graphosai.com)
+**Live Demo**: [https://gnoteai.com](https://gnoteai.com)
 
 ---
 
@@ -29,7 +29,7 @@
 
 ## 🎯 Overview
 
-G-Note is a comprehensive note-taking solution designed to work seamlessly across platforms with a focus on privacy, offline capability, and modern user experience. The project demonstrates advanced full-stack development skills including:
+G-Note AI is a comprehensive note-taking solution designed to work seamlessly across platforms with a focus on privacy, offline capability, and modern user experience. The project demonstrates advanced full-stack development skills including:
 
 - **Offline-First Architecture**: Full functionality without internet connection
 - **Real-Time Collaboration**: WebRTC-based peer-to-peer editing using CRDT
@@ -122,7 +122,7 @@ Users need a reliable, free note-taking app that:
 
 ### 🔌 Chrome Extension Features
 - Side Panel mode or Fullscreen tab
-- Context menu "Add to G-Note"
+- Context menu "Add to G-Note AI"
 - Capture selected text with HTML formatting
 - Chrome Identity API authentication
 - Background service worker
@@ -333,8 +333,8 @@ g-note/
 #### 1. Clone the repository
 
 ```bash
-git clone https://github.com/alvesoscar517-cloud/G-Note-Main.git
-cd G-Note-Main
+git clone https://github.com/alvesoscar517-cloud/G-Note AI-Main.git
+cd G-Note AI-Main
 ```
 
 #### 2. Install dependencies
@@ -590,8 +590,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Oscar Alves**
 
 - GitHub: [@alvesoscar517-cloud](https://github.com/alvesoscar517-cloud)
-- Project Link: [https://github.com/alvesoscar517-cloud/G-Note-Main](https://github.com/alvesoscar517-cloud/G-Note-Main)
-- Live Demo: [https://gnote.graphosai.com](https://gnote.graphosai.com)
+- Project Link: [https://github.com/alvesoscar517-cloud/G-Note AI-Main](https://github.com/alvesoscar517-cloud/G-Note AI-Main)
+- Live Demo: [https://gnoteai.com](https://gnoteai.com)
 
 ---
 

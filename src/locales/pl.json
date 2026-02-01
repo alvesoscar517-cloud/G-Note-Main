@@ -51,7 +51,10 @@
     "modalSizeFullscreen": "Pełny ekran",
     "offlineLogoutTitle": "Wylogować się offline?",
     "offlineLogoutWarning": "Jesteś obecnie offline. Niezapisane zmiany mogły nie zostać zsynchronizowane z Google Drive. Jeśli teraz się wylogujesz, możesz stracić te zmiany.",
-    "logoutAnyway": "Wyloguj mimo to"
+    "logoutAnyway": "Wyloguj mimo to",
+    "launchMode": "Tryb uruchamiania",
+    "launchSidePanel": "(Uruchom ponownie, aby zastosować)",
+    "launchFullscreen": "(Uruchom ponownie, aby zastosować)"
   },
   "credits": {
     "title": "Kup kredyty AI",
@@ -88,7 +91,7 @@
     "updated": "Zaktualizowano:"
   },
   "emptyState": {
-    "welcome": "Witaj w G-Note!",
+    "welcome": "Witaj w G-Note AI!",
     "getStarted": "Kliknij przycisk + w prawym górnym rogu, aby utworzyć pierwszą notatkę",
     "noResults": "Nie znaleziono wyników",
     "noResultsFor": "Brak notatek pasujących do \"{{query}}\"",
@@ -239,7 +242,7 @@
     "start": "Rozpocznij sesję",
     "stopSharing": "Zakończ sesję",
     "email": "E-mail",
-    "emailDescription": "Udostępnij bezpośrednio innemu użytkownikowi G-Note:",
+    "emailDescription": "Udostępnij bezpośrednio innemu użytkownikowi G-Note AI:",
     "emailPlaceholder": "E-mail odbiorcy...",
     "shareSuccess": "Udostępniono pomyślnie!",
     "shareButton": "Udostępnij",
@@ -252,7 +255,7 @@
     "error": "Nie można udostępnić",
     "sessionExpired": "Sesja wygasła. Zaloguj się ponownie.",
     "fileTooLarge": "Notatka jest za duża do udostępnienia (maks. 1 MB). Spróbuj usunąć obrazy.",
-    "userNotFound": "Użytkownik nie znaleziony. Potrzebują konta G-Note, aby otrzymywać udostępnione notatki.",
+    "userNotFound": "Użytkownik nie znaleziony. Potrzebują konta G-Note AI, aby otrzymywać udostępnione notatki.",
     "emailSent": "Notatka udostępniona! Wysłano powiadomienie e-mail."
   },
   "versionHistory": {
@@ -263,7 +266,7 @@
     "close": "Zamknij"
   },
   "install": {
-    "title": "Zainstaluj G-Note",
+    "title": "Zainstaluj G-Note AI",
     "description": "Dodaj do ekranu głównego dla szybkiego dostępu",
     "install": "Zainstaluj",
     "later": "Później",
@@ -277,7 +280,7 @@
     "recommended": "Zalecane",
     "installNow": "Zainstaluj teraz",
     "alreadyInstalled": "Już zainstalowano!",
-    "alreadyInstalledDescription": "Używasz wersji aplikacji G-Note.",
+    "alreadyInstalledDescription": "Używasz wersji aplikacji G-Note AI.",
     "androidChromeInstructions": "Stuknij ikonę menu (⋮) u góry, następnie wybierz \"Zainstaluj aplikację\" lub \"Dodaj do ekranu głównego\"",
     "desktopChromeInstructions": "Kliknij ikonę instalacji (⬇) w pasku adresu lub przejdź do Menu → Zainstaluj aplikację",
     "iosSafariInstructions": "Stuknij przycisk Udostępnij poniżej, następnie \"Dodaj do ekranu początkowego\"",
@@ -487,5 +490,9 @@
     "appError": "Aplikacja uległa awarii",
     "appErrorDescription": "Coś poszło nie tak i aplikacja musi zostać przeładowana. Przepraszamy za niedogodności."
   },
-  "webContent": {}
+  "webContent": {
+    "title": "Nowa notatka internetowa",
+    "description": "Treść z {{source}}",
+    "createNote": "Utwórz notatkę"
+  }
 }

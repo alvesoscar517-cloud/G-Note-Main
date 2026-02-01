@@ -11,6 +11,13 @@ import { useNotesStore } from '@/stores/notesStore'
 import { useAppStore } from '@/stores/appStore'
 import { useAuthStore } from '@/stores/authStore'
 import { getValidAccessToken, TokenExpiredError } from '@/lib/tokenManager'
+import { isChromeExtension } from '@/lib/platform/detection'
+
+const WEB_APP_URL = 'https://gnoteai.com'
+
+function getShareOrigin() {
+  return isChromeExtension() ? WEB_APP_URL : window.location.origin
+}
 
 interface ShareDialogProps {
   open: boolean
@@ -55,7 +62,7 @@ export function ShareDialog({
   // Check if note already has a public link when dialog opens
   useEffect(() => {
     if (open && note?.publicFileId) {
-      const link = `${window.location.origin}?view=${note.publicFileId}`
+      const link = `${getShareOrigin()}?view=${note.publicFileId}`
       setPublicLink(link)
     }
   }, [open, note?.publicFileId])
@@ -117,7 +124,7 @@ export function ShareDialog({
       driveShare.setAccessToken(accessToken)
       // Pass existing publicFileId to update instead of creating new
       const fileId = await driveShare.sharePublic(note, note.publicFileId)
-      const link = `${window.location.origin}?view=${fileId}`
+      const link = `${getShareOrigin()}?view=${fileId}`
       setPublicLink(link)
       setShareSuccess(true)
 
@@ -417,8 +424,8 @@ function TabButton({ children, active, onClick }: {
     <button
       onClick={onClick}
       className={`flex-1 flex items-center justify-center gap-1 py-1.5 px-1 rounded-[8px] text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${active
-          ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-sm'
-          : 'text-neutral-500 dark:text-neutral-400'
+        ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-sm'
+        : 'text-neutral-500 dark:text-neutral-400'
         }`}
     >
       {children}

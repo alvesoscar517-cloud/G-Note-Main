@@ -1,81 +1,62 @@
-import { useGoogleLogin } from '@react-oauth/google'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import { VantaWaves } from '@/components/ui/VantaWaves'
-import { hasAuthBackend, getGoogleAuthUrl } from '@/lib/tokenRefresh'
 import { useAppStore } from '@/stores/appStore'
 import { WifiOff } from 'lucide-react'
+import { isChromeExtension } from '@/lib/platform/detection'
+import { platformLogin } from '@/lib/platform/auth'
 import { DownloadAppPill } from '@/components/layout/DownloadAppPill'
 
-export function LoginScreen() {
+interface LoginScreenProps {
+  LinkComponent?: React.ElementType<{ to: string, className?: string, children: React.ReactNode }>
+}
+
+export function LoginScreen({ LinkComponent }: LoginScreenProps) {
   const { t } = useTranslation()
   const { setUser, setLoading, setLoginTransition } = useAuthStore()
   const { isOnline } = useAppStore()
+  const isExtension = isChromeExtension()
 
-  // Implicit flow (fallback when no backend)
-  const implicitLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setLoading(true)
-      setLoginTransition(true)
-      try {
-        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
-        }).then((res) => res.json())
+  // Platform-aware login handler
+  const handleLogin = async () => {
+    setLoginTransition(true)
+    setLoading(true)
 
-        setUser({
-          id: userInfo.sub,
-          email: userInfo.email,
-          name: userInfo.name,
-          avatar: userInfo.picture,
-          accessToken: tokenResponse.access_token,
-          tokenExpiry: Date.now() + ((tokenResponse.expires_in || 3600) * 1000)
-        })
-        
+    try {
+      const result = await platformLogin()
+
+      if (result.success && result.user) {
+        setUser(result.user)
         // Keep overlay visible briefly for smooth transition
         setTimeout(() => setLoginTransition(false), 500)
-      } catch (error) {
-        console.error('Login failed:', error)
+      } else if (result.error) {
+        console.error('Login failed:', result.error)
         setLoginTransition(false)
-      } finally {
-        setLoading(false)
       }
-    },
-    onError: (error) => {
-      console.error('Login error:', error)
+    } catch (error) {
+      console.error('Login failed:', error)
       setLoginTransition(false)
-    },
-    scope: 'email profile https://www.googleapis.com/auth/drive.file',
-    flow: 'implicit'
-  })
-
-  // Handle login - use auth code flow if backend available, otherwise implicit
-  const handleLogin = () => {
-    setLoginTransition(true)
-    if (hasAuthBackend()) {
-      // Redirect to Google OAuth (authorization code flow)
-      window.location.href = getGoogleAuthUrl()
-    } else {
-      // Use implicit flow (popup)
-      implicitLogin()
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <div 
+    <div
       className="min-h-screen min-h-dvh flex flex-col items-center justify-center relative overflow-hidden p-4 safe-top safe-bottom"
     >
       {/* Vanta Clouds Background */}
       <VantaWaves />
+
       {/* Card Container - Apple-style glassmorphism */}
       <div className="relative z-10 w-full max-w-sm bg-white/40 dark:bg-black/40 backdrop-blur-xl rounded-[24px] p-8 shadow-2xl border border-white/50 dark:border-white/10">
         <div className="space-y-5 text-center">
           {/* Logo - App icon: white background with black logo, iOS standard corners */}
           <div className="flex flex-col items-center gap-3">
             <div className="w-20 h-20 rounded-[18px] bg-white shadow-lg flex items-center justify-center p-[13px]">
-              <img 
+              <img
                 src="/g-note.svg"
-                alt="G-Note" 
+                alt="G-Note"
                 className="w-full h-full"
               />
             </div>
@@ -95,7 +76,7 @@ export function LoginScreen() {
             </div>
           )}
 
-          {/* Google Login Button */}
+          {/* Google Login Button - Same UI for both platforms */}
           <button
             onClick={handleLogin}
             disabled={!isOnline}
@@ -111,23 +92,74 @@ export function LoginScreen() {
             {t('auth.loginWithGoogle')}
           </button>
 
-          <p className="text-xs text-neutral-600 dark:text-white/60 !mt-3">
-            {t('auth.agreeToTerms.prefix')}{' '}
-            <Link to="/terms" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline">
-              {t('auth.agreeToTerms.terms')}
-            </Link>{' '}
-            {t('auth.agreeToTerms.and')}{' '}
-            <Link to="/privacy" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline">
-              {t('auth.agreeToTerms.privacy')}
-            </Link>
-          </p>
+          {/* Terms and Privacy Links - Conditional rendering */}
+          <TermsAndPrivacyLinks LinkComponent={LinkComponent} isExtension={isExtension} />
         </div>
       </div>
 
-      {/* Download App Pill - Footer */}
-      <div className="relative z-10 mt-6">
-        <DownloadAppPill />
-      </div>
+      {/* Download App Pill - Web only */}
+      {!isExtension && (
+        <div className="relative z-10 mt-6">
+          <DownloadAppPill />
+        </div>
+      )}
     </div>
+  )
+}
+
+// Conditional component for terms/privacy links
+function TermsAndPrivacyLinks({ LinkComponent, isExtension }: { LinkComponent?: any, isExtension: boolean }) {
+  const { t } = useTranslation()
+  const linkClass = "text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
+
+  // Extension or no LinkComponent provided: Plain text or external links
+  if (isExtension || !LinkComponent) {
+    if (isExtension) {
+      // For extension, use <a> tags with target blank for external pages
+      // Assuming pages are hosted on main domain which is likely gnoteai.com 
+      // But better to just link what we have.
+      // Or if users can't navigate, just text is handled by previous implementation.
+      // I'll stick to a simple external link if possible or just text if that's what user had.
+      // User had just text. 
+      // But let's upgrade to use external links if possible, 
+      // or just keep it simple.
+      // I'll use simple <span> as in original code, but cleaner.
+      // Original code used <span> without links.
+      return (
+        <p className="text-xs text-neutral-600 dark:text-white/60 !mt-3">
+          {t('auth.agreeToTerms.prefix')}{' '}
+          <span className="text-blue-600 dark:text-blue-400">
+            {t('auth.agreeToTerms.terms')}
+          </span>{' '}
+          {t('auth.agreeToTerms.and')}{' '}
+          <span className="text-blue-600 dark:text-blue-400">
+            {t('auth.agreeToTerms.privacy')}
+          </span>
+        </p>
+      )
+    }
+
+    // Fallback?
+    return null
+  }
+
+  // Web with LinkComponent: Router links
+  return (
+    <p className="text-xs text-neutral-600 dark:text-white/60 !mt-3">
+      {t('auth.agreeToTerms.prefix')}{' '}
+      <LinkComponent
+        to="/terms"
+        className={linkClass}
+      >
+        {t('auth.agreeToTerms.terms')}
+      </LinkComponent>{' '}
+      {t('auth.agreeToTerms.and')}{' '}
+      <LinkComponent
+        to="/privacy"
+        className={linkClass}
+      >
+        {t('auth.agreeToTerms.privacy')}
+      </LinkComponent>
+    </p>
   )
 }

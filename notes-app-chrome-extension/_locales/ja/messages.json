@@ -1,10 +1,14 @@
 {
   "extName": {
-    "message": "G-Note: シンプル＆モダンなメモアプリ",
+    "message": "G-Note AI",
     "description": "Chrome ウェブストア検索最適化のための拡張機能名"
   },
   "extDescription": {
     "message": "シンプル＆モダンなメモアプリ。Google Driveと同期。",
     "description": "拡張機能の説明"
+  },
+  "addToGNote": {
+    "message": "G-Note AIに追加",
+    "description": "Context menu item"
   }
 }

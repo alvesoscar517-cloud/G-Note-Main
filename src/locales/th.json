@@ -51,7 +51,10 @@
     "modalSizeFullscreen": "เต็มหน้าจอ",
     "offlineLogoutTitle": "ออกจากระบบขณะออฟไลน์?",
     "offlineLogoutWarning": "คุณออฟไลน์อยู่ การเปลี่ยนแปลงที่ยังไม่ได้บันทึกอาจยังไม่ได้ซิงค์กับ Google Drive หากคุณออกจากระบบตอนนี้ คุณอาจสูญเสียการเปลี่ยนแปลงเหล่านั้น",
-    "logoutAnyway": "ออกจากระบบต่อไป"
+    "logoutAnyway": "ออกจากระบบต่อไป",
+    "launchMode": "โหมดการเปิด",
+    "launchSidePanel": "(รีสตาร์ทเพื่อใช้งาน)",
+    "launchFullscreen": "(รีสตาร์ทเพื่อใช้งาน)"
   },
   "credits": {
     "title": "ซื้อเครดิต AI",
@@ -88,7 +91,7 @@
     "updated": "อัปเดต:"
   },
   "emptyState": {
-    "welcome": "ยินดีต้อนรับสู่ G-Note!",
+    "welcome": "ยินดีต้อนรับสู่ G-Note AI!",
     "getStarted": "คลิกปุ่ม + ที่มุมบนขวาเพื่อสร้างโน้ตแรกของคุณ",
     "noResults": "ไม่พบผลลัพธ์",
     "noResultsFor": "ไม่มีโน้ตที่ตรงกับ \"{{query}}\"",
@@ -239,7 +242,7 @@
     "start": "เริ่มเซสชัน",
     "stopSharing": "สิ้นสุดเซสชัน",
     "email": "อีเมล",
-    "emailDescription": "แชร์โดยตรงกับผู้ใช้ G-Note คนอื่น:",
+    "emailDescription": "แชร์โดยตรงกับผู้ใช้ G-Note AI คนอื่น:",
     "emailPlaceholder": "อีเมลผู้รับ...",
     "shareSuccess": "แชร์สำเร็จ!",
     "shareButton": "แชร์",
@@ -252,7 +255,7 @@
     "error": "ไม่สามารถแชร์ได้",
     "sessionExpired": "เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง",
     "fileTooLarge": "โน้ตใหญ่เกินไปที่จะแชร์ (สูงสุด 1 MB) ลองลบรูปภาพออก",
-    "userNotFound": "ไม่พบผู้ใช้ พวกเขาต้องมีบัญชี G-Note เพื่อรับโน้ตที่แชร์",
+    "userNotFound": "ไม่พบผู้ใช้ พวกเขาต้องมีบัญชี G-Note AI เพื่อรับโน้ตที่แชร์",
     "emailSent": "แชร์โน้ตแล้ว! ส่งการแจ้งเตือนทางอีเมลแล้ว"
   },
   "versionHistory": {
@@ -263,7 +266,7 @@
     "close": "ปิด"
   },
   "install": {
-    "title": "ติดตั้ง G-Note",
+    "title": "ติดตั้ง G-Note AI",
     "description": "เพิ่มไปยังหน้าจอหลักเพื่อเข้าถึงได้เร็ว",
     "install": "ติดตั้ง",
     "later": "ภายหลัง",
@@ -277,7 +280,7 @@
     "recommended": "แนะนำ",
     "installNow": "ติดตั้งเลย",
     "alreadyInstalled": "ติดตั้งแล้ว!",
-    "alreadyInstalledDescription": "คุณกำลังใช้เวอร์ชันแอปของ G-Note",
+    "alreadyInstalledDescription": "คุณกำลังใช้เวอร์ชันแอปของ G-Note AI",
     "androidChromeInstructions": "แตะไอคอนเมนู (⋮) ด้านบน จากนั้นเลือก \"ติดตั้งแอป\" หรือ \"เพิ่มไปยังหน้าจอหลัก\"",
     "desktopChromeInstructions": "คลิกไอคอนติดตั้ง (⬇) ในแถบที่อยู่ หรือไปที่ เมนู → ติดตั้งแอป",
     "iosSafariInstructions": "แตะปุ่มแชร์ด้านล่าง จากนั้นเลือก \"เพิ่มไปยังหน้าจอหลัก\"",
@@ -487,5 +490,9 @@
     "appError": "แอปขัดข้อง",
     "appErrorDescription": "เกิดข้อผิดพลาดและแอปต้องโหลดใหม่ ขออภัยในความไม่สะดวก"
   },
-  "webContent": {}
+  "webContent": {
+    "title": "โน้ตเว็บใหม่",
+    "description": "เนื้อหาจาก {{source}}",
+    "createNote": "สร้างโน้ต"
+  }
 }

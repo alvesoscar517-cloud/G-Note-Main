@@ -84,8 +84,8 @@ export function TermsOfService() {
                       <button
                         onClick={() => scrollToSection(section.id)}
                         className={`block w-full text-left pl-4 py-1.5 text-[13px] transition-colors -ml-px border-l ${activeSection === section.id
-                            ? 'border-neutral-900 dark:border-neutral-100 text-neutral-900 dark:text-neutral-100'
-                            : 'border-transparent text-neutral-500 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
+                          ? 'border-neutral-900 dark:border-neutral-100 text-neutral-900 dark:text-neutral-100'
+                          : 'border-transparent text-neutral-500 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'
                           }`}
                       >
                         {section.label}
@@ -107,14 +107,14 @@ export function TermsOfService() {
                 <section id="acceptance" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">1. Acceptance of Terms</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px]">
-                    By accessing or using G-Note ("the Service"), available at gnote.graphosai.com and as a Chrome extension, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
+                    By accessing or using G-Note AI ("the Service"), available at gnoteai.com and as a Chrome extension, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
                   </p>
                 </section>
 
                 <section id="description" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">2. Description of Service</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px] mb-4">
-                    G-Note is a note-taking application that provides the following features:
+                    G-Note AI is a note-taking application that provides the following features:
                   </p>
                   <ul className="list-disc pl-5 text-neutral-600 dark:text-neutral-400 space-y-2 text-[15px]">
                     <li>Rich text note creation and editing with formatting options</li>
@@ -133,11 +133,11 @@ export function TermsOfService() {
                 <section id="account" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">3. Account Requirements</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px] mb-4">
-                    To use G-Note, you must:
+                    To use G-Note AI, you must:
                   </p>
                   <ul className="list-disc pl-5 text-neutral-600 dark:text-neutral-400 space-y-2 text-[15px]">
                     <li>Have a valid Google account</li>
-                    <li>Grant G-Note permission to access your Google Drive for note storage</li>
+                    <li>Grant G-Note AI permission to access your Google Drive for note storage</li>
                     <li>Be at least 13 years of age</li>
                     <li>Provide accurate and complete information</li>
                   </ul>
@@ -149,7 +149,7 @@ export function TermsOfService() {
                 <section id="user-content" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">4. User Content</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px] mb-4">
-                    You retain all ownership rights to the content you create using G-Note. By using the Service, you grant us a limited license to process your content solely for the purpose of providing the Service features, including:
+                    You retain all ownership rights to the content you create using G-Note AI. By using the Service, you grant us a limited license to process your content solely for the purpose of providing the Service features, including:
                   </p>
                   <ul className="list-disc pl-5 text-neutral-600 dark:text-neutral-400 space-y-2 text-[15px]">
                     <li>Storing and synchronizing notes with Google Drive</li>
@@ -161,7 +161,7 @@ export function TermsOfService() {
                 <section id="acceptable-use" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">5. Acceptable Use</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px] mb-4">
-                    You agree not to use G-Note to:
+                    You agree not to use G-Note AI to:
                   </p>
                   <ul className="list-disc pl-5 text-neutral-600 dark:text-neutral-400 space-y-2 text-[15px]">
                     <li>Store or share illegal, harmful, or offensive content</li>
@@ -217,7 +217,7 @@ export function TermsOfService() {
                 <section id="intellectual-property" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">10. Intellectual Property</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px]">
-                    G-Note, including its design, features, and code, is owned by Graphoas AI. You may not copy, modify, distribute, or reverse engineer any part of the Service without our written permission. The G-Note name and logo are our trademarks.
+                    G-Note AI, including its design, features, and code, is owned by G-Note AI Team. You may not copy, modify, distribute, or reverse engineer any part of the Service without our written permission. The G-Note AI name and logo are our trademarks.
                   </p>
                 </section>
 
@@ -238,7 +238,7 @@ export function TermsOfService() {
                 <section id="termination" className="mb-12 scroll-mt-24">
                   <h2 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4">13. Termination</h2>
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px]">
-                    We reserve the right to suspend or terminate your access to the Service at any time for violation of these terms or for any other reason. You may stop using the Service at any time by logging out and revoking G-Note's access to your Google account.
+                    We reserve the right to suspend or terminate your access to the Service at any time for violation of these terms or for any other reason. You may stop using the Service at any time by logging out and revoking G-Note AI's access to your Google account.
                   </p>
                 </section>
 
@@ -261,7 +261,7 @@ export function TermsOfService() {
                   <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed text-[15px]">
                     If you have any questions about these Terms of Service, please contact us at:{' '}
                     <a href="mailto:Support@graphoasai.com" className="text-neutral-900 dark:text-neutral-100 underline underline-offset-2">
-                      Support@graphosai.com
+                      Support@gnoteai.com
                     </a>
                   </p>
                 </section>

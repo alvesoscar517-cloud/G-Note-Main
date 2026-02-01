@@ -48,7 +48,10 @@
     "modalSizeDefault": "Predefinita",
     "modalSizeLarge": "Grande",
     "modalSizeXLarge": "Molto grande",
-    "modalSizeFullscreen": "Schermo intero"
+    "modalSizeFullscreen": "Schermo intero",
+    "launchMode": "Modalità di avvio",
+    "launchSidePanel": "(Riavvia per applicare)",
+    "launchFullscreen": "(Riavvia per applicare)"
   },
   "credits": {
     "title": "Acquista crediti AI",
@@ -85,7 +88,7 @@
     "updated": "Aggiornato:"
   },
   "emptyState": {
-    "welcome": "Benvenuto in G-Note!",
+    "welcome": "Benvenuto in G-Note AI!",
     "getStarted": "Clicca sul pulsante + nell'angolo in alto per creare la tua prima nota",
     "noResults": "Nessun risultato trovato",
     "noResultsFor": "Nessuna nota corrisponde a \"{{query}}\"",
@@ -236,7 +239,7 @@
     "start": "Avvia sessione",
     "stopSharing": "Termina sessione",
     "email": "Email",
-    "emailDescription": "Condividi direttamente con un altro utente G-Note:",
+    "emailDescription": "Condividi direttamente con un altro utente G-Note AI:",
     "emailPlaceholder": "Email destinatario...",
     "shareSuccess": "Condiviso con successo!",
     "shareButton": "Condividi",
@@ -249,7 +252,7 @@
     "error": "Impossibile condividere",
     "sessionExpired": "Sessione scaduta. Effettua nuovamente l'accesso.",
     "fileTooLarge": "La nota è troppo grande per essere condivisa (max 1 MB). Prova a rimuovere le immagini.",
-    "userNotFound": "Utente non trovato. Hanno bisogno di un account G-Note per ricevere note condivise.",
+    "userNotFound": "Utente non trovato. Hanno bisogno di un account G-Note AI per ricevere note condivise.",
     "emailSent": "Nota condivisa! È stata inviata una notifica via email."
   },
   "versionHistory": {
@@ -260,7 +263,7 @@
     "close": "Chiudi"
   },
   "install": {
-    "title": "Installa G-Note",
+    "title": "Installa G-Note AI",
     "description": "Aggiungi alla schermata home per accesso rapido",
     "install": "Installa",
     "later": "Più tardi",
@@ -274,7 +277,7 @@
     "recommended": "Consigliato",
     "installNow": "Installa ora",
     "alreadyInstalled": "Già installato!",
-    "alreadyInstalledDescription": "Stai usando la versione app di G-Note.",
+    "alreadyInstalledDescription": "Stai usando la versione app di G-Note AI.",
     "androidChromeInstructions": "Tocca l'icona menu (⋮) in alto, poi seleziona \"Installa app\" o \"Aggiungi a schermata Home\"",
     "desktopChromeInstructions": "Clicca l'icona di installazione (⬇) nella barra degli indirizzi, o vai su Menu → Installa app",
     "iosSafariInstructions": "Tocca il pulsante Condividi sotto, poi \"Aggiungi a Home\"",
@@ -483,5 +486,9 @@
     "appError": "L'app si è bloccata",
     "appErrorDescription": "Qualcosa è andato storto e l'app deve essere ricaricata. Ci scusiamo per l'inconveniente."
   },
-  "webContent": {}
+  "webContent": {
+    "title": "Nuova nota web",
+    "description": "Contenuto da {{source}}",
+    "createNote": "Crea nota"
+  }
 }
